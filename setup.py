@@ -7,6 +7,7 @@ setup(
     packages = ['green'],
     version = VERSION,
     description = '!!! This module is still Pre-Alpha !!!  A plugin for nose that provides the colored, aligned, clean output that nose ought to have by default.',
+    long_description = open('README.md').read(),
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',
     license = 'MIT',
