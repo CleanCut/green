@@ -9,7 +9,7 @@ setup(
     author_email = 'nathan.stocks@gmail.com',
     license = 'MIT',
     url = 'https://github.com/CleanCut/green',
-    download_url = '',
+    download_url = 'https://github.com/CleanCut/green/tarball/0.1',
     keywords = ['nose', 'nosetest', 'nosetests', 'plugin', 'green', 'test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
         'Development Status :: 2 - Pre-Alpha',
