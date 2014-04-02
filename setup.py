@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = 'green',
     packages = ['green'],
-    version = '0.1',
+    version = '0.2',
     description = 'A plugin for nose that provides the colored, aligned, clean output that nose ought to have by default.',
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',
