@@ -1,11 +1,11 @@
 from distutils.core import setup
 
-VERSION='0.3'
+from green import version
 
 setup(
     name = 'green',
     packages = ['green'],
-    version = VERSION,
+    version = version,
     entry_points = {
         'nose.plugins.' : [
             'green = green:Green',
@@ -17,7 +17,7 @@ setup(
     author_email = 'nathan.stocks@gmail.com',
     license = 'MIT',
     url = 'https://github.com/CleanCut/green',
-    download_url = 'https://github.com/CleanCut/green/tarball/' + VERSION,
+    download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nosetest', 'nosetests', 'plugin', 'green', 'test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
         'Development Status :: 2 - Pre-Alpha',
