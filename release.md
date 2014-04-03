@@ -16,7 +16,9 @@ Steps to Release
 3. Test stuff (fix it and go back to #2 if tests fail).
 
     nosetests
-    python setup.py sdist upload -r pypi-test
+    nosetests-3.4
+    python3 setup.py sdist upload -r pypi-test
+    git commit -am "Added the updated MANIFEST file."
 
 3. Tag and push the new version:
 
@@ -25,5 +27,5 @@ Steps to Release
 
 4. Release stuff:
 
-    python setup.py sdist upload -r pypi
+    python3 setup.py sdist upload -r pypi
 
