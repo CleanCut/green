@@ -8,7 +8,7 @@ setup(
     packages = ['green'],
     version = version,
     entry_points = {
-        'nose.plugins.' : [
+        'nose.plugins.0.10' : [
             'green = green:Green',
             ]
         },
