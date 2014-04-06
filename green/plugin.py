@@ -12,17 +12,6 @@ log = logging.getLogger('nose.plugins.green')
 
 
 
-class DevNull:
-    """
-    I am a dummy stream that ignores write calls.
-    """
-    def write(self, *arg):
-        pass
-    def writeln(self, *arg):
-        pass
-
-
-
 class Green(Plugin):
     """
     I am the actual 'Green' nose plugin that does all the awesome output
@@ -55,7 +44,7 @@ class Green(Plugin):
         # Save the real stream object to use for our output
         self.stream = stream
         # Discard Nose's lousy default output
-        return DevNull()
+        return open(os.devnull, 'w')
 
 
     def options(self, parser, env=os.environ):
@@ -72,7 +61,10 @@ class Green(Plugin):
         selected.  This can't be done in init, because I can't start changing
         things if I wasn't actually selected to be used.
         """
+        # The superclass handles the enabling part for us
         super(Green, self).configure(options, conf)
-        termstyle.auto()
-        print(termstyle.green("GREEN!"))
+        # Now, if we're enabled then we can get stuff ready.
+        if self.enabled:
+            termstyle.auto()
+            print(termstyle.green("GREEN!"))
 
