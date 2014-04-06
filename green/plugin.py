@@ -51,8 +51,9 @@ class Green(Plugin):
         """
         I tell nosetests what options to add to its own "--help" command.
         """
+        # The superclass sets self.enabled to True if it sees the --with-green
+        # flag or the NOSE_WITH_GREEN environment variable set to non-blank.
         super(Green, self).options(parser, env)
-        self.enabled = bool(env.get('NOSE_WITH_GREEN', False))
 
 
     def configure(self, options, conf):
