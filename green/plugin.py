@@ -63,16 +63,7 @@ class Green(Plugin):
         I tell nosetests what options to add to its own "--help" command.
         """
         super(Green, self).options(parser, env)
-        self.enabled = bool(env.get('NOSE_GREEN', False))
-
-        parser.add_option(
-                "--with-green",
-                action="store_true",
-                default=self.enabled,
-                dest="green")
-#help=("Enable the green plugin, and get the output you've been "
-#                     "waiting for.  You can also set NOSE_GREEN=1 in your "
-#                     "environment."))
+        self.enabled = bool(env.get('NOSE_WITH_GREEN', False))
 
 
     def configure(self, options, conf):
@@ -83,4 +74,5 @@ class Green(Plugin):
         """
         super(Green, self).configure(options, conf)
         termstyle.auto()
+        print(termstyle.green("GREEN!"))
 
