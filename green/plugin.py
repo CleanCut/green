@@ -8,25 +8,30 @@ import os
 from nose.plugins import Plugin
 import termstyle
 
+from green.version import version
+
 log = logging.getLogger('nose.plugins.green')
 
 
 
-class Green(Plugin):
+class DevNull:
+    """
+    I am a dummy stream that ignores write calls.
+    """
+    def write(self, *arg):
+        pass
+    def writeln(self, *arg):
+        pass
+
+
+
+class Green(nose.plugins.Plugin):
     """
     I am the actual 'Green' nose plugin that does all the awesome output
     formatting.
     """
-
-
-    def __init__(self):
-        """
-        I call Plugin's __init__() and set some internal variables.
-        """
-        super(Green, self).__init__()
-        self.name    = 'green'
-        self.enabled = False
-        self.score   = 199
+    name    = 'green'
+    score   = 199
 
 
     def help(self):
@@ -44,7 +49,7 @@ class Green(Plugin):
         # Save the real stream object to use for our output
         self.stream = stream
         # Discard Nose's lousy default output
-        return open(os.devnull, 'w')
+        return DevNull()
 
 
     def options(self, parser, env=os.environ):
