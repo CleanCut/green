@@ -1,5 +1,6 @@
 from green.plugin import Green
-version = '0.4.6'
+from green.version import version
 
 # So pyflakes will stop complaining about disuse...
 Green
+version
