@@ -4,8 +4,9 @@ I am the green.plugin module that contains the actual Green plugin class.
 
 import logging
 import os
+import sys
 
-from nose.plugins import Plugin
+import nose
 import termstyle
 
 from green.version import version
@@ -36,7 +37,7 @@ class Green(nose.plugins.Plugin):
 
     def help(self):
         """
-        I provide the help string for...?
+        I provide the help string for the --with-green option for nosetests.
         """
         return ("Provide colored, aligned, clean output.  The kind of output "
             "that nose ought to have by default.")
@@ -48,6 +49,14 @@ class Green(nose.plugins.Plugin):
         """
         # Save the real stream object to use for our output
         self.stream = stream
+        # Go ahead and start our output
+        python_version = ".".join([str(x) for x in sys.version_info[0:3]])
+        self.stream.writeln(
+            termstyle.bold(
+            termstyle.white(
+            "Green v" + version + ", " +
+            "Nose " + nose.__version__ + ", " +
+            "Python " + python_version)))
         # Discard Nose's lousy default output
         return DevNull()
 
@@ -72,5 +81,23 @@ class Green(nose.plugins.Plugin):
         # Now, if we're enabled then we can get stuff ready.
         if self.enabled:
             termstyle.auto()
-            print(termstyle.green("GREEN!"))
+
+
+    def startContext(self, ctx):
+        """
+        I am called just after we load a new module or class with tests that
+        need to be run.
+        """
+        self.stream.writeln(ctx.__name__)
+
+
+    def _test_str(self, test):
+        return (test.shortDescription() or str(test).split()[0])
+
+
+    def startTest(self, test):
+        """
+        I am called before each test is run.
+        """
+        self.stream.writeln(self._test_str(test))
 
