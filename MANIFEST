@@ -3,5 +3,5 @@ README.md
 setup.cfg
 setup.py
 green/__init__.py
-green/htmlplug.py
 green/plugin.py
+green/version.py
