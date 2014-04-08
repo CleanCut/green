@@ -20,7 +20,7 @@ setup(
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nosetest', 'nosetests', 'plugin', 'green', 'test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Plugins',
         'Intended Audience :: Developers',
