@@ -5,7 +5,21 @@ import unittest
 #except:
 #    from mock import MagicMock
 
-from green.plugin import Green
+from green.plugin import DevNull, Green
+
+
+
+class TestDevNull(unittest.TestCase):
+
+
+    def test_write(self):
+        d = DevNull()
+        d.write("YOU SHOULD NOT SEE THIS #1")
+
+
+    def test_writeln(self):
+        d = DevNull()
+        d.writeln("YOU SHOULD NOT SEE THIS #2")
 
 
 
