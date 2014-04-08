@@ -48,7 +48,7 @@ class TestPlugin(PluginTester, unittest.TestCase):
 
 
     def test_modulePrintout(self):
-        self.assertIn('test_plugin', self.output)
+        self.assertIn('someTest', self.output)
 
 
 
