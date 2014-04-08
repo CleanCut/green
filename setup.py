@@ -6,6 +6,10 @@ setup(
     name = 'green',
     packages = ['green'],
     version = version,
+    install_requires = [
+        'nose',
+        'python-termstyle'
+        ],
     entry_points = {
         'nose.plugins.0.10' : [
             'green = green:Green',

@@ -1,2 +1,1 @@
-nose>=1.2.0
-python-termstyle>=0.1.10
+-e .
