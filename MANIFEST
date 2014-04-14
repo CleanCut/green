@@ -3,5 +3,6 @@ README.md
 setup.cfg
 setup.py
 green/__init__.py
+green/examples.py
 green/plugin.py
 green/version.py
