@@ -5,6 +5,7 @@ I am the green.plugin module that contains the actual Green plugin class.
 import logging
 import os
 import sys
+import traceback
 
 import nose
 import termstyle
@@ -42,6 +43,18 @@ class Green(nose.plugins.Plugin):
         self.unit_testing = False
         self.current_module = ''
         self.termstyle_enabled = False
+        self.module_style = lambda x: x
+        self.class_indent = 3
+        self.class_style = lambda x: x
+        self.test_indent = 6
+        self.stats = {
+            'PASS'  : 0,
+            'FAIL'  : 0,
+            'ERROR' : 0,
+            'SKIP'  : 0,
+        }
+
+
 
 
     def help(self):
@@ -63,10 +76,9 @@ class Green(nose.plugins.Plugin):
         python_version = ".".join([str(x) for x in sys.version_info[0:3]])
         self.stream.writeln(
             termstyle.bold(
-            termstyle.white(
-            "Green v" + version + ", " +
+            "Green " + version + ", " +
             "Nose " + nose.__version__ + ", " +
-            "Python " + python_version)) +
+            "Python " + python_version) +
             "\n")
         # Discard Nose's lousy default output
         return DevNull()
@@ -95,9 +107,84 @@ class Green(nose.plugins.Plugin):
             termstyle.auto() # Works because nose hasn't touched sys.stdout yet
             self.termstyle_enabled = bool(termstyle.bold(""))
 
+    @property
+    def terminal_width(self):
+        rows, columns = os.popen('stty size').read().strip().split()
+        return int(columns)
 
-    def handleError(self, test, error):
-        self.stream.writeln("\nERROR in" + str(test) + "\n" + str(error) + "\n")
+
+    def addError(self, test, error):
+        # TODO Check for SKIP condition.
+        #traceback.print_exception(*error, file=self.stream)
+        self.__processResult("ERROR")
+
+
+    def addFailure(self, test, error):
+        self.__processResult("FAIL")
+
+
+    def addSuccess(self, test):
+        self.__processResult("PASS")
+
+
+    def __processResult(self, result):
+        """
+        result should be 'PASS', 'FAIL', 'ERROR', or 'SKIP'
+        """
+        self.__check_termstyle()
+
+        # Current color
+        color_func = {
+            'PASS'  : termstyle.green,
+            'FAIL'  : termstyle.red,
+            'ERROR' : termstyle.red,
+            'SKIP'  : termstyle.blue,
+        }[result]
+
+        # How to get the cursor back to the start of this test output
+        cursor_reposition = '\r'
+
+        # Color the output
+        print_result = result[0]
+        if self.termstyle_enabled:
+            if (result == 'PASS'):
+                print_result = ""
+            else:
+                print_result = result[0]
+        self.stream.writeln(
+                cursor_reposition +
+                color_func(print_result) + (' ' * (self.test_indent - len(print_result))) +
+                color_func(self.current_line))
+
+        # Statistics
+        self.stats[result] += 1
+
+
+    def report(self, stream):
+        # Did we pass or fail?
+        if (self.stats['FAIL'] + self.stats['ERROR']) > 0:
+            verdict = termstyle.red('FAILED')
+        else:
+            verdict = termstyle.green('PASSED')
+
+        stats_list = []
+        if self.stats['PASS']:
+            stats_list.append('pass=' + termstyle.green(str(self.stats['PASS'])))
+        if self.stats['FAIL']:
+            stats_list.append('fail=' + termstyle.red(str(self.stats['FAIL'])))
+        if self.stats['ERROR']:
+            stats_list.append('error=' + termstyle.red(str(self.stats['ERROR'])))
+        if self.stats['SKIP']:
+            stats_list.append('skips=' + termstyle.blue(str(self.stats['PASS'])))
+
+        if sum(self.stats.values()) == 0:
+            stats_chunk = "(no tests)"
+        else:
+            stats_chunk = "(" + ", ".join(stats_list) + ")"
+
+        stats_line = ('\n' + verdict + ' ' + stats_chunk)
+
+        self.stream.writeln(stats_line)
 
 
     def startContext(self, ctx):
@@ -106,6 +193,7 @@ class Green(nose.plugins.Plugin):
         need to be run.
         """
         # Watch for when our context changes to a different class
+        self.current_line = ""
         if type(ctx) == type:
             # If this class is in a different module, output the new module first
             if ctx.__module__ != self.current_module:
@@ -121,22 +209,25 @@ class Green(nose.plugins.Plugin):
         """
         if not self.unit_testing:
             self.unit_testing = True
-        self.stream.writeln(self.__format_test(test))
+        self.stream.write(self.__format_test(test))
+        self.stream.flush()
 
 
     def __format_module(self, module):
         self.__check_termstyle()
-        return termstyle.bold(module)
+        return self.module_style(module)
 
 
     def __format_class(self, class_name):
         self.__check_termstyle()
-        return termstyle.bold("  " + class_name)
+        return self.class_style(' ' * self.class_indent + class_name)
 
 
     def __format_test(self, test):
         self.__check_termstyle()
-        return "    " + (test.shortDescription() or str(test).split()[0])
+        test_name = (test.shortDescription() or str(test).split()[0])
+        self.current_line = test_name
+        return (' ' * self.test_indent + self.current_line)
 
 
     def __check_termstyle(self):
