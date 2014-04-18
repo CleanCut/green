@@ -35,7 +35,7 @@ class Green(nose.plugins.Plugin):
     formatting.
     """
     name    = 'green'
-    score   = 199
+    score   = 1001
 
 
     def __init__(self):
@@ -115,8 +115,11 @@ class Green(nose.plugins.Plugin):
 
 
     def addError(self, test, error):
-        # TODO Check for SKIP condition.
-        #traceback.print_exception(*error, file=self.stream)
+        # This is _supposed_ to work.  It doesn't.  addError does not get
+        # called on skips for Nose.  Neither does addSkip.  How annoying.
+        if error[0].__name__ == 'SkipTest':
+            self.stream.writeln(termstyle.blue("!!!!!!!!!"))
+            return
         self.__storeError(test, error, 'ERROR')
         self.__outputResult("ERROR")
 
