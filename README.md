@@ -1,10 +1,10 @@
 Green, for clean unit test output
 =================================
 
-A thin-wrapper for the `nose` project that provides the colored, aligned, clean
+A plugin for the `nose2` project that provides the colored, aligned, clean
 output that you deserve.  To use green, just run `green` (or `green2` or
 `green3`, or `green-X.X` where `X.X` is your python version).  Alternatively,
-you can run `nosetests --with-green`
+you can run `nose2 --green`
 
 Installation
 ============

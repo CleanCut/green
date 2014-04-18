@@ -1,8 +1,5 @@
-import nose
-import os
-import sys
-from green import Green
+import nose2
 
 def main():
-    os.environ['NOSE_WITH_GREEN'] = '1'
-    nose.main(addplugins=[Green()], argv=sys.argv)
+    nose2.discover(plugins=['green'])
+

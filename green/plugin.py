@@ -7,14 +7,14 @@ import os
 import sys
 import traceback
 
-import nose
+import nose2
 import termstyle
 
 from green.version import version
 
-log = logging.getLogger('nose.plugins.green')
+log = logging.getLogger('nose2.plugins.green')
 
-
+__unittest = True
 
 class DevNull:
     """
@@ -29,20 +29,17 @@ class DevNull:
 
 
 
-class Green(nose.plugins.Plugin):
+class Green(nose2.events.Plugin):
     """
-    I am the actual 'Green' nose plugin that does all the awesome output
-    formatting.
+    The test output you deserve.
     """
-    name    = 'green'
-    score   = 1001
+    alwaysOn = True
+    configSection    = 'green'
+    commandLineSwitch = ('G', 'green', 'The test output you deserve.')
 
 
     def __init__(self):
-        super(Green, self).__init__()
-        self.unit_testing = False
-        self.current_module = ''
-        self.termstyle_enabled = False
+        self.termstyle_enabled = self.config.as_bool('color', True)
         self.module_style = lambda x: x
         self.class_indent = 3
         self.class_style = lambda x: x
@@ -54,35 +51,20 @@ class Green(nose.plugins.Plugin):
             'SKIP'  : 0,
         }
         self.errors = []
+        self.stream = nose2.util._WritelnDecorator(sys.stderr)
 
 
-
-
-    def help(self):
-        """
-        I provide the help string for the --with-green option for nosetests.
-        """
-        return ("Provide colored, aligned, clean output.  The kind of output "
-            "that nose ought to have by default.")
-
-
-    def setOutputStream(self, stream):
-        """
-        I stop nosetests from outputting its own output.
-        """
+    def startTestRun(self, event):
         self.__check_termstyle()
-        # Save the real stream object to use for our output
-        self.stream = stream
         # Go ahead and start our output
         python_version = ".".join([str(x) for x in sys.version_info[0:3]])
         self.stream.writeln(
             termstyle.bold(
             "Green " + version + ", " +
-            "Nose " + nose.__version__ + ", " +
+            "Nose2, " +
             "Python " + python_version) +
             "\n")
-        # Discard Nose's lousy default output
-        return DevNull()
+        event.handled = True
 
 
     def options(self, parser, env=os.environ):
