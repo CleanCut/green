@@ -53,6 +53,7 @@ class Green(nose.plugins.Plugin):
             'ERROR' : 0,
             'SKIP'  : 0,
         }
+        self.errors = []
 
 
 
@@ -116,18 +117,24 @@ class Green(nose.plugins.Plugin):
     def addError(self, test, error):
         # TODO Check for SKIP condition.
         #traceback.print_exception(*error, file=self.stream)
-        self.__processResult("ERROR")
+        self.__storeError(test, error, 'ERROR')
+        self.__outputResult("ERROR")
 
 
     def addFailure(self, test, error):
-        self.__processResult("FAIL")
+        self.__storeError(test, error, 'FAIL')
+        self.__outputResult("FAIL")
 
 
     def addSuccess(self, test):
-        self.__processResult("PASS")
+        self.__outputResult("PASS")
 
 
-    def __processResult(self, result):
+    def __storeError(self, test, error, error_type):
+        self.errors.append((test, error, error_type))
+
+
+    def __outputResult(self, result):
         """
         result should be 'PASS', 'FAIL', 'ERROR', or 'SKIP'
         """
@@ -146,11 +153,6 @@ class Green(nose.plugins.Plugin):
 
         # Color the output
         print_result = result[0]
-        if self.termstyle_enabled:
-            if (result == 'PASS'):
-                print_result = ""
-            else:
-                print_result = result[0]
         self.stream.writeln(
                 cursor_reposition +
                 color_func(print_result) + (' ' * (self.test_indent - len(print_result))) +
@@ -161,6 +163,16 @@ class Green(nose.plugins.Plugin):
 
 
     def report(self, stream):
+        # Print out the errors
+        for i, (test, error, error_type) in enumerate(self.errors, start=1):
+            last_relevant_frames = [x for x in traceback.format_exception(*error) if 'unittest' not in x][-2:]
+            self.stream.write(
+                    "\n" + termstyle.red(error_type) +
+                    ' in ' + termstyle.bold(str(test).split()[0]) +
+                    ' from ' + str(test).split()[1].strip('()') + '\n' + 
+                    "".join(last_relevant_frames))
+
+
         # Did we pass or fail?
         if (self.stats['FAIL'] + self.stats['ERROR']) > 0:
             verdict = termstyle.red('FAILED')
@@ -177,10 +189,11 @@ class Green(nose.plugins.Plugin):
         if self.stats['SKIP']:
             stats_list.append('skips=' + termstyle.blue(str(self.stats['PASS'])))
 
-        if sum(self.stats.values()) == 0:
-            stats_chunk = "(no tests)"
-        else:
-            stats_chunk = "(" + ", ".join(stats_list) + ")"
+        if len(stats_list) > 1:
+            total_tests = sum(self.stats.values())
+            stats_list.append('total=' + termstyle.bold(str(total_tests)))
+
+        stats_chunk = "(" + ", ".join(sorted(stats_list)) + ")"
 
         stats_line = ('\n' + verdict + ' ' + stats_chunk)
 

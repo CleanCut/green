@@ -26,7 +26,7 @@ setup(
         ],
         'console_scripts' : scripts,
     },
-    description = '!!! This module is still Alpha !!!  A plugin for nose that provides the colored, aligned, clean output that nose ought to have by default.',
+    description = 'A thin-wrapper for the "nose" project that provides the colored, aligned, clean output that nose ought to have by default.  To use green, just run green (or green2 or green3, or green-X.X where X.X is your python version).  Alternatively, you can run "nosetests --with-green"',
     long_description = open('README.md').read(),
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',
@@ -35,7 +35,7 @@ setup(
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nosetest', 'nosetests', 'plugin', 'green', 'test', 'tests', 'trial', 'functional test', 'system test', 'unit test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Environment :: Plugins',
         'Intended Audience :: Developers',
