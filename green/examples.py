@@ -6,55 +6,57 @@ import unittest
 class TestNormalStates(unittest.TestCase):
 
 
-    def test_pass(self):
+    def test0Pass(self):
         return
 
 
-    def test_error(self):
-        raise Exception
-
-
-    def test_fail(self):
+    def test1Fail(self):
         self.assertTrue(False)
 
 
+    def test2Error(self):
+        raise Exception
+
+
     @unittest.skip("Skipping for fun.")
-    def test_skip(self):
+    def test3Skip(self):
         pass
+
+    @unittest.expectedFailure
+    def test4ExpectedFailure(self):
+        self.assertEqual(True, False)
+
+
+    @unittest.expectedFailure
+    def test5UnexpectedPass(self):
+        pass
+
 
 
 class TestOutputBeforeAndAfter(unittest.TestCase):
 
 
-    def test_pass0(self):
-        time.sleep(.1)
-
-
-    def test_pass0b(self):
-        time.sleep(.1)
-
-
-    def test_pass1(self):
+    def testTimed0(self):
         time.sleep(.2)
 
 
-    def test_pass2(self):
+    def testTimed1(self):
         time.sleep(.2)
 
 
-    def test_pass3(self):
-        time.sleep(.3)
+    def testTimed2(self):
+        time.sleep(.2)
 
 
-    def test_pass4(self):
-        time.sleep(.3)
+    def testTimed3(self):
+        time.sleep(.2)
 
 
-    def test_simpleError(self):
-        time.sleep(.4)
-        raise Exception
+    def testTimed4(self):
+        time.sleep(.2)
 
 
-    def test_simpleFail(self):
-        time.sleep(.4)
-        self.assertTrue(False)
+    def testTimed5(self):
+        time.sleep(.2)
+
+

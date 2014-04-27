@@ -7,7 +7,7 @@ import os
 import sys
 import traceback
 
-import nose2
+from nose2 import events, util
 import termstyle
 
 from green.version import version
@@ -16,167 +16,158 @@ log = logging.getLogger('nose2.plugins.green')
 
 __unittest = True
 
-class DevNull:
-    """
-    I am a dummy stream that ignores write calls.
-    """
-    def flush(self):
-        pass
-    def write(self, *arg):
-        pass
-    def writeln(self, *arg):
-        pass
 
 
-
-class Green(nose2.events.Plugin):
+class Green(events.Plugin):
     """
     The test output you deserve.
     """
-    alwaysOn = True
+    alwaysOn = False
     configSection    = 'green'
     commandLineSwitch = ('G', 'green', 'The test output you deserve.')
 
 
     def __init__(self):
         self.termstyle_enabled = self.config.as_bool('color', True)
-        self.module_style = lambda x: x
-        self.class_indent = 3
-        self.class_style = lambda x: x
-        self.test_indent = 6
-        self.stats = {
-            'PASS'  : 0,
-            'FAIL'  : 0,
-            'ERROR' : 0,
-            'SKIP'  : 0,
+        self.module_style      = lambda x: x
+        self.class_style       = lambda x: x
+        self.class_indent      = 3
+        self.test_indent       = 6
+        self.stream            = util._WritelnDecorator(sys.stderr)
+        self.num_passed        = 0
+        self.last_module       = ""
+        self.last_class        = ""
+        self.category_attributes = {
+            'passed'              : (self._green,  'P'),
+            'failed'              : (self._red,    'F'),
+            'failures'            : (self._red,    'F'),
+            'error'               : (self._red,    'E'),
+            'errors'              : (self._red,    'E'),
+            'skipped'             : (self._blue,   'S'),
+            'unexpectedSuccesses' : (self._yellow, 'U'),
+            'expectedFailures'    : (self._yellow, 'X'),
         }
-        self.errors = []
-        self.stream = nose2.util._WritelnDecorator(sys.stderr)
-
 
     def startTestRun(self, event):
-        self.__check_termstyle()
         # Go ahead and start our output
         python_version = ".".join([str(x) for x in sys.version_info[0:3]])
-        self.stream.writeln(
-            termstyle.bold(
-            "Green " + version + ", " +
-            "Nose2, " +
-            "Python " + python_version) +
-            "\n")
+        if self.session.verbosity > 2:
+            self.stream.writeln(
+                termstyle.bold(
+                "Green " + version + ", " +
+                "Nose2, " +
+                "Python " + python_version) +
+                "\n")
+
+
+    def reportStartTest(self, event):
+        """Handle startTest hook"""
+        # Output module if it changed
+        current_module = event.testEvent.test.__module__
+        if current_module != self.last_module:
+            event.stream.writeln(self.module_style(current_module))
+            self.last_module = current_module
+        # Output class if it changed
+        current_class = event.testEvent.test.__class__.__name__
+        if current_class != self.last_class:
+            event.stream.writeln(
+                    ' ' * self.class_indent + self.class_style(current_class))
+            self.last_class = current_class
+        # Output the current test
+        test_name = (event.testEvent.test.shortDescription()
+                or str(event.testEvent.test).split()[0])
+        self.current_line = (' ' * self.test_indent + test_name)
+        event.stream.write(self._bold(self.current_line))
         event.handled = True
 
-
-    def options(self, parser, env=os.environ):
-        """
-        I tell nosetests what options to add to its own "--help" command.
-        """
-        # The superclass sets self.enabled to True if it sees the --with-green
-        # flag or the NOSE_WITH_GREEN environment variable set to non-blank.
-        super(Green, self).options(parser, env)
-
-
-    def configure(self, options, conf):
-        """
-        I prep the environment once nosetests passes me which options were
-        selected.  This can't be done in init, because I can't start changing
-        things if I wasn't actually selected to be used.
-        """
-        self.__check_termstyle()
-        # The superclass handles the enabling part for us
-        super(Green, self).configure(options, conf)
-        # Now, if we're enabled then we can get stuff ready.
-        if self.enabled:
-            termstyle.auto() # Works because nose hasn't touched sys.stdout yet
-            self.termstyle_enabled = bool(termstyle.bold(""))
-
-    @property
-    def terminal_width(self):
-        rows, columns = os.popen('stty size').read().strip().split()
-        return int(columns)
-
-
-    def addError(self, test, error):
-        # This is _supposed_ to work.  It doesn't.  addError does not get
-        # called on skips for Nose.  Neither does addSkip.  How annoying.
-        if error[0].__name__ == 'SkipTest':
-            self.stream.writeln(termstyle.blue("!!!!!!!!!"))
-            return
-        self.__storeError(test, error, 'ERROR')
-        self.__outputResult("ERROR")
-
-
-    def addFailure(self, test, error):
-        self.__storeError(test, error, 'FAIL')
-        self.__outputResult("FAIL")
-
-
-    def addSuccess(self, test):
-        self.__outputResult("PASS")
-
-
-    def __storeError(self, test, error, error_type):
-        self.errors.append((test, error, error_type))
-
-
-    def __outputResult(self, result):
-        """
-        result should be 'PASS', 'FAIL', 'ERROR', or 'SKIP'
-        """
-        self.__check_termstyle()
-
-        # Current color
-        color_func = {
-            'PASS'  : termstyle.green,
-            'FAIL'  : termstyle.red,
-            'ERROR' : termstyle.red,
-            'SKIP'  : termstyle.blue,
-        }[result]
-
         # How to get the cursor back to the start of this test output
-        cursor_reposition = '\r'
-
-        # Color the output
-        print_result = result[0]
-        self.stream.writeln(
-                cursor_reposition +
-                color_func(print_result) + (' ' * (self.test_indent - len(print_result))) +
-                color_func(self.current_line))
-
-        # Statistics
-        self.stats[result] += 1
+        self.test_cursor_reposition = '\r'
 
 
-    def report(self, stream):
-        # Print out the errors
-        for i, (test, error, error_type) in enumerate(self.errors, start=1):
-            last_relevant_frames = [x for x in traceback.format_exception(*error) if 'unittest' not in x][-2:]
-            self.stream.write(
-                    "\n" + termstyle.red(error_type) +
-                    ' in ' + termstyle.bold(str(test).split()[0]) +
-                    ' from ' + str(test).split()[1].strip('()') + '\n' + 
-                    "".join(last_relevant_frames))
+    def reportSuccess(self, event):
+        self._reportOutcome(event)
+
+
+    def reportError(self, event):
+        self._reportOutcome(event)
+
+
+    def reportFailure(self, event):
+        self._reportOutcome(event)
+
+
+    def reportSkip(self, event):
+        self._reportOutcome(event)
+
+
+    def reportExpectedFailure(self, event):
+        self._reportOutcome(event)
+
+
+    def reportUnexpectedSuccess(self, event):
+        self._reportOutcome(event)
+
+
+    def reportOtherOutcome(self, event):
+        # TODO - I can't figure out how to cause this to get called!
+        pass
+
+
+    def stopTestRun(self, event):
+        self.final_time_taken = event.timeTaken
+
+
+    def beforeErrorList(self, event):
+        # Print out the tracebacks for failures and errors
+#        for i in rc['failures']:
+#            event.stream.writeln(str(i))
+        for test_outcome in event.reportCategories['failures']:
+            last_relevant_frames = [x for x in traceback.format_exception(*(test_outcome.exc_info)) if 'unittest' not in x][-2:]
+            event.stream.write(
+                    '\n' + termstyle.red(test_outcome.outcome.title()) +
+                    ' in ' + termstyle.bold(str(test_outcome.test).split()[0]) +
+                    ' from ' + str(test_outcome.test).split()[1].strip('()') +
+                    '\n' + ''.join(last_relevant_frames))
+
+        self._preventStreamOutput(event)
+
+
+    def _preventStreamOutput(self, event):
+        # For some reason, there are a few events where this is the only way to
+        # stop the built-in handling from writing its own output to the stream.
+        # (Well, technically it still writes it, it just doesn't make it
+        # through.)  The nicer events just let you set event.handled = True
+        event.stream = util._WritelnDecorator(open(os.devnull, 'w'))
+
+
+    def beforeSummaryReport(self, event):
+        # Alias, because we use this one a lot
+        rc = event.reportCategories
+
+        # How many, how long?
+        total_tests = sum([len(x) for x in rc.values()]) + self.num_passed
+        event.stream.writeln("Ran {} tests in {}".format(
+            self._bold(str(total_tests)),
+            self._bold(str(round(self.final_time_taken, 3))+'s')))
 
 
         # Did we pass or fail?
-        if (self.stats['FAIL'] + self.stats['ERROR']) > 0:
-            verdict = termstyle.red('FAILED')
+        if sum([len(x) for x in rc.values()]) > 0:
+            verdict = self._red('FAILED')
         else:
-            verdict = termstyle.green('PASSED')
+            verdict = self._green('PASSED')
 
         stats_list = []
-        if self.stats['PASS']:
-            stats_list.append('pass=' + termstyle.green(str(self.stats['PASS'])))
-        if self.stats['FAIL']:
-            stats_list.append('fail=' + termstyle.red(str(self.stats['FAIL'])))
-        if self.stats['ERROR']:
-            stats_list.append('error=' + termstyle.red(str(self.stats['ERROR'])))
-        if self.stats['SKIP']:
-            stats_list.append('skips=' + termstyle.blue(str(self.stats['PASS'])))
+        for category in rc:
+            color_func = self.category_attributes[category][0]
+            if rc[category]:
+                stats_list.append(
+                    category + '=' +
+                    color_func(str(len(rc[category]))))
+        # 'passed' is a special case - nose2 doesn't include it
+        color_func = self.category_attributes['passed'][0]
+        stats_list.append('passed=' + color_func(str(self.num_passed)))
 
-        if len(stats_list) > 1:
-            total_tests = sum(self.stats.values())
-            stats_list.append('total=' + termstyle.bold(str(total_tests)))
 
         stats_chunk = "(" + ", ".join(sorted(stats_list)) + ")"
 
@@ -184,55 +175,77 @@ class Green(nose2.events.Plugin):
 
         self.stream.writeln(stats_line)
 
+        self._preventStreamOutput(event)
 
-    def startContext(self, ctx):
+
+    def _reportOutcome(self, event):
         """
-        I am called just after we load a new module or class with tests that
-        need to be run.
+        Handle the outcome reporting.
+
         """
-        # Watch for when our context changes to a different class
-        self.current_line = ""
-        if type(ctx) == type:
-            # If this class is in a different module, output the new module first
-            if ctx.__module__ != self.current_module:
-                self.stream.writeln(self.__format_module(ctx.__module__))
-                self.current_module = ctx.__module__
-            # Now output the class itself
-            self.stream.writeln(self.__format_class(ctx.__name__))
+        # Prep for the four most common outcomes
+        color_func, character = self.category_attributes[event.testEvent.outcome]
+
+        # Prep for the "Expected Failure" outcome
+        if (event.testEvent.outcome == 'failed') and event.testEvent.expected:
+            color_func, character = (self._yellow, 'X')
+
+        # Pref for the "Unexpected Success" outcome
+        if (event.testEvent.outcome == 'passed') and not event.testEvent.expected:
+            color_func, character = (self._yellow, 'U')
+
+        # Count 'passed' (for some reason it's not included in the normal stats)
+        if (event.testEvent.outcome == 'passed') and event.testEvent.expected:
+            self.num_passed += 1
+
+        # Overwrite the test placeholder with the test outcome
+        event.stream.writeln(
+                self.test_cursor_reposition +
+                color_func(character) + (' ' * (self.test_indent - len(character))) +
+                color_func(self.current_line.lstrip()))
+
+        # Tell other plugins to omit output
+        event.handled = True
 
 
-    def startTest(self, test):
-        """
-        I am called before each test is run.
-        """
-        if not self.unit_testing:
-            self.unit_testing = True
-        self.stream.write(self.__format_test(test))
-        self.stream.flush()
 
 
-    def __format_module(self, module):
-        self.__check_termstyle()
-        return self.module_style(module)
+    def _bold(self, text):
+        self._restore_termstyle()
+        return termstyle.bold(text)
 
 
-    def __format_class(self, class_name):
-        self.__check_termstyle()
-        return self.class_style(' ' * self.class_indent + class_name)
+    def _red(self, text):
+        self._restore_termstyle()
+        return termstyle.red(text)
 
 
-    def __format_test(self, test):
-        self.__check_termstyle()
-        test_name = (test.shortDescription() or str(test).split()[0])
-        self.current_line = test_name
-        return (' ' * self.test_indent + self.current_line)
+    def _green(self, text):
+        self._restore_termstyle()
+        return termstyle.green(text)
 
 
-    def __check_termstyle(self):
+    def _blue(self, text):
+        self._restore_termstyle()
+        return termstyle.blue(text)
+
+
+    def _yellow(self, text):
+        self._restore_termstyle()
+        return termstyle.yellow(text)
+
+
+    def _restore_termstyle(self):
         # Anything that we test can potentially mess with our termstyle
         # setting. In fact, our own self-tests DO mess with it.  This function
-        # restores it.
+        # restores the termstyle setting.
         if self.termstyle_enabled:
             termstyle.enable()
         else:
             termstyle.disable()
+
+
+    @property
+    def terminal_width(self):
+        rows, columns = os.popen('stty size').read().strip().split()
+        return int(columns)

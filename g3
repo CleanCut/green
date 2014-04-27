@@ -1,5 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import nose2
+import sys
 
 if __name__ == '__main__':
+    sys.argv.append('-v')
+    sys.argv.append('--green')
     nose2.discover(plugins=['green'])
