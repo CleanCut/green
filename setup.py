@@ -1,16 +1,8 @@
 from distutils.core import setup
+import os
 import sys
 
-from green import version
-
-# Install a script as "green", and as "green[23]", and as
-# "green-3.4" (or whatever).
-scripts = [
-    'green = green:main',
-    'green%d = green:main' % sys.version_info[:1],
-    'green-%d.%d = green:main' % sys.version_info[:2],
-]
-
+version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read().strip()
 
 setup(
     name = 'green',
@@ -21,10 +13,11 @@ setup(
         'python-termstyle'
         ],
     entry_points = {
-        'nose.plugins.0.10' : [
-            'green = green:Green',
-        ],
-        'console_scripts' : scripts,
+        'console_scripts' : [
+            'green = green:main',
+            'green%d = green:main' % sys.version_info[:1],     # green2 or green3
+            'green-%d.%d = green:main' % sys.version_info[:2], # green-3.4 etc.
+            ],
     },
     description = 'A plugin for the "nose2" project that provides the colored, aligned, clean output that you deserve.  You can just run green (or green2 or green3, or green-X.X where X.X is your python version).  Alternatively, you can run "nose2 --green"',
     long_description = open('README.md').read(),

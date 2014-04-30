@@ -9,7 +9,7 @@ Very First Time
 Steps to Release
 ================
 
-1. Bump the version in green/version.py
+1. Bump the version in green/VERSION
 
 2. Make sure everything is committed.
 
