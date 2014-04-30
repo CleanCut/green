@@ -3,14 +3,14 @@ I am the green.plugin module that contains the actual Green plugin class.
 """
 
 import logging
+from nose2 import events, util
 import os
 import sys
 import traceback
-
-from nose2 import events, util
 import termstyle
 
-from green.version import version
+from green.version import __version__
+
 
 log = logging.getLogger('nose2.plugins.green')
 
@@ -55,7 +55,7 @@ class Green(events.Plugin):
         if self.session.verbosity > 2:
             self.stream.writeln(
                 termstyle.bold(
-                "Green " + version + ", " +
+                "Green " + __version__ + ", " +
                 "Nose2, " +
                 "Python " + python_version) +
                 "\n")
