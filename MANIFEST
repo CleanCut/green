@@ -2,6 +2,7 @@
 README.md
 setup.cfg
 setup.py
+green/VERSION
 green/__init__.py
 green/cmdline.py
 green/examples.py
