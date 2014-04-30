@@ -37,6 +37,7 @@ class Green(events.Plugin):
         self.num_passed        = 0
         self.last_module       = ""
         self.last_class        = ""
+        self.error_list        = []
         self.category_attributes = {
             'passed'              : (self._green,  'P'),
             'failed'              : (self._red,    'F'),
@@ -119,14 +120,12 @@ class Green(events.Plugin):
 
     def beforeErrorList(self, event):
         # Print out the tracebacks for failures and errors
-#        for i in rc['failures']:
-#            event.stream.writeln(str(i))
-        for test_outcome in event.reportCategories['failures']:
-            last_relevant_frames = [x for x in traceback.format_exception(*(test_outcome.exc_info)) if 'unittest' not in x][-2:]
+        for testEvent in self.error_list:
+            last_relevant_frames = [x for x in traceback.format_exception(*(testEvent.exc_info)) if 'unittest' not in x][-2:]
             event.stream.write(
-                    '\n' + termstyle.red(test_outcome.outcome.title()) +
-                    ' in ' + termstyle.bold(str(test_outcome.test).split()[0]) +
-                    ' from ' + str(test_outcome.test).split()[1].strip('()') +
+                    '\n' + termstyle.red(testEvent.outcome.title()) +
+                    ' in ' + termstyle.bold(str(testEvent.test).split()[0]) +
+                    ' from ' + str(testEvent.test).split()[1].strip('()') +
                     '\n' + ''.join(last_relevant_frames))
 
         self._preventStreamOutput(event)
@@ -197,6 +196,10 @@ class Green(events.Plugin):
         # Count 'passed' (for some reason it's not included in the normal stats)
         if (event.testEvent.outcome == 'passed') and event.testEvent.expected:
             self.num_passed += 1
+
+        # Capture the traceback stuff for printing the error list later
+        if event.testEvent.outcome in ['failed', 'error'] and not event.testEvent.expected:
+            self.error_list.append(event.testEvent)
 
         # Overwrite the test placeholder with the test outcome
         event.stream.writeln(
