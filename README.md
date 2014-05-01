@@ -1,7 +1,8 @@
 Green.  Clean test output for modern Python.
 =================================
 
-Green provides clean output for Python unit tests.
+Green provides clean output for Python unit tests.  Compare it to nose, nose2,
+or trial.
 
 Basic Usage
 ===========
