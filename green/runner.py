@@ -185,11 +185,6 @@ class GreenTestResult(TestResult):
             self.last_class = current_class
 
 
-    def addSuccess(self, test):
-        super(GreenTestResult, self).addSuccess(test)
-        self._reportOutcome(test, 'P', self.colors.passing)
-
-
     def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=''):
         if self.showAll:
             # Move the cursor back to the start of the line in terminal mode
@@ -210,6 +205,11 @@ class GreenTestResult(TestResult):
         elif self.dots:
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
+
+
+    def addSuccess(self, test):
+        super(GreenTestResult, self).addSuccess(test)
+        self._reportOutcome(test, '.', self.colors.passing)
 
 
     def addError(self, test, err):
