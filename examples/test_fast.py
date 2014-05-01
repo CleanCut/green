@@ -18,7 +18,7 @@ class TestNormalStates(unittest.TestCase):
         raise Exception
 
 
-    @unittest.skip("Skipping for fun.")
+    @unittest.skip("Testing skip functionality.")
     def test3Skip(self):
         pass
 
