@@ -1,10 +1,16 @@
-Green, for clean unit test output
+Green.  Clean test output for modern Python.
 =================================
 
-A plugin for the `nose2` project that provides the colored, aligned, clean
-output that you deserve.  To use green, just run `green` (or `green2` or
-`green3`, or `green-X.X` where `X.X` is your python version).  Alternatively,
-you can run `nose2 --green`
+Green provides clean output for Python unit tests.
+
+Basic Usage
+===========
+
+To use green with existing Python unit tests, just run `green` in the home
+directory of your project.  (or `green2` or `green3`, or `green-X.X` where
+`X.X` is your python version).
+
+For more advanced usage, see `green --help`
 
 Installation
 ============
