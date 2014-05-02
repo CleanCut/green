@@ -1,11 +1,3 @@
-Very First Time
-===============
-
-0. Set up `~/.pypirc`
-1. `python setup.py register -r pypi`
-2. `python setup.py sdist upload -r pypi`
-
-
 Steps to Release
 ================
 
@@ -13,17 +5,35 @@ Steps to Release
 
 2. Make sure everything is committed.
 
-3. Test stuff (fix it and go back to #2 if tests fail).
+3. Run `make release`, which will:
+    a. Run the unit tests
+    b. Distribute to PyPi-Test
+    c. Commit the MANIFEST file if it changed.
+    d. Tag and push the new version.
+    e. Distribute to PyPi
 
-    make test
-    git commit -am "Added the updated MANIFEST file."
 
-3. Tag and push the new version:
+Very First Time
+===============
 
-    git tag X.X.X -m "Tagging a release version"
-    git push --tags origin master
+1. Set up `~/.pypirc`
 
-4. Release stuff:
+    [distutils]
+    index-servers =
+        pypi
+        pypi-test
 
-    python3 setup.py sdist upload -r pypi
+    [pypi]
+    repository: https://pypi.python.org/pypi
+    username: (my username)
+    password: (my password)
+
+    [pypi-test]
+    repository: https://testpypi.python.org/pypi
+    username: (my username)
+    password: (my password)
+
+2. `python setup.py register -r pypi`
+3. `python setup.py sdist upload -r pypi`
+
 

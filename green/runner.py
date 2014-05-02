@@ -266,6 +266,13 @@ class GreenTestResult(TestResult):
                         continue
                     if "unittest" in frame.split(',')[0]:
                         continue
+                reindented_lines = []
+                for line in frame.split('\n'):
+                    frame_indent = 0
+                    while line[:2] == '  ':
+                        line = line[2:]
+                        frame_indent += 1
+
                 relevant_frames.append(frame)
             self.stream.write(''.join(relevant_frames))
 
