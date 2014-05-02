@@ -16,7 +16,6 @@ Steps to Release
 3. Test stuff (fix it and go back to #2 if tests fail).
 
     ./g2
-    ./g3
     python3 setup.py sdist upload -r pypi-test
     git commit -am "Added the updated MANIFEST file."
 
