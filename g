@@ -19,7 +19,6 @@ if __name__ == '__main__':
     # These options disable termcolor
     if args.html or args.notermcolor:
         args.termcolor = False
-        print(args.termcolor)
 
     # Set up our various main objects
     colors    = Colors(termcolor = args.termcolor, html = args.html)
