@@ -19,7 +19,7 @@ setup(
             'green-%d.%d = green:main' % sys.version_info[:2], # green-3.4 etc.
             ],
     },
-    description = '',
+    description = 'Green provides clean output for Python unit tests.  Compare it to nose, nose2, or trial.',
     long_description = open('README.md').read(),
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',
