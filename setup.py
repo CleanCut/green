@@ -7,7 +7,7 @@ version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read
 setup(
     name = 'green',
     packages = ['green'],
-    data_files = [('green', ['green/VERSION'])],
+    package_data = {'green' : ['VERSION']},
     version = version,
     install_requires = [
         'python-termstyle'
