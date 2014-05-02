@@ -1,9 +1,8 @@
-import time
 import unittest
 
 
 
-class TestNormalStates(unittest.TestCase):
+class TestStates(unittest.TestCase):
 
 
     def test0Pass(self):
@@ -30,33 +29,5 @@ class TestNormalStates(unittest.TestCase):
     @unittest.expectedFailure
     def test5UnexpectedPass(self):
         pass
-
-
-
-class TestOutputBeforeAndAfter(unittest.TestCase):
-
-
-    def testTimed0(self):
-        time.sleep(.2)
-
-
-    def testTimed1(self):
-        time.sleep(.2)
-
-
-    def testTimed2(self):
-        time.sleep(.2)
-
-
-    def testTimed3(self):
-        time.sleep(.2)
-
-
-    def testTimed4(self):
-        time.sleep(.2)
-
-
-    def testTimed5(self):
-        time.sleep(.2)
 
 
