@@ -5,6 +5,5 @@ setup.py
 green/VERSION
 green/__init__.py
 green/cmdline.py
-green/examples.py
-green/plugin.py
+green/runner.py
 green/version.py
