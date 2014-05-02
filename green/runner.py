@@ -1,6 +1,7 @@
 import sys
 import termstyle
 import time
+import traceback
 from unittest.result import TestResult
 from unittest.signals import registerResult
 import warnings
@@ -52,7 +53,7 @@ class Colors:
     def bold(self, text):
         self._restoreColor()
         if self.html:
-            return '<strong>{}</strong>'.format(text)
+            return '<span style="color: rgb(255,255,255);">{}</span>'.format(text)
         else:
             return termstyle.bold(text)
 
@@ -128,8 +129,6 @@ class GreenTestResult(TestResult):
 
     Used by GreenTestRunner.
     """
-    separator1 = '=' * 70
-    separator2 = '-' * 70
 
     def __init__(self, stream, descriptions, verbosity, colors=None, html=False):
         """stream, descriptions, and verbosity are as in
@@ -141,10 +140,13 @@ class GreenTestResult(TestResult):
         self.stream = stream
         self.showAll = verbosity > 1
         self.dots = verbosity == 1
+        self.verbosity = verbosity
         self.descriptions = descriptions
         self.colors = colors or Colors()
         self.last_module = ''
         self.last_class = ''
+        self.all_errors = []
+        self.passing = []
 
 
     def getDescription(self, test):
@@ -171,11 +173,13 @@ class GreenTestResult(TestResult):
                 self.stream.writeln(self.colors.className(
                     self.stream.formatText(current_class, indent=1)))
             # Test name or description
-            self.test_output_line = test.shortDescription() or str(test).split()[0]
+            self.test_output_line = self._testDescription(test)
             if not self.colors.html:
                 # In the terminal, we will write a placeholder, and then
                 # rewrite it in color after the test has run.
-                self.stream.write(self.stream.formatLine(self.test_output_line, indent=2))
+                self.stream.write(
+                    self.colors.bold(
+                        self.stream.formatLine(self.test_output_line, indent=2)))
             self.stream.flush()
 
         # Set state for next time
@@ -183,6 +187,10 @@ class GreenTestResult(TestResult):
             self.last_module = current_module
         if current_class != self.last_class:
             self.last_class = current_class
+
+
+    def _testDescription(self, test):
+        return test.shortDescription() or str(test).split()[0]
 
 
     def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=''):
@@ -209,16 +217,19 @@ class GreenTestResult(TestResult):
 
     def addSuccess(self, test):
         super(GreenTestResult, self).addSuccess(test)
+        self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
 
 
     def addError(self, test, err):
         super(GreenTestResult, self).addError(test, err)
+        self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
 
     def addFailure(self, test, err):
         super(GreenTestResult, self).addFailure(test, err)
+        self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
 
@@ -239,18 +250,24 @@ class GreenTestResult(TestResult):
 
 
     def printErrors(self):
-        if self.dots or self.showAll:
+        if not self.all_errors:
+            return
+        if self.dots:
             self.stream.writeln()
-        self.printErrorList('ERROR', self.errors)
-        self.printErrorList('FAIL', self.failures)
-
-
-    def printErrorList(self, flavour, errors):
-        for test, err in errors:
-            self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
-            self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+        for (test, color_func, outcome, err) in self.all_errors:
+            self.stream.writeln(
+                    '\n' + color_func(outcome) +
+                    ' in ' + self.colors.bold(str(test).split()[0]) +
+                    ' from ' + str(test).split()[1].strip('()'))
+            relevant_frames = []
+            for frame in traceback.format_exception(*err):
+                if self.verbosity < 3:
+                    if "Traceback (most recent call last)" in frame:
+                        continue
+                    if "unittest" in frame.split(',')[0]:
+                        continue
+                relevant_frames.append(frame)
+            self.stream.write(''.join(relevant_frames))
 
 
 
@@ -263,8 +280,8 @@ class GreenStream(object):
        indentation and line breaks to HTML5)
     """
 
-    pixels_per_space = 8
-    indent_spaces = 3
+    pixels_per_space = 10
+    indent_spaces = 2
     margin_template = '<span style="margin-left: {}px;">{}</span>'
 
     def __init__(self, stream, html=False):
@@ -283,6 +300,8 @@ class GreenStream(object):
 
 
     def write(self, text):
+        if self.html:
+            text = text.replace('\n', '<br>\n')
         self.stream.write(text)
 
 
@@ -297,11 +316,8 @@ class GreenStream(object):
             else:
                 updated_lines.append('')
             outcome_char = '' # only the first line gets an outcome character
-        # Join the list back together with the appropriate line separators
-        if self.html:
-            output = '<br>\n'.join(updated_lines)
-        else:
-            output = '\n'.join(updated_lines)
+        # Join the list back together
+        output = '\n'.join(updated_lines)
         return output
 
 
@@ -355,6 +371,9 @@ class GreenTestRunner(object):
     def run(self, test):
         "Run the given test case or test suite."
         # Really verbose information
+        if self.colors.html:
+            self.stream.write(
+                    '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
         python_version = ".".join([str(x) for x in sys.version_info[0:3]])
         if self.verbosity > 2:
             self.stream.writeln(
@@ -392,41 +411,36 @@ class GreenTestRunner(object):
             stopTime = time.time()
         timeTaken = stopTime - startTime
         result.printErrors()
-        if hasattr(result, 'separator2'):
-            self.stream.writeln(result.separator2)
         run = result.testsRun
-        self.stream.writeln("Ran %d test%s in %.3fs" %
-                            (run, run != 1 and "s" or "", timeTaken))
+        if run:
+            self.stream.writeln()
+        self.stream.writeln("Ran %s test%s in %ss" %
+            (self.colors.bold(str(run)),
+            run != 1 and "s" or "",
+            self.colors.bold("%.3f" % timeTaken)))
         self.stream.writeln()
 
-        expectedFails = unexpectedSuccesses = skipped = 0
-        try:
-            results = map(len, (result.expectedFailures,
-                                result.unexpectedSuccesses,
-                                result.skipped))
-        except AttributeError:
-            pass
+        results = [
+            (result.errors, 'errors', self.colors.error),
+            (result.expectedFailures, 'expected_failures',
+                self.colors.expectedFailure),
+            (result.failures, 'failures', self.colors.failing),
+            (result.passing, 'passes', self.colors.passing),
+            (result.skipped, 'skips', self.colors.skipped),
+            (result.unexpectedSuccesses, 'unexpected_successes',
+                self.colors.unexpectedSuccess),
+        ]
+        stats = []
+        for obj_list, name, color_func in results:
+            if obj_list:
+                stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
+        if not stats:
+            self.stream.writeln(self.colors.passing("No Tests Found"))
         else:
-            expectedFails, unexpectedSuccesses, skipped = results
-
-        infos = []
-        if not result.wasSuccessful():
-            self.stream.write("FAILED")
-            failed, errored = len(result.failures), len(result.errors)
-            if failed:
-                infos.append("failures=%d" % failed)
-            if errored:
-                infos.append("errors=%d" % errored)
-        else:
-            self.stream.write("OK")
-        if skipped:
-            infos.append("skipped=%d" % skipped)
-        if expectedFails:
-            infos.append("expected failures=%d" % expectedFails)
-        if unexpectedSuccesses:
-            infos.append("unexpected successes=%d" % unexpectedSuccesses)
-        if infos:
-            self.stream.writeln(" (%s)" % (", ".join(infos),))
-        else:
-            self.stream.write("\n")
+            grade = self.colors.passing('OK')
+            if result.errors or result.failures:
+                grade = self.colors.failing('FAILED')
+            self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
+        if self.colors.html:
+            self.stream.writeln('</div>')
         return result
