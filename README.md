@@ -1,13 +1,17 @@
-Green.  Clean test output for modern Python.
-=================================
+Green
+=====
 
-Green provides clean output for Python unit tests.  Compare it to nose, nose2,
-or trial.
+Clean, colorful test runner for Python
+--------------------------------------
+[![Version](http://img.shields.io/github/release/CleanCut/green.svg)]
+
+Green is a clean, colorful test runner for Python unit tests.  Compare it to
+nose, nose2, and trial.
 
 Basic Usage
 ===========
 
-To use green with existing Python unit tests, just run `green` in the home
+To use Green with existing Python unit tests, just run `green` in the home
 directory of your project.  (or `green2` or `green3`, or `green-X.X` where
 `X.X` is your python version).
 
