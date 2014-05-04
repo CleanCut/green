@@ -3,7 +3,7 @@ Green
 
 Clean, colorful test runner for Python
 --------------------------------------
-Latest stable release: [![Version](http://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
+[![Version](http://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
 nose, nose2, and trial.
