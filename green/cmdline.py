@@ -89,7 +89,7 @@ def getTests(target):
 def main():
     parser = argparse.ArgumentParser(
             usage="%(prog)s [-hlv] [-m | -t | -T] [target]",
-            description="Green provides clean output for Python unit tests.")
+            description="Green is a clean, colorful test runner for Python unit tests.")
     parser.add_argument('target', action='store', nargs='?', default='.',
         help=("""Target to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or

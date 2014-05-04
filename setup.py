@@ -4,6 +4,9 @@ import sys
 
 version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read().strip()
 
+long_description = '\n'.join(list(filter(lambda x: not x.startswith('[!'),
+                             open('README.md').read().split('\n'))))
+
 setup(
     name = 'green',
     packages = ['green'],
@@ -19,8 +22,8 @@ setup(
             'green-%d.%d = green:main' % sys.version_info[:2], # green-3.4 etc.
             ],
     },
-    description = 'Green provides clean output for Python unit tests.  Compare it to nose, nose2, or trial.',
-    long_description = open('README.md').read(),
+    description = 'Green is a clean, colorful test runner for Python unit tests.  Compare it to nose, nose2, and trial.',
+    long_description = long_description,
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',
     license = 'MIT',
