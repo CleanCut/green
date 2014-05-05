@@ -10,19 +10,23 @@ test: clean
 	./g3 green
 
 sanity-checks:
-	@printf "\nVersion is at `cat green/VERSION`  Is that correct?  (Ctrl-C if not!) "
-	@read
+	@if git show-ref --verify --quiet refs/tags/`cat green/VERSION` ; then printf "\nVersion `cat green/VERSION` has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
+	@printf "\n== SANITY CHECK: GIT STATUS ==\n"
 	@git status
 	@printf "\nIs everything committed?  (Ctrl-C if not!) "
 	@read
 
-release-test: sanity-checks test
+release-test: test sanity-checks
 	@echo "\n== CHECKING PyPi-Test =="
 	python3 setup.py sdist upload -r pypi-test
-
-release: release-test
-	@echo "\n== Releasing Version `cat green/VERSION` =="
 	if [ "`git diff MANIFEST`" != "" ] ; then git add MANIFEST && git commit -m "Added the updated MANIFEST file." ; fi
+
+release-tag:
 	git tag `cat green/VERSION` -m "Tagging a release version"
 	git push --tags origin HEAD
+
+release-unsafe:
+	@echo "\n== Releasing Version `cat green/VERSION` =="
 	python3 setup.py sdist upload -r pypi
+
+release: release-test release-tag release-unsafe
