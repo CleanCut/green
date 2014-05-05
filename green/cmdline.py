@@ -122,6 +122,11 @@ def main():
         help="Force terminal colors off.  Default is to autodetect.")
     args = parser.parse_args()
 
+    # Clear out all the passed-in-options just in case someone tries to run a
+    # test that assumes sys.argv is clean.  I can't guess at the script name
+    # that they want, though, so we'll just leave ours.
+    sys.argv = sys.argv[:1]
+
     # Handle logging options
 
     if args.debug:
