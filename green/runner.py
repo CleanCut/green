@@ -1,3 +1,4 @@
+import logging
 import sys
 import termstyle
 import time
@@ -255,24 +256,33 @@ class GreenTestResult(TestResult):
         if self.dots:
             self.stream.writeln()
         for (test, color_func, outcome, err) in self.all_errors:
+            # Header Line
             self.stream.writeln(
                     '\n' + color_func(outcome) +
                     ' in ' + self.colors.bold(str(test).split()[0]) +
                     ' from ' + str(test).split()[1].strip('()'))
+
+            # Frame Line
             relevant_frames = []
-            for frame in traceback.format_exception(*err):
+            for i, frame in enumerate(traceback.format_exception(*err)):
+                logging.debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
+                        + "\n{}".format(self.colors.yellow(frame)))
+                # Ignore useless frames
                 if self.verbosity < 3:
                     if "Traceback (most recent call last)" in frame:
                         continue
-                    if "unittest" in frame.split(',')[0]:
-                        continue
                 reindented_lines = []
-                for line in frame.split('\n'):
-                    frame_indent = 0
-                    while line[:2] == '  ':
-                        line = line[2:]
-                        frame_indent += 1
-
+                # If we're in html, space-based indenting needs to be converted.
+                if self.colors.html:
+                    for line in frame.split('\n'):
+                        frame_indent = 0
+                        while line[:2] == '  ':
+                            line = line[2:]
+                            frame_indent += 1
+                        line = self.stream.formatLine(line, indent=frame_indent)
+                        reindented_lines.append(line)
+                    frame = "\n".join(reindented_lines)
+                # Done with this frame, capture it.
                 relevant_frames.append(frame)
             self.stream.write(''.join(relevant_frames))
 
@@ -282,9 +292,10 @@ class GreenStream(object):
     """Wraps a stream-like object with the following additonal features:
 
     1) A handy writeln() method (which calls write() under-the-hood)
-    2) Augment the write() method to support specified indentation levels.
-    3) Augment the write() method to support HTML5 output (converting
+    2) Augment the write() method to support HTML5 output (converting
        indentation and line breaks to HTML5)
+    3) Handy formatLine() and formatText() methods, which support HTML5, indent
+       levels, and outcome codes.
     """
 
     pixels_per_space = 10
