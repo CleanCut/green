@@ -6,6 +6,7 @@ import sys
 import unittest
 
 from green.runner import GreenTestRunner, GreenStream, Colors
+import green.runner
 
 
 def getTests(target):
@@ -17,16 +18,17 @@ def getTests(target):
     # some/real/dir
     bare_dir = target
     # some.real.dir
-    if '.' in target:
-        dot_dir  = target.replace('.', os.sep)
+    if ('.' in target) and (len(target) > 1):
+        dot_dir  = target[0] + target[1:].replace('.', os.sep)
     else:
         dot_dir = None
     # pyzmq.tests  (Package (=dir) in PYTHONPATH, including installed ones)
     pkg_in_path_dir = None
     if target and (target[0] != '.'):
         try:
-            pkg_in_path_dir = os.path.dirname(
-                    importlib.import_module(target).__file__)
+            filename = importlib.import_module(target).__file__
+            if '__init__.py' in filename:
+                pkg_in_path_dir = os.path.dirname(filename)
         except ImportError:
             pkg_in_path_dir = None
 
@@ -36,6 +38,7 @@ def getTests(target):
             continue
         tests = loader.discover(candidate)
         if tests and tests.countTestCases():
+            logging.debug("Load method: DISCOVER - {}".format(candidate))
             return tests
 
 
@@ -48,6 +51,7 @@ def getTests(target):
     except ImportError:
         pass
     if tests and tests.countTestCases():
+        logging.debug("Load method: DOTTED OBJECT - {}".format(target))
         return tests
 
 
@@ -67,6 +71,7 @@ def getTests(target):
         except (ImportError, AttributeError):
             pass
         if tests.countTestCases():
+            logging.debug("Load method: FILE - {}".format(candidate))
             return tests
 
 
@@ -100,8 +105,9 @@ def main():
         be accessible through the package's scope).  In all other cases,
         only tests accessible from introspection of the object will be
         loaded."""))
-    parser.add_argument('-d', '--debug', action='store_true', default=False,
-        help="Enable internal debugging statements.  Implies --logging.")
+    parser.add_argument('-d', '--debug', action='count', default=0,
+        help=("Enable internal debugging statements.  Implies --logging.  Can "
+        "be specified up to three times for more debug output."))
     parser.add_argument('-l', '--logging', action='store_true', default=False,
         help="Don't configure the root logger to redirect to /dev/null")
     parser.add_argument('-v', '--verbose', action='count', default=1,
@@ -117,11 +123,12 @@ def main():
     args = parser.parse_args()
 
     # Handle logging options
+
     if args.debug:
+        green.runner.debug_level = args.debug
         logging.basicConfig(
                 level=logging.DEBUG,
                 format="%(asctime)s %(levelname)9s %(message)s")
-        logging.debug("Turned on internal debug logging.")
     elif not args.logging:
         logging.basicConfig(filename=os.devnull)
 

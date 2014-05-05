@@ -9,6 +9,15 @@ import warnings
 
 from green.version import __version__
 
+global debug_level
+debug_level = 0
+
+
+def debug(message, level=0):
+    """So we can tune how much debug output we get when we turn it on."""
+    if level <= debug_level:
+        logging.debug(message)
+
 
 
 class Colors:
@@ -131,7 +140,8 @@ class GreenTestResult(TestResult):
     Used by GreenTestRunner.
     """
 
-    def __init__(self, stream, descriptions, verbosity, colors=None, html=False):
+    def __init__(self, stream, descriptions, verbosity, colors=None,
+            html=False):
         """stream, descriptions, and verbosity are as in
         unittest.runner.TextTestRunner.
 
@@ -265,11 +275,11 @@ class GreenTestResult(TestResult):
             # Frame Line
             relevant_frames = []
             for i, frame in enumerate(traceback.format_exception(*err)):
-                logging.debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
-                        + "\n{}".format(self.colors.yellow(frame)))
+                debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
+                        + "\n{}".format(self.colors.yellow(frame)), level = 3)
                 # Ignore useless frames
-                if self.verbosity < 3:
-                    if "Traceback (most recent call last)" in frame:
+                if self.verbosity < 4:
+                    if frame.strip() == "Traceback (most recent call last):":
                         continue
                 reindented_lines = []
                 # If we're in html, space-based indenting needs to be converted.
