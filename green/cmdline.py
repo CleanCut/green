@@ -100,6 +100,8 @@ def main():
         be accessible through the package's scope).  In all other cases,
         only tests accessible from introspection of the object will be
         loaded."""))
+    parser.add_argument('-d', '--debug', action='store_true', default=False,
+        help="Enable internal debugging statements.  Implies --logging.")
     parser.add_argument('-l', '--logging', action='store_true', default=False,
         help="Don't configure the root logger to redirect to /dev/null")
     parser.add_argument('-v', '--verbose', action='count', default=1,
@@ -114,10 +116,16 @@ def main():
         help="Force terminal colors off.  Default is to autodetect.")
     args = parser.parse_args()
 
-    if not args.logging:
+    # Handle logging options
+    if args.debug:
+        logging.basicConfig(
+                level=logging.DEBUG,
+                format="%(asctime)s %(levelname)9s %(message)s")
+        logging.debug("Turned on internal debug logging.")
+    elif not args.logging:
         logging.basicConfig(filename=os.devnull)
 
-    # These options disable termcolor
+    # These options both disable termcolor
     if args.html or args.notermcolor:
         args.termcolor = False
 
