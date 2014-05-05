@@ -12,10 +12,18 @@ Basic Usage
 ===========
 
 To use Green with existing Python unit tests, just run `green` in the home
-directory of your project.  (or `green2` or `green3`, or `green-X.X` where
-`X.X` is your python version).
+directory of your project.  (To make it easier on developers with multiple
+versions of Python installed, we also install greenX and green-X.Y, where X is
+the major version number of Python [2 or 3] and Y is the minor version number.)
 
 For more advanced usage, see `green --help`
+
+Screenshots
+===========
+
+Okay, so I haven't figured out how to get screenshots into the README yet, but
+you can take a look at some example output by running `green -vv
+green.examples`
 
 Installation
 ============
