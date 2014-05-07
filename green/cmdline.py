@@ -46,13 +46,14 @@ def getTests(target):
     # globally importable or importable from the current working directory.
     # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
     tests = None
-    try:
-        tests = loader.loadTestsFromName(target)
-    except ImportError:
-        pass
-    if tests and tests.countTestCases():
-        logging.debug("Load method: DOTTED OBJECT - {}".format(target))
-        return tests
+    if target and (target[0] != '.'): # We don't handle relative dot objects
+        try:
+            tests = loader.loadTestsFromName(target)
+        except ImportError:
+            pass
+        if tests and tests.countTestCases():
+            logging.debug("Load method: DOTTED OBJECT - {}".format(target))
+            return tests
 
 
     # FILE VARIATIONS - These will import a specific file and any tests
@@ -78,14 +79,15 @@ def getTests(target):
     # INSTALLED MODULE - (Unlike the installed package, we don't discover
     # inaccessible tests in this case -- we stick to tests accessible from the
     # module)
-    tests = None
-    try:
-        module = importlib.import_module(target)
-        tests = loader.loadTestsFromModule(module)
-    except ImportError:
-        pass
-    if tests.countTestCases():
-        return tests
+    if target and (target[0] != '.'): # We don't handle relative installed modules
+        tests = None
+        try:
+            module = importlib.import_module(target)
+            tests = loader.loadTestsFromModule(module)
+        except ImportError:
+            pass
+        if tests and tests.countTestCases():
+            return tests
 
     return None
 
