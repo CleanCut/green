@@ -153,11 +153,7 @@ def main():
 
     # We didn't even load 0 tests...
     if not tests:
-        stream.writeln(
-            colors.red("Sorry, I couldn't process '{}'.".format(
-                args.target)) +
-            "  Maybe you should try the --help option?")
-        sys.exit(2)
+        tests = unittest.suite.TestSuite()
 
     # Actually run the tests
     result    = runner.run(tests)
