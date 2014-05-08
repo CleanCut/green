@@ -168,8 +168,12 @@ def main():
     colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            colors = colors, run_coverage=args.run_coverage, omit=omit)
+            colors = colors)
 
+
+    if args.run_coverage:
+        cov = coverage.coverage()
+        cov.start()
     tests = getTests(args.target)
 
     # We didn't even load 0 tests...
@@ -180,5 +184,9 @@ def main():
 
     # Actually run the tests
     result    = runner.run(tests)
+    if args.run_coverage:
+        stream.writeln()
+        cov.stop()
+        cov.report(file=stream, omit=omit)
     sys.exit(not result.wasSuccessful())
 
