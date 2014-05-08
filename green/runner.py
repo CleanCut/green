@@ -481,9 +481,11 @@ class GreenTestRunner(object):
         if self.colors.html:
             self.stream.writeln('</div>')
         if self.run_coverage:
+            self.stream.writeln()
             cov.stop()
             cov.report(file=self.stream, omit=[
                 '*/termstyle*',
                 '*/test*',
+                '*site-packages*/green*',
                 ])
         return result
