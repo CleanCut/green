@@ -1,6 +1,6 @@
 import unittest
 
-from green import __version__
+from green.version import __version__
 
 
 

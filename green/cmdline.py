@@ -10,92 +10,7 @@ try:
 except:
     coverage = None
 
-from green.runner import GreenTestRunner, GreenStream, Colors
-import green.runner
-
-
-def getTests(target):
-    loader = unittest.TestLoader()
-
-    # DIRECTORY VARIATIONS - These will discover all tests in a directory
-    # structure, whether or not they are accessible by the root package.
-
-    # some/real/dir
-    bare_dir = target
-    # some.real.dir
-    if ('.' in target) and (len(target) > 1):
-        dot_dir  = target[0] + target[1:].replace('.', os.sep)
-    else:
-        dot_dir = None
-    # pyzmq.tests  (Package (=dir) in PYTHONPATH, including installed ones)
-    pkg_in_path_dir = None
-    if target and (target[0] != '.'):
-        try:
-            filename = importlib.import_module(target).__file__
-            if '__init__.py' in filename:
-                pkg_in_path_dir = os.path.dirname(filename)
-        except ImportError:
-            pkg_in_path_dir = None
-
-    # => DISCOVER DIRS
-    for candidate in [bare_dir, dot_dir, pkg_in_path_dir]:
-        if (candidate == None) or (not os.path.isdir(candidate)):
-            continue
-        tests = loader.discover(candidate)
-        if tests and tests.countTestCases():
-            logging.debug("Load method: DISCOVER - {}".format(candidate))
-            return tests
-
-
-    # DOTTED OBJECT - These will discover a specific object if it is
-    # globally importable or importable from the current working directory.
-    # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
-    tests = None
-    if target and (target[0] != '.'): # We don't handle relative dot objects
-        try:
-            tests = loader.loadTestsFromName(target)
-        except ImportError:
-            pass
-        if tests and tests.countTestCases():
-            logging.debug("Load method: DOTTED OBJECT - {}".format(target))
-            return tests
-
-
-    # FILE VARIATIONS - These will import a specific file and any tests
-    # accessible from its scope.
-
-    # some/file.py
-    bare_file = target
-    # some/file
-    pyless_file = target + '.py'
-    for candidate in [bare_file, pyless_file]:
-        if (candidate == None) or (not os.path.isfile(candidate)):
-            continue
-        try:
-            slashed_path = target.replace('.py', '').replace(os.sep, '.')
-            tests = loader.loadTestsFromName(slashed_path)
-        except (ImportError, AttributeError):
-            pass
-        if tests.countTestCases():
-            logging.debug("Load method: FILE - {}".format(candidate))
-            return tests
-
-
-    # INSTALLED MODULE - (Unlike the installed package, we don't discover
-    # inaccessible tests in this case -- we stick to tests accessible from the
-    # module)
-    if target and (target[0] != '.'): # We don't handle relative installed modules
-        tests = None
-        try:
-            module = importlib.import_module(target)
-            tests = loader.loadTestsFromModule(module)
-        except ImportError:
-            pass
-        if tests and tests.countTestCases():
-            return tests
-
-    return None
-
+# Importing from green is done after coverage initialization
 
 
 def main():
@@ -141,7 +56,6 @@ def main():
     # Handle logging options
 
     if args.debug:
-        green.runner.debug_level = args.debug
         logging.basicConfig(
                 level=logging.DEBUG,
                 format="%(asctime)s %(levelname)9s %(message)s")
@@ -160,21 +74,23 @@ def main():
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             sys.exit(3)
-        omit = ['*/test*', '*site-packages*/green*']
-        if 'termstyle' not in args.target:
-            omit.append('*/termstyle*')
+        cov = coverage.coverage()
+        cov.start()
+
 
     # Set up our various main objects
+    from green.loader import getTests
+    from green.runner import GreenTestRunner, GreenStream, Colors, debug_level
+    if args.debug:
+        debug_level = args.debug
+
     colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
             colors = colors)
 
-
-    if args.run_coverage:
-        cov = coverage.coverage()
-        cov.start()
-    tests = getTests(args.target)
+    # Discover/Load the TestSuite
+    tests  = getTests(args.target)
 
     # We didn't even load 0 tests...
     if not tests:
@@ -183,10 +99,13 @@ def main():
         tests = unittest.suite.TestSuite()
 
     # Actually run the tests
-    result    = runner.run(tests)
+    result = runner.run(tests)
     if args.run_coverage:
         stream.writeln()
         cov.stop()
+        omit = ['*/test*', '*site-packages*/green*']
+        if 'termstyle' not in args.target:
+            omit.append('*/termstyle*')
         cov.report(file=stream, omit=omit)
     sys.exit(not result.wasSuccessful())
 
