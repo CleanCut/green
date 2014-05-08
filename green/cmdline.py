@@ -160,9 +160,9 @@ def main():
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             sys.exit(3)
-            omit = ['*/test*', '*site-packages*/green*']
-            if 'termstyle' not in args.target:
-                omit.append('*/termstyle*')
+        omit = ['*/test*', '*site-packages*/green*']
+        if 'termstyle' not in args.target:
+            omit.append('*/termstyle*')
 
     # Set up our various main objects
     colors = Colors(termcolor = args.termcolor, html = args.html)
@@ -174,6 +174,8 @@ def main():
 
     # We didn't even load 0 tests...
     if not tests:
+        logging.debug(
+            "No test loading attempts succeeded.  Created an empty test suite.")
         tests = unittest.suite.TestSuite()
 
     # Actually run the tests
