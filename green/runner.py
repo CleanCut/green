@@ -376,7 +376,7 @@ class GreenTestRunner(object):
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
                  failfast=False, buffer=False, warnings=None,
-                 colors=None, html=None, run_coverage=False):
+                 colors=None, html=None, run_coverage=False, omit=[]):
         """All arguments ar as in unittest.TextTestRunner except...
 
         stream - Any stream passed in will be wrapped in a GreenStream
@@ -395,6 +395,7 @@ class GreenTestRunner(object):
         self.warnings = warnings
         self.colors = colors or Colors()
         self.run_coverage = run_coverage and coverage
+        self.omit = omit
 
 
     def _makeResult(self):
@@ -483,9 +484,5 @@ class GreenTestRunner(object):
         if self.run_coverage:
             self.stream.writeln()
             cov.stop()
-            cov.report(file=self.stream, omit=[
-                '*/termstyle*',
-                '*/test*',
-                '*site-packages*/green*',
-                ])
+            cov.report(file=self.stream, omit=self.omit)
         return result

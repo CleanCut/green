@@ -153,17 +153,22 @@ def main():
         args.termcolor = False
 
     # Coverage?
+    omit = []
     if args.run_coverage:
         if not coverage:
             sys.stderr.write(
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             sys.exit(3)
+            omit = ['*/test*', '*site-packages*/green*']
+            if 'termstyle' not in args.target:
+                omit.append('*/termstyle*')
+
     # Set up our various main objects
     colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            colors = colors, run_coverage=args.run_coverage)
+            colors = colors, run_coverage=args.run_coverage, omit=omit)
 
     tests = getTests(args.target)
 
