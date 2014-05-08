@@ -5,6 +5,11 @@ import os
 import sys
 import unittest
 
+try:
+    import coverage
+except:
+    coverage = None
+
 from green.runner import GreenTestRunner, GreenStream, Colors
 import green.runner
 
@@ -122,6 +127,10 @@ def main():
         help="Force terminal colors on.  Default is to autodetect.")
     output.add_argument('-T', '--notermcolor', action='store_true', default=None,
         help="Force terminal colors off.  Default is to autodetect.")
+    parser.add_argument('-r', '--run-coverage', action='store_true',
+        default=False,
+        help=("Produce coverage output.  You need to install the 'coverage' "
+        "module separately for this to work."))
     args = parser.parse_args()
 
     # Clear out all the passed-in-options just in case someone tries to run a
@@ -143,11 +152,18 @@ def main():
     if args.html or args.notermcolor:
         args.termcolor = False
 
+    # Coverage?
+    if args.run_coverage:
+        if not coverage:
+            sys.stderr.write(
+                "Fatal: The 'coverage' module is not installed.  Have you "
+                "run 'pip install coverage'???")
+            sys.exit(3)
     # Set up our various main objects
     colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            colors = colors)
+            colors = colors, run_coverage=args.run_coverage)
 
     tests = getTests(args.target)
 

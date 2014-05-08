@@ -7,6 +7,11 @@ from unittest.result import TestResult
 from unittest.signals import registerResult
 import warnings
 
+try:
+    import coverage
+except:
+    coverage = None
+
 from green.version import __version__
 
 global debug_level
@@ -371,7 +376,7 @@ class GreenTestRunner(object):
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
                  failfast=False, buffer=False, warnings=None,
-                 colors=None, html=None):
+                 colors=None, html=None, run_coverage=False):
         """All arguments ar as in unittest.TextTestRunner except...
 
         stream - Any stream passed in will be wrapped in a GreenStream
@@ -389,6 +394,7 @@ class GreenTestRunner(object):
         self.buffer = buffer
         self.warnings = warnings
         self.colors = colors or Colors()
+        self.run_coverage = run_coverage and coverage
 
 
     def _makeResult(self):
@@ -398,6 +404,9 @@ class GreenTestRunner(object):
 
     def run(self, test):
         "Run the given test case or test suite."
+        if self.run_coverage:
+            cov = coverage.coverage()
+            cov.start()
         # Really verbose information
         if self.colors.html:
             self.stream.write(
@@ -471,4 +480,10 @@ class GreenTestRunner(object):
             self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
         if self.colors.html:
             self.stream.writeln('</div>')
+        if self.run_coverage:
+            cov.stop()
+            cov.report(file=self.stream, omit=[
+                '*/termstyle*',
+                '*/test*',
+                ])
         return result
