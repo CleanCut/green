@@ -20,7 +20,6 @@ def debug(message, level=0):
 
 
 
-
 class GreenTestResult(TestResult):
     """A test result class that prints clean Green test results to a stream.
 

@@ -3,6 +3,7 @@ import importlib
 import logging
 import os
 import sys
+import tempfile
 import unittest
 
 try:
@@ -103,7 +104,10 @@ def main():
     if args.run_coverage:
         stream.writeln()
         cov.stop()
-        omit = ['*/test*', '*site-packages*/green*']
+        omit = [
+            '*/test*',
+            '*site-packages*/green*',
+            tempfile.gettempdir() + '*']
         if 'termstyle' not in args.target:
             omit.append('*/termstyle*')
         cov.report(file=stream, omit=omit)
