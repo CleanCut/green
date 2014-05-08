@@ -57,14 +57,6 @@ class Colors:
             return termstyle.blue(text)
 
 
-    def red(self, text):
-        self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(237,73,62)">{}</span>'.format(text)
-        else:
-            return termstyle.red(text)
-
-
     def green(self, text):
         self._restoreColor()
         if self.html:
@@ -73,12 +65,21 @@ class Colors:
             return termstyle.green(text)
 
 
+    def red(self, text):
+        self._restoreColor()
+        if self.html:
+            return '<span style="color: rgb(237,73,62)">{}</span>'.format(text)
+        else:
+            return termstyle.red(text)
+
+
     def yellow(self, text):
         self._restoreColor()
         if self.html:
             return '<span style="color: rgb(225,140,0)">{}</span>'.format(text)
         else:
             return termstyle.yellow(text)
+
 
     # Abstracted colors and styles
     def passing(self, text):
@@ -134,9 +135,7 @@ class GreenStream(object):
 
 
     def __getattr__(self, attr):
-        if attr in ('stream', '__getstate__'):
-            raise AttributeError(attr)
-        return getattr(self.stream,attr)
+        return getattr(self.stream, attr)
 
 
     def writeln(self, text=''):
