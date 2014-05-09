@@ -12,10 +12,13 @@ class TestGetTests(unittest.TestCase):
 
 
     def setUp(self):
+        self.curdir = os.getcwd()
         self.tmpdir = tempfile.mkdtemp()
 
 
     def tearDown(self):
+        if os.getcwd() != self.curdir:
+            os.chdir(self.curdir)
         shutil.rmtree(self.tmpdir)
 
 
@@ -87,6 +90,29 @@ class A(unittest.TestCase):
         # Load the tests
         module_name = basename + ".module"
         tests = loader.getTests(module_name)
+        del(sys.path[0])
+        self.assertTrue(tests.countTestCases() == 1)
+
+
+    def test_DottedNamePackageFromPath(self):
+        "Importing a package from path loads the tests."
+        # Parent directory setup
+        dirname = os.path.dirname(self.tmpdir)
+        sys.path.insert(0, dirname)
+        # Child setup
+        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        fh = open(os.path.join(self.tmpdir, 'test_module.py'), 'w')
+        fh.write("""\
+import unittest
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""")
+        fh.close()
+        # Load the tests
+        tests = loader.getTests(os.path.basename(self.tmpdir))
         del(sys.path[0])
         self.assertTrue(tests.countTestCases() == 1)
 
