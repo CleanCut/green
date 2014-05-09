@@ -8,7 +8,7 @@ from green import loader
 
 
 
-class TestGetTestsDirs(unittest.TestCase):
+class TestGetTests(unittest.TestCase):
 
 
     def setUp(self):
@@ -58,9 +58,36 @@ class TestGetTestsDirs(unittest.TestCase):
         # Child setup
         target = os.path.join(self.tmpdir, '__init__.py')
         fh = open(target, 'w')
-        fh.write('# pragma nocover')
+        fh.write('\n')
         fh.close()
         # Load the tests
         module_name = os.path.basename(self.tmpdir)
         tests = loader.getTests(module_name)
         self.assertTrue(tests == None)
+
+
+    def test_DottedName(self):
+        "Importing a module via dotted name loads the tests."
+        # Parent directory setup
+        basename = os.path.basename(self.tmpdir)
+        os.chdir(self.tmpdir)
+        os.chdir('..')
+        sys.path.insert(0, os.getcwd())
+        # Child setup
+        fh = open(os.path.join(basename, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        fh = open(os.path.join(basename, 'module.py'), 'w')
+        fh.write("""\
+import unittest
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""")
+        fh.close()
+        # Load the tests
+        module_name = basename + ".module"
+        tests = loader.getTests(module_name)
+        self.assertTrue(tests.countTestCases() == 1)
+
+
