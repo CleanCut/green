@@ -66,7 +66,7 @@ def getTests(target):
             tests = loader.loadTestsFromName(slashed_path)
         except (ImportError, AttributeError):
             pass
-        if tests.countTestCases():
+        if tests and tests.countTestCases():
             logging.debug("Load method: FILE - {}".format(candidate))
             return tests
 
