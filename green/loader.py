@@ -1,6 +1,7 @@
 import importlib
 import logging
 import os
+import sys
 import unittest
 
 
@@ -42,9 +43,11 @@ def getTests(target):
     # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
     tests = None
     if target and (target[0] != '.'): # We don't handle relative dot objects
+        if '' not in sys.path:
+            sys.path.insert(0, '')
         try:
             tests = loader.loadTestsFromName(target)
-        except ImportError:
+        except ImportError as i:
             pass
         if tests and tests.countTestCases():
             logging.debug("Load method: DOTTED OBJECT - {}".format(target))
