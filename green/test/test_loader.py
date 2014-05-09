@@ -54,7 +54,6 @@ class TestGetTests(unittest.TestCase):
         # Parent directory setup
         os.chdir(self.tmpdir)
         os.chdir('..')
-        sys.path.insert(0, os.getcwd())
         # Child setup
         target = os.path.join(self.tmpdir, '__init__.py')
         fh = open(target, 'w')
@@ -88,6 +87,7 @@ class A(unittest.TestCase):
         # Load the tests
         module_name = basename + ".module"
         tests = loader.getTests(module_name)
+        del(sys.path[0])
         self.assertTrue(tests.countTestCases() == 1)
 
 
