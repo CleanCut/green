@@ -10,7 +10,7 @@ from green import loader
 
 class TestGetTests(unittest.TestCase):
 
-
+    # Setup
     @classmethod
     def setUpClass(cls):
         cls.startdir = os.getcwd()
@@ -35,6 +35,7 @@ class TestGetTests(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
 
 
+    # Tests
     def test_emptyDirAbsolute(self):
         "Absolute path to empty directory returns None"
         tests = loader.getTests(self.tmpdir)
@@ -115,8 +116,6 @@ class A(unittest.TestCase):
 
     def test_DottedNamePackageFromPath(self):
         "Importing a package from path loads the tests."
-        # Parent directory setup
-        dirname = os.path.dirname(self.tmpdir)
         # Child setup
         fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
         fh.write('\n')
@@ -129,6 +128,9 @@ class A(unittest.TestCase):
         pass
 """)
         fh.close()
+        # Go somewhere else, but setup the path
+        os.chdir(self.startdir)
+        sys.path.insert(0, self.container_dir)
         # Load the tests
         tests = loader.getTests(os.path.basename(self.tmpdir))
         self.assertTrue(tests.countTestCases() == 1)
