@@ -115,10 +115,12 @@ class A(unittest.TestCase):
     def test_DottedNamePackageFromPath(self):
         "Importing a package from path loads the tests."
         # Child setup
-        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
+
+        tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        fh = open(os.path.join(self.tmpdir, 'test_module.py'), 'w')
+        fh = open(os.path.join(tmp_subdir, 'test_module.py'), 'w')
         fh.write("""\
 import unittest
 class A(unittest.TestCase):
@@ -128,11 +130,11 @@ class A(unittest.TestCase):
         fh.close()
         # Go somewhere else, but setup the path
         os.chdir(self.startdir)
-        sys.path.insert(0, self.container_dir)
+        sys.path.insert(0, self.tmpdir)
         # Load the tests
-        tests = loader.getTests(os.path.basename(self.tmpdir))
+        tests = loader.getTests(os.path.basename(tmp_subdir))
+        sys.path.remove(self.tmpdir)
         self.assertTrue(tests.countTestCases(), 1)
-        sys.path.remove(self.container_dir)
 
 
     def test_ModuleByName(self):
@@ -152,3 +154,17 @@ class A(unittest.TestCase):
         # Load the tests
         tests = loader.getTests(named_module)
         self.assertEqual(tests.countTestCases(), 1)
+
+
+    def test_MalformedModuleByName(self):
+        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        malformed_module = os.path.join(os.path.basename(self.tmpdir),
+                                    'malformed_module.py')
+        fh = open(malformed_module, 'w')
+        fh.write("This is a malformed module.")
+        fh.close()
+        # Load the tests
+        tests = loader.getTests(malformed_module)
+        self.assertEqual(tests, None)

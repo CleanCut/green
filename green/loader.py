@@ -80,7 +80,7 @@ def getTests(target):
             # this works better if we use the /var symlink
             slashed_path = target.replace('.py', '').replace(os.sep, '.')
             tests = loader.loadTestsFromName(slashed_path)
-        except (ImportError, AttributeError):
+        except: # Any exception could occur here
             pass
         if need_cleanup:
             sys.path.remove(cwd)
