@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 import sys
 
@@ -9,7 +9,7 @@ long_description = '\n'.join(list(filter(lambda x: not x.startswith('[!'),
 
 setup(
     name = 'green',
-    packages = ['green'],
+    packages = find_packages(),
     package_data = {'green' : ['VERSION']},
     version = version,
     install_requires = [
@@ -22,6 +22,7 @@ setup(
             'green-%d.%d = green:main' % sys.version_info[:2], # green-3.4 etc.
             ],
     },
+    test_suite='green.test',
     description = 'Green is a clean, colorful test runner for Python unit tests.  Compare it to nose, nose2, and trial.',
     long_description = long_description,
     author = 'Nathan Stocks',

@@ -1,3 +1,2 @@
 include README.md
 include green/VERSION
-include green/test
