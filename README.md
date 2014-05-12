@@ -6,7 +6,7 @@ Clean, colorful test runner for Python
 [![Version](http://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
-nose, nose2, and trial.
+nose or trial.
 
 Green currently supports Python 2.7.x and 3.4.x.  Python 2.6 and older will
 never be supported.  Python 3.0-3.3 may be supported depending on difficulty
