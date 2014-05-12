@@ -28,6 +28,8 @@ def main():
         be accessible through the package's scope).  In all other cases,
         only tests accessible from introspection of the object will be
         loaded."""))
+    parser.add_argument('-V', '--version', action='store_true', default=False,
+        help="Print the version of Green and Python and exit.")
     parser.add_argument('-d', '--debug', action='count', default=0,
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."))
@@ -53,6 +55,12 @@ def main():
     # test that assumes sys.argv is clean.  I can't guess at the script name
     # that they want, though, so we'll just leave ours.
     sys.argv = sys.argv[:1]
+
+    # Just print version and exit?
+    if args.version:
+        from green.version import pretty_version
+        print(pretty_version())
+        sys.exit()
 
     # Handle logging options
 

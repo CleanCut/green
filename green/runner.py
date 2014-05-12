@@ -7,7 +7,7 @@ from unittest.signals import registerResult
 import warnings
 
 from green.output import Colors, GreenStream
-from green.version import __version__
+from green.version import pretty_version
 
 global debug_level
 debug_level = 0
@@ -224,11 +224,7 @@ class GreenTestRunner(object):
                     '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
         python_version = ".".join([str(x) for x in sys.version_info[0:3]])
         if self.verbosity > 2:
-            self.stream.writeln(
-                self.colors.bold(
-                "Green " + __version__ + ", " +
-                "Python " + python_version) +
-                "\n")
+            self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
         result = self._makeResult()
         registerResult(result)
         result.failfast = self.failfast
