@@ -11,7 +11,7 @@ try:
     coverage_version = "Coverage {}".format(coverage.__version__)
 except:
     coverage = None
-    covarage_version = "Coverage Not Installed"
+    coverage_version = "Coverage Not Installed"
 
 # Importing from green is done after coverage initialization
 
