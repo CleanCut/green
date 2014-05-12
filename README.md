@@ -6,11 +6,16 @@ Clean, colorful test runner for Python
 [![Version](http://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
-nose or trial.  Green grew out of a desire to have the **Red/Green/Refactor**
-process _actually display red and green__.  Most python unit testing actually
-goes **Gray/Gray/Refactor** (at least on my terminal, which is gray text on
-black background).  Even worse, the default output for most test runners is
-cluttered, hard-to-read, and redundant.  Green fixes all that.
+nose or trial.
+
+Green grew out of a desire to see pretty colors.  Really!  A big part of the
+whole the **Red/Green/Refactor** process in test-driven-development is
+_actually getting to see red and green output_.  Most python unit testing
+actually goes **Gray/Gray/Refactor** (at least on my terminal, which is gray
+text on black background).  That's a shame.  Even TV is in color these days.
+Why not terminal output?  Even worse, the default output for most test runners
+is cluttered, hard-to-read, redundant, and the dang statuses are not aligned
+vertically!  Green fixes all that.
 
 ### Features ###
 
