@@ -32,7 +32,11 @@ def getTests(target):
     for candidate in [bare_dir, dot_dir, pkg_in_path_dir]:
         if (candidate == None) or (not os.path.isdir(candidate)):
             continue
+        # TestLoader.discover() rudely alters the path.  We'll have to restore
+        # it ourselves.
+        saved_sys_path = sys.path[:]
         tests = loader.discover(candidate)
+        sys.path = saved_sys_path
         if tests and tests.countTestCases():
             logging.debug("Load method: DISCOVER - {}".format(candidate))
             return tests
@@ -47,7 +51,7 @@ def getTests(target):
             sys.path.insert(0, '')
         try:
             tests = loader.loadTestsFromName(target)
-        except ImportError as i:
+        except ImportError:
             pass
         if tests and tests.countTestCases():
             logging.debug("Load method: DOTTED OBJECT - {}".format(target))
@@ -64,11 +68,22 @@ def getTests(target):
     for candidate in [bare_file, pyless_file]:
         if (candidate == None) or (not os.path.isfile(candidate)):
             continue
+        need_cleanup = False
+        cwd = os.getcwd()
+        if cwd.startswith('/private'):
+            cwd = cwd[8:]
+        if cwd != sys.path[0]:
+            need_cleanup = True
+            sys.path.insert(0, cwd)
         try:
+            # In OS X, /var is a symlink to /private/var, and for some reason
+            # this works better if we use the /var symlink
             slashed_path = target.replace('.py', '').replace(os.sep, '.')
             tests = loader.loadTestsFromName(slashed_path)
         except (ImportError, AttributeError):
             pass
+        if need_cleanup:
+            sys.path.remove(cwd)
         if tests and tests.countTestCases():
             logging.debug("Load method: FILE - {}".format(candidate))
             return tests
