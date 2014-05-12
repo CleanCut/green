@@ -94,8 +94,6 @@ class A(unittest.TestCase):
         "Importing a module via dotted name loads the tests."
         # Parent directory setup
         basename = os.path.basename(self.tmpdir)
-        os.chdir(self.tmpdir)
-        os.chdir('..')
         # Child setup
         fh = open(os.path.join(basename, '__init__.py'), 'w')
         fh.write('\n')
@@ -133,6 +131,24 @@ class A(unittest.TestCase):
         sys.path.insert(0, self.container_dir)
         # Load the tests
         tests = loader.getTests(os.path.basename(self.tmpdir))
-        self.assertTrue(tests.countTestCases() == 1)
+        self.assertTrue(tests.countTestCases(), 1)
+        sys.path.remove(self.container_dir)
 
 
+    def test_ModuleByName(self):
+        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        named_module = os.path.join(os.path.basename(self.tmpdir),
+                                    'named_module.py')
+        fh = open(named_module, 'w')
+        fh.write("""\
+import unittest
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""")
+        fh.close()
+        # Load the tests
+        tests = loader.getTests(named_module)
+        self.assertEqual(tests.countTestCases(), 1)
