@@ -107,9 +107,11 @@ def main():
 
     # Set up our various main objects
     from green.loader import getTests
-    from green.runner import GreenTestRunner, GreenStream, Colors, debug_level
+    from green.runner import GreenTestRunner
+    from green.output import Colors, GreenStream
+    import green.output
     if args.debug:
-        debug_level = args.debug
+        green.output.debug_level = args.debug
 
     colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)

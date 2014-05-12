@@ -1,4 +1,3 @@
-import logging
 import sys
 import time
 import traceback
@@ -6,17 +5,8 @@ from unittest.result import TestResult
 from unittest.signals import registerResult
 import warnings
 
-from green.output import Colors, GreenStream
+from green.output import Colors, debug, GreenStream
 from green.version import pretty_version
-
-global debug_level
-debug_level = 0
-
-
-def debug(message, level=0):
-    """So we can tune how much debug output we get when we turn it on."""
-    if level <= debug_level:
-        logging.debug(message)
 
 
 

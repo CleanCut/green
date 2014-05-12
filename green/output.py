@@ -1,4 +1,15 @@
+import logging
 import termstyle
+
+global debug_level
+debug_level = 0
+
+
+def debug(message, level=0):
+    """So we can tune how much debug output we get when we turn it on."""
+    if level <= debug_level:
+        logging.debug(message)
+
 
 
 class Colors:
