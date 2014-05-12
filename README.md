@@ -11,6 +11,14 @@ nose, nose2, and trial.
 Basic Usage
 ===========
 
+See some (hopefully) passing tests:
+
+    green -v green.tests
+
+See all the different kinds of failures, errors, etc. that could occur:
+
+    green -v green.examples
+
 To use Green with existing Python unit tests, just run `green` in the home
 directory of your project.  (To make it easier on developers with multiple
 versions of Python installed, we also install greenX and green-X.Y, where X is
