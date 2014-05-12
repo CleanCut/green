@@ -138,10 +138,13 @@ class A(unittest.TestCase):
 
 
     def test_ModuleByName(self):
-        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
+        "A module in a package can be loaded by filename."
+        os.chdir(self.tmpdir)
+        tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        named_module = os.path.join(os.path.basename(self.tmpdir),
+        named_module = os.path.join(os.path.basename(tmp_subdir),
                                     'named_module.py')
         fh = open(named_module, 'w')
         fh.write("""\
@@ -153,10 +156,17 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         tests = loader.getTests(named_module)
-        self.assertEqual(tests.countTestCases(), 1)
+        try:
+            self.assertEqual(tests.countTestCases(), 1)
+        except:
+            raise
+        finally:
+            shutil.rmtree(tmp_subdir)
+
 
 
     def test_MalformedModuleByName(self):
+        "We don't crash attempting to load a module with a SyntaxError"
         fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
