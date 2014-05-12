@@ -114,10 +114,13 @@ def main():
         cov.stop()
         omit = [
             '*/test*',
-            '*site-packages*/green*',
+            '*site-packages/pkg_resources*',
+            '*Python.framework*',
             tempfile.gettempdir() + '*']
         if 'termstyle' not in args.target:
             omit.append('*/termstyle*')
+        if (args.target != 'green') and (not args.target.startswith('green.')):
+            omit.append('*site-packages*/green*')
         cov.report(file=stream, omit=omit)
     sys.exit(not result.wasSuccessful())
 
