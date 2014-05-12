@@ -1,6 +1,9 @@
-import os
-import sys
 import unittest
+
+try:
+    from io import StringIO
+except:
+    from StringIO import StringIO
 
 from green.output import Colors, GreenStream
 
@@ -62,14 +65,26 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testHTMLWriteNewlines(self):
-        "html=True causes newlines to be translated into '<br>\\n'"
-        try:
-            from io import StringIO
-        except:
-            from StringIO import StringIO
+        "html=True causes write() to transate newlines into '<br>\\n'"
         s = StringIO()
         gs = GreenStream(s, html=True)
         gs.write(u'\n')
         self.assertEqual(s.getvalue(), '<br>\n')
+
+
+    def testFormatText(self):
+        "formatText returns the input text by default"
+        s = StringIO()
+        gs = GreenStream(s)
+        msg = u"Unindented line.\n  Indented.\n    Double-indented.\n\n\n"
+        self.assertEqual(gs.formatText(msg), str(msg))
+
+
+    def testHTMLFormatLine(self):
+        "html=True causes formatLine() to replace spaces with pixel margins"
+        s = StringIO()
+        gs = GreenStream(s, html=True)
+        msg = u"  Indented"
+        self.assertTrue('margin-left' in gs.formatLine(msg))
 
 
