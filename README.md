@@ -14,7 +14,7 @@ and user requests.
 
 
 Basic Usage
-===========
+-----------
 
 To use Green with existing Python unit tests, just run `green` in the home
 directory of your project.  (To make it easier on developers with multiple
@@ -35,31 +35,32 @@ To see all examples of all the failures, errors, etc. that could occur:
 
 
 Advanced Usage
-==============
+--------------
 
 Please see `green --help`
 
 
-Installation
-============
+Install
+-------
 
-For recent versions of Python 3, the command is usually (you may have to
-preface the command with `sudo`):
+Replace `pip3` with your version of pip if necessary.  You may need to prepend
+this command with `sudo` or run it as root if your normal user cannot write to
+the local Python package directory.
 
     pip3 install green
 
 
-Upgrading
-=========
-
-Just add the `--upgrade` option to what you used above.  For example:
+Upgrade
+-------
 
     pip3 install --upgrade green
 
+Wait...what do I have installed?
 
-Uninstalling
-============
+    green --version
 
-Replace `install` with `uninstall`:
+
+Uninstall
+---------
 
     pip3 uninstall green
