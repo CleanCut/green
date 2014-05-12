@@ -61,4 +61,15 @@ class TestColors(unittest.TestCase):
 class TestGreenStream(unittest.TestCase):
 
 
-    pass
+    def testHTMLWriteNewlines(self):
+        "html=True causes newlines to be translated into '<br>\\n'"
+        try:
+            from io import StringIO
+        except:
+            from StringIO import StringIO
+        s = StringIO()
+        gs = GreenStream(s, html=True)
+        gs.write(u'\n')
+        self.assertEqual(s.getvalue(), '<br>\n')
+
+
