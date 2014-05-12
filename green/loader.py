@@ -88,18 +88,4 @@ def getTests(target):
             logging.debug("Load method: FILE - {}".format(candidate))
             return tests
 
-
-    # INSTALLED MODULE - (Unlike the installed package, we don't discover
-    # inaccessible tests in this case -- we stick to tests accessible from the
-    # module)
-    if target and (target[0] != '.'): # We don't handle relative installed modules
-        tests = None
-        try:
-            module = importlib.import_module(target)
-            tests = loader.loadTestsFromModule(module)
-        except ImportError:
-            pass
-        if tests and tests.countTestCases():
-            return tests
-
     return None
