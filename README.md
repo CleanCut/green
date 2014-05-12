@@ -8,10 +8,23 @@ Clean, colorful test runner for Python
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
 nose or trial.
 
-Green currently supports Python 2.7.x and 3.4.x.  Python 2.6 and older will
-never be supported.  Python 3.0-3.3 may be supported depending on difficulty
-and user requests.
+Features
 
+- Colored terminal output
+- Test discovery
+- Flexible test target specification
+- No new objects to learn -- just use normal `unittest` classes.
+- HTML output
+- Four verbosity levels
+- Built-in, optional, integration with
+  [coverage](http://nedbatchelder.com/code/coverage/)
+- Supports Python 2.7, 3.4+
+- Supports OS X, Linux, BSDs (and maybe Windows)
+
+Wish List
+
+- Supports Python 3.3, 3.2 (which may already work -- need to verify...)
+- Parallel test-running (multiprocessing)
 
 Basic Usage
 -----------
