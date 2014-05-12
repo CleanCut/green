@@ -20,6 +20,7 @@ vertically!  Green fixes all that.
 ### Features ###
 
 - Colored terminal output
+- Aligned status indicators
 - Test discovery
 - Flexible test target specification
 - No new objects to learn -- just use normal `unittest` classes.
