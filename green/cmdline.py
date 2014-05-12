@@ -8,17 +8,20 @@ import unittest
 
 try:
     import coverage
+    coverage_version = "Coverage {}".format(coverage.__version__)
 except:
     coverage = None
+    covarage_version = "Coverage Not Installed"
 
 # Importing from green is done after coverage initialization
 
 
 def main():
     parser = argparse.ArgumentParser(
-            usage="%(prog)s [-hlv] [-m | -t | -T] [target]",
+            add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
-    parser.add_argument('target', action='store', nargs='?', default='.',
+    target_args = parser.add_argument_group("Target Specification")
+    target_args.add_argument('target', action='store', nargs='?', default='.',
         help=("""Target to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
@@ -28,33 +31,48 @@ def main():
         be accessible through the package's scope).  In all other cases,
         only tests accessible from introspection of the object will be
         loaded."""))
-    parser.add_argument('-V', '--version', action='store_true', default=False,
-        help="Print the version of Green and Python and exit.")
-    parser.add_argument('-d', '--debug', action='count', default=0,
+    format_args = parser.add_argument_group("Format Options")
+    format_args.add_argument('-m', '--html', action='store_true', default=False,
+        help="HTML5 format.  Overrides terminal color options if specified.")
+    format_args.add_argument('-t', '--termcolor', action='store_true',
+        default=None,
+        help="Force terminal colors on.  Default is to autodetect.")
+    format_args.add_argument('-T', '--notermcolor', action='store_true',
+        default=None,
+        help="Force terminal colors off.  Default is to autodetect.")
+    out_args = parser.add_argument_group("Output Options")
+    out_args.add_argument('-d', '--debug', action='count', default=0,
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."))
-    parser.add_argument('-l', '--logging', action='store_true', default=False,
+    out_args.add_argument('-h', '--help', action='store_true', default=False,
+        help="Show this help message and exit.")
+    out_args.add_argument('-l', '--logging', action='store_true', default=False,
         help="Don't configure the root logger to redirect to /dev/null")
-    parser.add_argument('-v', '--verbose', action='count', default=1,
+    out_args.add_argument('-V', '--version', action='store_true', default=False,
+        help="Print the version of Green and Python and exit.")
+    out_args.add_argument('-v', '--verbose', action='count', default=1,
         help=("Verbose. Can be specified up to three times for more verbosity. "
         "Recommended levels are -v and -vv."))
-    output = parser.add_mutually_exclusive_group()
-    output.add_argument('-m', '--html', action='store_true', default=False,
-        help="Output in HTML5.  Overrides terminal color options if specified.")
-    output.add_argument('-t', '--termcolor', action='store_true', default=None,
-        help="Force terminal colors on.  Default is to autodetect.")
-    output.add_argument('-T', '--notermcolor', action='store_true', default=None,
-        help="Force terminal colors off.  Default is to autodetect.")
-    parser.add_argument('-r', '--run-coverage', action='store_true',
+    cov_args = parser.add_argument_group(
+        "Coverage Options ({})".format(coverage_version))
+    cov_args.add_argument('-r', '--run-coverage', action='store_true',
         default=False,
-        help=("Produce coverage output.  You need to install the 'coverage' "
-        "module separately for this to work."))
+        help=("Produce coverage output."))
+    cov_args.add_argument('-o', '--omit', action='store', default=None,
+        metavar='PATTERN',
+        help=("Comma-separated file-patterns to omit from coverage.  Default is something like "
+            "'*/test*,*/termstyle*,*(temp dir)*,*(python packages)*'"))
     args = parser.parse_args()
 
     # Clear out all the passed-in-options just in case someone tries to run a
     # test that assumes sys.argv is clean.  I can't guess at the script name
     # that they want, though, so we'll just leave ours.
     sys.argv = sys.argv[:1]
+
+    # Help?
+    if args.help:
+        parser.print_help()
+        sys.exit(0)
 
     # Just print version and exit?
     if args.version:
@@ -112,16 +130,17 @@ def main():
     if args.run_coverage:
         stream.writeln()
         cov.stop()
-        omit = [
-            '*/test*',
-            tempfile.gettempdir() + '*']
-        if 'termstyle' not in args.target:
-            omit.append('*/termstyle*')
-        if (args.target != 'green') and (not args.target.startswith('green.')):
-            omit.extend([
-            '*site-packages/pkg_resources*',
-            '*Python.framework*',
-            '*site-packages*/green*'])
+        if args.omit:
+            omit = args.omit.split(',')
+        else:
+            omit = [
+                '*/test*',
+                '*/termstyle*',
+                tempfile.gettempdir() + '*']
+            if (args.target != 'green') and (not args.target.startswith('green.')):
+                omit.extend([
+                '*Python.framework*',
+                '*site-packages*'])
         cov.report(file=stream, omit=omit)
     sys.exit(not result.wasSuccessful())
 
