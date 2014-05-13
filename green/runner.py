@@ -178,7 +178,7 @@ class GreenTestRunner(object):
 
         stream - Any stream passed in will be wrapped in a GreenStream
         colors - A Colors object.  Default colors will be used if not provided.
-        Used to determine whether html mode is desired as well.
+                 Used to determine whether html mode is desired as well.
         """
         if stream is None:
             stream = sys.stderr
