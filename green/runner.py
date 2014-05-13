@@ -36,14 +36,6 @@ class GreenTestResult(TestResult):
         self.passing = []
 
 
-    def getDescription(self, test):
-        doc_first_line = test.shortDescription()
-        if self.descriptions and doc_first_line:
-            return '\n'.join((str(test), doc_first_line))
-        else:
-            return str(test)
-
-
     def startTest(self, test):
         super(GreenTestResult, self).startTest(test)
         # Get our bearings
