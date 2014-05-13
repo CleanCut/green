@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import unittest
 
 try:
@@ -5,7 +6,27 @@ try:
 except:
     from StringIO import StringIO
 
-from green.output import Colors, GreenStream
+from green.output import Colors, GreenStream, debug
+import green.output
+
+
+
+class TestDebug(unittest.TestCase):
+
+
+    def testDebug(self):
+        orig_logging = green.output.logging.debug
+        s = StringIO()
+        green.output.logging.debug = s.write
+        green.output.debug_level = 0
+        debug("Nothing should happen", level=1)
+        self.assertEqual('', s.getvalue())
+        green.output.debug_level = 2
+        debug("Something should happen", level=1)
+        self.assertNotEqual('', s.getvalue())
+
+
+        green.output.logging.debug = orig_logging
 
 
 
