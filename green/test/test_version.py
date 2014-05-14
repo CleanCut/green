@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import unittest
 
 from green.version import __version__, pretty_version
