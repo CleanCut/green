@@ -28,14 +28,17 @@ class TestGreenTestResult(unittest.TestCase):
 
     def test_startTestVerbose(self):
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
-        tc = unittest.TestCase()
+        class FakeCase(unittest.TestCase):
+            def test_it(self):
+                pass
+        tc = FakeCase('test_it')
         gtr.startTest(tc)
         output = self.stream.getvalue()
         output_lines = output.split('\n')
         # Output should look like (I'm not putting the termcolor formatting here)
-        # unittest.case
-        #   TestCase
-        #     No test
+        # green.test.test_runner
+        #   FakeCase
+        #     test_it
         self.assertEqual(len(output_lines), 3)
         self.assertFalse(' ' in output_lines[0])
         self.assertTrue('  ' in output_lines[1])
