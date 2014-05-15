@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import argparse
-import importlib
 import logging
 import os
 import sys
@@ -61,8 +60,9 @@ def main():
         help=("Produce coverage output."))
     cov_args.add_argument('-o', '--omit', action='store', default=None,
         metavar='PATTERN',
-        help=("Comma-separated file-patterns to omit from coverage.  Default is something like "
-            "'*/test*,*/termstyle*,*(temp dir)*,*(python packages)*'"))
+        help=("Comma-separated file-patterns to omit from coverage.  Default "
+            "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
+            "dir)*,*(python system packages)*'"))
     args = parser.parse_args()
 
     # Clear out all the passed-in-options just in case someone tries to run a
@@ -139,6 +139,7 @@ def main():
             omit = [
                 '*/test*',
                 '*/termstyle*',
+                '*/mock*',
                 tempfile.gettempdir() + '*']
             if (args.target != 'green') and (not args.target.startswith('green.')):
                 omit.extend([
