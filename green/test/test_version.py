@@ -9,7 +9,7 @@ import green.version
 class TestVersion(unittest.TestCase):
 
     def test_versionType(self):
-        "__version__ is a string"
+        "__version__ is a unicode string"
         self.assertEqual(type(__version__), type(''))
 
 
@@ -19,6 +19,7 @@ class TestVersion(unittest.TestCase):
 
 
     def test_pretty_version(self):
+        "pretty_version() has the content we expect"
         pv = pretty_version()
         self.assertTrue('Green' in pv)
         self.assertTrue('Python' in pv)

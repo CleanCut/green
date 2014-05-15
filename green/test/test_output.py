@@ -15,6 +15,7 @@ class TestDebug(unittest.TestCase):
 
 
     def testDebug(self):
+        "debug() works as we expect"
         orig_logging = green.output.logging.debug
         s = StringIO()
         green.output.logging.debug = s.write
