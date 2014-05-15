@@ -48,13 +48,21 @@ class TestGreenTestResult(unittest.TestCase):
     def test_reportOutcome(self):
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         gtr._reportOutcome(None, '.', lambda x: x)
+        self.assertTrue('.' in self.stream.getvalue())
 
 
     def test_reportOutcomeVerbose(self):
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
-        gtr.test_output_line = "a fake test output line"
-        gtr._reportOutcome(None, '.', lambda x: x, None, 'a fake reason')
+        l = 'a fake test output line'
+        r = 'a fake reason'
+        gtr.test_output_line = l
+        gtr._reportOutcome(None, '.', lambda x: x, None, r)
+        self.assertTrue(l in self.stream.getvalue())
+        self.assertTrue(r in self.stream.getvalue())
 
+
+    def test_addResultTypes(self):
+        gtr = GreenTestResult(GreenStream(self.stream), None, 2)
 
 
 class TestGreenTestRunner(unittest.TestCase):
