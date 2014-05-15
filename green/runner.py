@@ -116,7 +116,7 @@ class GreenTestResult(TestResult):
     def addSkip(self, test, reason):
         super(GreenTestResult, self).addSkip(test, reason)
         self._reportOutcome(
-                test, 's', self.colors.skipped, err=None, reason=reason)
+                test, 's', self.colors.skipped, reason)
 
 
     def addExpectedFailure(self, test, err):
@@ -126,7 +126,7 @@ class GreenTestResult(TestResult):
 
     def addUnexpectedSuccess(self, test):
         super(GreenTestResult, self).addUnexpectedSuccess(test)
-        self._reportOutcome(test, 'u', self.colors.expectedFailure)
+        self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
 
     def printErrors(self):
@@ -205,7 +205,6 @@ class GreenTestRunner(object):
         if self.colors.html:
             self.stream.write(
                     '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
-        python_version = ".".join([str(x) for x in sys.version_info[0:3]])
         if self.verbosity > 2:
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
         result = self._makeResult()
