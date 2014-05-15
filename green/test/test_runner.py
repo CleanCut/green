@@ -66,6 +66,78 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertTrue(r in self.stream.getvalue())
 
 
+    def test_printErrorsDots(self):
+        "printErrors() looks correct in verbose=1 (dots) mode"
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(GreenStream(self.stream), None, 1)
+        test = MagicMock()
+        gtr.addError(test, err)
+        gtr.printErrors()
+        self.assertTrue('\n\n' in self.stream.getvalue())
+        self.assertTrue('test_printErrorsDots' in self.stream.getvalue())
+        self.assertTrue('raise Exception' in self.stream.getvalue())
+        self.assertTrue('Error' in self.stream.getvalue())
+
+
+    def test_printErrorsVerbose2(self):
+        "printErrors() looks correct in verbose=2 mode"
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(GreenStream(self.stream), None, 2)
+        gtr.test_output_line = "   some test output"
+        test = MagicMock()
+        gtr.addError(test, err)
+        gtr.printErrors()
+        self.assertTrue('\n\n' in self.stream.getvalue())
+        self.assertTrue('test_printErrorsVerbose2' in self.stream.getvalue())
+        self.assertTrue('raise Exception' in self.stream.getvalue())
+        self.assertTrue('Error' in self.stream.getvalue())
+
+
+    def test_printErrorsVerbose4(self):
+        "printErrors() looks correct in verbose=4 mode"
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(GreenStream(self.stream), None, 4)
+        gtr.test_output_line = "   some test output"
+        test = MagicMock()
+        gtr.addError(test, err)
+        gtr.printErrors()
+        self.assertTrue('\n\n' in self.stream.getvalue())
+        self.assertTrue('(most recent call last)' in self.stream.getvalue())
+        self.assertTrue('test_printErrorsVerbose4' in self.stream.getvalue())
+        self.assertTrue('raise Exception' in self.stream.getvalue())
+        self.assertTrue('Error' in self.stream.getvalue())
+
+
+    def test_printErrorsHTML(self):
+        "printErrors() looks correct in verbose=4 mode"
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(GreenStream(self.stream), None, 4)
+        gtr.colors.html = True
+        gtr.test_output_line = "   some test output"
+        test = MagicMock()
+        gtr.addError(test, err)
+        gtr.printErrors()
+        self.assertTrue('\n\n' in self.stream.getvalue())
+        self.assertTrue('(most recent call last)' in self.stream.getvalue())
+        self.assertTrue('test_printErrorsHTML' in self.stream.getvalue())
+        self.assertTrue('raise Exception' in self.stream.getvalue())
+        self.assertTrue('Error' in self.stream.getvalue())
+        self.assertTrue('<span' in self.stream.getvalue())
+        self.assertTrue('color: rgb(' in self.stream.getvalue())
+
+
 
 class TestGreenTestResultAdds(unittest.TestCase):
 
@@ -91,7 +163,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def test_addError(self):
         "addError() makes the correct calls to other functions."
-        err = None
         try:
             raise Exception
         except:
