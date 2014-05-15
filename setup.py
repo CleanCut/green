@@ -7,14 +7,18 @@ version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read
 long_description = '\n'.join(list(filter(lambda x: not x.startswith('[!'),
                              open('README.md').read().split('\n'))))
 
+dependencies = [
+    'python-termstyle'
+]
+if sys.version_info[0] == 2:
+    dependencies.append('mock')
+
 setup(
     name = 'green',
     packages = find_packages(),
     package_data = {'green' : ['VERSION']},
     version = version,
-    install_requires = [
-        'python-termstyle'
-        ],
+    install_requires = dependencies,
     entry_points = {
         'console_scripts' : [
             'green = green:main',
