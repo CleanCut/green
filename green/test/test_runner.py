@@ -17,6 +17,12 @@ except:
 
 
 
+class FakeCase(unittest.TestCase):
+    def runTest(self):
+        pass
+
+
+
 class TestGreenTestResult(unittest.TestCase):
 
 
@@ -31,10 +37,7 @@ class TestGreenTestResult(unittest.TestCase):
     def test_startTestVerbose(self):
         "startTest() contains output we expect in verbose mode"
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
-        class FakeCase(unittest.TestCase):
-            def test_it(self):
-                pass
-        tc = FakeCase('test_it')
+        tc = FakeCase()
         gtr.startTest(tc)
         output = self.stream.getvalue()
         output_lines = output.split('\n')
@@ -117,8 +120,8 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertTrue('Error' in self.stream.getvalue())
 
 
-    def test_printErrorsHTML(self):
-        "printErrors() looks correct in verbose=4 mode"
+    def test_printErrorsZHTML(self):
+        "printErrors() looks correct in html mode"
         try:
             raise Exception
         except:
@@ -131,7 +134,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
-        self.assertTrue('test_printErrorsHTML' in self.stream.getvalue())
+        self.assertTrue('test_printErrorsZHTML' in self.stream.getvalue())
         self.assertTrue('raise Exception' in self.stream.getvalue())
         self.assertTrue('Error' in self.stream.getvalue())
         self.assertTrue('<span' in self.stream.getvalue())
@@ -220,13 +223,23 @@ class TestGreenTestRunner(unittest.TestCase):
 
 
     def setUp(self):
-        pass
+        self.stream = StringIO()
 
 
     def tearDown(self):
-        pass
+        del(self.stream)
 
 
     def test_instantiate(self):
-        "GreenTestRunner can be instantiated"
-        GreenTestRunner()
+        "GreenTestRunner can be instantiated and creates a default stream."
+        gtr = GreenTestRunner()
+        self.assertTrue(type(gtr.stream), GreenStream)
+
+
+    def test_HTML(self):
+        "html=True causes html output"
+        gtr = GreenTestRunner(self.stream)
+        gtr.colors.html = True
+        test = FakeCase()
+        gtr.run(test)
+
