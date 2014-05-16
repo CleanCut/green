@@ -39,10 +39,9 @@ vertically!  Green fixes all that.
 Basic Usage
 -----------
 
-To use Green with existing Python unit tests, just run `green` in the home
-directory of your project.  (To make it easier on developers with multiple
-versions of Python installed, we also install `greenX` and `green-X.Y`, where
-`X` is the major version number of Python and `Y` is the minor version number.)
+To use Green to run existing Python unit tests, just run `greenX.Y` in the home
+directory of your project (Substitute your version of Python in for `X.Y`.  For
+example: `green2.7` for Python 2.7, `green3.4` for Python 3.4, etc.).
 
 By default, Green mimics the verbosity levels of vanilla unittest or nose,
 meaning that output is mostly just dots.  For Green we recommend adding more
@@ -50,17 +49,17 @@ verbosity by using the `-v` or `-vv` options.
 
 To run Green's own internal unit tests (which are hopefully all passing):
 
-    green -v green
+    green3.4 -v green
 
 To see all examples of all the failures, errors, etc. that could occur:
 
-    green -v green.examples
+    green3.4 -v green.examples
 
 
 Advanced Usage
 --------------
 
-Please see `green --help`
+Please see `green3.4 --help`
 
 
 Install
@@ -80,7 +79,7 @@ Upgrade
 
 Wait...what do I have installed?
 
-    green --version
+    green3.4 --version
 
 
 Uninstall
