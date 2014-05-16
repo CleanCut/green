@@ -10,6 +10,14 @@ from green.output import Colors, debug, GreenStream
 from green.version import pretty_version
 
 
+try: # pragma nocover
+    import html
+    escape = html.escape
+except:
+    import cgi
+    escape = cgi.escape
+
+
 
 class GreenTestResult(TestResult):
     """A test result class that prints clean Green test results to a stream.
@@ -78,6 +86,9 @@ class GreenTestResult(TestResult):
             # Move the cursor back to the start of the line in terminal mode
             if not self.colors.html:
                 self.stream.write('\r')
+            # Escape the HTML that may be in the docstring
+            if self.colors.html:
+                self.test_output_line = escape(self.test_output_line)
             self.stream.write(
                 color_func(
                     self.stream.formatLine(

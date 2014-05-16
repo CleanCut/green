@@ -180,10 +180,8 @@ class GreenStream(object):
         """Takes a single line, optionally adds an indent and/or outcome
         character to the beginning of the line."""
         actual_spaces = (indent * self.indent_spaces) - len(outcome_char)
-        indent_pixels = actual_spaces * self.pixels_per_space
+        space_char = ' '
         if self.html:
-            return (outcome_char +
-                    self.margin_template.format(indent_pixels, line))
-        else:
-            return outcome_char + ' ' * actual_spaces + line
+            space_char = '&nbsp;'
+        return (outcome_char + space_char * actual_spaces + line)
 

@@ -103,10 +103,10 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testHTMLFormatLine(self):
-        "html=True causes formatLine() to replace spaces with pixel margins"
+        "html=True causes formatLine() to add HTML '&nbsp;' instead of spaces"
         s = StringIO()
         gs = GreenStream(s, html=True)
         msg = u"  Indented"
-        self.assertTrue('margin-left' in gs.formatLine(msg))
+        self.assertTrue('&nbsp;' in gs.formatLine(msg, indent=1))
 
 
