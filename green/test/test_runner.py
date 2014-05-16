@@ -240,6 +240,37 @@ class TestGreenTestRunner(unittest.TestCase):
         "html=True causes html output"
         gtr = GreenTestRunner(self.stream)
         gtr.colors.html = True
-        test = FakeCase()
-        gtr.run(test)
+        gtr.run(FakeCase())
 
+
+    def test_verbose3(self):
+        "verbose=3 causes version output, and an empty test case passes."
+        gtr = GreenTestRunner(self.stream, verbosity=3)
+        gtr.colors.html = True
+        gtr.run(FakeCase())
+        self.assertTrue('Green' in self.stream.getvalue())
+        self.assertTrue('OK' in self.stream.getvalue())
+
+
+    def test_warnings(self):
+        "setting warnings='always' doesn't crash"
+        gtr = GreenTestRunner(self.stream, warnings='always')
+        gtr.colors.html = True
+        gtr.run(FakeCase())
+
+
+    def test_noTestsFound(self):
+        "When we don't find any tests, we say so."
+        gtr = GreenTestRunner(self.stream)
+        gtr.run(unittest.TestSuite())
+        self.assertTrue('No Tests Found' in self.stream.getvalue())
+
+
+    def test_failedSaysSo(self):
+        "A failing test case causes the whole run to report 'FAILED'"
+        class FailCase(unittest.TestCase):
+            def runTest(self):
+                self.assertTrue(False)
+        gtr = GreenTestRunner(self.stream)
+        gtr.run(FailCase())
+        self.assertTrue('FAILED' in self.stream.getvalue())
