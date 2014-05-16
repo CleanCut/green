@@ -13,7 +13,7 @@ from green.version import pretty_version
 try: # pragma nocover
     import html
     escape = html.escape
-except:
+except: # pragma nocover
     import cgi
     escape = cgi.escape
 

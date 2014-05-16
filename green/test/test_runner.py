@@ -69,6 +69,23 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertTrue(r in self.stream.getvalue())
 
 
+    def test_reportOutcomeVerboseHTML(self):
+        "html=True causes _reportOutcome() to escape HTML in docstrings"
+        gtr = GreenTestResult(GreenStream(self.stream), None, 2)
+        gtr.colors.html = True
+        l = 'a fake test output line &nbsp; <>'
+        r = 'a fake reason'
+        gtr.test_output_line = l
+        gtr._reportOutcome(None, '.', lambda x: x, None, r)
+        self.assertTrue(r in self.stream.getvalue())
+        self.assertTrue('&amp;' in self.stream.getvalue())
+        self.assertTrue('&lt;' in self.stream.getvalue())
+        self.assertTrue('&gt;' in self.stream.getvalue())
+        self.assertFalse('&nbsp;' in self.stream.getvalue())
+        self.assertFalse('<' in self.stream.getvalue())
+        self.assertFalse('>' in self.stream.getvalue())
+
+
     def test_printErrorsDots(self):
         "printErrors() looks correct in verbose=1 (dots) mode"
         try:
