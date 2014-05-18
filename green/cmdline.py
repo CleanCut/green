@@ -133,6 +133,7 @@ def main():
     if args.run_coverage:
         stream.writeln()
         cov.stop()
+        cov.save()
         if args.omit:
             omit = args.omit.split(',')
         else:
