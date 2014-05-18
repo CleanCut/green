@@ -4,6 +4,7 @@ Green
 Clean, colorful test runner for Python
 --------------------------------------
 [![Version](http://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
+[![Build Status](http://img.shields.io/travis/joyent/node.svg)](https://travis-ci.org/CleanCut/green)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
 nose or trial.
@@ -28,12 +29,12 @@ vertically!  Green fixes all that.
 - Four verbosity levels
 - Built-in, optional, integration with
   [coverage](http://nedbatchelder.com/code/coverage/)
-- Supports Python 2.7, 3.4+
-- Supports OS X, Linux, BSDs (and maybe Windows)
+- Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
+- Completely supports OS X and Linux, most likely BSDs (and maybe Windows,
+  someone want to try it and let me know?)
 
 ### Wish List ###
 
-- Supports Python 3.3, 3.2 (which may already work -- need to verify...)
 - Parallel test-running (multiprocessing)
 
 Basic Usage
