@@ -6,10 +6,10 @@ import sys
 import tempfile
 import unittest
 
-try:
+try: # pragma: no cover
     import coverage
     coverage_version = "Coverage {}".format(coverage.__version__)
-except:
+except: # pragma: no cover
     coverage = None
     coverage_version = "Coverage Not Installed"
 
@@ -71,15 +71,15 @@ def main():
     sys.argv = sys.argv[:1]
 
     # Help?
-    if args.help:
+    if args.help: # pragma: no cover
         parser.print_help()
-        sys.exit(0)
+        return 0
 
     # Just print version and exit?
     if args.version:
         from green.version import pretty_version
-        print(pretty_version())
-        sys.exit()
+        sys.stdout.write(pretty_version()+'\n')
+        return 0
 
     # Handle logging options
 
@@ -101,7 +101,7 @@ def main():
             sys.stderr.write(
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
-            sys.exit(3)
+            return 3
         cov = coverage.coverage()
         cov.start()
 
@@ -133,7 +133,6 @@ def main():
     if args.run_coverage:
         stream.writeln()
         cov.stop()
-        cov.save()
         if args.omit:
             omit = args.omit.split(',')
         else:
@@ -147,5 +146,5 @@ def main():
                 '*Python.framework*',
                 '*site-packages*'])
         cov.report(file=stream, omit=omit)
-    sys.exit(not result.wasSuccessful())
+    return(int(not result.wasSuccessful()))
 
