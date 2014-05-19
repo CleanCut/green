@@ -21,6 +21,8 @@ setup(
     install_requires = dependencies,
     entry_points = {
         'console_scripts' : [
+            'green = green:main',
+            'green%d = green:main' % sys.version_info[:1],    # green2 or green3
             'green%d.%d = green:main' % sys.version_info[:2], # green3.4 etc.
             ],
     },
