@@ -132,7 +132,7 @@ package:
         ├── __init__.py
         └── test_foo.py   # 'test_foo' is the only "test" module
 
-Some things to note:
+Notes:
 
 1. There is an `__init__.py` in every directory.  Don't forget it.  It can be
    an empty file, but it needs to exist.
@@ -140,14 +140,14 @@ Some things to note:
 2. `proj` itself is a directory that you will be storing somewhere.  We'll
    pretend it's in `/home/user`
 
-3. The `test` directory is named as it is for a reason.
+3. The `test` directory needs to start with `test`.
 
-4. The test modules will all start with `test...` for a reason.
+4. The test modules need to start with `test`.
 
 
 When your project starts adding code in sub-packages, you will need to make a
-choice on where you put tests for sub-packages.  The choice I prefer is to
-create a `test` subdirectory in each sub-package.  Here is what it looks like.
+choice on where you put their tests.  I prefer to create a `test` subdirectory
+in each sub-package.
 
     proj
     ├── __init__.py
@@ -221,7 +221,7 @@ from proj.foo import answer, School
 class TestAnswer(unittest.TestCase):
 
     def test_type(self):
-        "answer() returns and integer"
+        "answer() returns an integer"
         self.assertEqual(type(answer()), int)
 
     def test_expected(self):
@@ -259,5 +259,49 @@ it is not.  Notice the difference in the output below.
 To run the unittests, we would change to the parent directory of the project
 (`/home/user` in this example) and then run `green proj`.
 
-**In a real terminal, this output should be nicely colored**
+**In a real terminal, this output is syntax highlighted**
 
+    $ green proj
+    ....
+    Ran 4 tests in 0.000s
+
+    OK (passes=4)
+
+Okay, so that's the classic short-form output for unit tests.  Green really
+shines when you start getting more verbose:
+
+**In a real terminal, this output is syntax highlighted**
+
+    $ green -v proj
+    test.test_foo
+      TestAnswer
+    .   answer() returns 42
+    .   answer() returns an integer
+      TestSchool
+    .   test_age
+    .   test_food
+
+    Ran 4 tests in 0.001s
+
+    OK (passes=4)
+
+Notes:
+
+1. Green outputs clean, heirarchical output.
+
+2. Test status is aligned on the _left_
+
+3. Method names are replaced with docstrings when present.
+
+4. Green always outputs a summary of statuses that will add up to the total
+   number of tests that were run.  For some reason, many test runners forget
+   about statuses other than Error and Fail, and even the built-in unittest runner
+   forgets about passing ones.
+
+5. Possible values for test status (these match the `unittest` short status characters exactly)
+ - `.` Pass
+ - `F` Failure
+ - `E` Error
+ - `s` Skipped
+ - `x` Expected Failure
+ - `u` Unexpected pass
