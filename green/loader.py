@@ -9,6 +9,13 @@ import unittest
 def getTests(target):
     loader = unittest.TestLoader()
 
+    # For a test loader, we want to always the current working directory to be
+    # the first item in sys.path, just like when a python interpreter is loaded
+    # interactively.  See also
+    # https://docs.python.org/3.4/library/sys.html#sys.path
+    if sys.path[0] != '':
+        sys.path.insert(0, '')
+
     # DIRECTORY VARIATIONS - These will discover all tests in a directory
     # structure, whether or not they are accessible by the root package.
 
@@ -33,8 +40,9 @@ def getTests(target):
     for candidate in [bare_dir, dot_dir, pkg_in_path_dir]:
         if (candidate == None) or (not os.path.isdir(candidate)):
             continue
-        # TestLoader.discover() rudely alters the path.  We'll have to restore
-        # it ourselves.
+        # TestLoader.discover() rudely alters the path.  Not usually a big deal
+        # for people who call it only once, but it wreaks havoc on our internal
+        # unittests! We'll have to restore it ourselves.
         saved_sys_path = sys.path[:]
         tests = loader.discover(candidate)
         sys.path = saved_sys_path
@@ -48,8 +56,6 @@ def getTests(target):
     # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
     tests = None
     if target and (target[0] != '.'): # We don't handle relative dot objects
-        if '' not in sys.path:
-            sys.path.insert(0, '')
         try:
             tests = loader.loadTestsFromName(target)
         except ImportError:

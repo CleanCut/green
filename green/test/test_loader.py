@@ -67,6 +67,39 @@ class TestGetTests(unittest.TestCase):
         self.assertTrue(tests == None)
 
 
+    def test_BigDirWithAbsoluteImports(self):
+        "Big dir discovers tests and doesn't crash on absolute import"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # Child setup
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'target_module.py'), 'w')
+        fh.write('a = 1\n')
+        fh.close()
+        # pkg/test/__init__.py
+        os.mkdir(os.path.join(sub_tmpdir, 'test'))
+        fh = open(os.path.join(sub_tmpdir, 'test', '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'test', 'test_target_module.py'), 'w')
+        fh.write("""\
+import unittest
+import {}.target_module
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""".format(sub_tmpdir))
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        tests = loader.getTests('.')
+        self.assertEqual(tests.countTestCases(), 1)
+
+
     def test_DirWithInit(self):
         "Dir empty other than blank __init__.py returns None"
         # Parent directory setup
@@ -94,7 +127,9 @@ class A(unittest.TestCase):
     def test_DottedName(self):
         "Importing a module via dotted name loads the tests."
         # Parent directory setup
-        basename = os.path.basename(self.tmpdir)
+        os.chdir(self.tmpdir)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        basename = os.path.basename(sub_tmpdir)
         # Child setup
         fh = open(os.path.join(basename, '__init__.py'), 'w')
         fh.write('\n')
