@@ -127,7 +127,7 @@ class GreenTestResult(TestResult):
     def addSkip(self, test, reason):
         super(GreenTestResult, self).addSkip(test, reason)
         self._reportOutcome(
-                test, 's', self.colors.skipped, reason)
+                test, 's', self.colors.skipped, reason=reason)
 
 
     def addExpectedFailure(self, test, err):

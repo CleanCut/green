@@ -212,7 +212,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         reason = 'skip reason'
         self.gtr.addSkip(test, reason)
         self.gtr._reportOutcome.assert_called_with(
-                test, 's', self.gtr.colors.skipped, reason)
+                test, 's', self.gtr.colors.skipped, reason=reason)
 
 
     def test_addExpectedFailure(self):
