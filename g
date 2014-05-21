@@ -1,6 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 
-from green.cmdline import main
+# If the first argument is a version number, use it to run that version of python
+PYTHON=python
+if [[ -e `which python$1` ]] ; then
+    PYTHON=python$1
+    shift
+fi
 
-if __name__ == '__main__': # pragma nocover
-    main()
+$PYTHON -c 'from green.cmdline import main ; main()' $@
