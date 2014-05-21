@@ -9,6 +9,5 @@ install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
 script:
-  - "./g -vvv"
-  - "coverage run --source green --omit '*/test*,*examples*' -m green.cmdline"
+  - "./g cov no_delete -vvv"
 after_success: coveralls
