@@ -5,8 +5,7 @@ Clean, colorful test runner for Python
 --------------------------------------
 [![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 [![Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
-[![Coverage Status](https://coveralls.io/repos/CleanCut/green/badge.png?branch=master)](https://coveralls.io/r/CleanCut/green?branch=master)
-[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg)](https://coveralls.io/r/CleanCut/green?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
 nose or trial.
