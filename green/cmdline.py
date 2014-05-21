@@ -148,3 +148,7 @@ def main():
         cov.report(file=stream, omit=omit)
     return(int(not result.wasSuccessful()))
 
+
+
+if __name__ == '__main__': # pragma: no cover
+    main()
