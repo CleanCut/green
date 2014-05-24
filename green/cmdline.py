@@ -16,7 +16,7 @@ except: # pragma: no cover
 # Importing from green is done after coverage initialization
 
 
-def main():
+def main(testing=False):
     parser = argparse.ArgumentParser(
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
@@ -127,6 +127,11 @@ def main():
         logging.debug(
             "No test loading attempts succeeded.  Created an empty test suite.")
         tests = unittest.suite.TestSuite()
+
+    # If we're just testing main(), then we're done.
+    if testing:
+        return 0
+
 
     # Actually run the tests
     result = runner.run(tests)
