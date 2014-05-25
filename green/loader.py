@@ -58,7 +58,7 @@ def getTests(target):
     if target and (target[0] != '.'): # We don't handle relative dot objects
         try:
             tests = loader.loadTestsFromName(target)
-        except ImportError:
+        except (ImportError, AttributeError):
             pass
         if tests and tests.countTestCases():
             logging.debug("Load method: DOTTED OBJECT - {}".format(target))

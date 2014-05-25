@@ -200,7 +200,6 @@ class A(unittest.TestCase):
             shutil.rmtree(tmp_subdir)
 
 
-
     def test_MalformedModuleByName(self):
         "We don't crash attempting to load a module with a SyntaxError"
         fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
@@ -214,3 +213,28 @@ class A(unittest.TestCase):
         # Load the tests
         tests = loader.getTests(malformed_module)
         self.assertEqual(tests, None)
+
+
+    def test_partiallyGoodName(self):
+        "Don't crash loading module.object with existing module but not object"
+        # Parent directory setup
+        os.chdir(self.tmpdir)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        basename = os.path.basename(sub_tmpdir)
+        # Child setup
+        fh = open(os.path.join(basename, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        fh = open(os.path.join(basename, 'existing_module.py'), 'w')
+        fh.write("""\
+import unittest
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""")
+        fh.close()
+        # Load the tests
+        module_name = basename + ".existing_module.nonexistant_object"
+        tests = loader.getTests(module_name)
+        self.assertEqual(tests, None)
+
