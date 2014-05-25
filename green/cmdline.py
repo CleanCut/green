@@ -128,13 +128,13 @@ def main(testing=False):
             "No test loading attempts succeeded.  Created an empty test suite.")
         tests = unittest.suite.TestSuite()
 
-    # If we're just testing main(), then we're done.
-    if testing:
-        return 0
-
-
     # Actually run the tests
-    result = runner.run(tests)
+    if testing:
+        result = lambda: None
+        result.wasSuccessful = lambda: 0
+    else:
+        result = runner.run(tests)
+
     if args.run_coverage:
         stream.writeln()
         cov.stop()

@@ -17,12 +17,6 @@ except:
 
 
 
-class FakeCase(unittest.TestCase):
-    def runTest(self):
-        pass
-
-
-
 class TestGreenTestResult(unittest.TestCase):
 
 
@@ -36,6 +30,9 @@ class TestGreenTestResult(unittest.TestCase):
 
     def test_startTestVerbose(self):
         "startTest() contains output we expect in verbose mode"
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
         tc = FakeCase()
         gtr.startTest(tc)
@@ -255,6 +252,9 @@ class TestGreenTestRunner(unittest.TestCase):
 
     def test_HTML(self):
         "html=True causes html output"
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
         gtr = GreenTestRunner(self.stream)
         gtr.colors.html = True
         gtr.run(FakeCase())
@@ -262,6 +262,9 @@ class TestGreenTestRunner(unittest.TestCase):
 
     def test_verbose3(self):
         "verbose=3 causes version output, and an empty test case passes."
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
         gtr = GreenTestRunner(self.stream, verbosity=3)
         gtr.colors.html = True
         gtr.run(FakeCase())
@@ -271,6 +274,9 @@ class TestGreenTestRunner(unittest.TestCase):
 
     def test_warnings(self):
         "setting warnings='always' doesn't crash"
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
         gtr = GreenTestRunner(self.stream, warnings='always')
         gtr.colors.html = True
         gtr.run(FakeCase())

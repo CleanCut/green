@@ -24,13 +24,18 @@ class TestMain(unittest.TestCase):
     def setUp(self):
         self.s = StringIO()
         self.gs = GreenStream(self.s)
+        self.s2 = StringIO()
+        self.gs2 = GreenStream(self.s)
         self.saved_stdout = sys.stdout
+        self.saved_stderr = sys.stderr
         self.saved_argv = sys.argv
         sys.stdout = self.gs
+        sys.stderr = self.gs2
 
 
     def tearDown(self):
         sys.stdout = self.saved_stdout
+        sys.stderr = self.saved_stderr
         sys.argv = self.saved_argv
 
 
@@ -62,11 +67,14 @@ class TestMain(unittest.TestCase):
 
     def test_noCoverage(self):
         "The absence of coverage prompts a return code of 3"
+        save_stderr = cmdline.sys.stderr
+        cmdline.sys.stderr = MagicMock()
         save_coverage = cmdline.coverage
         cmdline.coverage = None
         cmdline.sys.argv = ['', '--run-coverage']
         self.assertEqual(cmdline.main(), 3)
         cmdline.coverage = save_coverage
+        cmdline.sys.stderr = save_stderr
 
 
     def test_coverage(self):
@@ -77,4 +85,27 @@ class TestMain(unittest.TestCase):
         cmdline.main(testing=True)
         cmdline.coverage.coverage.assert_called_with()
         cmdline.coverage = save_coverage
+
+
+    def test_noTestsCreatesEmptyTestSuite(self):
+        "If getTests doesn't find any tests, an empty test suite is created"
+        save_TestSuite = cmdline.unittest.suite.TestSuite
+        cmdline.unittest.suite.TestSuite = MagicMock()
+        cmdline.sys.argv = ['', '/tmp/non-existent/path']
+        cmdline.main(testing=True)
+        cmdline.unittest.suite.TestSuite.assert_called_with()
+        cmdline.unittest.suite.TestSuite = save_TestSuite
+
+
+    def test_omit(self):
+        "Omit pattern gets parsed"
+        save_coverage = cmdline.coverage
+        cmdline.coverage = MagicMock()
+        cov = MagicMock()
+        cmdline.coverage.coverage.return_value = cov
+        cmdline.sys.argv = ['', '--run-coverage', '--omit', 'a,b']
+        cmdline.main(testing=True)
+        self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
+        cmdline.coverage = save_coverage
+
 
