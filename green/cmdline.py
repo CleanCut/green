@@ -109,15 +109,13 @@ def main(testing=False):
     # Set up our various main objects
     from green.loader import getTests
     from green.runner import GreenTestRunner
-    from green.output import Colors, GreenStream
+    from green.output import GreenStream
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
 
-    colors = Colors(termcolor = args.termcolor, html = args.html)
     stream = GreenStream(sys.stderr, html = args.html)
-    runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            colors = colors)
+    runner = GreenTestRunner(verbosity = args.verbose, stream = stream)
 
     # Discover/Load the TestSuite
     tests  = getTests(args.target)

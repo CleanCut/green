@@ -255,9 +255,9 @@ class TestGreenTestRunner(unittest.TestCase):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
-        gtr = GreenTestRunner(self.stream)
-        gtr.colors.html = True
+        gtr = GreenTestRunner(self.stream, html=True)
         gtr.run(FakeCase())
+        self.assertIn('<', self.stream.getvalue())
 
 
     def test_verbose3(self):
@@ -266,7 +266,6 @@ class TestGreenTestRunner(unittest.TestCase):
             def runTest(self):
                 pass
         gtr = GreenTestRunner(self.stream, verbosity=3)
-        gtr.colors.html = True
         gtr.run(FakeCase())
         self.assertTrue('Green' in self.stream.getvalue())
         self.assertTrue('OK' in self.stream.getvalue())
@@ -278,7 +277,6 @@ class TestGreenTestRunner(unittest.TestCase):
             def runTest(self):
                 pass
         gtr = GreenTestRunner(self.stream, warnings='always')
-        gtr.colors.html = True
         gtr.run(FakeCase())
 
 

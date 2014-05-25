@@ -8,7 +8,6 @@ import warnings
 from green.output import Colors, debug, GreenStream
 from green.version import pretty_version
 
-
 try: # pragma nocover
     import html
     escape = html.escape
@@ -19,24 +18,19 @@ except: # pragma nocover
 
 
 class GreenTestResult():
-    """A test result class that prints clean Green test results to a stream.
+    "Aggregates test results and outputs them to a stream."
 
-    Used by GreenTestRunner.
-    """
 
-    def __init__(self, stream, descriptions, verbosity, colors=None,
-            html=False):
+    def __init__(self, stream, descriptions, verbosity, html=False):
         """stream, descriptions, and verbosity are as in
         unittest.runner.TextTestRunner.
-
-        colors - An instance of Colors.
         """
         self.stream       = stream
         self.showAll      = verbosity > 1
         self.dots         = verbosity == 1
         self.verbosity    = verbosity
         self.descriptions = descriptions
-        self.colors       = colors or Colors()
+        self.colors       = Colors(html=html)
         self.last_module  = ''
         self.last_class   = ''
         self.shouldStop   = False
@@ -54,15 +48,50 @@ class GreenTestResult():
 
     def startTestRun(self):
         "Called once before any tests run"
+        self.startTime = time.time()
+        # Really verbose information
+        if self.colors.html:
+            self.stream.write(
+                    '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
+        if self.verbosity > 2:
+            self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
 
 
     def stopTestRun(self):
         "Called once after all tests have run"
-
-
-    def wasSuccessful(self):
-        "Tells whether or not this result was a success"
-        return len(self.all_errors) == 0
+        self.stopTime = time.time()
+        self.timeTaken = self.stopTime - self.startTime
+        self.printErrors()
+        if self.testsRun:
+            self.stream.writeln()
+        self.stream.writeln("Ran %s test%s in %ss" %
+            (self.colors.bold(str(self.testsRun)),
+            self.testsRun != 1 and "s" or "",
+            self.colors.bold("%.3f" % self.timeTaken)))
+        self.stream.writeln()
+        results = [
+            (self.errors, 'errors', self.colors.error),
+            (self.expectedFailures, 'expected_failures',
+                self.colors.expectedFailure),
+            (self.failures, 'failures', self.colors.failing),
+            (self.passing, 'passes', self.colors.passing),
+            (self.skipped, 'skips', self.colors.skipped),
+            (self.unexpectedSuccesses, 'unexpected_successes',
+                self.colors.unexpectedSuccess),
+        ]
+        stats = []
+        for obj_list, name, color_func in results:
+            if obj_list:
+                stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
+        if not stats:
+            self.stream.writeln(self.colors.passing("No Tests Found"))
+        else:
+            grade = self.colors.passing('OK')
+            if self.errors or self.failures:
+                grade = self.colors.failing('FAILED')
+            self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
+        if self.colors.html:
+            self.stream.writeln('</div>')
 
 
     def startTest(self, test):
@@ -107,7 +136,8 @@ class GreenTestResult():
         return test.shortDescription() or str(test).split()[0]
 
 
-    def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=''):
+    def _reportOutcome(self, test, outcome_char, color_func, err=None,
+            reason=''):
         if self.showAll:
             # Move the cursor back to the start of the line in terminal mode
             if not self.colors.html:
@@ -133,39 +163,46 @@ class GreenTestResult():
 
 
     def addSuccess(self, test):
+        "Called when a test passed"
         self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
 
 
     def addError(self, test, err):
+        "Called when a test raises an exception"
         self.errors.append(test)
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
 
     def addFailure(self, test, err):
+        "Called when a test fails a unittest assertion"
         self.failures.append(test)
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
 
     def addSkip(self, test, reason):
+        "Called when a test is skipped"
         self.skipped.append(test)
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
 
 
     def addExpectedFailure(self, test, err):
+        "Called when a test fails, and we expeced the failure"
         self.expectedFailures.append(test)
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
 
     def addUnexpectedSuccess(self, test):
+        "Called when a test passed, but we expected a failure"
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
 
     def printErrors(self):
+        "Print a list of all tracebacks from errors and failures"
         if not self.all_errors:
             return
         if self.dots:
@@ -202,20 +239,20 @@ class GreenTestResult():
             self.stream.write(''.join(relevant_frames))
 
 
+    def wasSuccessful(self):
+        "Tells whether or not the overall run was successful"
+        return len(self.all_errors) == 0
+
+
 
 class GreenTestRunner(object):
-    """A test runner class that displays results in Green's clean style.
-    """
+    "A test runner class that displays results in Green's clean style."
 
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
-                 failfast=False, buffer=False, warnings=None,
-                 colors=None, html=None):
-        """All arguments ar as in unittest.TextTestRunner except...
-
+                 warnings=None, html=None):
+        """
         stream - Any stream passed in will be wrapped in a GreenStream
-        colors - A Colors object.  Default colors will be used if not provided.
-                 Used to determine whether html mode is desired as well.
         """
         if stream is None:
             stream = sys.stderr
@@ -224,26 +261,15 @@ class GreenTestRunner(object):
         self.stream = stream
         self.descriptions = descriptions
         self.verbosity = verbosity
-        self.failfast = failfast
-        self.buffer = buffer
         self.warnings = warnings
-        self.colors = colors or Colors()
-
+        self.html = html
 
 
     def run(self, suite):
         "Run the given test case or test suite."
-        # Really verbose information
-        if self.colors.html:
-            self.stream.write(
-                    '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
-        if self.verbosity > 2:
-            self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
         result = GreenTestResult(
-                self.stream, self.descriptions, self.verbosity, self.colors)
+                self.stream, self.descriptions, self.verbosity, html=self.html)
         registerResult(result)
-        result.failfast = self.failfast
-        result.buffer = self.buffer
         with warnings.catch_warnings():
             if self.warnings:
                 # if self.warnings is set, use it to filter all the warnings
@@ -257,49 +283,10 @@ class GreenTestRunner(object):
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
                             message='Please use assert\w+ instead.')
-            startTime = time.time()
-            startTestRun = getattr(result, 'startTestRun', None)
-            if startTestRun is not None:
-                startTestRun()
+            result.startTestRun()
             try:
                 suite.run(result)
             finally:
-                stopTestRun = getattr(result, 'stopTestRun', None)
-                if stopTestRun is not None:
-                    stopTestRun()
-            stopTime = time.time()
-        timeTaken = stopTime - startTime
-        result.printErrors()
-        run = result.testsRun
-        if run:
-            self.stream.writeln()
-        self.stream.writeln("Ran %s test%s in %ss" %
-            (self.colors.bold(str(run)),
-            run != 1 and "s" or "",
-            self.colors.bold("%.3f" % timeTaken)))
-        self.stream.writeln()
+                result.stopTestRun()
 
-        results = [
-            (result.errors, 'errors', self.colors.error),
-            (result.expectedFailures, 'expected_failures',
-                self.colors.expectedFailure),
-            (result.failures, 'failures', self.colors.failing),
-            (result.passing, 'passes', self.colors.passing),
-            (result.skipped, 'skips', self.colors.skipped),
-            (result.unexpectedSuccesses, 'unexpected_successes',
-                self.colors.unexpectedSuccess),
-        ]
-        stats = []
-        for obj_list, name, color_func in results:
-            if obj_list:
-                stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
-        if not stats:
-            self.stream.writeln(self.colors.passing("No Tests Found"))
-        else:
-            grade = self.colors.passing('OK')
-            if result.errors or result.failures:
-                grade = self.colors.failing('FAILED')
-            self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
-        if self.colors.html:
-            self.stream.writeln('</div>')
         return result
