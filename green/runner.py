@@ -205,10 +205,6 @@ class GreenTestRunner(object):
         self.colors = colors or Colors()
 
 
-    def _makeResult(self):
-        return GreenTestResult(
-                self.stream, self.descriptions, self.verbosity, self.colors)
-
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -218,7 +214,8 @@ class GreenTestRunner(object):
                     '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
         if self.verbosity > 2:
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
-        result = self._makeResult()
+        result = GreenTestResult(
+                self.stream, self.descriptions, self.verbosity, self.colors)
         registerResult(result)
         result.failfast = self.failfast
         result.buffer = self.buffer
