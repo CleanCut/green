@@ -66,6 +66,7 @@ class GreenTestResult():
 
 
     def startTest(self, test):
+        "Called before the start of each test"
         self.testsRun += 1
 
         # Get our bearings
@@ -99,7 +100,7 @@ class GreenTestResult():
 
 
     def stopTest(self, test):
-        pass
+        "Called after the end of each test"
 
 
     def _testDescription(self, test):
@@ -230,7 +231,7 @@ class GreenTestRunner(object):
 
 
 
-    def run(self, test):
+    def run(self, suite):
         "Run the given test case or test suite."
         # Really verbose information
         if self.colors.html:
@@ -261,7 +262,7 @@ class GreenTestRunner(object):
             if startTestRun is not None:
                 startTestRun()
             try:
-                test(result)
+                suite.run(result)
             finally:
                 stopTestRun = getattr(result, 'stopTestRun', None)
                 if stopTestRun is not None:
