@@ -77,8 +77,6 @@ def getTests(target):
             continue
         need_cleanup = False
         cwd = os.getcwd()
-        if cwd.startswith('/private'):
-            cwd = cwd[8:]
         if cwd != sys.path[0]:
             need_cleanup = True
             sys.path.insert(0, cwd)
