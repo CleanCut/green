@@ -12,9 +12,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import call, MagicMock
+    from unittest.mock import MagicMock
 except:
-    from mock import call, MagicMock
+    from mock import MagicMock
 
 
 
@@ -59,4 +59,22 @@ class TestMain(unittest.TestCase):
         cmdline.sys.argv = ['', '--notermcolor']
         cmdline.main(testing=True)
 
+
+    def test_noCoverage(self):
+        "The absence of coverage prompts a return code of 3"
+        save_coverage = cmdline.coverage
+        cmdline.coverage = None
+        cmdline.sys.argv = ['', '--run-coverage']
+        self.assertEqual(cmdline.main(), 3)
+        cmdline.coverage = save_coverage
+
+
+    def test_coverage(self):
+        "If coverage and --run-coverage, then coverage is started"
+        save_coverage = cmdline.coverage
+        cmdline.coverage = MagicMock()
+        cmdline.sys.argv = ['', '--run-coverage']
+        cmdline.main(testing=True)
+        cmdline.coverage.coverage.assert_called_with()
+        cmdline.coverage = save_coverage
 
