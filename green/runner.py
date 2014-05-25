@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 import sys
 import time
 import traceback
-from unittest.result import TestResult
 from unittest.signals import registerResult
 import warnings
 
@@ -19,7 +18,7 @@ except: # pragma nocover
 
 
 
-class GreenTestResult(TestResult):
+class GreenTestResult():
     """A test result class that prints clean Green test results to a stream.
 
     Used by GreenTestRunner.
@@ -32,21 +31,43 @@ class GreenTestResult(TestResult):
 
         colors - An instance of Colors.
         """
-        super(GreenTestResult, self).__init__(stream, descriptions, verbosity)
-        self.stream = stream
-        self.showAll = verbosity > 1
-        self.dots = verbosity == 1
-        self.verbosity = verbosity
+        self.stream       = stream
+        self.showAll      = verbosity > 1
+        self.dots         = verbosity == 1
+        self.verbosity    = verbosity
         self.descriptions = descriptions
-        self.colors = colors or Colors()
-        self.last_module = ''
-        self.last_class = ''
+        self.colors       = colors or Colors()
+        self.last_module  = ''
+        self.last_class   = ''
+        self.shouldStop   = False
+        self.testsRun     = 0
+        # Individual lists
+        self.errors              = []
+        self.expectedFailures    = []
+        self.failures            = []
+        self.passing             = []
+        self.skipped             = []
+        self.unexpectedSuccesses = []
+        # Combination of all errors and failures
         self.all_errors = []
-        self.passing = []
+
+
+    def startTestRun(self):
+        "Called once before any tests run"
+
+
+    def stopTestRun(self):
+        "Called once after all tests have run"
+
+
+    def wasSuccessful(self):
+        "Tells whether or not this result was a success"
+        return len(self.all_errors) == 0
 
 
     def startTest(self, test):
-        super(GreenTestResult, self).startTest(test)
+        self.testsRun += 1
+
         # Get our bearings
         current_module = test.__module__
         current_class  = test.__class__.__name__
@@ -75,6 +96,10 @@ class GreenTestResult(TestResult):
             self.last_module = current_module
         if current_class != self.last_class:
             self.last_class = current_class
+
+
+    def stopTest(self, test):
+        pass
 
 
     def _testDescription(self, test):
@@ -107,36 +132,35 @@ class GreenTestResult(TestResult):
 
 
     def addSuccess(self, test):
-        super(GreenTestResult, self).addSuccess(test)
         self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
 
 
     def addError(self, test, err):
-        super(GreenTestResult, self).addError(test, err)
+        self.errors.append(test)
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
 
     def addFailure(self, test, err):
-        super(GreenTestResult, self).addFailure(test, err)
+        self.failures.append(test)
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
 
     def addSkip(self, test, reason):
-        super(GreenTestResult, self).addSkip(test, reason)
+        self.skipped.append(test)
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
 
 
     def addExpectedFailure(self, test, err):
-        super(GreenTestResult, self).addExpectedFailure(test, err)
+        self.expectedFailures.append(test)
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
 
     def addUnexpectedSuccess(self, test):
-        super(GreenTestResult, self).addUnexpectedSuccess(test)
+        self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
 
