@@ -1,12 +1,20 @@
 from __future__ import unicode_literals
+from __future__ import print_function
+from collections import OrderedDict
+import logging
+import multiprocessing
+from multiprocessing.pool import Pool
 import sys
 import time
 import traceback
+
 from unittest.signals import registerResult
+from unittest import TestCase
 import warnings
 
 from green.output import Colors, debug, GreenStream
 from green.version import pretty_version
+from green.loader import getTests
 
 try: # pragma nocover
     import html
@@ -16,12 +24,81 @@ except: # pragma nocover
     escape = cgi.escape
 
 
+class ProtoTestResult():
+
+
+    def __init__(self):
+        self.shouldStop = False
+        # Individual lists
+        self.errors              = []
+        self.expectedFailures    = []
+        self.failures            = []
+        self.passing             = []
+        self.skipped             = []
+        self.unexpectedSuccesses = []
+
+
+    def spy(self, test_name):
+        if sum([len(x) for x in [self.errors, self.expectedFailures, self.failures, self.passing, self.skipped, self.unexpectedSuccesses]]) == 0:
+            fh = open('dmp', 'a')
+            fh.write(test_name + '\n')
+            fh.close()
+
+    def __repr__(self):
+        return (
+                "errors" + str(self.errors) + ', ' +
+                "expectedFailures" + str(self.expectedFailures) + ', ' +
+                "failures" + str(self.failures) + ', ' +
+                "passing" + str(self.passing) + ', ' +
+                "skipped" + str(self.skipped) + ', ' +
+                "unexpectedSuccesses" + str(self.unexpectedSuccesses))
+
+
+    def startTest(self, test):
+        "Called before each test runs"
+
+
+    def stopTest(self, test):
+        "Called after each test runs"
+
+
+    def addSuccess(self, test):
+        "Called when a test passed"
+        self.passing.append(test)
+
+
+    def addError(self, test, err):
+        "Called when a test raises an exception"
+        self.errors.append((test, traceback.format_exception(*err)))
+
+
+    def addFailure(self, test, err):
+        "Called when a test fails a unittest assertion"
+        self.failures.append((test, traceback.format_exception(*err)))
+
+
+    def addSkip(self, test, reason):
+        "Called when a test is skipped"
+        self.skipped.append((test, reason))
+
+
+    def addExpectedFailure(self, test, err):
+        "Called when a test fails, and we expeced the failure"
+        self.expectedFailures.append((test, traceback.format_exception(*err)))
+
+
+    def addUnexpectedSuccess(self, test):
+        "Called when a test passed, but we expected a failure"
+        self.unexpectedSuccesses.append(test)
+
+
 
 class GreenTestResult():
     "Aggregates test results and outputs them to a stream."
 
 
-    def __init__(self, stream, descriptions, verbosity, html=False):
+    def __init__(self, stream, descriptions, verbosity, html=False,
+            termcolor=None):
         """stream, descriptions, and verbosity are as in
         unittest.runner.TextTestRunner.
         """
@@ -30,7 +107,7 @@ class GreenTestResult():
         self.dots         = verbosity == 1
         self.verbosity    = verbosity
         self.descriptions = descriptions
-        self.colors       = Colors(html=html)
+        self.colors       = Colors(termcolor, html)
         self.last_module  = ''
         self.last_class   = ''
         self.shouldStop   = False
@@ -44,6 +121,30 @@ class GreenTestResult():
         self.unexpectedSuccesses = []
         # Combination of all errors and failures
         self.all_errors = []
+
+
+    def addProto(self, proto):
+        if getattr(proto, 'passing', None) == None:
+            print(proto)
+        else:
+            for test, err in proto.errors:
+                self.startTest(test)
+                self.addError(test, err)
+            for test, err in proto.expectedFailures:
+                self.startTest(test)
+                self.addExpectedFailure(test, err)
+            for test, err in proto.failures:
+                self.startTest(test)
+                self.addFailure(test, err)
+            for test in proto.passing:
+                self.startTest(test)
+                self.addSuccess(test)
+            for test, reason in proto.skipped:
+                self.startTest(test)
+                self.addSkip(test, reason)
+            for test in proto.unexpectedSuccesses:
+                self.startTest(test)
+                self.addUnexpectedSuccess(test)
 
 
     def startTestRun(self):
@@ -216,9 +317,13 @@ class GreenTestResult():
 
             # Frame Line
             relevant_frames = []
-            for i, frame in enumerate(traceback.format_exception(*err)):
+            if issubclass(type(err), Exception) or (type(err) == tuple):
+                iterable = enumerate(traceback.format_exception(*err))
+            else:
+                iterable = enumerate(err)
+            for i, frame in iterable:
                 debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
-                        + "\n{}".format(self.colors.yellow(frame)), level = 3)
+                      + "\n{}".format(self.colors.yellow(frame)), level = 3)
                 # Ignore useless frames
                 if self.verbosity < 4:
                     if frame.strip() == "Traceback (most recent call last):":
@@ -245,12 +350,74 @@ class GreenTestResult():
 
 
 
-class GreenTestRunner(object):
+class LogExceptions(object):
+
+
+    def __init__(self, callable):
+        self.__callable = callable
+
+
+    def __call__(self, *args, **kwargs):
+        try:
+            result = self.__callable(*args, **kwargs)
+        except Exception:
+            # Here we add some debugging help. If multiprocessing's
+            # debugging is on, it will arrange to log the traceback
+            logger = multiprocessing.get_logger()
+            if not logger.handlers:
+                logger.addHandler(logging.StreamHandler())
+            logger.error(traceback.format_exc())
+            logger.handlers[0].flush()
+            # Re-raise the original exception so the Pool worker can
+            # clean up
+            raise
+
+        # It was fine, give a normal answer
+        return result
+
+
+
+class LoggingPool(Pool):
+
+
+    def apply_async(self, func, args=(), kwds={}, callback=None):
+        return Pool.apply_async(self, LogExceptions(func), args, kwds, callback)
+
+
+
+def pool_runner(test_name):
+    result = ProtoTestResult()
+    try:
+        suite = getTests(test_name)
+        suite.run(result)
+    except:
+        err = sys.exc_info()
+        result.addError('a test', err)
+    return result
+
+
+
+def getSuiteDict(item, suite_dict=OrderedDict()):
+    if issubclass(type(item), TestCase):
+        class_part = item.__module__ + '.' + item.__class__.__name__
+        test_part = str(item).split(' ')[0]
+        full_test = class_part + '.' + test_part
+        if class_part not in suite_dict.keys():
+            suite_dict[class_part] = []
+        suite_dict[class_part].append(full_test)
+    else:
+        for i in item:
+            getSuiteDict(i, suite_dict)
+        return suite_dict
+
+
+
+class GreenTestRunner():
     "A test runner class that displays results in Green's clean style."
 
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
-                 warnings=None, html=None):
+                 warnings=None, html=None, cpus=None, termcolor=None):
         """
         stream - Any stream passed in will be wrapped in a GreenStream
         """
@@ -263,12 +430,15 @@ class GreenTestRunner(object):
         self.verbosity = verbosity
         self.warnings = warnings
         self.html = html
+        self.cpus = cpus
+        self.termcolor = termcolor
 
 
     def run(self, suite):
         "Run the given test case or test suite."
         result = GreenTestResult(
-                self.stream, self.descriptions, self.verbosity, html=self.html)
+                self.stream, self.descriptions, self.verbosity, html=self.html,
+                termcolor=self.termcolor)
         registerResult(result)
         with warnings.catch_warnings():
             if self.warnings:
@@ -284,9 +454,21 @@ class GreenTestRunner(object):
                             category=DeprecationWarning,
                             message='Please use assert\w+ instead.')
             result.startTestRun()
-            try:
+
+            if self.cpus == 1:
                 suite.run(result)
-            finally:
-                result.stopTestRun()
+            else:
+                tests = getSuiteDict(suite)
+                pool = LoggingPool(processes=self.cpus)
+                if tests:
+                    for group in tests:
+                        for test in tests[group]:
+                            async_result = pool.apply_async(
+                                pool_runner, (test,), callback=result.addProto)
+                            async_result.get(.5)
+                    pool.close()
+                    pool.join()
+
+            result.stopTestRun()
 
         return result

@@ -82,7 +82,6 @@ def main(testing=False):
         return 0
 
     # Handle logging options
-
     if args.debug:
         logging.basicConfig(
                 level=logging.DEBUG,
@@ -115,7 +114,8 @@ def main(testing=False):
         green.output.debug_level = args.debug
 
     stream = GreenStream(sys.stderr, html = args.html)
-    runner = GreenTestRunner(verbosity = args.verbose, stream = stream)
+    runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
+            termcolor=args.termcolor)
 
     # Discover/Load the TestSuite
     tests  = getTests(args.target)

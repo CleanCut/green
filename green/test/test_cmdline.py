@@ -24,25 +24,26 @@ class TestMain(unittest.TestCase):
     def setUp(self):
         self.s = StringIO()
         self.gs = GreenStream(self.s)
-        self.s2 = StringIO()
-        self.gs2 = GreenStream(self.s)
         self.saved_stdout = sys.stdout
-        self.saved_stderr = sys.stderr
+        self.saved_stderr = cmdline.sys.stderr
         self.saved_argv = sys.argv
         sys.stdout = self.gs
-        sys.stderr = self.gs2
+        cmdline.sys.stderr = self.gs
 
 
     def tearDown(self):
         sys.stdout = self.saved_stdout
-        sys.stderr = self.saved_stderr
+        cmdline.sys.stderr = self.saved_stderr
         sys.argv = self.saved_argv
-
+        del(self.gs)
+        del(self.s)
+        del(self.saved_stderr)
+        del(self.saved_stdout)
 
     def test_optVersion(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']
-        cmdline.main()
+        cmdline.main(testing=True)
         self.assertIn('Green', self.s.getvalue())
         self.assertIn('Python', self.s.getvalue())
 

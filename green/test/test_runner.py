@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import sys
+import traceback
 import unittest
 
 from green.runner import GreenTestResult, GreenTestRunner
@@ -91,7 +92,7 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         test = MagicMock()
-        gtr.addError(test, err)
+        gtr.addError(test, traceback.format_exception(*err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsDots' in self.stream.getvalue())
@@ -108,7 +109,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, err)
+        gtr.addError(test, traceback.format_exception(*err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsVerbose2' in self.stream.getvalue())
@@ -125,7 +126,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 4)
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, err)
+        gtr.addError(test, traceback.format_exception(*err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
@@ -144,7 +145,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.colors.html = True
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, err)
+        gtr.addError(test, traceback.format_exception(*err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
@@ -255,7 +256,7 @@ class TestGreenTestRunner(unittest.TestCase):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
-        gtr = GreenTestRunner(self.stream, html=True)
+        gtr = GreenTestRunner(self.stream, html=True, cpus=1)
         gtr.run(FakeCase())
         self.assertIn('<', self.stream.getvalue())
 
@@ -265,7 +266,7 @@ class TestGreenTestRunner(unittest.TestCase):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
-        gtr = GreenTestRunner(self.stream, verbosity=3)
+        gtr = GreenTestRunner(self.stream, verbosity=3, cpus=1)
         gtr.run(FakeCase())
         self.assertTrue('Green' in self.stream.getvalue())
         self.assertTrue('OK' in self.stream.getvalue())
@@ -276,13 +277,13 @@ class TestGreenTestRunner(unittest.TestCase):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
-        gtr = GreenTestRunner(self.stream, warnings='always')
+        gtr = GreenTestRunner(self.stream, warnings='always', cpus=1)
         gtr.run(FakeCase())
 
 
     def test_noTestsFound(self):
         "When we don't find any tests, we say so."
-        gtr = GreenTestRunner(self.stream)
+        gtr = GreenTestRunner(self.stream, cpus=1)
         gtr.run(unittest.TestSuite())
         self.assertTrue('No Tests Found' in self.stream.getvalue())
 
@@ -292,6 +293,6 @@ class TestGreenTestRunner(unittest.TestCase):
         class FailCase(unittest.TestCase):
             def runTest(self):
                 self.assertTrue(False)
-        gtr = GreenTestRunner(self.stream)
+        gtr = GreenTestRunner(self.stream, cpus=1)
         gtr.run(FailCase())
         self.assertTrue('FAILED' in self.stream.getvalue())
