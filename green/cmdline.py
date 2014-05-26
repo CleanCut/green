@@ -31,6 +31,14 @@ def main(testing=False):
         be accessible through the package's scope).  In all other cases,
         only tests accessible from introspection of the object will be
         loaded."""))
+    concurrency_args = parser.add_argument_group("Concurrency Options")
+    concurrency_args.add_argument('-s', '--subprocesses', action='store',
+            type=int, default=0, metavar='NUM',
+            help="Number of subprocesses to use to run tests.  Default is 0, "
+            "meaning try to autodetect the number of CPUs in the system.  1 "
+            "will disable using subprocesses.  Note that for trivial tests "
+            "(tests that take < 1ms), running in a single process may be "
+            "faster.")
     format_args = parser.add_argument_group("Format Options")
     format_args.add_argument('-m', '--html', action='store_true', default=False,
         help="HTML5 format.  Overrides terminal color options if specified.")
@@ -115,7 +123,7 @@ def main(testing=False):
 
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            termcolor=args.termcolor)
+            termcolor=args.termcolor, subprocesses=args.subprocesses)
 
     # Discover/Load the TestSuite
     tests  = getTests(args.target)

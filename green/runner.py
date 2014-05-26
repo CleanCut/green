@@ -417,7 +417,7 @@ class GreenTestRunner():
 
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
-                 warnings=None, html=None, cpus=None, termcolor=None):
+                 warnings=None, html=None, termcolor=None, subprocesses=0):
         """
         stream - Any stream passed in will be wrapped in a GreenStream
         """
@@ -430,8 +430,8 @@ class GreenTestRunner():
         self.verbosity = verbosity
         self.warnings = warnings
         self.html = html
-        self.cpus = cpus
         self.termcolor = termcolor
+        self.subprocesses = subprocesses or None
 
 
     def run(self, suite):
@@ -455,17 +455,16 @@ class GreenTestRunner():
                             message='Please use assert\w+ instead.')
             result.startTestRun()
 
-            if self.cpus == 1:
+            if self.subprocesses == 1:
                 suite.run(result)
             else:
                 tests = getSuiteDict(suite)
-                pool = LoggingPool(processes=self.cpus)
+                pool = LoggingPool(processes=self.subprocesses)
                 if tests:
                     for group in tests:
                         for test in tests[group]:
-                            async_result = pool.apply_async(
+                            pool.apply_async(
                                 pool_runner, (test,), callback=result.addProto)
-                            async_result.get(.5)
                     pool.close()
                     pool.join()
 
