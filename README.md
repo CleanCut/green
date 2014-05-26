@@ -21,12 +21,11 @@ vertically!  Green fixes all that.
 
 ### Features ###
 
-- Colored terminal output
-- Aligned status indicators
-- Test discovery
-- Flexible test target specification
+- Colored terminal output with vertically-aligned status indicators
+- FAST -- tests run in independent subprocesses by default
+- Test auto-discovery
 - No new objects to learn -- just use normal `unittest` classes.
-- HTML output
+- Optional HTML output
 - Four verbosity levels
 - Built-in, optional, integration with
   [coverage](http://nedbatchelder.com/code/coverage/)
@@ -34,9 +33,6 @@ vertically!  Green fixes all that.
 - Completely supports OS X and Linux, most likely BSDs (and maybe Windows,
   someone want to try it and let me know?)
 
-### Wish List ###
-
-- Parallel test-running (multiprocessing)
 
 Basic Usage
 -----------
