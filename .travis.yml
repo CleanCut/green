@@ -9,5 +9,5 @@ install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
 script:
-  - "./g cov no_delete -vvv"
+  - "./g cov no_delete -s 1 -vvv"
 after_success: coveralls
