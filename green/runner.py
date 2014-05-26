@@ -24,6 +24,7 @@ except: # pragma nocover
     escape = cgi.escape
 
 
+
 class ProtoTestResult():
 
 
@@ -38,13 +39,7 @@ class ProtoTestResult():
         self.unexpectedSuccesses = []
 
 
-    def spy(self, test_name):
-        if sum([len(x) for x in [self.errors, self.expectedFailures, self.failures, self.passing, self.skipped, self.unexpectedSuccesses]]) == 0:
-            fh = open('dmp', 'a')
-            fh.write(test_name + '\n')
-            fh.close()
-
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return (
                 "errors" + str(self.errors) + ', ' +
                 "expectedFailures" + str(self.expectedFailures) + ', ' +
