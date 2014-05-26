@@ -5,9 +5,9 @@ clean:
 
 test: clean
 	@echo "\n== CHECKING PYTHON 2.7 =="
-	./g 2.7 cov green
+	./g 2.7 cov -s 1 green
 	@echo "\n== CHECKING PYTHON 3.4 =="
-	./g 3.4 cov green
+	./g 3.4 cov -s 1 green
 
 sanity-checks:
 	@if git show-ref --verify --quiet refs/tags/`cat green/VERSION` ; then printf "\nVersion `cat green/VERSION` has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
