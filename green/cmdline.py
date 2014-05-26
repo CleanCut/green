@@ -109,6 +109,11 @@ def main(testing=False):
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             return 3
+        if args.subprocesses != 1:
+            sys.stderr.write(
+                "Warning: Running coverage for subprocesses is not yet "
+                "supported.  Setting subprocesses to 1.")
+            args.subprocesses = 1
         cov = coverage.coverage()
         cov.start()
 
