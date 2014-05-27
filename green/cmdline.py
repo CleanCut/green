@@ -33,12 +33,14 @@ def main(testing=False):
         loaded."""))
     concurrency_args = parser.add_argument_group("Concurrency Options")
     concurrency_args.add_argument('-s', '--subprocesses', action='store',
-            type=int, default=0, metavar='NUM',
-            help="Number of subprocesses to use to run tests.  Default is 0, "
-            "meaning try to autodetect the number of CPUs in the system.  1 "
-            "will disable using subprocesses.  Note that for trivial tests "
-            "(tests that take < 1ms), running in a single process may be "
-            "faster.")
+            type=int, default=1, metavar='NUM',
+            help="Number of subprocesses to use to run tests.  Note that your "
+            "tests need to be written to avoid using the same resources (temp "
+            "files, sockets, ports, etc.) for the multi-process mode to work "
+            "well. Default is 1, meaning try to autodetect the number of CPUs "
+            "in the system.  1 will disable using subprocesses.  Note that for "
+            "trivial tests (tests that take < 1ms), running everything in a "
+            "single process may be faster.")
     format_args = parser.add_argument_group("Format Options")
     format_args.add_argument('-m', '--html', action='store_true', default=False,
         help="HTML5 format.  Overrides terminal color options if specified.")

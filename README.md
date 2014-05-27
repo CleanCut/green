@@ -22,7 +22,7 @@ vertically!  Green fixes all that.
 ### Features ###
 
 - Colored terminal output with vertically-aligned status indicators
-- FAST -- tests run in independent subprocesses by default
+- FAST -- experimental support for running tests independent subprocesses
 - Test auto-discovery
 - No new objects to learn -- just use normal `unittest` classes.
 - Optional HTML output
