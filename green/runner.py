@@ -4,7 +4,10 @@ from collections import OrderedDict
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool
+import os
+import shutil
 import sys
+import tempfile
 import time
 import traceback
 
@@ -381,6 +384,14 @@ class LoggingPool(Pool):
 
 
 def pool_runner(test_name):
+    # Each pool worker gets his own temp directory, to avoid having tests that
+    # are used to taking turns using the same temp file name from interfering
+    # with eachother.  So long as the test doesn't use a hard-coded temp
+    # directory, anyway.
+    saved_tempdir = tempfile.tempdir
+    tempfile.tempdir = tempfile.mkdtemp()
+
+    # Create a structure to return the results of this one test
     result = ProtoTestResult()
     try:
         suite = getTests(test_name)
@@ -388,6 +399,9 @@ def pool_runner(test_name):
     except:
         err = sys.exc_info()
         result.addError('a test', err)
+    # Restore the state of the temp directory
+    shutil.rmtree(tempfile.tempdir)
+    tempfile.tempdir = saved_tempdir
     return result
 
 
