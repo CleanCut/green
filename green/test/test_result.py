@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 import sys
-import traceback
 import unittest
 
 from green.output import GreenStream
-from green.result import GreenTestResult
+from green.result import GreenTestResult, ProtoError
 
 try:
     from io import StringIO
@@ -92,7 +91,7 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         test = MagicMock()
-        gtr.addError(test, traceback.format_exception(*err))
+        gtr.addError(test, ProtoError(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsDots' in self.stream.getvalue())
@@ -109,7 +108,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, traceback.format_exception(*err))
+        gtr.addError(test, ProtoError(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsVerbose2' in self.stream.getvalue())
@@ -126,7 +125,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 4)
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, traceback.format_exception(*err))
+        gtr.addError(test, err)
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
@@ -145,7 +144,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.colors.html = True
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, traceback.format_exception(*err))
+        gtr.addError(test, ProtoError(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
@@ -187,8 +186,8 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = MagicMock()
         self.gtr.addError(test, err)
-        self.gtr._reportOutcome.assert_called_with(
-                test, 'E', self.gtr.colors.error, err)
+        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
+                (test, 'E', self.gtr.colors.error))
 
 
     def test_addFailure(self):
@@ -200,8 +199,8 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = MagicMock()
         self.gtr.addFailure(test, err)
-        self.gtr._reportOutcome.assert_called_with(
-                test, 'F', self.gtr.colors.failing, err)
+        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
+                (test, 'F', self.gtr.colors.failing))
 
 
     def test_addSkip(self):
@@ -221,8 +220,8 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = MagicMock()
         self.gtr.addExpectedFailure(test, err)
-        self.gtr._reportOutcome.assert_called_with(
-                test, 'x', self.gtr.colors.expectedFailure, err)
+        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
+                (test, 'x', self.gtr.colors.expectedFailure))
 
 
     def test_addUnexpectedSuccess(self):
