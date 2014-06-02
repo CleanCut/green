@@ -22,8 +22,62 @@ class TestProtoTestResult(unittest.TestCase):
 
     def test_addSuccess(self):
         ptr = ProtoTestResult()
-        test = MagicMock()
+        test = proto_test(MagicMock())
         ptr.addSuccess(test)
+        self.assertEqual(test, ptr.passing[0])
+
+
+    def test_addError(self):
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            err = proto_error(sys.exc_info())
+        ptr.addError(test, err)
+        self.assertEqual(test, ptr.errors[0][0])
+        self.assertEqual(err, ptr.errors[0][1])
+
+
+    def test_addFailure(self):
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            err = proto_error(sys.exc_info())
+        ptr.addFailure(test, err)
+        self.assertEqual(test, ptr.failures[0][0])
+        self.assertEqual(err, ptr.failures[0][1])
+
+
+    def test_addSkip(self):
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        reason = "some plausible reason"
+        ptr.addSkip(test, reason)
+        self.assertEqual(test, ptr.skipped[0][0])
+        self.assertEqual(reason, ptr.skipped[0][1])
+
+
+    def test_addExpectedFailure(self):
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            err = proto_error(sys.exc_info())
+        ptr.addExpectedFailure(test, err)
+        self.assertEqual(test, ptr.expectedFailures[0][0])
+        self.assertEqual(err, ptr.expectedFailures[0][1])
+
+
+    def test_addUnexpectedSuccess(self):
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        ptr.addUnexpectedSuccess(test)
+        self.assertEqual(test, ptr.unexpectedSuccesses[0])
+
 
 
 class TestGreenTestResult(unittest.TestCase):
@@ -162,6 +216,52 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertTrue('Error' in self.stream.getvalue())
         self.assertTrue('<span' in self.stream.getvalue())
         self.assertTrue('color: rgb(' in self.stream.getvalue())
+
+
+    def test_addProtoTestResult(self):
+        "addProtoTestResult adds the correct things to the correct places"
+        ptr = ProtoTestResult()
+
+        err_t = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            err_e = proto_error(sys.exc_info())
+        ptr.addError(err_t, err_e)
+
+        ef_t = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            ef_e = proto_error(sys.exc_info())
+        ptr.addExpectedFailure(ef_t, ef_e)
+
+        fail_t = proto_test(MagicMock())
+        try:
+            raise Exception
+        except:
+            fail_e = proto_error(sys.exc_info())
+        ptr.addFailure(fail_t, fail_e)
+
+        pass_t = proto_test(MagicMock())
+        ptr.addSuccess(pass_t)
+
+        skip_t = proto_test(MagicMock())
+        skip_r = proto_test(MagicMock())
+        ptr.addSkip(skip_t, skip_r)
+
+        us_t = proto_test(MagicMock())
+        ptr.addUnexpectedSuccess(us_t)
+
+        gtr = GreenTestResult(GreenStream(self.stream), None, 0)
+        gtr.addProtoTestResult(ptr)
+
+        self.assertEqual(gtr.errors, [(err_t, err_e)])
+        self.assertEqual(gtr.expectedFailures, [(ef_t, ef_e)])
+        self.assertEqual(gtr.failures, [(fail_t, fail_e)])
+        self.assertEqual(gtr.passing, [pass_t])
+        self.assertEqual(gtr.skipped, [(skip_t, skip_r)])
+        self.assertEqual(gtr.unexpectedSuccesses, [us_t])
 
 
 

@@ -150,28 +150,25 @@ class GreenTestResult():
         self.all_errors = []
 
 
-    def addProto(self, proto):
-        if getattr(proto, 'passing', None) == None:
-            print(proto)
-        else:
-            for test, err in proto.errors:
-                self.startTest(test)
-                self.addError(test, err)
-            for test, err in proto.expectedFailures:
-                self.startTest(test)
-                self.addExpectedFailure(test, err)
-            for test, err in proto.failures:
-                self.startTest(test)
-                self.addFailure(test, err)
-            for test in proto.passing:
-                self.startTest(test)
-                self.addSuccess(test)
-            for test, reason in proto.skipped:
-                self.startTest(test)
-                self.addSkip(test, reason)
-            for test in proto.unexpectedSuccesses:
-                self.startTest(test)
-                self.addUnexpectedSuccess(test)
+    def addProtoTestResult(self, protoTestResult):
+        for test, err in protoTestResult.errors:
+            self.startTest(test)
+            self.addError(test, err)
+        for test, err in protoTestResult.expectedFailures:
+            self.startTest(test)
+            self.addExpectedFailure(test, err)
+        for test, err in protoTestResult.failures:
+            self.startTest(test)
+            self.addFailure(test, err)
+        for test in protoTestResult.passing:
+            self.startTest(test)
+            self.addSuccess(test)
+        for test, reason in protoTestResult.skipped:
+            self.startTest(test)
+            self.addSkip(test, reason)
+        for test in protoTestResult.unexpectedSuccesses:
+            self.startTest(test)
+            self.addUnexpectedSuccess(test)
 
 
     def startTestRun(self):
@@ -304,7 +301,7 @@ class GreenTestResult():
     def addError(self, test, err):
         "Called when a test raises an exception"
         err = proto_error(err)
-        self.errors.append(test)
+        self.errors.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
@@ -312,14 +309,14 @@ class GreenTestResult():
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
         err = proto_error(err)
-        self.failures.append(test)
+        self.failures.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
 
     def addSkip(self, test, reason):
         "Called when a test is skipped"
-        self.skipped.append(test)
+        self.skipped.append((test, reason))
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
 
@@ -327,7 +324,7 @@ class GreenTestResult():
     def addExpectedFailure(self, test, err):
         "Called when a test fails, and we expeced the failure"
         err = proto_error(err)
-        self.expectedFailures.append(test)
+        self.expectedFailures.append((test, err))
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
 

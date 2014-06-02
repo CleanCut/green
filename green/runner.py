@@ -144,7 +144,8 @@ class GreenTestRunner():
                     for group in tests:
                         for test in tests[group]:
                             pool.apply_async(
-                                pool_runner, (test,), callback=result.addProto)
+                                pool_runner, (test,),
+                                callback=result.addProtoTestResult)
                     pool.close()
                     pool.join()
 
