@@ -3,7 +3,8 @@ import sys
 import unittest
 
 from green.output import GreenStream
-from green.result import GreenTestResult, ProtoError
+from green.result import GreenTestResult, proto_test, \
+        proto_error, ProtoTestResult
 
 try:
     from io import StringIO
@@ -15,6 +16,14 @@ try:
 except:
     from mock import MagicMock
 
+
+class TestProtoTestResult(unittest.TestCase):
+
+
+    def test_addSuccess(self):
+        ptr = ProtoTestResult()
+        test = MagicMock()
+        ptr.addSuccess(test)
 
 
 class TestGreenTestResult(unittest.TestCase):
@@ -91,7 +100,7 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         test = MagicMock()
-        gtr.addError(test, ProtoError(err))
+        gtr.addError(test, proto_error(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsDots' in self.stream.getvalue())
@@ -108,7 +117,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, ProtoError(err))
+        gtr.addError(test, proto_error(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('test_printErrorsVerbose2' in self.stream.getvalue())
@@ -144,7 +153,7 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.colors.html = True
         gtr.test_output_line = "   some test output"
         test = MagicMock()
-        gtr.addError(test, ProtoError(err))
+        gtr.addError(test, proto_error(err))
         gtr.printErrors()
         self.assertTrue('\n\n' in self.stream.getvalue())
         self.assertTrue('(most recent call last)' in self.stream.getvalue())
@@ -184,10 +193,11 @@ class TestGreenTestResultAdds(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        test = MagicMock()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
         self.gtr.addError(test, err)
-        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
-                (test, 'E', self.gtr.colors.error))
+        self.gtr._reportOutcome.assert_called_with(
+                test, 'E', self.gtr.colors.error, err)
 
 
     def test_addFailure(self):
@@ -197,10 +207,11 @@ class TestGreenTestResultAdds(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        test = MagicMock()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
         self.gtr.addFailure(test, err)
-        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
-                (test, 'F', self.gtr.colors.failing))
+        self.gtr._reportOutcome.assert_called_with(
+                test, 'F', self.gtr.colors.failing, err)
 
 
     def test_addSkip(self):
@@ -218,10 +229,11 @@ class TestGreenTestResultAdds(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        test = MagicMock()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
         self.gtr.addExpectedFailure(test, err)
-        self.assertEqual(self.gtr._reportOutcome.call_args[0][:-1],
-                (test, 'x', self.gtr.colors.expectedFailure))
+        self.gtr._reportOutcome.assert_called_with(
+                test, 'x', self.gtr.colors.expectedFailure, err)
 
 
     def test_addUnexpectedSuccess(self):

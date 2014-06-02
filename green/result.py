@@ -13,39 +13,47 @@ except: # pragma nocover
     escape = cgi.escape
 
 
+def proto_test(test):
+    """If test is a ProtoTest, I just return it.  Otherwise I create a
+    ProtoTest out of test and return it."""
+    if isinstance(test, ProtoTest):
+        return test
+    else:
+        return ProtoTest(test)
+
+
+def proto_error(err):
+    """If err is a ProtoError, I just return it.  Otherwise I create a
+    ProtoError out of err and return it."""
+    if isinstance(err, ProtoError):
+        return err
+    else:
+        return ProtoError(err)
+
+
+
 class ProtoTest():
     """I take a full-fledged TestCase and preserve just the information we need
-    and can pass between subprocesses.  If you pass me another ProtoTest, I'll
-    just copy it."""
+    and can pass between subprocesses.
+    """
 
 
     def __init__(self, test):
-        if isinstance(test, ProtoTest):
-            self.module      = test.module
-            self.class_name  = test.class_name
-            self.description = test.description
-            self.method_name = test.method_name
-        else:
-            self.module      = test.__module__
-            self.class_name  = test.__class__.__name__
-            self.description = test.shortDescription()
-            self.method_name = str(test).split()[0]
+        self.module      = test.__module__
+        self.class_name  = test.__class__.__name__
+        self.description = test.shortDescription()
+        self.method_name = str(test).split()[0]
 
 
 
 class ProtoError():
     """I take a full-fledged test error and preserve just the information we
-    need and can bass between subprocesses.  If you pass me another ProtoError,
-    I'll just copy it.  You can instantiate me without passing me an error."""
+    need and can bass between subprocesses.
+    """
 
 
     def __init__(self, err=None):
-        if isinstance(err, ProtoError):
-            self.traceback_lines = err.traceback_lines
-        elif err:
-            self.traceback_lines = traceback.format_exception(*err)
-        else:
-            self.traceback_lines = []
+        self.traceback_lines = traceback.format_exception(*err)
 
 
 
@@ -83,32 +91,32 @@ class ProtoTestResult():
 
     def addSuccess(self, test):
         "Called when a test passed"
-        self.passing.append(ProtoTest(test))
+        self.passing.append(proto_test(test))
 
 
     def addError(self, test, err):
         "Called when a test raises an exception"
-        self.errors.append((ProtoTest(test), ProtoError(err)))
+        self.errors.append((proto_test(test), proto_error(err)))
 
 
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
-        self.failures.append((ProtoTest(test), ProtoError(err)))
+        self.failures.append((proto_test(test), proto_error(err)))
 
 
     def addSkip(self, test, reason):
         "Called when a test is skipped"
-        self.skipped.append((ProtoTest(test), reason))
+        self.skipped.append((proto_test(test), reason))
 
 
     def addExpectedFailure(self, test, err):
         "Called when a test fails, and we expeced the failure"
-        self.expectedFailures.append((ProtoTest(test), ProtoError(err)))
+        self.expectedFailures.append((proto_test(test), proto_error(err)))
 
 
     def addUnexpectedSuccess(self, test):
         "Called when a test passed, but we expected a failure"
-        self.unexpectedSuccesses.append(ProtoTest(test))
+        self.unexpectedSuccesses.append(proto_test(test))
 
 
 
@@ -219,7 +227,7 @@ class GreenTestResult():
         self.testsRun += 1
 
         # Get our bearings
-        test = ProtoTest(test)
+        test = proto_test(test)
         current_module = test.module
         current_class  = test.class_name
 
@@ -254,7 +262,7 @@ class GreenTestResult():
 
 
     def _testDescription(self, test):
-        test = ProtoTest(test)
+        test = proto_test(test)
         if self.verbosity == 2:
             return test.method_name
         elif self.verbosity > 2:
@@ -295,7 +303,7 @@ class GreenTestResult():
 
     def addError(self, test, err):
         "Called when a test raises an exception"
-        err = ProtoError(err)
+        err = proto_error(err)
         self.errors.append(test)
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
@@ -303,7 +311,7 @@ class GreenTestResult():
 
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
-        err = ProtoError(err)
+        err = proto_error(err)
         self.failures.append(test)
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
@@ -318,7 +326,7 @@ class GreenTestResult():
 
     def addExpectedFailure(self, test, err):
         "Called when a test fails, and we expeced the failure"
-        err = ProtoError(err)
+        err = proto_error(err)
         self.expectedFailures.append(test)
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
