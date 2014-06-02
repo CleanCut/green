@@ -16,7 +16,7 @@ except: # pragma: no cover
 # Importing from green is done after coverage initialization
 
 
-def main(testing=False):
+def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
@@ -116,8 +116,9 @@ def main(testing=False):
                 "Warning: Running coverage for subprocesses is not yet "
                 "supported.  Setting subprocesses to 1.")
             args.subprocesses = 1
-        cov = coverage.coverage()
-        cov.start()
+        if (not testing) or coverage_testing:
+            cov = coverage.coverage()
+            cov.start()
 
 
     # Set up our various main objects
@@ -148,7 +149,7 @@ def main(testing=False):
     else:
         result = runner.run(tests)
 
-    if args.run_coverage:
+    if args.run_coverage and ((not testing) or coverage_testing):
         stream.writeln()
         cov.stop()
         if args.omit:

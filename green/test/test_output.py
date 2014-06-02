@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import sys
 import unittest
 
 try:
@@ -110,3 +111,14 @@ class TestGreenStream(unittest.TestCase):
         self.assertTrue('&nbsp;' in gs.formatLine(msg, indent=1))
 
 
+    def testBadStringType(self):
+        "passing the wrong stream type to GreenStream gets auto-converted"
+        s = StringIO()
+        gs = GreenStream(s)
+        msg = "some string"
+        if sys.version_info[0] == 3: # pragma: no cover
+            bad_str = bytes(msg)
+        else: # pragma: no cover
+            bad_str = str(msg)
+        gs.write(bad_str)
+        self.assertEqual(s.getvalue(), msg)

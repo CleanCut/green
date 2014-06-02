@@ -40,6 +40,15 @@ class TestMain(unittest.TestCase):
         del(self.saved_stderr)
         del(self.saved_stdout)
 
+    def test_coverageVsSubprocesses(self):
+        "'--subprocesses=(not 1) --run-coverage' is not currently supported"
+        cmdline.sys.argv = ['', '--subprocesses=2', '--run-coverage']
+        cmdline.main(testing=True)
+        self.assertIn('Warning', self.s.getvalue())
+        self.assertIn('not', self.s.getvalue())
+        self.assertIn('supported', self.s.getvalue())
+
+
     def test_optVersion(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']
@@ -83,7 +92,7 @@ class TestMain(unittest.TestCase):
         save_coverage = cmdline.coverage
         cmdline.coverage = MagicMock()
         cmdline.sys.argv = ['', '--run-coverage']
-        cmdline.main(testing=True)
+        cmdline.main(testing=True, coverage_testing=True)
         cmdline.coverage.coverage.assert_called_with()
         cmdline.coverage = save_coverage
 
@@ -105,7 +114,7 @@ class TestMain(unittest.TestCase):
         cov = MagicMock()
         cmdline.coverage.coverage.return_value = cov
         cmdline.sys.argv = ['', '--run-coverage', '--omit', 'a,b']
-        cmdline.main(testing=True)
+        cmdline.main(testing=True, coverage_testing=True)
         self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
         cmdline.coverage = save_coverage
 

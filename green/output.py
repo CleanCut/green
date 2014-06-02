@@ -1,9 +1,16 @@
 from __future__ import unicode_literals
 import logging
+import sys
 import termstyle
 
 global debug_level
 debug_level = 0
+
+if sys.version_info[0] == 3: # pragma: no cover
+    text_type = str
+    unicode = None # so pyflakes stops complaining
+else: # pragma: no cover
+    text_type = unicode
 
 
 def debug(message, level=0):
@@ -157,6 +164,8 @@ class GreenStream(object):
     def write(self, text):
         if self.html:
             text = text.replace('\n', '<br>\n')
+        if type(text) != text_type:
+            text = text_type(text)
         self.stream.write(text)
 
 
