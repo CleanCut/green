@@ -4,7 +4,7 @@ import unittest
 
 from green.output import GreenStream
 from green.result import GreenTestResult, proto_test, \
-        proto_error, ProtoTestResult
+        ProtoTest, proto_error, ProtoTestResult
 
 try:
     from io import StringIO
@@ -21,6 +21,7 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addSuccess(self):
+        "addSuccess adds a test correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         ptr.addSuccess(test)
@@ -28,6 +29,7 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addError(self):
+        "addError adds a test and error correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -40,6 +42,7 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addFailure(self):
+        "addFailure adds a test and error correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -52,6 +55,7 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addSkip(self):
+        "addSkip adds a test and reason correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         reason = "some plausible reason"
@@ -61,6 +65,7 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addExpectedFailure(self):
+        "addExpectedFailure adds a test and error correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -73,10 +78,41 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addUnexpectedSuccess(self):
+        "addUnexpectedSuccess adds a test correctly"
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         ptr.addUnexpectedSuccess(test)
         self.assertEqual(test, ptr.unexpectedSuccesses[0])
+
+
+
+class TestProtoTest(unittest.TestCase):
+
+
+    def test_ProtoTestBlank(self):
+        "ProtoTest can be instantiated empty"
+        pt = ProtoTest()
+        for i in ['module', 'class_name', 'description', 'method_name']:
+            self.assertEqual('', getattr(pt, i, None))
+
+
+    def test_ProtoTestFromTest(self):
+        "Passing a test into ProtoTest copies out the relevant info."
+        module      = 'some_module'
+        class_name  = 'some_class'
+        description = 'stuff'
+        method_name = 'method()'
+
+        t             = MagicMock()
+        t.__module__  = module
+        t.__class__.__name__  = str(class_name)
+        t.shortDescription.return_value = description
+        t.__str__.return_value = method_name
+
+        pt = ProtoTest(t)
+
+        for i in ['module', 'class_name', 'description', 'method_name']:
+            self.assertEqual(locals()[i], getattr(pt, i, None))
 
 
 

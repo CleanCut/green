@@ -15,7 +15,7 @@ import warnings
 
 from green.loader import getTests
 from green.output import GreenStream
-from green.result import ProtoTestResult, GreenTestResult
+from green.result import ProtoTest, ProtoTestResult, GreenTestResult
 
 
 
@@ -64,12 +64,21 @@ def pool_runner(test_name):
 
     # Create a structure to return the results of this one test
     result = ProtoTestResult()
+    test = None
     try:
-        suite = getTests(test_name)
-        suite.run(result)
+        test = getTests(test_name)
+        test.run(result)
     except:
         err = sys.exc_info()
-        result.addError('a test', err)
+        if test:
+            result.addError(test, err)
+        else:
+            t             = ProtoTest()
+            t.module      = 'green.runner'
+            t.class_name  = 'N/A'
+            t.description = "Green's subprocess pool should function correctly."
+            t.method_name = 'pool_runner'
+            result.addError(t, err)
     # Restore the state of the temp directory
     shutil.rmtree(tempfile.tempdir)
     tempfile.tempdir = saved_tempdir
@@ -78,6 +87,13 @@ def pool_runner(test_name):
 
 
 def getSuiteDict(item, suite_dict=OrderedDict()):
+    # Python's lousy handling of module import failures during loader discovery
+    # makes this crazy special case necessary.  See _make_failed_import_test in
+    # the source code for unittest.loader
+    if item.__class__.__name__ == 'ModuleImportFailure':
+        exception_method = str(item).split()[0]
+        getattr(item, exception_method)()
+    # On to the real stuff
     if issubclass(type(item), TestCase):
         class_part = item.__module__ + '.' + item.__class__.__name__
         test_part = str(item).split(' ')[0]

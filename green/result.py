@@ -38,11 +38,17 @@ class ProtoTest():
     """
 
 
-    def __init__(self, test):
-        self.module      = test.__module__
-        self.class_name  = test.__class__.__name__
-        self.description = test.shortDescription()
-        self.method_name = str(test).split()[0]
+    def __init__(self, test=None):
+        if test:
+            self.module      = test.__module__
+            self.class_name  = test.__class__.__name__
+            self.description = test.shortDescription()
+            self.method_name = str(test).split()[0]
+        else:
+            self.module = ''
+            self.class_name = ''
+            self.description = ''
+            self.method_name = ''
 
 
 
