@@ -352,7 +352,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def test_addSkip(self):
         "addSkip() makes the correct calls to other functions."
-        test = 'skip test'
+        test = proto_test(MagicMock())
         reason = 'skip reason'
         self.gtr.addSkip(test, reason)
         self.gtr._reportOutcome.assert_called_with(
@@ -374,7 +374,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def test_addUnexpectedSuccess(self):
         "addUnexpectedSuccess() makes the correct calls to other functions."
-        test = 'unexpected success test'
+        test = proto_test(MagicMock())
         self.gtr.addUnexpectedSuccess(test)
         self.gtr._reportOutcome.assert_called_with(
                 test, 'u', self.gtr.colors.unexpectedSuccess)

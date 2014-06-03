@@ -306,6 +306,7 @@ class GreenTestResult():
 
     def addError(self, test, err):
         "Called when a test raises an exception"
+        test = proto_test(test)
         err = proto_error(err)
         self.errors.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Error', err))
@@ -314,6 +315,7 @@ class GreenTestResult():
 
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
+        test = proto_test(test)
         err = proto_error(err)
         self.failures.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Failure', err))
@@ -321,6 +323,7 @@ class GreenTestResult():
 
 
     def addSkip(self, test, reason):
+        test = proto_test(test)
         "Called when a test is skipped"
         self.skipped.append((test, reason))
         self._reportOutcome(
@@ -329,6 +332,7 @@ class GreenTestResult():
 
     def addExpectedFailure(self, test, err):
         "Called when a test fails, and we expeced the failure"
+        test = proto_test(test)
         err = proto_error(err)
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
@@ -336,6 +340,7 @@ class GreenTestResult():
 
     def addUnexpectedSuccess(self, test):
         "Called when a test passed, but we expected a failure"
+        test = proto_test(test)
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
@@ -350,8 +355,8 @@ class GreenTestResult():
             # Header Line
             self.stream.writeln(
                     '\n' + color_func(outcome) +
-                    ' in ' + self.colors.bold(str(test).split()[0]) +
-                    ' from ' + str(test).split()[1].strip('()'))
+                    ' in ' + self.colors.bold(test.method_name) +
+                    ' from ' + test.module)
 
             # Frame Line
             relevant_frames = []
