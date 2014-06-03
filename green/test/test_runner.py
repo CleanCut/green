@@ -110,8 +110,7 @@ class TestSubprocesses(unittest.TestCase):
 
 
     def test_collisionProtection(self):
-        """As long as tests use the tempdir defined through tempfile, using the
-        same testfile name will not collide in subprocesses"""
+        "If tempfile.gettempdir() is used for dir, using same testfile name will not collide"
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # Child setup
         # pkg/__init__.py

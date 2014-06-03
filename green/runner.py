@@ -19,7 +19,7 @@ from green.result import ProtoTest, ProtoTestResult, GreenTestResult
 
 
 
-class LogExceptions(object):
+class SubprocessLogger(object):
 
 
     def __init__(self, callable):
@@ -46,15 +46,27 @@ class LogExceptions(object):
 
 
 
-class LoggingPool(Pool):
+class DaemonlessProcess(multiprocessing.Process):
+    # make 'daemon' attribute always return False
+    def _get_daemon(self):
+        return False
+    def _set_daemon(self, value):
+        pass
+    daemon = property(_get_daemon, _set_daemon)
+
+
+
+class LoggingDaemonlessPool(Pool):
+    Process = DaemonlessProcess
 
 
     def apply_async(self, func, args=(), kwds={}, callback=None):
-        return Pool.apply_async(self, LogExceptions(func), args, kwds, callback)
+        return Pool.apply_async(
+                self, SubprocessLogger(func), args, kwds, callback)
 
 
 
-def pool_runner(test_name):
+def PoolRunner(test_name):
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
@@ -77,7 +89,7 @@ def pool_runner(test_name):
             t.module      = 'green.runner'
             t.class_name  = 'N/A'
             t.description = "Green's subprocess pool should function correctly."
-            t.method_name = 'pool_runner'
+            t.method_name = 'PoolRunner'
             result.addError(t, err)
     # Restore the state of the temp directory
     shutil.rmtree(tempfile.tempdir)
@@ -86,7 +98,9 @@ def pool_runner(test_name):
 
 
 
-def getSuiteDict(item, suite_dict=OrderedDict()):
+def getSuiteDict(item, suite_dict=None):
+    if suite_dict == None:
+        suite_dict = OrderedDict()
     # Python's lousy handling of module import failures during loader discovery
     # makes this crazy special case necessary.  See _make_failed_import_test in
     # the source code for unittest.loader
@@ -155,12 +169,12 @@ class GreenTestRunner():
                 suite.run(result)
             else:
                 tests = getSuiteDict(suite)
-                pool = LoggingPool(processes=self.subprocesses)
+                pool = LoggingDaemonlessPool(processes=self.subprocesses)
                 if tests:
-                    for group in tests:
-                        for test in tests[group]:
+                    for class_name in tests:
+                        for test in tests[class_name]:
                             pool.apply_async(
-                                pool_runner, (test,),
+                                PoolRunner, (test,),
                                 callback=result.addProtoTestResult)
                     pool.close()
                     pool.join()
