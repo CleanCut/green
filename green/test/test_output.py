@@ -117,7 +117,7 @@ class TestGreenStream(unittest.TestCase):
         gs = GreenStream(s)
         msg = "some string"
         if sys.version_info[0] == 3: # pragma: no cover
-            bad_str = bytes(msg)
+            bad_str = bytes(msg, 'utf-8')
         else: # pragma: no cover
             bad_str = str(msg)
         gs.write(bad_str)

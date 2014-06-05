@@ -164,8 +164,8 @@ class GreenStream(object):
     def write(self, text):
         if self.html:
             text = text.replace('\n', '<br>\n')
-        if type(text) != text_type:
-            text = text_type(text)
+        if type(text) == bytes:
+            text = text.decode('utf-8')
         self.stream.write(text)
 
 
