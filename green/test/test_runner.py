@@ -157,3 +157,22 @@ class A(unittest.TestCase):
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         gtr.run(tests)
         self.assertIn('OK', self.stream.getvalue())
+
+
+
+    def test_badTest(self):
+        "If tempfile.gettempdir() is used for dir, using same testfile name will not collide"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'test_bad_syntax.py'), 'w')
+        fh.write("aoeu")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        tests = getTests('.')
+        gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
+        self.assertRaises(ImportError, gtr.run, (tests,))
