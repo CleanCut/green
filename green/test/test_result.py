@@ -378,3 +378,11 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr.addUnexpectedSuccess(test)
         self.gtr._reportOutcome.assert_called_with(
                 test, 'u', self.gtr.colors.unexpectedSuccess)
+
+
+    def test_wasSuccessful(self):
+        "wasSuccessful returns what we expect"
+        gtr = GreenTestResult(GreenStream(self.stream), None, 1)
+        self.assertEqual(gtr.wasSuccessful(), True)
+        gtr.all_errors.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), False)
