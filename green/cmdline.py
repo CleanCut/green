@@ -111,13 +111,8 @@ def main(testing=False, coverage_testing=False):
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             return 3
-        if args.subprocesses != 1:
-            sys.stderr.write(
-                "Warning: Running coverage for subprocesses is not yet "
-                "supported.  Setting subprocesses to 1.")
-            args.subprocesses = 1
         if (not testing) or coverage_testing:
-            cov = coverage.coverage()
+            cov = coverage.coverage(data_file='.coverage')
             cov.start()
 
 
@@ -131,7 +126,8 @@ def main(testing=False, coverage_testing=False):
 
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            termcolor=args.termcolor, subprocesses=args.subprocesses)
+            termcolor=args.termcolor, subprocesses=args.subprocesses,
+            run_coverage=args.run_coverage)
 
     # Discover/Load the TestSuite
     tests  = getTests(args.target)
@@ -152,6 +148,8 @@ def main(testing=False, coverage_testing=False):
     if args.run_coverage and ((not testing) or coverage_testing):
         stream.writeln()
         cov.stop()
+        cov.save()
+        cov.combine()
         if args.omit:
             omit = args.omit.split(',')
         else:

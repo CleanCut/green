@@ -161,7 +161,7 @@ class A(unittest.TestCase):
 
 
     def test_badTest(self):
-        "If tempfile.gettempdir() is used for dir, using same testfile name will not collide"
+        "Bad syntax in a testfile is caught as a test error."
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')

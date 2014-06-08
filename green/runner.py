@@ -4,6 +4,7 @@ from collections import OrderedDict
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool
+import random
 import shutil
 import sys
 import tempfile
@@ -12,6 +13,11 @@ import traceback
 from unittest.signals import registerResult
 from unittest import TestCase
 import warnings
+
+try: # pragma: no cover
+    import coverage
+except: # pragma: no cover
+    coverage = None
 
 from green.loader import getTests
 from green.output import GreenStream
@@ -76,13 +82,20 @@ class LoggingDaemonlessPool(Pool):
 
 
 
-def PoolRunner(test_name):
+def PoolRunner(test_name, coverage_number=None):
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
     # directory, anyway.
     saved_tempdir = tempfile.tempdir
     tempfile.tempdir = tempfile.mkdtemp()
+
+    # Each pool starts its own coverage, later combined by the main process.
+    if coverage_number and coverage:
+        cov = coverage.coverage(
+                data_file='.coverage.{}_{}'.format(
+                    coverage_number, random.randint(0, 10000)))
+        cov.start()
 
     # Create a structure to return the results of this one test
     result = ProtoTestResult()
@@ -101,6 +114,12 @@ def PoolRunner(test_name):
             t.description = "Green's subprocess pool should function correctly."
             t.method_name = 'PoolRunner'
             result.addError(t, err)
+
+    # Finish coverage
+    if coverage_number and coverage:
+        cov.stop()
+        cov.save()
+
     # Restore the state of the temp directory
     shutil.rmtree(tempfile.tempdir)
     tempfile.tempdir = saved_tempdir
@@ -137,7 +156,8 @@ class GreenTestRunner():
 
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
-                 warnings=None, html=None, termcolor=None, subprocesses=0):
+                 warnings=None, html=None, termcolor=None, subprocesses=0,
+                 run_coverage=False):
         """
         stream - Any stream passed in will be wrapped in a GreenStream
         """
@@ -152,6 +172,7 @@ class GreenTestRunner():
         self.html = html
         self.termcolor = termcolor
         self.subprocesses = subprocesses or None
+        self.run_coverage = run_coverage
 
 
     def run(self, suite):
@@ -182,9 +203,13 @@ class GreenTestRunner():
                 pool = LoggingDaemonlessPool(processes=self.subprocesses)
                 if tests:
                     for class_name in tests:
-                        for test in tests[class_name]:
+                        for index, test in enumerate(tests[class_name]):
+                            if self.run_coverage:
+                                coverage_number = index + 1
+                            else:
+                                coverage_number = None
                             pool.apply_async(
-                                PoolRunner, (test,),
+                                PoolRunner, (test, coverage_number),
                                 callback=result.addProtoTestResult)
                     pool.close()
                     pool.join()
