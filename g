@@ -11,24 +11,5 @@ if [[ -e `which python$1` ]] ; then
     shift
 fi
 
-# If the next argument is "cov", run coverage externally
-if [[ $1 == "cov" ]] ; then
-    shift
-    if [[ $1 == "no_delete" ]] ; then
-        shift
-        DELETE="no"
-    else
-        DELETE="yes"
-    fi
-    coverage run --source green --omit '*/test*,*examples*' -m green.cmdline $@
-    echo ""
-    coverage report -m
-    if [[ $DELETE == "yes" ]] ; then
-        rm .coverage
-    fi
-    exit
-fi
-
-
 # Run the command-line version of green
 $PYTHON -m green.cmdline $@
