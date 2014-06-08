@@ -151,28 +151,3 @@ class TestRunning(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.container_dir)
         shutil.rmtree(self.tmpdir)
-
-
-
-    def test_runTest(self):
-        "cmdline can actually run a test"
-        # Parent directory setup
-        os.chdir(self.tmpdir)
-        os.chdir('..')
-        # Child setup
-        target = os.path.join(self.tmpdir, '__init__.py')
-        fh = open(target, 'w')
-        fh.write('\n')
-        fh.close()
-        fh = open(os.path.join(self.tmpdir, 'test_to_run.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
-        fh.close()
-        # Run the tests
-        module_name = os.path.basename(self.tmpdir)
-        cmdline.sys.argv = ['', module_name]
-        cmdline.main()
