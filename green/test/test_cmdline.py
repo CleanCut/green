@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 import logging
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 from green import cmdline
@@ -110,3 +113,66 @@ class TestMain(unittest.TestCase):
         cmdline.coverage = save_coverage
 
 
+    def test_import_cmdline_module(self):
+        "The cmdline module can be imported"
+        global reload
+        try: # Python 3.x's reload is in importlib
+            import importlib
+            importlib.reload
+            reload = importlib.reload
+        except:
+            pass # Python 2.7's reload is builtin
+        reload(cmdline)
+
+
+
+class TestRunning(unittest.TestCase):
+
+    # Setup
+    @classmethod
+    def setUpClass(cls):
+        cls.startdir = os.getcwd()
+        cls.container_dir = tempfile.mkdtemp()
+
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.getcwd() != cls.startdir:
+            os.chdir(cls.startdir)
+        cls.startdir = None
+        shutil.rmtree(cls.container_dir)
+
+
+    def setUp(self):
+        os.chdir(self.container_dir)
+        self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
+
+
+    def tearDown(self):
+        os.chdir(self.container_dir)
+        shutil.rmtree(self.tmpdir)
+
+
+
+    def test_runTest(self):
+        "cmdline can actually run a test"
+        # Parent directory setup
+        os.chdir(self.tmpdir)
+        os.chdir('..')
+        # Child setup
+        target = os.path.join(self.tmpdir, '__init__.py')
+        fh = open(target, 'w')
+        fh.write('\n')
+        fh.close()
+        fh = open(os.path.join(self.tmpdir, 'test_to_run.py'), 'w')
+        fh.write("""\
+import unittest
+class A(unittest.TestCase):
+    def testPass(self):
+        pass
+""")
+        fh.close()
+        # Run the tests
+        module_name = os.path.basename(self.tmpdir)
+        cmdline.sys.argv = ['', module_name]
+        cmdline.main()

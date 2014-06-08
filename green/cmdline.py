@@ -104,7 +104,6 @@ def main(testing=False, coverage_testing=False):
         args.termcolor = False
 
     # Coverage?
-    omit = []
     if args.run_coverage:
         if not coverage:
             sys.stderr.write(
@@ -143,7 +142,7 @@ def main(testing=False, coverage_testing=False):
         result = lambda: None
         result.wasSuccessful = lambda: 0
     else:
-        result = runner.run(tests)
+        result = runner.run(tests) # pragma: no cover
 
     if args.run_coverage and ((not testing) or coverage_testing):
         stream.writeln()
