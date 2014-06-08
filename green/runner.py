@@ -82,7 +82,7 @@ class LoggingDaemonlessPool(Pool):
 
 
 
-def PoolRunner(test_name, coverage_number=None):
+def PoolRunner(test_name, coverage_number=None, omit=[]):
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
@@ -94,7 +94,8 @@ def PoolRunner(test_name, coverage_number=None):
     if coverage_number and coverage:
         cov = coverage.coverage(
                 data_file='.coverage.{}_{}'.format(
-                    coverage_number, random.randint(0, 10000)))
+                    coverage_number, random.randint(0, 10000)),
+                omit=omit)
         cov.start()
 
     # Create a structure to return the results of this one test
@@ -157,7 +158,7 @@ class GreenTestRunner():
 
     def __init__(self, stream=None, descriptions=True, verbosity=1,
                  warnings=None, html=None, termcolor=None, subprocesses=0,
-                 run_coverage=False):
+                 run_coverage=False, omit=[]):
         """
         stream - Any stream passed in will be wrapped in a GreenStream
         """
@@ -173,6 +174,7 @@ class GreenTestRunner():
         self.termcolor = termcolor
         self.subprocesses = subprocesses or None
         self.run_coverage = run_coverage
+        self.omit = omit
 
 
     def run(self, suite):
@@ -209,7 +211,7 @@ class GreenTestRunner():
                             else:
                                 coverage_number = None
                             pool.apply_async(
-                                PoolRunner, (test, coverage_number),
+                                PoolRunner, (test, coverage_number, self.omit),
                                 callback=result.addProtoTestResult)
                     pool.close()
                     pool.join()

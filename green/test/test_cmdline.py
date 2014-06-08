@@ -85,9 +85,10 @@ class TestMain(unittest.TestCase):
         "If coverage and --run-coverage, then coverage is started"
         save_coverage = cmdline.coverage
         cmdline.coverage = MagicMock()
-        cmdline.sys.argv = ['', '--run-coverage']
+        cmdline.sys.argv = ['', '--run-coverage', '--omit=abc']
         cmdline.main(testing=True, coverage_testing=True)
-        cmdline.coverage.coverage.assert_called_with(data_file=u'.coverage')
+        cmdline.coverage.coverage.assert_called_with(
+                data_file=u'.coverage', omit=['abc'])
         cmdline.coverage = save_coverage
 
 

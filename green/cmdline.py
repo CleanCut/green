@@ -104,14 +104,27 @@ def main(testing=False, coverage_testing=False):
         args.termcolor = False
 
     # Coverage?
+    omit = []
     if args.run_coverage:
+        if args.omit:
+            omit = args.omit.split(',')
+        else:
+            omit = [
+                '*/test*',
+                '*/termstyle*',
+                '*/mock*',
+                tempfile.gettempdir() + '*']
+            if (args.target != 'green') and (not args.target.startswith('green.')):
+                omit.extend([
+                '*Python.framework*',
+                '*site-packages*'])
         if not coverage:
             sys.stderr.write(
                 "Fatal: The 'coverage' module is not installed.  Have you "
                 "run 'pip install coverage'???")
             return 3
         if (not testing) or coverage_testing:
-            cov = coverage.coverage(data_file='.coverage')
+            cov = coverage.coverage(data_file='.coverage', omit=omit)
             cov.start()
 
 
@@ -126,7 +139,7 @@ def main(testing=False, coverage_testing=False):
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
             termcolor=args.termcolor, subprocesses=args.subprocesses,
-            run_coverage=args.run_coverage)
+            run_coverage=args.run_coverage, omit=omit)
 
     # Discover/Load the TestSuite
     tests  = getTests(args.target)
@@ -149,18 +162,7 @@ def main(testing=False, coverage_testing=False):
         cov.stop()
         cov.save()
         cov.combine()
-        if args.omit:
-            omit = args.omit.split(',')
-        else:
-            omit = [
-                '*/test*',
-                '*/termstyle*',
-                '*/mock*',
-                tempfile.gettempdir() + '*']
-            if (args.target != 'green') and (not args.target.startswith('green.')):
-                omit.extend([
-                '*Python.framework*',
-                '*site-packages*'])
+        cov.save()
         cov.report(file=stream, omit=omit)
     return(int(not result.wasSuccessful()))
 
