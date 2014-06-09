@@ -73,7 +73,7 @@ class LoggingDaemonlessPool(Pool):
 
 
 
-def PoolRunner(test_name, coverage_number=None, omit=[]):
+def poolRunner(test_name, coverage_number=None, omit=[]):
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
@@ -97,15 +97,12 @@ def PoolRunner(test_name, coverage_number=None, omit=[]):
         test.run(result)
     except:
         err = sys.exc_info()
-        if test:
-            result.addError(test, err)
-        else:
-            t             = ProtoTest()
-            t.module      = 'green.runner'
-            t.class_name  = 'N/A'
-            t.description = "Green's subprocess pool should function correctly."
-            t.method_name = 'PoolRunner'
-            result.addError(t, err)
+        t             = ProtoTest()
+        t.module      = 'green.runner'
+        t.class_name  = 'N/A'
+        t.description = 'Green encountered an error loading the unit test itself.'
+        t.method_name = 'poolRunner'
+        result.addError(t, err)
 
     # Finish coverage
     if coverage_number and coverage:

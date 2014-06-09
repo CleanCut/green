@@ -14,7 +14,7 @@ except: # pragma: no cover
 
 from green.output import GreenStream
 from green.result import GreenTestResult
-from green.subprocess import LoggingDaemonlessPool, PoolRunner
+from green.subprocess import LoggingDaemonlessPool, poolRunner
 
 
 
@@ -101,7 +101,7 @@ class GreenTestRunner():
                             else:
                                 coverage_number = None
                             pool.apply_async(
-                                PoolRunner, (test, coverage_number, self.omit),
+                                poolRunner, (test, coverage_number, self.omit),
                                 callback=result.addProtoTestResult)
                     pool.close()
                     pool.join()
