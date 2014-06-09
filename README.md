@@ -22,16 +22,16 @@ vertically!  Green fixes all that.
 ### Features ###
 
 - Colored terminal output with vertically-aligned status indicators
-- FAST -- experimental support for running tests independent subprocesses
-- Test auto-discovery
+- FAST -- tests can be run in independent subprocesses
+- Auto-discovery of tests in a directory, package, or module
 - No new objects to learn -- just use normal `unittest` classes.
-- Optional HTML output
 - Four verbosity levels
-- Built-in, optional, integration with
+- Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/)
 - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
 - Completely supports OS X and Linux, most likely BSDs (and maybe Windows,
   someone want to try it and let me know?)
+- Optional HTML output
 
 
 Basic Usage
