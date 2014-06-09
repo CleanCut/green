@@ -12,4 +12,4 @@ if [[ -e `which python$1` ]] ; then
 fi
 
 # Run the command-line version of green
-$PYTHON -m green.cmdline $@
+PYTHONPATH="." $PYTHON -m green.cmdline $@

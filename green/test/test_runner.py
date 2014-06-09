@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from green.loader import getTests
-from green.runner import GreenTestRunner
+from green.runner import GreenTestRunner, getSuiteDict
 from green.output import GreenStream
 
 try:
@@ -13,6 +13,10 @@ try:
 except:
     from StringIO import StringIO
 
+try:
+    from unittest.mock import MagicMock
+except:
+    from mock import MagicMock
 
 
 class TestGreenTestRunner(unittest.TestCase):
@@ -154,10 +158,33 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = getTests('.')
+        os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         gtr.run(tests)
         self.assertIn('OK', self.stream.getvalue())
 
+
+    def test_runCoverage(self):
+        "Running coverage in subprocess mode doesn't crash"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'test_coverage.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        tests = getTests('.')
+        os.chdir(TestSubprocesses.startdir)
+        gtr = GreenTestRunner(self.stream, subprocesses=2, run_coverage=True)
+        gtr.run(tests)
 
 
     def test_badTest(self):
@@ -174,5 +201,19 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = getTests('.')
+        os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         self.assertRaises(ImportError, gtr.run, (tests,))
+
+
+
+class TestGetSuiteDict(unittest.TestCase):
+
+
+    def test_moduleImportFailure(self):
+        suite = MagicMock()
+        suite.__class__.__name__ = str('ModuleImportFailure')
+        suite.__str__.return_value = "exception_method other_stuff"
+        suite.exception_method.side_effect = AttributeError
+        self.assertRaises(AttributeError, getSuiteDict, (suite,))
+
