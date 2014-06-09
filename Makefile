@@ -4,10 +4,14 @@ clean:
 	@rm -rf .coverage _trial_temp build dist green.egg-info
 
 test: clean
-	@echo "\n== CHECKING PYTHON 2.7 =="
-	./g 2.7 cov -s 1 green
-	@echo "\n== CHECKING PYTHON 3.4 =="
-	./g 3.4 cov -s 1 green
+	@echo "\n== CHECKING PYTHON 2.7 (SINGLE) =="
+	./g 2.7 -r -s 1 green
+	@echo "\n== CHECKING PYTHON 2.7 (MULTI) =="
+	./g 2.7 -r -s 0 green
+	@echo "\n== CHECKING PYTHON 3.4 (SINGLE) =="
+	./g 3.4 -r -s 1 green
+	@echo "\n== CHECKING PYTHON 3.4 (MULTI) =="
+	./g 3.4 -r -s 1 green
 
 sanity-checks:
 	@if git show-ref --verify --quiet refs/tags/`cat green/VERSION` ; then printf "\nVersion `cat green/VERSION` has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
