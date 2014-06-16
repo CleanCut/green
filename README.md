@@ -41,18 +41,16 @@ Basic Usage
 You may need to prepend the installation command with `sudo` or run it as root
 if your normal user cannot write to the local Python package directory.
 
-    pip3 install green
+```bash
+pip3 install green    # To upgrade: "pip3 install --upgrade green"
+```
 
-When new releases come out, be sure to upgrade with:
-
-    pip3 install --upgrade green
-
-To run existing unit tests, navigate to the *parent* directory of your project:
+To run existing unit tests, navigate to the *parent* directory of your project.
 
     cd /parent/directory
 
-Then run green and let it autodiscover the tests (assuming the test modules,
-classes, and methods all start with 'test'):
+Then pass green the directory of your project and let it autodiscover the tests
+(assuming the test modules, classes, and methods all start with 'test').
 
     green yourproject
 
@@ -61,8 +59,11 @@ carefully set up your `PYTHONPATH` environment variable to include the parent
 path of your project, you may be able to just run `green` from _inside_ your
 project directory.
 
-    cd /parent/directory/yourproject
-    PYTHONPATH=/parent/directory green
+```bash
+export PYTHONPATH=/parent/directory
+cd /parent/directory/yourproject
+green
+```
 
 Verbosity Levels
 ----------------
@@ -73,9 +74,11 @@ using the `-v` or `-vv` options.
 
 Levels:
 - `default` - Dots, tracebacks, and summary line.
-- `-v` - Dots are replaced with module/class heirarchy and function names
+- `-v` - Add module/class heirarchy and function names
 - `-vv` - Version information added. Function names are replaced with first line of docstring.
 - `-vvv` - Highest verbosity level recognized.  Details coming soon.
+
+See the section entitled [Running Green](#running-green) for example output.
 
 Canned Examples
 ---------------
@@ -240,7 +243,8 @@ class TestSchool(unittest.TestCase):
 
 Notes:
 
-1. Start all your test class names with `Test`, and always subclass `unittest.TestCase`
+1. Start all your test class names with `Test`, and always subclass
+   `unittest.TestCase`
 
 2. Start all your test method names with `test`.
 
@@ -249,9 +253,9 @@ Notes:
    of methods that seem logical to go together.
 
 4. The methods of `TestAnswer` have docstrings, while the methods on
-   `TestSchool` do not.  For most output modes, green will use the method
-docstring to describe the test if it is present, and the name of the method if
-it is not.  Notice the difference in the output below.
+   `TestSchool` do not.  For more verbose output modes, green will use the
+   method docstring to describe the test if it is present, and the name of the
+   method if it is not.  Notice the difference in the output below.
 
 ### Running Green ###
 
