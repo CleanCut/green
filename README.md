@@ -21,17 +21,17 @@ vertically!  Green fixes all that.
 
 ### Features ###
 
-- Colored terminal output with vertically-aligned status indicators
-- FAST -- tests can be run in independent subprocesses
-- Auto-discovery of tests in a directory, package, or module
-- No new objects to learn -- just use normal `unittest` classes.
-- Four verbosity levels
-- Built-in, optional integration with
-  [coverage](http://nedbatchelder.com/code/coverage/)
-- Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
-- Completely supports OS X and Linux, most likely BSDs (and maybe Windows,
-  someone want to try it and let me know?)
-- Optional HTML output
+- *Colorful* - Terminal output makes good use of color when the terminal supports it.
+- *Clean* - Vertically-aligned statuses.  Low redundancy in output.
+- *Fast* - Can run tests in independent subprocesses.
+- *Powerful* - Multi-target + auto-discovery.
+- *Traditional* - Use the normal `unittest` classes and methods for your unit tests.
+- *Descriptive* - Four verbosity levels, from just dots to full docstring output.
+- *Thorough* - Built-in, optional integration with
+  [coverage](http://nedbatchelder.com/code/coverage/).
+- *Modern* - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
+- *Portable* - Completely supports OS X, Linux, and BSDs (and maybe Windows).
+- *Flexible* - Optional HTML output.
 
 
 Basic Usage
@@ -104,7 +104,6 @@ This tutorial *does* cover:
 
 This tutorial *does not* cover:
 
-- Stupid, useless examples like _all-your-code-and-tests-in-one-file_.
 - [Why you should write unit tests at
   all](http://stackoverflow.com/questions/67299/is-unit-testing-worth-the-effort)
 - The benefits of [Test-Driven
