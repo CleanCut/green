@@ -14,10 +14,9 @@ except: # pragma: no cover
     coverage_version = "Coverage Not Installed"
 
 # Importing from green is done after coverage initialization
-from green.loader import getTests
+_getTests = None
 
-
-def main(testing=False, coverage_testing=False):
+def main(testing=False, coverage_testing=False, testing_getTests=False):
     parser = argparse.ArgumentParser(
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
@@ -130,11 +129,15 @@ def main(testing=False, coverage_testing=False):
 
 
     # Set up our various main objects
+    from green.loader import getTests
     from green.runner import GreenTestRunner
     from green.output import GreenStream
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
+
+    if testing_getTests:
+        getTests = _getTests
 
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,

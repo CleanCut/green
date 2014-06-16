@@ -131,12 +131,11 @@ class TestMain(unittest.TestCase):
         sys.stdout = self.saved_stdout
         cmdline.sys.stderr = self.saved_stderr
 
-        self.addCleanup(setattr, cmdline, 'getTests', cmdline.getTests)
-        cmdline.getTests = MagicMock()
+        cmdline._getTests = MagicMock()
         cmdline.sys.argv = ['', 'c', 'd']
-        cmdline.main(testing=True)
-        self.assertTrue(cmdline.getTests.called)
-        self.assertEqual(cmdline.getTests.call_args_list, [call(u'c'), call(u'd')])
+        cmdline.main(testing=True, testing_getTests=True)
+        self.assertTrue(cmdline._getTests.called)
+        self.assertEqual(cmdline._getTests.call_args_list, [call(u'c'), call(u'd')])
 
 
 
