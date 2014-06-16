@@ -21,17 +21,17 @@ vertically!  Green fixes all that.
 
 ### Features ###
 
-- *Colorful* - Terminal output makes good use of color when the terminal supports it.
-- *Clean* - Vertically-aligned statuses.  Low redundancy in output.
-- *Fast* - Can run tests in independent subprocesses.
-- *Powerful* - Multi-target + auto-discovery.
-- *Traditional* - Use the normal `unittest` classes and methods for your unit tests.
-- *Descriptive* - Four verbosity levels, from just dots to full docstring output.
-- *Thorough* - Built-in, optional integration with
+- **Colorful** - Terminal output makes good use of color when the terminal supports it.
+- **Clean** - Vertically-aligned statuses.  Low redundancy in output.
+- **Fast** - Can run tests in independent subprocesses.
+- **Powerful** - Multi-target + auto-discovery.
+- **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
+- **Descriptive** - Four verbosity levels, from just dots to full docstring output.
+- **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
-- *Modern* - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
-- *Portable* - Completely supports OS X, Linux, and BSDs (and maybe Windows).
-- *Flexible* - Optional HTML output.
+- **Modern** - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
+- **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
+- **Flexible** - Optional HTML output.
 
 
 Basic Usage
