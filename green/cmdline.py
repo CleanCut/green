@@ -14,6 +14,7 @@ except: # pragma: no cover
     coverage_version = "Coverage Not Installed"
 
 # Importing from green is done after coverage initialization
+from green.loader import getTests
 
 
 def main(testing=False, coverage_testing=False):
@@ -21,8 +22,8 @@ def main(testing=False, coverage_testing=False):
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
     target_args = parser.add_argument_group("Target Specification")
-    target_args.add_argument('target', action='store', nargs='?', default='.',
-        help=("""Target to test.  If blank, then discover all testcases in the
+    target_args.add_argument('targets', action='store', nargs='*', default='.',
+        help=("""Targets to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
         proj.tests.test_things.TestStuff.  If a directory (or package)
@@ -114,7 +115,7 @@ def main(testing=False, coverage_testing=False):
                 '*/termstyle*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
-            if (args.target != 'green') and (not args.target.startswith('green.')):
+            if (args.targets != ['green',]) and (False not in [t.startswith('green.') for t in args.targets]):
                 omit.extend([
                 '*Python.framework*',
                 '*site-packages*'])
@@ -129,7 +130,6 @@ def main(testing=False, coverage_testing=False):
 
 
     # Set up our various main objects
-    from green.loader import getTests
     from green.runner import GreenTestRunner
     from green.output import GreenStream
     import green.output
@@ -142,7 +142,12 @@ def main(testing=False, coverage_testing=False):
             run_coverage=args.run_coverage, omit=omit)
 
     # Discover/Load the TestSuite
-    tests  = getTests(args.target)
+    tests = None
+    for target in args.targets:
+        if not tests:
+            tests = getTests(target)
+        else:
+            tests.addTests(getTests(target))
 
     # We didn't even load 0 tests...
     if not tests:
