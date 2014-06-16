@@ -8,7 +8,8 @@ Clean, colorful test runner for Python
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
 Green is a clean, colorful test runner for Python unit tests.  Compare it to
-nose or trial.
+[nose](https://nose.readthedocs.org/en/latest/) or
+[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial).
 
 Green grew out of a desire to see pretty colors.  Really!  A big part of the
 whole the **Red/Green/Refactor** process in test-driven-development is
@@ -47,9 +48,9 @@ carefully set up your `PYTHONPATH` environment variable to include the parent
 path of your project, you may be able to just run `green` from _inside_ your
 project directory.
 
-By default, Green mimics the verbosity levels of vanilla unittest or nose,
-meaning that output is mostly just dots.  For Green we recommend adding more
-verbosity by using the `-v` or `-vv` options.
+By default, Green mimics the verbosity levels of vanilla unittest, meaning that
+output is mostly just dots.  For Green we recommend adding more verbosity by
+using the `-v` or `-vv` options.
 
 To run Green's own internal unit tests (which are hopefully all passing):
 
