@@ -38,27 +38,56 @@ vertically!  Green fixes all that.
 Basic Usage
 -----------
 
-The simplest way is to just run `green your_project_dir` in the parent
-directory of your project.  (For convenience, you can also use `greenX` or
-`greenX.Y`, where `X` and `Y` are the major and minor version number of your
-Python installation.)
+You may need to prepend the installation command with `sudo` or run it as root
+if your normal user cannot write to the local Python package directory.
+
+    pip3 install green
+
+When new releases come out, be sure to upgrade with:
+
+    pip3 install --upgrade green
+
+To run existing unit tests, navigate to the *parent* directory of your project:
+
+    cd /parent/directory
+
+Then run green and let it autodiscover the tests (assuming the test modules,
+classes, and methods all start with 'test'):
+
+    green yourproject
 
 If your tests are extremely simple (don't attempt absolute imports), or if you
 carefully set up your `PYTHONPATH` environment variable to include the parent
 path of your project, you may be able to just run `green` from _inside_ your
 project directory.
 
+    cd /parent/directory/yourproject
+    PYTHONPATH=/parent/directory green
+
+Verbosity Levels
+----------------
+
 By default, Green mimics the verbosity levels of vanilla unittest, meaning that
 output is mostly just dots.  For Green we recommend adding more verbosity by
 using the `-v` or `-vv` options.
 
-To run Green's own internal unit tests (which are hopefully all passing):
+Levels:
+- `default` - Dots, tracebacks, and summary line.
+- `-v` - Dots are replaced with module/class heirarchy and function names
+- `-vv` - Version information added. Function names are replaced with first line of docstring.
+- `-vvv` - Highest verbosity level recognized.  Details coming soon.
 
-    green -v green
+Canned Examples
+---------------
 
 To see all examples of all the failures, errors, etc. that could occur:
 
-    green -v green.examples
+    green green.examples
+
+
+To run Green's own internal unit tests:
+
+    green green
 
 
 Advanced Usage
@@ -66,31 +95,6 @@ Advanced Usage
 
 Please see `green --help`
 
-
-Install
--------
-
-Replace `pip3` with your version of pip if necessary.  You may need to prepend
-this command with `sudo` or run it as root if your normal user cannot write to
-the local Python package directory.
-
-    pip3 install green
-
-
-Upgrade
--------
-
-    pip3 install --upgrade green
-
-Wait...what do I have installed?
-
-    green --version
-
-
-Uninstall
----------
-
-    pip3 uninstall green
 
 Unit Test Structure Tutorial
 ----------------------------
