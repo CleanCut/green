@@ -14,9 +14,11 @@ except: # pragma: no cover
     coverage_version = "Coverage Not Installed"
 
 # Importing from green is done after coverage initialization
+
+# This is used to mock imported getTests
 _getTests = None
 
-def main(testing=False, coverage_testing=False, testing_getTests=False):
+def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
@@ -136,7 +138,8 @@ def main(testing=False, coverage_testing=False, testing_getTests=False):
     if args.debug:
         green.output.debug_level = args.debug
 
-    if testing_getTests:
+    # Use the placeholder object rather than the imported object if it exists
+    if _getTests:
         getTests = _getTests
 
     stream = GreenStream(sys.stderr, html = args.html)

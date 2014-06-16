@@ -128,12 +128,12 @@ class TestMain(unittest.TestCase):
 
     def test_multiple_targets(self):
         "You can specify multiple targets"
-        sys.stdout = self.saved_stdout
-        cmdline.sys.stderr = self.saved_stderr
-
+        # Revert the mocked object after test
+        self.addCleanup(setattr, cmdline, '_getTests', None)
+        # Use the getTests placeholder
         cmdline._getTests = MagicMock()
         cmdline.sys.argv = ['', 'c', 'd']
-        cmdline.main(testing=True, testing_getTests=True)
+        cmdline.main(testing=True)
         self.assertTrue(cmdline._getTests.called)
         self.assertEqual(cmdline._getTests.call_args_list, [call(u'c'), call(u'd')])
 
