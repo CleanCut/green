@@ -15,9 +15,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, call
 except:
-    from mock import MagicMock
+    from mock import MagicMock, call
 
 
 
@@ -124,6 +124,18 @@ class TestMain(unittest.TestCase):
         except:
             pass # Python 2.7's reload is builtin
         reload(cmdline)
+
+
+    def test_multiple_targets(self):
+        "You can specify multiple targets"
+        # Revert the mocked object after test
+        self.addCleanup(setattr, cmdline, '_getTests', None)
+        # Use the getTests placeholder
+        cmdline._getTests = MagicMock()
+        cmdline.sys.argv = ['', 'c', 'd']
+        cmdline.main(testing=True)
+        self.assertTrue(cmdline._getTests.called)
+        self.assertEqual(cmdline._getTests.call_args_list, [call(u'c'), call(u'd')])
 
 
 

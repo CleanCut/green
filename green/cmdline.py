@@ -15,14 +15,16 @@ except: # pragma: no cover
 
 # Importing from green is done after coverage initialization
 
+# This is used to mock imported getTests
+_getTests = None
 
 def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
     target_args = parser.add_argument_group("Target Specification")
-    target_args.add_argument('target', action='store', nargs='?', default='.',
-        help=("""Target to test.  If blank, then discover all testcases in the
+    target_args.add_argument('targets', action='store', nargs='*', default='.',
+        help=("""Targets to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
         proj.tests.test_things.TestStuff.  If a directory (or package)
@@ -114,7 +116,7 @@ def main(testing=False, coverage_testing=False):
                 '*/termstyle*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
-            if (args.target != 'green') and (not args.target.startswith('green.')):
+            if 'green' not in args.targets and (False not in [t.startswith('green.') for t in args.targets]):
                 omit.extend([
                 '*Python.framework*',
                 '*site-packages*'])
@@ -136,13 +138,22 @@ def main(testing=False, coverage_testing=False):
     if args.debug:
         green.output.debug_level = args.debug
 
+    # Use the placeholder object rather than the imported object if it exists
+    if _getTests:
+        getTests = _getTests
+
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
             termcolor=args.termcolor, subprocesses=args.subprocesses,
             run_coverage=args.run_coverage, omit=omit)
 
     # Discover/Load the TestSuite
-    tests  = getTests(args.target)
+    tests = None
+    for target in args.targets:
+        if not tests:
+            tests = getTests(target)
+        else:
+            tests.addTests(getTests(target))
 
     # We didn't even load 0 tests...
     if not tests:
