@@ -10,7 +10,6 @@ except:
 
 from green.subprocess import SubprocessLogger, DaemonlessProcess, poolRunner
 from green import subprocess
-from green import loader
 
 
 class TestSubprocessLogger(unittest.TestCase):
@@ -130,10 +129,10 @@ class A(unittest.TestCase):
         fh = open(os.path.join(basename, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        fh = open(os.path.join(basename, 'test_pool_runner_dotted.py'), 'w')
+        fh = open(os.path.join(basename, 'test_pool_syntax_error.py'), 'w')
         fh.write("aoeu")
         fh.close()
-        module_name = basename + '.test_pool_runner_dotted.A.testPass'
+        module_name = basename + '.test_pool_syntax_error'
         result = poolRunner(module_name, 1)
         subprocess.coverage = saved_coverage
         self.assertEqual(len(result.errors), 1)
