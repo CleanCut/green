@@ -116,7 +116,7 @@ def main(testing=False, coverage_testing=False):
                 '*/termstyle*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
-            if 'green' not in args.targets and (False not in [t.startswith('green.') for t in args.targets]):
+            if 'green' not in args.targets and (False in [t.startswith('green.') for t in args.targets]):
                 omit.extend([
                 '*Python.framework*',
                 '*site-packages*'])
