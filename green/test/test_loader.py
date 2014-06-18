@@ -238,3 +238,33 @@ class A(unittest.TestCase):
         tests = loader.getTests(module_name)
         self.assertEqual(tests, None)
 
+
+    def test_multiple_targets(self):
+        "Specifying multiple targets causes them all to be tested"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target1.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target1.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # pkg/test/test_target2.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target2.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        pkg = os.path.basename(sub_tmpdir)
+        tests = loader.getTests([pkg + '.' + 'test_target1',
+                                 pkg + '.' + 'test_target2'])
+        self.assertEqual(tests.countTestCases(), 2)

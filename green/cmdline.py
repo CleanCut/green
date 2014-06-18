@@ -142,12 +142,7 @@ def main(testing=False, coverage_testing=False):
             run_coverage=args.run_coverage, omit=omit)
 
     # Discover/Load the TestSuite
-    tests = None
-    for target in args.targets:
-        if not tests:
-            tests = getTests(target)
-        else:
-            tests.addTests(getTests(target))
+    tests = getTests(args.targets)
 
     # We didn't even load 0 tests...
     if not tests:

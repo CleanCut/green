@@ -6,7 +6,22 @@ import sys
 import unittest
 
 
-def getTests(target):
+def getTests(targets):
+    if type(targets) != list:
+        targets = [targets]
+    tests = None
+    for target in targets:
+        more_tests = getTest(target)
+        if not more_tests:
+            continue
+        if not tests:
+            tests = more_tests
+        else:
+            tests.addTests(more_tests)
+    return tests
+
+
+def getTest(target):
     loader = unittest.TestLoader()
 
     # For a test loader, we want to always the current working directory to be
