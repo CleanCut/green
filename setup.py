@@ -4,8 +4,7 @@ import sys
 
 version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read().strip()
 
-long_description = '\n'.join(list(filter(lambda x: not x.startswith('[!'),
-                             open('README.md').read().split('\n'))))
+long_description = open('README-pypi.rst').read()
 
 dependencies = [
     'python-termstyle'
