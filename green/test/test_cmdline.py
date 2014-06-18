@@ -43,6 +43,7 @@ class TestMain(unittest.TestCase):
         del(self.saved_stderr)
         del(self.saved_stdout)
 
+
     def test_optVersion(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']
@@ -146,11 +147,25 @@ class TestRunning(unittest.TestCase):
     def setUp(self):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
+        self.s = StringIO()
+        self.gs = GreenStream(self.s)
+        self.saved_stdout = sys.stdout
+        self.saved_stderr = cmdline.sys.stderr
+        self.saved_argv = sys.argv
+        sys.stdout = self.gs
+        cmdline.sys.stderr = self.gs
 
 
     def tearDown(self):
         os.chdir(self.container_dir)
         shutil.rmtree(self.tmpdir)
+        sys.stdout = self.saved_stdout
+        cmdline.sys.stderr = self.saved_stderr
+        sys.argv = self.saved_argv
+        del(self.gs)
+        del(self.s)
+        del(self.saved_stderr)
+        del(self.saved_stdout)
 
 
     def test_multiple_targets(self):
@@ -181,4 +196,4 @@ class A(unittest.TestCase):
         pkg = os.path.basename(sub_tmpdir)
         cmdline.sys.argv = [
                 '', pkg + '.' + 'test_target1', pkg + '.' + 'test_target2']
-        cmdline.main(testing=True)
+        self.assertEqual(cmdline.main(), 0)
