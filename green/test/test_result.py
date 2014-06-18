@@ -115,6 +115,32 @@ class TestProtoTest(unittest.TestCase):
             self.assertEqual(locals()[i], getattr(pt, i, None))
 
 
+    def test_adjustedDescription(self):
+        "adjustedDescription() returns what we expect for all verbosity levels"
+        # With a docstring
+        t = MagicMock()
+        val1 = 'apple'
+        val2 = 'banana'
+        t.__str__.return_value = val1
+        t.shortDescription.return_value = val2
+        t = proto_test(t)
+        self.assertEqual(t.adjustedDescription(1), '')
+        self.assertEqual(t.adjustedDescription(2), val1)
+        self.assertEqual(t.adjustedDescription(3), val2)
+        self.assertEqual(t.adjustedDescription(4), val2)
+
+        # Without a docstring
+        t = MagicMock()
+        val1 = 'apple'
+        t.__str__.return_value = val1
+        t.shortDescription.return_value = None
+        t = proto_test(t)
+        self.assertEqual(t.adjustedDescription(1), '')
+        self.assertEqual(t.adjustedDescription(2), val1)
+        self.assertEqual(t.adjustedDescription(3), val1)
+        self.assertEqual(t.adjustedDescription(4), val1)
+
+
 
 class TestGreenTestResult(unittest.TestCase):
 
@@ -157,22 +183,21 @@ class TestGreenTestResult(unittest.TestCase):
     def test_reportOutcomeVerbose(self):
         "_reportOutcome contains output we expect in verbose mode"
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
-        l = 'a fake test output line'
         r = 'a fake reason'
-        gtr.test_output_line = l
-        gtr._reportOutcome(None, '.', lambda x: x, None, r)
-        self.assertTrue(l in self.stream.getvalue())
+        t = MagicMock()
+        t.__str__.return_value = 'junk'
+        gtr._reportOutcome(t, '.', lambda x: x, None, r)
         self.assertTrue(r in self.stream.getvalue())
 
 
     def test_reportOutcomeVerboseHTML(self):
         "html=True causes _reportOutcome() to escape HTML in docstrings"
-        gtr = GreenTestResult(GreenStream(self.stream), None, 2)
+        gtr = GreenTestResult(GreenStream(self.stream), None, 3)
         gtr.colors.html = True
-        l = 'a fake test output line &nbsp; <>'
         r = 'a fake reason'
-        gtr.test_output_line = l
-        gtr._reportOutcome(None, '.', lambda x: x, None, r)
+        t = MagicMock()
+        t.shortDescription.return_value = 'a fake test output line &nbsp; <>'
+        gtr._reportOutcome(t, '.', lambda x: x, None, r)
         self.assertTrue(r in self.stream.getvalue())
         self.assertTrue('&amp;' in self.stream.getvalue())
         self.assertTrue('&lt;' in self.stream.getvalue())
@@ -317,7 +342,10 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def test_addSuccess(self):
         "addSuccess() makes the correct calls to other functions."
-        test = 'success test'
+        test = MagicMock()
+        test.shortDescription.return_value = 'a'
+        test.__str__.return_value = 'b'
+        test = proto_test(test)
         self.gtr.addSuccess(test)
         self.gtr._reportOutcome.assert_called_with(
                 test, '.', self.gtr.colors.passing)

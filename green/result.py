@@ -51,6 +51,15 @@ class ProtoTest():
             self.method_name = ''
 
 
+    def adjustedDescription(self, verbosity):
+        if verbosity == 2:
+            return self.method_name
+        elif verbosity > 2:
+            return self.description or self.method_name
+        else:
+            return ''
+
+
 
 class ProtoError():
     """I take a full-fledged test error and preserve just the information we
@@ -244,13 +253,14 @@ class GreenTestResult():
                 self.stream.writeln(self.colors.className(
                     self.stream.formatText(current_class, indent=1)))
             # Test name or description
-            self.test_output_line = self._testDescription(test)
             if not self.colors.html:
                 # In the terminal, we will write a placeholder, and then
                 # rewrite it in color after the test has run.
                 self.stream.write(
                     self.colors.bold(
-                        self.stream.formatLine(self.test_output_line, indent=2)))
+                        self.stream.formatLine(
+                            test.adjustedDescription(self.verbosity),
+                            indent=2)))
             self.stream.flush()
 
         # Set state for next time
@@ -264,27 +274,21 @@ class GreenTestResult():
         "Called after the end of each test"
 
 
-    def _testDescription(self, test):
-        test = proto_test(test)
-        if self.verbosity == 2:
-            return test.method_name
-        elif self.verbosity > 2:
-            return test.description or test.method_name
-
-
     def _reportOutcome(self, test, outcome_char, color_func, err=None,
             reason=''):
+        test = proto_test(test)
         if self.showAll:
             # Move the cursor back to the start of the line in terminal mode
             if not self.colors.html:
                 self.stream.write('\r')
             # Escape the HTML that may be in the docstring
+            test_description = test.adjustedDescription(self.verbosity)
             if self.colors.html:
-                self.test_output_line = escape(self.test_output_line)
+                test_description = escape(test_description)
             self.stream.write(
                 color_func(
                     self.stream.formatLine(
-                        self.test_output_line,
+                        test_description,
                         indent=2,
                         outcome_char=outcome_char)
                 )
@@ -300,6 +304,7 @@ class GreenTestResult():
 
     def addSuccess(self, test):
         "Called when a test passed"
+        test = proto_test(test)
         self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
 
