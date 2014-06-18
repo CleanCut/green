@@ -1,9 +1,6 @@
 from __future__ import unicode_literals
 import logging
-import os
-import shutil
 import sys
-import tempfile
 import unittest
 
 from green import cmdline
@@ -118,12 +115,15 @@ class TestMain(unittest.TestCase):
     def test_import_cmdline_module(self):
         "The cmdline module can be imported"
         global reload
-        try: # Python 3.x's reload is in importlib
+        try: # In Python 3.4+ reload is in importlib
             import importlib
             importlib.reload
             reload = importlib.reload
         except:
-            pass # Python 2.7's reload is builtin
+            try: # In Python 3.3 reload is in imp
+                import imp
+                imp.reload
+                reload = imp.reload
+            except:
+                pass # Python 2.7's reload is builtin
         reload(cmdline)
-
-
