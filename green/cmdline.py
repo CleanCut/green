@@ -23,7 +23,7 @@ def main(testing=False, coverage_testing=False):
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
     target_args = parser.add_argument_group("Target Specification")
-    target_args.add_argument('targets', action='store', nargs='*', default='.',
+    target_args.add_argument('targets', action='store', nargs='*', default=['.'],
         help=("""Targets to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
