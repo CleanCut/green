@@ -168,4 +168,4 @@ def main(testing=False, coverage_testing=False):
 
 
 if __name__ == '__main__': # pragma: no cover
-    main()
+    sys.exit(main())
