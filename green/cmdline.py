@@ -167,7 +167,6 @@ def main(testing=False, coverage_testing=False):
         cov.stop()
         cov.save()
         cov.combine()
-        cov.save()
         cov.report(file=stream, omit=omit)
     return(int(not result.wasSuccessful()))
 
