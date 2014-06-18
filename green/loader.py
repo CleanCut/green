@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import OrderedDict
 import importlib
 import logging
 import os
@@ -7,17 +8,31 @@ import unittest
 
 
 def getTests(targets):
+    # If a string was passed in, put it into a list.
     if type(targets) != list:
         targets = [targets]
+
+    # Make sure there are no duplicate entries, preserving order
+    target_dict = OrderedDict()
+    for target in targets:
+        target_dict[target] = True
+    targets = target_dict.keys()
+
+    # Get the tests
     tests = None
     for target in targets:
         more_tests = getTest(target)
         if not more_tests:
+            logging.debug("Found 0 tests for target '{}'".format(target))
             continue
+        num_tests = more_tests.countTestCases()
+        logging.debug("Found {} test{} for target '{}'".format(
+            num_tests, '' if (num_tests == 1) else 's', target))
         if not tests:
             tests = more_tests
         else:
             tests.addTests(more_tests)
+
     return tests
 
 

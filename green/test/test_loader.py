@@ -268,3 +268,27 @@ class A(unittest.TestCase):
         tests = loader.getTests([pkg + '.' + 'test_target1',
                                  pkg + '.' + 'test_target2'])
         self.assertEqual(tests.countTestCases(), 2)
+
+
+    def test_duplicate_targets(self):
+        "Specifying duplicate targets does not cause duplicate loading."
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_dupe_target.py
+        fh = open(os.path.join(sub_tmpdir, 'test_dupe_target.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        pkg = os.path.basename(sub_tmpdir)
+        tests = loader.getTests([pkg + '.' + 'test_dupe_target',
+                                 pkg + '.' + 'test_dupe_target',
+                                 pkg + '.' + 'test_dupe_target'])
+        self.assertEqual(tests.countTestCases(), 1)
