@@ -15,8 +15,6 @@ except: # pragma: no cover
 
 # Importing from green is done after coverage initialization
 
-# This is used to mock imported getTests
-_getTests = None
 
 def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
@@ -137,10 +135,6 @@ def main(testing=False, coverage_testing=False):
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
-
-    # Use the placeholder object rather than the imported object if it exists
-    if _getTests:
-        getTests = _getTests
 
     stream = GreenStream(sys.stderr, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,

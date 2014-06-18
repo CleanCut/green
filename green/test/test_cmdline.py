@@ -15,9 +15,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import MagicMock, call
+    from unittest.mock import MagicMock
 except:
-    from mock import MagicMock, call
+    from mock import MagicMock
 
 
 
@@ -126,19 +126,6 @@ class TestMain(unittest.TestCase):
         reload(cmdline)
 
 
-    def test_multiple_targets(self):
-        "You can specify multiple targets"
-        # Revert the mocked object after test
-        self.addCleanup(setattr, cmdline, '_getTests', None)
-        # Use the getTests placeholder
-        cmdline._getTests = MagicMock()
-        cmdline.sys.argv = ['', 'c', 'd']
-        cmdline.main(testing=True)
-        self.assertTrue(cmdline._getTests.called)
-        self.assertEqual(cmdline._getTests.call_args_list, [call(u'c'), call(u'd')])
-
-
-
 class TestRunning(unittest.TestCase):
 
     # Setup
@@ -164,3 +151,34 @@ class TestRunning(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.container_dir)
         shutil.rmtree(self.tmpdir)
+
+
+    def test_multiple_targets(self):
+        "Specifying multiple targets causes them all to be tested"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target1.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target1.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # pkg/test/test_target2.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target2.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        pkg = os.path.basename(sub_tmpdir)
+        cmdline.sys.argv = [
+                '', pkg + '.' + 'test_target1', pkg + '.' + 'test_target2']
+        cmdline.main(testing=True)
