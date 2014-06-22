@@ -17,6 +17,8 @@ from green.loader import getTests
 
 
 class SubprocessLogger(object):
+    """I am used by LoggingDaemonlessPool to get crash output out to the
+    logger, instead of having subprocess crashes be silent"""
 
 
     def __init__(self, callable):
@@ -44,6 +46,8 @@ class SubprocessLogger(object):
 
 
 class DaemonlessProcess(multiprocessing.Process):
+    """I am used by LoggingDaemonlessPool to make pool workers NOT run in
+    daemon mode (daemon mode subprocess can't launch their own subprocesses)"""
 
 
     def _get_daemon(self):
@@ -62,6 +66,7 @@ class DaemonlessProcess(multiprocessing.Process):
 
 
 class LoggingDaemonlessPool(Pool):
+    "I use SubprocessLogger and DoemonlessProcess to make a pool of workers."
 
 
     Process = DaemonlessProcess
@@ -74,6 +79,7 @@ class LoggingDaemonlessPool(Pool):
 
 
 def poolRunner(test_name, coverage_number=None, omit=[]):
+    "I am the function that pool worker subprocesses run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
