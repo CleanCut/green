@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from green.loader import getTests
-from green.runner import GreenTestRunner, getSuiteDict
+from green.runner import GreenTestRunner, getTestList
 from green.output import GreenStream
 
 try:
@@ -207,7 +207,7 @@ class A(unittest.TestCase):
 
 
 
-class TestGetSuiteDict(unittest.TestCase):
+class TestGetTestList(unittest.TestCase):
 
 
     def test_moduleImportFailure(self):
@@ -215,5 +215,4 @@ class TestGetSuiteDict(unittest.TestCase):
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
-        self.assertRaises(AttributeError, getSuiteDict, (suite,))
-
+        self.assertRaises(AttributeError, getTestList, (suite,))

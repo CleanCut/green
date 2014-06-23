@@ -51,6 +51,11 @@ class ProtoTest():
             self.method_name = ''
 
 
+    @property
+    def dotted_name(self, ignored=None):
+        return self.module + '.' + self.class_name + '.' + self.method_name
+
+
     def adjustedDescription(self, verbosity):
         if verbosity == 2:
             return self.method_name
@@ -73,6 +78,9 @@ class ProtoError():
 
 
 class ProtoTestResult():
+    """
+    I'm the TestResult object for a single unit test run in a subprocess.
+    """
 
 
     def __init__(self):
@@ -167,22 +175,16 @@ class GreenTestResult():
 
     def addProtoTestResult(self, protoTestResult):
         for test, err in protoTestResult.errors:
-            self.startTest(test)
             self.addError(test, err)
         for test, err in protoTestResult.expectedFailures:
-            self.startTest(test)
             self.addExpectedFailure(test, err)
         for test, err in protoTestResult.failures:
-            self.startTest(test)
             self.addFailure(test, err)
         for test in protoTestResult.passing:
-            self.startTest(test)
             self.addSuccess(test)
         for test, reason in protoTestResult.skipped:
-            self.startTest(test)
             self.addSkip(test, reason)
         for test in protoTestResult.unexpectedSuccesses:
-            self.startTest(test)
             self.addUnexpectedSuccess(test)
 
 

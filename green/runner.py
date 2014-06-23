@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 from __future__ import print_function
-from collections import OrderedDict
 import sys
 
 from unittest.signals import registerResult
@@ -13,14 +12,14 @@ except: # pragma: no cover
     coverage = None
 
 from green.output import GreenStream
-from green.result import GreenTestResult
+from green.result import GreenTestResult, proto_test
 from green.subprocess import LoggingDaemonlessPool, poolRunner
 
 
 
-def getSuiteDict(item, suite_dict=None):
-    if suite_dict == None:
-        suite_dict = OrderedDict()
+def getTestList(item, test_list=None):
+    if test_list == None:
+        test_list = []
     # Python's lousy handling of module import failures during loader discovery
     # makes this crazy special case necessary.  See _make_failed_import_test in
     # the source code for unittest.loader
@@ -29,16 +28,11 @@ def getSuiteDict(item, suite_dict=None):
         getattr(item, exception_method)()
     # On to the real stuff
     if issubclass(type(item), TestCase):
-        class_part = item.__module__ + '.' + item.__class__.__name__
-        test_part = str(item).split(' ')[0]
-        full_test = class_part + '.' + test_part
-        if class_part not in suite_dict.keys():
-            suite_dict[class_part] = []
-        suite_dict[class_part].append(full_test)
+        test_list.append(proto_test(item))
     else:
         for i in item:
-            getSuiteDict(i, suite_dict)
-        return suite_dict
+            getTestList(i, test_list)
+        return test_list
 
 
 
@@ -86,25 +80,31 @@ class GreenTestRunner():
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
                             message='Please use assert\w+ instead.')
+
             result.startTestRun()
 
             if self.subprocesses == 1:
                 suite.run(result)
             else:
-                tests = getSuiteDict(suite)
+                tests = getTestList(suite)
                 pool = LoggingDaemonlessPool(processes=self.subprocesses)
                 if tests:
-                    for class_name in tests:
-                        for index, test in enumerate(tests[class_name]):
-                            if self.run_coverage:
-                                coverage_number = index + 1
-                            else:
-                                coverage_number = None
-                            pool.apply_async(
-                                poolRunner, (test, coverage_number, self.omit),
-                                callback=result.addProtoTestResult)
+                    async_responses = []
+                    for index, test in enumerate(tests):
+                        if self.run_coverage:
+                            coverage_number = index + 1
+                        else:
+                            coverage_number = None
+                        async_responses.append(pool.apply_async(
+                            poolRunner,
+                            (test.dotted_name, coverage_number, self.omit)))
                     pool.close()
-                    pool.join()
+                for test, async_response in zip(tests, async_responses):
+                    # Prints out the white 'processing...' version of the output
+                    result.startTest(test)
+                    # This blocks until the worker who is processing this
+                    # particular test actually finishes
+                    result.addProtoTestResult(async_response.get())
 
             result.stopTestRun()
 

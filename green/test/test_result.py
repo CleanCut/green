@@ -17,6 +17,7 @@ except:
     from mock import MagicMock
 
 
+
 class TestProtoTestResult(unittest.TestCase):
 
 
