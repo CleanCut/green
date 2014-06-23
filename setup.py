@@ -35,7 +35,7 @@ setup(
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nose2', 'trial', 'tox', 'green', 'test', 'tests', 'functional test', 'system test', 'unit test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
