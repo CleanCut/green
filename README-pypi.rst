@@ -27,8 +27,8 @@ Features
 - **Flexible** - Optional HTML output.
 
 
-.. _nose: https://github.com/CleanCut/green#green
+.. _nose: https://nose.readthedocs.org
 .. _trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
-.. _GitHub page for Green: http://twistedmatrix.com/trac/wiki/TwistedTrial
+.. _GitHub page for Green: https://github.com/CleanCut/green#green
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
