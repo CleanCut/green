@@ -17,13 +17,13 @@ _actually getting to see red and green output_.  Most python unit testing
 actually goes **Gray/Gray/Refactor** (at least on my terminal, which is gray
 text on black background).  That's a shame.  Even TV is in color these days.
 Why not terminal output?  Even worse, the default output for most test runners
-is cluttered, hard-to-read, redundant, and the dang statuses are not aligned
-vertically!  Green fixes all that.
+is cluttered, hard-to-read, redundant, and the dang status indicators are not lined
+up in a vertical column!  Green fixes all that.
 
 ### Features ###
 
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
-- **Clean** - Vertically-aligned statuses.  Low redundancy in output.
+- **Clean** - Low redundancy in output. Result stats for each test is lined up in a vertical column.
 - **Fast** - Can run tests in independent subprocesses.
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
