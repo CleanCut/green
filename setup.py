@@ -26,7 +26,7 @@ setup(
             ],
     },
     test_suite='green.test',
-    description = 'Green is a clean, colorful test runner for Python unit tests.  Compare it to nose or trial.',
+    description = 'Green is a clean, colorful test runner for Python unit tests.  Compare it to trial or nose.',
     long_description = long_description,
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',

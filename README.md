@@ -1,26 +1,26 @@
 Green
 =====
 
-Clean, colorful test runner for Python
---------------------------------------
 [![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 [![Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
-Green is a clean, colorful test runner for Python unit tests.  Compare it to
-[nose](https://nose.readthedocs.org/en/latest/) or
-[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial).
+1. [Features](https://github.com/CleanCut/green#features)
+2. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
+3. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
+4. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
+5. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
+6. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
+7. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
+8. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
-Green grew out of a desire to see pretty colors.  Really!  A big part of the
-whole the **Red/Green/Refactor** process in test-driven-development is
-_actually getting to see red and green output_.  Most python unit testing
-actually goes **Gray/Gray/Refactor** (at least on my terminal, which is gray
-text on black background).  That's a shame.  Even TV is in color these days.
-Why not terminal output?  Even worse, the default output for most test runners
-is cluttered, hard-to-read, redundant, and the dang status indicators are not lined
-up in a vertical column!  Green fixes all that.
 
-### Features ###
+Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
+[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial) or
+[nose](https://nose.readthedocs.org/en/latest/).
+
+Features
+--------
 
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
 - **Clean** - Low redundancy in output. Result stats for each test is lined up in a vertical column.
@@ -329,3 +329,131 @@ Notes:
  - `s` Skipped
  - `x` Expected Failure
  - `u` Unexpected pass
+
+
+Origin Story
+------------
+
+Green grew out of a desire to see pretty colors.  Really!  A big part of the
+whole the **Red/Green/Refactor** process in test-driven-development is
+_actually getting to see red and green output_.  Most python unit testing
+actually goes **Gray/Gray/Refactor** (at least on my terminal, which is gray
+text on black background).  That's a shame.  Even TV is in color these days.
+Why not terminal output?  Even worse, the default output for most test runners
+is cluttered, hard-to-read, redundant, and the dang status indicators are not
+lined up in a vertical column!  Green fixes all that.
+
+But how did Green come to be?  Why not just use one of the existing test
+runners out there?  It's an interesting story, actually.  And it starts with
+trial.
+
+**trial**
+
+Honestly, I really like Twisted's trial, though I don't really have any need
+for the rest of the Twisted event-driven networking engine library.  I started
+professionally developing in Python when version 2.3 was the latest, greatest
+version and none of us in my small shop had ever even heard of unit testing
+(gasp!).  As we grew, we matured and started testing and we chose trial to do
+the test running.  If most of my projects at my day job hadn't moved to Python
+3,  I probably would have just stuck with trial, but at the time I wrote green
+[trial didn't run on Python 3](http://twistedmatrix.com/trac/ticket/5965)
+(still doesn't as I write this). Trial was and is the foundation for my
+inspiration for having better-than-unittest output in the first place.  It's a
+great example of reducing redundancy (report module/class once, not on every
+line), lining up status vertically, and using color.  I feel like Green trumps
+trial in two important ways: 1) It's not part of an immense event-driven
+networking engine (probably not ever going to change), and 2) it is not stuck
+in Python 2 (which will hopefully be fixed someday).  Green will never replace
+trial, as trial has features necessary to run asynchronous unit tests on
+Twisted code.  But I couldn't use it for my increasing amount of Python 3 code.
+Which led me to...
+
+**nose**
+
+I had really high hopes for nose.  It seemed to be widely accepted.  It seemed
+to be powerful.  The output was just horrible (exactly the same as unittest's
+output).  But it had a plugin system!  I tried all the plugins I could find
+that mentioned improving upon the output.  When I couldn't find one I liked, I
+started developing Green (yes, this Green) *as a plugin for nose*.  I chose the
+name Green for three reasons: 1) It was available on PyPi! 2) I like to focus
+on the positive aspect of testing (everything passes!), and 3) It made a nice
+counterpoint to several nose plugins that had "Red" in the name.  I made steady
+progress on my plugin until I hit a serious problem in the nose plugin API.
+That's when I discovered that [nose is in maintenance
+mode](https://github.com/nose-devs/nose/issues/45#issuecomment-40827502) --
+abandoned by the original developers, handed off to someone who won't fix
+anything if it changes the existing behavior.  What a downer.  Despite the huge
+user base, I already consider nose dead and gone.  A project which will not
+change (even to fix bugs!) will die.  Even the maintainer keeps pointing
+everyone to...
+
+**nose2**
+
+So I pivoted to nose2!  I started over developing Green (same repo -- it's in
+the history).  I can understand the allure of a fresh rewrite as much as the
+other guy.  Nose had made less-than-ideal design decisions, and this time they
+would be done right!  Hopefully.  I had started reading nose code while writing
+the plugin for it, and so I dived deep into nose2.  And ran into a mess.  Nose2
+is alpha.  That by itself is not necessarily a problem, if the devs will
+release early and often and work to fix things you run into.  I submitted a
+3-line pull request to [fix some
+problems](https://github.com/nose-devs/nose2/pull/171) where the behavior did
+not conform to the already-written documentation which broke my plugin.  The
+pull request wasn't accepted because I (ironically) didn't write unit tests for
+it.  While reading code for nose and nose2 I kept thinking, "I can write a
+better test runner than *this*".  I got tired of battering on a seemingly
+closed door with the nose/nose2 devs and decided to see what it would take to
+write my own test runner.  That brought be to...
+
+**unittest**
+
+I finally went and started reading unittest (Python 2.7 and 3.4) source code.
+unittest is its own special kind of mess, but it's universally built-in, and
+most importantly, subclassing or replacing unittest objects to customize the
+output looked a lot *easier* than writing a plugin for nose and nose2.  And it
+was, for the output portion!  Writing the rest of the test runner other turned
+out to be quite a project, though.  I started over on Green *again*, starting
+down the road to what we have now.  A custom runner that subclasses or replaces
+bits of unittest to provide exactly the output (and other feature creep) that I
+wanted.
+
+
+I had three initial goals for Green:
+
+1. Colorful, clean output (at least as good as trial's)
+
+2. Run on Python 3
+
+3. Try to avoid making it a huge bundle of tightly-coupled, hard-to-read code.
+
+
+I contend that I nailed **1.** and **2.**, and ended up implementing a bunch of
+other useful features as well.  Whether I succeeded with **3.** is debatable.
+I continue to try to refactor and simplify whenever I touch the code.  I'm not
+sure that I'm convinced that [community acceptance of my
+project](https://github.com/kennethreitz/python-guide/pull/459#issuecomment-46914167)
+really hinges on full internal adherence to the PEP-8 and PEP-257 coding
+styles, but I'm willing to get 98% of the way there just to see. (Hey, I *like*
+vertically aligning equal signs!)  :-)
+
+Wait!  What about the other test runners?
+
+- **pytest** -- Somehow I never realized pytest existed until a few weeks
+  before I released Green 1.0.  All I know is that apparently many people
+  appear to like and use it.  Hey, don't give me that look!  I'm not
+  omniscient!
+
+- **tox** -- I think I first ran across tox only a few weeks before I heard of
+  pytest.  It's homepage didn't mention anything about color, so I didn't try
+  using it.
+
+- **the ones I missed** -- Er, haven't heard of them yet either.
+
+I'd love to hear **your** feedback regarding Green.  Like it?  Hate it?  Have
+some awesome suggestions?  Whatever the case, go submit it as an
+[Issue](https://github.com/CleanCut/green/issues?state=open).  I'm
+not picky about what goes into the Issue tracker.  Questions, comments, bugs,
+feature requests, just letting me know that I should go look at some other cool
+tool.  Go for it.
+
+

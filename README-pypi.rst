@@ -2,14 +2,15 @@ Green
 =====
 
 Green is a colorful, clean, fast and powerful test runner for Python unit
-tests.  Compare it to `nose`_ or `trial`_.
+tests.  Compare it to `trial`_ or `nose`_.
 
 
 Documentation
 -------------
 
 Please visit the `GitHub page for Green`_ for full documentation, including a
-nice tutorial on how to correctly layout unit tests in your own python project.
+nice `tutorial on how to correctly layout unit tests`_ in your own python
+project.
 
 
 Features
@@ -30,5 +31,6 @@ Features
 .. _nose: https://nose.readthedocs.org
 .. _trial: http://twistedmatrix.com/trac/wiki/TwistedTrial
 .. _GitHub page for Green: https://github.com/CleanCut/green#green
+.. _tutorial on how to correctly layout unit tests: https://github.com/CleanCut/green#unit-test-structure-tutorial
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
