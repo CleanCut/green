@@ -45,23 +45,44 @@ if your normal user cannot write to the local Python package directory.
 pip3 install green    # To upgrade: "pip3 install --upgrade green"
 ```
 
-To run existing unit tests, navigate to the *parent* directory of your project.
+Now run green...
+
+```bash
+# From inside your code directory
+green
+
+# From outside your code directory
+green code_directory
+
+# A specific file
+green test_stuff.py
+
+# A specific test inside a large package.
+#
+# Assuming you want to run TestClass.test_function inside
+# package/test/test_module.py ...
+green package.test.test_module.TestClass.test_function
+```
+
+Basic Troubleshooting
+---------------------
+
+One easy way to avoid common importing problems is to navigate to the *parent*
+directory of the directory your python code is in.  Then pass green the
+directory your code is in and let it autodiscover the tests (see the Tutorial below
+for tips on making your tests discoverable).
 
     cd /parent/directory
+    green code_directory
 
-Then pass green the directory of your project and let it autodiscover the tests
-(assuming the test modules, classes, and methods all start with 'test').
-
-    green yourproject
-
-If your tests are extremely simple (don't attempt absolute imports), or if you
-carefully set up your `PYTHONPATH` environment variable to include the parent
-path of your project, you may be able to just run `green` from _inside_ your
-project directory.
+Another way to address importing problems is to carefully set up your
+`PYTHONPATH` environment variable to include the parent path of your code
+directory.  Then you should be able to just run `green` from _inside_ your code
+directory directory.
 
 ```bash
 export PYTHONPATH=/parent/directory
-cd /parent/directory/yourproject
+cd /parent/directory/code_directory
 green
 ```
 
