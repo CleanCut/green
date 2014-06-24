@@ -16,7 +16,7 @@ Features
 --------
 
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
-- **Clean** - Vertically-aligned statuses.  Low redundancy in output.
+- **Clean** - Low redundancy in output. Result stats for each test is lined up in a vertical column.
 - **Fast** - Can run tests in independent subprocesses.
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal ``unittest`` classes and methods for your unit tests.
