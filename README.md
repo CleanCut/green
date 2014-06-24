@@ -5,6 +5,12 @@ Green
 [![Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
+Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
+[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial) or
+[nose](https://nose.readthedocs.org/en/latest/).
+
+#### Table of Contents
+
 1. [Features](https://github.com/CleanCut/green#features)
 2. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
 3. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
@@ -14,10 +20,6 @@ Green
 7. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
 8. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
-
-Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
-[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial) or
-[nose](https://nose.readthedocs.org/en/latest/).
 
 Features
 --------
