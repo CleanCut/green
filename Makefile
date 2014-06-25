@@ -17,12 +17,11 @@ test: clean
 
 testinstalled: clean
 	python setup.py sdist
-	cd dist
-	tar zxvf green-$(VERSION).tar.gz
-	cd green-$(VERSION)
-	python setup.py install
-	green -vvv green
-	green -s 0 -vvv green
+	ls -lR
+	tar zxvf dist/green-$(VERSION).tar.gz
+	bash -c "cd green-$(VERSION) && python setup.py install"
+	bash -c "green -vvv green"
+	bash -c "green -s 0 -vvv green"
 	cd ../..
 
 sanity-checks:
