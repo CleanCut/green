@@ -20,9 +20,8 @@ testinstalled: clean
 	ls -lR
 	tar zxvf dist/green-$(VERSION).tar.gz
 	bash -c "cd green-$(VERSION) && python setup.py install"
-	bash -c "green -vvv green"
-	bash -c "green -s 0 -vvv green"
-	cd ../..
+	bash -c "cd && green -vvv green"
+	bash -c "cd && green -s 0 -vvv green"
 
 sanity-checks:
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
