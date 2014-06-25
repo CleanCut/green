@@ -17,14 +17,13 @@ test: clean
 
 testinstalled: clean
 	python setup.py sdist
-	pushd dist
+	cd dist
 	tar zxvf green-$(VERSION).tar.gz
-	popd
-	pushd green-$(VERSION)
+	cd green-$(VERSION)
 	python setup.py install
 	green -vvv green
 	green -s 0 -vvv green
-	popd
+	cd ../..
 
 sanity-checks:
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
