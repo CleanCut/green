@@ -17,26 +17,20 @@ from green.subprocess import LoggingDaemonlessPool, poolRunner
 
 
 
-def getTestList(suite_part, test_list=None):
-    """
-    Take a TestSuite and turn it into a list of ProtoTests.
-
-    This function is recursive.  Pass it a suite, and it will re-call itself
-    with smaller parts of the suite.
-    """
+def getTestList(item, test_list=None):
     if test_list == None:
         test_list = []
     # Python's lousy handling of module import failures during loader discovery
     # makes this crazy special case necessary.  See _make_failed_import_test in
     # the source code for unittest.loader
-    if suite_part.__class__.__name__ == 'ModuleImportFailure':
-        exception_method = str(suite_part).split()[0]
-        getattr(suite_part, exception_method)()
+    if item.__class__.__name__ == 'ModuleImportFailure':
+        exception_method = str(item).split()[0]
+        getattr(item, exception_method)()
     # On to the real stuff
-    if issubclass(type(suite_part), TestCase):
-        test_list.append(proto_test(suite_part))
+    if issubclass(type(item), TestCase):
+        test_list.append(proto_test(item))
     else:
-        for i in suite_part:
+        for i in item:
             getTestList(i, test_list)
         return test_list
 
