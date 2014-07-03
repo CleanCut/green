@@ -2,6 +2,10 @@ from __future__ import unicode_literals
 import logging
 import sys
 import termstyle
+import colorama
+
+# Make it work on Windows, too
+colorama.init()
 
 global debug_level
 debug_level = 0
