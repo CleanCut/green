@@ -63,7 +63,7 @@ def getTest(target):
             filename = importlib.import_module(target).__file__
             if '__init__.py' in filename:
                 pkg_in_path_dir = os.path.dirname(filename)
-        except ImportError:
+        except (ImportError, KeyError):
             pkg_in_path_dir = None
 
     # => DISCOVER DIRS
