@@ -98,7 +98,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        test_suite = loader.getTests(pkg_name)
+        test_suite = loader.getTests(pkg_name, pkg_name)
         self.assertEqual(test_suite.countTestCases(), 1)
         # Dotted name should start with the package!
         self.assertEqual(
