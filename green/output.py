@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+import platform
 import sys
 import termstyle
 
@@ -44,6 +45,13 @@ class Colors:
             self.termcolor = bool(termstyle.bold(""))
         else:
             self.termcolor = termcolor
+
+        # Windows needs an extra library to translate ANSI colors into Windows
+        # terminal colors.
+        if self.termcolor and (platform.system() == 'Windows'): # pragma: no cover
+            import colorama
+            colorama.init()
+
         self._restoreColor()
 
 
