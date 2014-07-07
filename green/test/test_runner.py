@@ -32,7 +32,7 @@ class TestGreenTestRunner(unittest.TestCase):
 
     def test_instantiate(self):
         "GreenTestRunner can be instantiated and creates a default stream."
-        gtr = GreenTestRunner()
+        gtr = GreenTestRunner(self.stream)
         self.assertTrue(type(gtr.stream), GreenStream)
 
 
