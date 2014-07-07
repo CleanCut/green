@@ -158,7 +158,7 @@ class GreenStream(object):
 
     def __init__(self, stream, html=False):
         self.stream = stream
-        if platform.system() == 'Windows':
+        if platform.system() == 'Windows': # pragma: no cover
             from colorama.initialise import wrap_stream
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.html = html
