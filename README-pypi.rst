@@ -26,6 +26,7 @@ Features
 - **Modern** - Supports Python 2.7, 3.3, 3.4, and `PyPy`_
 - **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
 - **Flexible** - Optional HTML output.
+- **Living** - This project grows and changes.  See the `changelog`_
 
 
 .. _nose: https://nose.readthedocs.org
@@ -34,3 +35,4 @@ Features
 .. _tutorial on how to correctly layout unit tests: https://github.com/CleanCut/green#unit-test-structure-tutorial
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
+.. _changelog: https://github.com/CleanCut/green/blob/master/CHANGELOG
