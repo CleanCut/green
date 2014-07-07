@@ -158,6 +158,9 @@ class GreenStream(object):
 
     def __init__(self, stream, html=False):
         self.stream = stream
+        if platform.system() == 'Windows':
+            from colorama.initialize import wrap_stream
+            self.stream = wrap_stream(self.stream, wrap=True)
         self.html = html
 
 
