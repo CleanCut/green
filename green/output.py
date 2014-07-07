@@ -46,12 +46,6 @@ class Colors:
         else:
             self.termcolor = termcolor
 
-        # Windows needs an extra library to translate ANSI colors into Windows
-        # terminal colors.
-        if self.termcolor and (platform.system() == 'Windows'): # pragma: no cover
-            import colorama
-            colorama.init()
-
         self._restoreColor()
 
 
