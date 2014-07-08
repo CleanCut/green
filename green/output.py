@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+import platform
 import sys
 import termstyle
 
@@ -44,6 +45,7 @@ class Colors:
             self.termcolor = bool(termstyle.bold(""))
         else:
             self.termcolor = termcolor
+
         self._restoreColor()
 
 
@@ -150,6 +152,9 @@ class GreenStream(object):
 
     def __init__(self, stream, html=False):
         self.stream = stream
+        if platform.system() == 'Windows': # pragma: no cover
+            from colorama.initialise import wrap_stream
+            self.stream = wrap_stream(self.stream, None, None, None, True)
         self.html = html
 
 

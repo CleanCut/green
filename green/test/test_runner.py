@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import os
 import shutil
 import tempfile
+import time
 import unittest
 
 from green.loader import getTests
@@ -32,7 +33,7 @@ class TestGreenTestRunner(unittest.TestCase):
 
     def test_instantiate(self):
         "GreenTestRunner can be instantiated and creates a default stream."
-        gtr = GreenTestRunner()
+        gtr = GreenTestRunner(self.stream)
         self.assertTrue(type(gtr.stream), GreenStream)
 
 
@@ -109,7 +110,14 @@ class TestSubprocesses(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.container_dir)
-        shutil.rmtree(self.tmpdir)
+        # On windows, the subprocesses block access to the files while
+        # they take a bit to clean themselves up.
+        for i in range(20):
+            try:
+                shutil.rmtree(self.tmpdir)
+                break
+            except PermissionError:
+                time.sleep(.01)
         del(self.stream)
 
 
@@ -143,22 +151,21 @@ class A(unittest.TestCase):
         self.filename = os.path.join(tempfile.gettempdir(), 'file.txt')
     def testOne(self):
         for msg in [str(x) for x in range(100)]:
-            self.fh = open(self.filename, 'w')
-            self.fh.write(msg)
-            self.fh.close()
+            fh = open(self.filename, 'w')
+            fh.write(msg)
+            fh.close()
             self.assertEqual(msg, open(self.filename).read())
     def testTwo(self):
         for msg in [str(x) for x in range(100,200)]:
-            self.fh = open(self.filename, 'w')
-            self.fh.write(msg)
-            self.fh.close()
+            fh = open(self.filename, 'w')
+            fh.write(msg)
+            fh.close()
             self.assertEqual(msg, open(self.filename).read())
 """.format(os.path.basename(sub_tmpdir)))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
         tests = getTests('.')
-        os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         gtr.run(tests)
         self.assertIn('OK', self.stream.getvalue())

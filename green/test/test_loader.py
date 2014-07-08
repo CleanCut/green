@@ -6,7 +6,6 @@ import tempfile
 import unittest
 
 from green import loader
-from green.runner import getTestList
 
 
 
@@ -71,7 +70,6 @@ class TestGetTests(unittest.TestCase):
     def test_BigDirWithAbsoluteImports(self):
         "Big dir discovers tests and doesn't crash on absolute import"
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        pkg_name = os.path.basename(sub_tmpdir)
         # Child setup
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
@@ -94,16 +92,12 @@ import {}.target_module
 class A(unittest.TestCase):
     def testPass(self):
         pass
-""".format(pkg_name))
+""".format(sub_tmpdir))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        test_suite = loader.getTests(pkg_name, pkg_name)
-        self.assertEqual(test_suite.countTestCases(), 1)
-        # Dotted name should start with the package!
-        self.assertEqual(
-                pkg_name + '.test.test_target_module.A.testPass',
-                getTestList(test_suite)[0].dotted_name)
+        tests = loader.getTests('.')
+        self.assertEqual(tests.countTestCases(), 1)
 
 
     def test_DirWithInit(self):

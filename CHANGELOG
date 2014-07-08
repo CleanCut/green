@@ -1,11 +1,23 @@
 Unreleased...
 
-- Installation process is now tested automatically - Issue #9
+- (nothing at the moment)
+
+
+Version 1.0.2 - 6 July 2014
+
+- Color works on Windows - Issues #18, #19
 - Self-tests run against installed versions automatically - Issue #10
+- Installation process is now tested automatically - Issue #9
+- Switched to "branch-based development"
+- Added an "example" directory with an example project with unit tests
+- Added the CHANGELOG (this file)
+- Improved the README.md file a lot based on feedback from reddit.
+
 
 Version 1.0.1 - 23 June 2014
 
 - Fixed MANIFEST so that installation didn't crash
+
 
 Version 1.0 - 22 June 2014
 
@@ -21,3 +33,10 @@ Features:
 - Modern - Supports Python 2.7, 3.3, 3.4, and PyPy
 - Portable - Completely supports OS X, Linux, and BSDs (and maybe Windows).
 - Flexible - Optional HTML output.
+
+
+Version (everything before 1.0)
+
+- There were lots of versions before 1.0 was released (54 published releases,
+actually).  No one heard about it before 1.0 though, so we didn't bother
+tracking individual releases.

@@ -35,6 +35,8 @@ Features
 - **Modern** - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
 - **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
 - **Flexible** - Optional HTML output.
+- **Living** - This project grows and changes.  See the
+  [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG)
 
 
 Basic Usage
