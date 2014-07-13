@@ -72,6 +72,8 @@ class env_excursion(object):
 class TestConfig(unittest.TestCase):
 
     def setUp(self):
+        if hasattr(config.get_config, "_cfg"):
+            del config.get_config._cfg
         self.tmpd = tempfile.mkdtemp()
         self.defname = os.path.join(self.tmpd, ".green")
         self.write_file(self.defname,
@@ -103,8 +105,6 @@ class TestConfig(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.tmpd)
-        if hasattr(config.get_config, "_cfg"):
-            del config.get_config._cfg
 
     def test_cmd_env_def(self):
         """
