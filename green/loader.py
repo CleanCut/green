@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
+from fnmatch import fnmatch
 import importlib
 import logging
 import os
+import re
 import sys
 import unittest
+import traceback
 
 
 def getTests(targets):
@@ -36,69 +39,114 @@ def getTests(targets):
     return tests
 
 
-def makeDottedName(base_dir, file_path):
+def isPackage(file_path):
+    return (os.path.isdir(file_path) and
+            os.path.isfile(os.path.join(file_path, '__init__.py')))
+
+
+python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
+def findDottedModuleAndParentDir(file_path):
     """
-    I convert a file_path into a dotted name based on a base_dir.
+    I return a tuple (dotted_module, parent_dir) where dotted_module is the
+    full dotted name of the module with respect to the package it is in, and
+    parent_dir is the absolute path to the parent directory of the package.
 
-    For example:
+    If the python file is not part of a package, I return (None, None).
 
-    makeDotted('/start/dir/', '/start/dir/pkg/module.py')
-
-    ...would likely return 'pkg.module'
-
-    If the file does not have a proper Python extension, then AttributeError
-    is raised.
+    For for filepath /a/b/c/d.py where b is the package, ('b.c.d', '/a') would
+    be returned.
     """
-    dotted_name = file_path.replace(base_dir, '').lstrip(os.sep)
-    found = False
-    for suffix in ['.py', '.pyc', '.pyo']:
-        if dotted_name.endswith(suffix):
-            found = True
-            dotted_name = dotted_name[:len(dotted_name)-len(suffix)]
-    if not found:
-        raise AttributeError("No valid python extension found")
-    dotted_name = dotted_name.replace(os.sep, '.')
-    return dotted_name
+    parent_dir = os.path.dirname(os.path.abspath(file_path))
+    dotted_module = os.path.basename(file_path).replace('.py', '')
+    while isPackage(parent_dir):
+        dotted_module = os.path.basename(parent_dir) + '.' + dotted_module
+        parent_dir = os.path.dirname(parent_dir)
+    return (dotted_module, parent_dir)
 
 
-def isPkg(path):
-    return (os.path.isdir(path) and
-            (
-                os.path.isfile(os.path.join(path, '__init__.py'))
-                or os.path.isfile(os.path.join(path, '__init__.pyc'))
-                or os.path.isfile(os.path.join(path, '__init__.pyo'))
-            ))
-
-
-def discoverDottedNames(start_dir, pkg_dir=None):
+def discover(current_path, file_pattern='test*.py'):
     """
-    I discover all the valid dotted names in a directory.
+    I take a path to a directory and discover all the tests inside files
+    matching file_pattern.
 
-    start_dir is used when the function calls itself recursively
+    If path is not a readable directory, I raise an ImportError.
+
+    If I don't find anything, I return None.  Otherwise I return a
+    unittest.TestSuite -- but that may change someday.
     """
-    if not pkg_dir:
-        if isPkg(start_dir):
-            pkg_dir = start_dir
-            while isPkg(os.path.dirname(pkg_dir)):
-                pkg_dir = os.path.dirname(pkg_dir)
-    dottedNames = OrderedDict()
-    paths = sorted(os.listdir(start_dir))
-    for path in paths:
-        path = os.path.join(start_dir, path)
-        if os.path.isfile(path):
+    current_abspath = os.path.abspath(current_path)
+    if not os.path.isdir(current_abspath):
+        raise ImportError(
+                "'%s' is not a directory".format(str(current_path)))
+    suite = unittest.suite.TestSuite()
+    for file_or_dir_name in sorted(os.listdir(current_abspath)):
+        path = os.path.join(current_abspath, file_or_dir_name)
+        # Recurse into directories
+        if os.path.isdir(path):
+            sub_suite = discover(path, file_pattern)
+            if sub_suite:
+                suite.addTest(sub_suite)
+
+        elif os.path.isfile(current_abspath):
+            # Skip irrelevant files
+            if not python_file_pattern.match(file_or_dir_name):
+                continue
+            if not fnmatch(file_or_dir_name, file_pattern):
+                continue
+
+            # --- Try loading the file as a module ---
+            dotted_module, parent_dir = findDottedModuleAndParentDir(
+                    file_or_dir_name)
+            # Adding the parent path of the module to the start of sys.path is
+            # the closest we can get to an absolute import in Python that I can
+            # find.
+            sys.path.insert(0, parent_dir)
             try:
-                dottedNames[makeDottedName(path, pkg_dir)] = True
-            except AttributeError:
-                pass
-        elif os.path.isdir(path) and pkg_dir:
-            if isPkg(path):
-                for dottedName in discoverDottedNames(path, pkg_dir):
-                    dottedNames[dottedName] = True
-    return list(dottedNames.keys())
+                __import__(dotted_module)
+                loaded_module = sys.modules[dotted_module]
+            except unittest.case.SkipTest as e:
+                # TODO: Right now this mimics the behavior in unittest.  Lets
+                # refactor it and simplify it after we make sure it works.
+                reason = str(e)
+                @unittest.case.skip(reason)
+                def testSkipped(self):
+                    pass
+                TestClass = type(
+                        "ModuleSkipped",
+                        (unittest.case.TestCase,),
+                        {file_or_dir_name: testSkipped})
+                return unittest.suite.TestSuite((TestClass(file_or_dir_name),))
+            except:
+                # TODO: Right now this mimics the behavior in unittest.  Lets
+                # refactor it and simplify it after we make sure it works.
+                message = 'Failed to import test module: {}\n{}'.format(
+                        file_or_dir_name, traceback.format_exc())
+                def testFailure(self):
+                    raise ImportError(message)
+                TestClass = type(
+                        "ModuleImportFailure",
+                        (unittest.case.TestCase,),
+                        {file_or_dir_name: testFailure})
+                return unittest.suite.TestSuite((TestClass(file_or_dir_name),))
+            finally:
+                # This gets called before return statements in except clauses
+                # actually return.  Yay!
+                sys.path.pop(0)
+
+            # --- Find the tests inside the loaded module ---
+            # XXX
 
 
-def discover():
-    pass
+
+    if suite.countTestCases():
+        return suite
+    else:
+        return None
+
+
+
+
+
 
 
 
@@ -188,6 +236,8 @@ def load(target='.', file_pattern='test*.py'):
             return tests
 
     return None
+
+
 
 def getTest(target):
     loader = unittest.TestLoader()

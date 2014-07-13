@@ -219,35 +219,35 @@ class TestLoader(object):
                 try:
                     start_dir = os.path.abspath(
                        os.path.dirname((the_module.__file__)))
-                except AttributeError:
-                    # look for namespace packages
-                    try:
-                        spec = the_module.__spec__
-                    except AttributeError:
-                        spec = None
-
-                    if spec and spec.loader is None:
-                        if spec.submodule_search_locations is not None:
-                            is_namespace = True
-
-                            for path in the_module.__path__:
-                                if (not set_implicit_top and
-                                    not path.startswith(top_level_dir)):
-                                    continue
-                                self._top_level_dir = \
-                                    (path.split(the_module.__name__
-                                         .replace(".", os.path.sep))[0])
-                                tests.extend(self._find_tests(path,
-                                                              pattern,
-                                                              namespace=True))
-                    elif the_module.__name__ in sys.builtin_module_names:
-                        # builtin module
-                        raise TypeError('Can not use builtin modules '
-                                        'as dotted module names') from None
-                    else:
-                        raise TypeError(
-                            'don\'t know how to discover from {!r}'
-                            .format(the_module)) from None
+#                except AttributeError:
+#                    # look for namespace packages
+#                    try:
+#                        spec = the_module.__spec__
+#                    except AttributeError:
+#                        spec = None
+#
+#                    if spec and spec.loader is None:
+#                        if spec.submodule_search_locations is not None:
+#                            is_namespace = True
+#
+#                            for path in the_module.__path__:
+#                                if (not set_implicit_top and
+#                                    not path.startswith(top_level_dir)):      # NAMESPACE
+#                                    continue
+#                                self._top_level_dir = \
+#                                    (path.split(the_module.__name__
+#                                         .replace(".", os.path.sep))[0])
+#                                tests.extend(self._find_tests(path,
+#                                                              pattern,
+#                                                              namespace=True))
+#                    elif the_module.__name__ in sys.builtin_module_names:
+#                        # builtin module
+#                        raise TypeError('Can not use builtin modules '
+#                                        'as dotted module names') from None
+#                    else:
+#                        raise TypeError(
+#                            'don\'t know how to discover from {!r}'
+#                            .format(the_module)) from None
 
                 if set_implicit_top:
                     if not is_namespace:
