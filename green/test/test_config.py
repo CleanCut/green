@@ -1,4 +1,7 @@
-import ConfigParser
+try:
+    import ConfigParser as cp
+except:
+    import configparser as cp
 import pdb
 import os
 import sys
@@ -117,13 +120,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "cmdline_config"], cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "env_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
     def test_cmd_env_nodef(self):
@@ -138,13 +141,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "cmdline_config"], cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "env_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
     def test_cmd_noenv_def(self):
@@ -159,13 +162,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "cmdline_config"], cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "env_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
     def test_cmd_noenv_nodef(self):
@@ -181,13 +184,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "cmdline_config"], cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "env_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
     def test_nocmd_env_def(self):
@@ -201,13 +204,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "env_config"], cfg.sections())
             self.assertEqual("not the same", cfg.get('green', 'different'))
             self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "cmdline")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
 
@@ -223,13 +226,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "env_config"], cfg.sections())
             self.assertEqual("not the same", cfg.get('green', 'different'))
             self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "cmdline")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "default_config", "something")
 
 
@@ -245,13 +248,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "default_config"], cfg.sections())
             self.assertEqual("bar", cfg.get('green', 'foo'))
             self.assertEqual(self.defname, cfg.get('green', 'filename'))
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "cmdline")
-            self.assertRaises(ConfigParser.NoOptionError,
+            self.assertRaises(cp.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(ConfigParser.NoSectionError,
+            self.assertRaises(cp.NoSectionError,
                               cfg.get, "env_config", "something")
 
     def test_nocmd_noenv_nodef(self):
