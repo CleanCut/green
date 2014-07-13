@@ -51,24 +51,23 @@ def main(testing=False, coverage_testing=False):
         default=None,
         help="Force terminal colors off.  Default is to autodetect.")
     out_args = parser.add_argument_group("Output Options")
-    out_args.add_argument('-c', '--config', action='store',
-                          default=None,
-                          help="Explicit config file")
-    out_args.add_argument('-C', '--cfgcheck', action='store_true',
-                          default=False,
-                          help="Dump the config and exit")
     out_args.add_argument('-d', '--debug', action='count', default=0,
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."))
     out_args.add_argument('-h', '--help', action='store_true', default=False,
         help="Show this help message and exit.")
     out_args.add_argument('-l', '--logging', action='store_true', default=False,
-        help="Don't configure the root logger to redirect to /dev/null")
+        help="Don't configure the root logger to redirect to /dev/null, "
+        "enabling internal debugging output")
     out_args.add_argument('-V', '--version', action='store_true', default=False,
         help="Print the version of Green and Python and exit.")
     out_args.add_argument('-v', '--verbose', action='count', default=1,
         help=("Verbose. Can be specified up to three times for more verbosity. "
         "Recommended levels are -v and -vv."))
+    other_args = parser.add_argument_group("Other Options")
+    other_args.add_argument('-c', '--config', action='store', default=None,
+        metavar='FILE', help="Use this config file instead of the one pointed "
+        "to by environment variable GREEN_CONFIG or the default ~/.green")
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
     cov_args.add_argument('-r', '--run-coverage', action='store_true',
@@ -95,15 +94,6 @@ def main(testing=False, coverage_testing=False):
     if args.version:
         from green.version import pretty_version
         sys.stdout.write(pretty_version()+'\n')
-        return 0
-
-    # Check config
-    from green.config import get_config, load_config
-    load_config(args.config)
-    if args.cfgcheck:
-        from green.config import get_config
-        cfg = get_config()
-        cfg.write(sys.stdout)
         return 0
 
     # Handle logging options
@@ -144,6 +134,7 @@ def main(testing=False, coverage_testing=False):
 
 
     # Set up our various main objects
+    from green.config import get_config
     from green.loader import getTests
     from green.runner import GreenTestRunner
     from green.output import GreenStream
