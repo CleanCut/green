@@ -5,7 +5,7 @@ import sys
 import shutil
 import tempfile
 import unittest
-import config
+from green import config
 
 """
 Testcases:
