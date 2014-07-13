@@ -51,6 +51,12 @@ def main(testing=False, coverage_testing=False):
         default=None,
         help="Force terminal colors off.  Default is to autodetect.")
     out_args = parser.add_argument_group("Output Options")
+    out_args.add_argument('-c', '--config', action='store',
+                          default=None,
+                          help="Explicit config file")
+    out_args.add_argument('-C', '--cfgcheck', action='store_true',
+                          default=False,
+                          help="Dump the config and exit")
     out_args.add_argument('-d', '--debug', action='count', default=0,
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."))
@@ -89,6 +95,15 @@ def main(testing=False, coverage_testing=False):
     if args.version:
         from green.version import pretty_version
         sys.stdout.write(pretty_version()+'\n')
+        return 0
+
+    # Check config
+    from green.config import get_config, load_config
+    load_config(args.config)
+    if args.cfgcheck:
+        from green.config import get_config
+        cfg = get_config()
+        cfg.write(sys.stdout)
         return 0
 
     # Handle logging options
