@@ -1,4 +1,7 @@
-import ConfigParser as cp
+try:
+    import ConfigParser as cp
+except:
+    import configparser as cp
 import os
 
 def get_config():
