@@ -1,7 +1,7 @@
 try:
-    import configparser as cp
+    import configparser
 except:
-    import ConfigParser as cp
+    import ConfigParser as configparser
 import os
 import shutil
 import tempfile
@@ -116,10 +116,10 @@ class TestConfig(unittest.TestCase):
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
             self.assertEqual("not the same", cfg.get("green", "different"))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "foo")
             self.assertEqual("ignored", cfg.get("env_config", "this_section"))
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "default_config", "something")
 
 
@@ -135,10 +135,10 @@ class TestConfig(unittest.TestCase):
                              cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "different")
             self.assertEqual("bar", cfg.get("green", "foo"))
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "env_config", "this_section")
             self.assertEqual("to be here",
                              cfg.get("default_config", "something"))
@@ -156,13 +156,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "cmdline_config"], cfg.sections())
             self.assertEqual("yes", cfg.get("green", "cmdline"))
             self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "env_config", "this_section")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "default_config", "something")
 
 
@@ -178,10 +178,10 @@ class TestConfig(unittest.TestCase):
                              cfg.sections())
             self.assertEqual("not the same", cfg.get('green', 'different'))
             self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "cmdline")
             self.assertEqual("bar", cfg.get("green", "foo"))
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
             self.assertEqual("to be here",
                              cfg.get("default_config", "something"))
@@ -200,13 +200,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "env_config"], cfg.sections())
             self.assertEqual("not the same", cfg.get('green', 'different'))
             self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "cmdline")
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "foo")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "default_config", "something")
 
 
@@ -222,13 +222,13 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(["green", "default_config"], cfg.sections())
             self.assertEqual("bar", cfg.get('green', 'foo'))
             self.assertEqual(self.defname, cfg.get('green', 'filename'))
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "cmdline")
-            self.assertRaises(cp.NoOptionError,
+            self.assertRaises(configparser.NoOptionError,
                               cfg.get, "green", "different")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(cp.NoSectionError,
+            self.assertRaises(configparser.NoSectionError,
                               cfg.get, "env_config", "something")
 
 

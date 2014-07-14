@@ -21,7 +21,7 @@ def main(testing=False, coverage_testing=False):
             add_help=False,
             description="Green is a clean, colorful test runner for Python unit tests.")
     target_args = parser.add_argument_group("Target Specification")
-    target_args.add_argument('targets', action='store', nargs='*', default=['.'],
+    target_args.add_argument('targets', action='store', nargs='*',
         help=("""Targets to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
@@ -33,7 +33,7 @@ def main(testing=False, coverage_testing=False):
         loaded."""))
     concurrency_args = parser.add_argument_group("Concurrency Options")
     concurrency_args.add_argument('-s', '--subprocesses', action='store',
-            type=int, default=1, metavar='NUM',
+            type=int, metavar='NUM',
             help="Number of subprocesses to use to run tests.  Note that your "
             "tests need to be written to avoid using the same resources (temp "
             "files, sockets, ports, etc.) for the multi-process mode to work "
@@ -42,43 +42,63 @@ def main(testing=False, coverage_testing=False):
             "trivial tests (tests that take < 1ms), running everything in a "
             "single process may be faster.")
     format_args = parser.add_argument_group("Format Options")
-    format_args.add_argument('-m', '--html', action='store_true', default=False,
+    format_args.add_argument('-m', '--html', action='store_true',
         help="HTML5 format.  Overrides terminal color options if specified.")
     format_args.add_argument('-t', '--termcolor', action='store_true',
-        default=None,
         help="Force terminal colors on.  Default is to autodetect.")
     format_args.add_argument('-T', '--notermcolor', action='store_true',
-        default=None,
         help="Force terminal colors off.  Default is to autodetect.")
     out_args = parser.add_argument_group("Output Options")
-    out_args.add_argument('-d', '--debug', action='count', default=0,
+    out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."))
-    out_args.add_argument('-h', '--help', action='store_true', default=False,
+    out_args.add_argument('-h', '--help', action='store_true',
         help="Show this help message and exit.")
-    out_args.add_argument('-l', '--logging', action='store_true', default=False,
+    out_args.add_argument('-l', '--logging', action='store_true',
         help="Don't configure the root logger to redirect to /dev/null, "
         "enabling internal debugging output")
-    out_args.add_argument('-V', '--version', action='store_true', default=False,
+    out_args.add_argument('-V', '--version', action='store_true',
         help="Print the version of Green and Python and exit.")
-    out_args.add_argument('-v', '--verbose', action='count', default=1,
+    out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more verbosity. "
         "Recommended levels are -v and -vv."))
     other_args = parser.add_argument_group("Other Options")
-    other_args.add_argument('-c', '--config', action='store', default=None,
+    other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green")
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
     cov_args.add_argument('-r', '--run-coverage', action='store_true',
-        default=False,
         help=("Produce coverage output."))
-    cov_args.add_argument('-o', '--omit', action='store', default=None,
+    cov_args.add_argument('-o', '--omit', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
             "dir)*,*(python system packages)*'"))
+    # Set the defaults in a re-usable way
+    default_args = argparse.Namespace(
+            targets = ['.'],
+            subprocesses = 1,
+            html = False,
+            termcolor = None,
+            notermcolor = None,
+            debug = 0,
+            help = False,
+            logging = False,
+            version = False,
+            verbose = 1,
+            config = None,
+            run_coverage = False,
+            omit = None,
+            )
+    parser.set_defaults(**(dict(default_args._get_kwargs())))
+
     args = parser.parse_args()
+
+    # Unfortunately we can't fully cover the config module (the global part of
+    # it), because we need to use it to see if we need to turn coverage on.
+    from green.config import merge_config
+    args = merge_config(args, default_args)
 
     # Clear out all the passed-in-options just in case someone tries to run a
     # test that assumes sys.argv is clean.  I can't guess at the script name
@@ -134,7 +154,6 @@ def main(testing=False, coverage_testing=False):
 
 
     # Set up our various main objects
-    from green.config import get_config
     from green.loader import getTests
     from green.runner import GreenTestRunner
     from green.output import GreenStream

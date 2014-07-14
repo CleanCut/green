@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals # pragma: no cover
 """
 Configuration settings are read in this order:
 
@@ -12,12 +12,14 @@ of the last place the setting is seen.  So, for example, if a setting is turned
 on in ~/.green and turned off by a command-line argument, then the setting will
 be turned off.
 """
-try:
-    import configparser as cp
-except: # pragma: no cover
-    import ConfigParser as cp
-import logging
-import os
+try:           # pragma: no cover
+    import configparser
+except:        # pragma: no cover
+    import ConfigParser as configparser
+
+import copy    # pragma: no cover
+import logging # pragma: no cover
+import os      # pragma: no cover
 
 
 def get_config(filepath=None):
@@ -30,7 +32,7 @@ def get_config(filepath=None):
 
     Returns: A ConfigParser object.
     """
-    config_parser = cp.ConfigParser()
+    parser = configparser.ConfigParser()
 
     filepaths = []
     # Lowest priority goes first in the list
@@ -51,6 +53,46 @@ def get_config(filepath=None):
 
     if filepaths:
         logging.debug("Loading config options from: " + ", ".join(filepaths))
-        config_parser.read(filepaths)
+        parser.read(filepaths)
 
-    return config_parser
+    return parser
+
+
+def merge_config(args, default_args):
+    """
+    I take in a namespace created by the ArgumentParser in cmdline.main() and
+    merge in options from configuration files.  The config items only replace
+    argument items that are set to default value.
+
+    Returns: I return a new argparse.Namespace
+    """
+    config = get_config(args.config)
+    new_args = copy.deepcopy(default_args) # Default by default!
+
+    for name, args_value in dict(args._get_kwargs()).items():
+        # Config options overwrite default options
+        config_getter = None
+        if name in ['html', 'termcolor', 'notermcolor', 'help', 'logging',
+                'version', 'run_coverage']:
+            config_getter = config.getboolean
+        elif name in ['subprocesses', 'debug', 'verbose']:
+            config_getter = config.getint
+        elif name in ['omit']:
+            config_getter = config.get
+        elif name in ['targets', 'help', 'config']:
+            pass # Some options only make sense coming on the command-line.
+        else:
+            raise NotImplementedError(name)
+
+        if config_getter:
+            try:
+                config_value = config_getter('green', name.replace('_','-'))
+                setattr(new_args, name, config_value)
+            except (configparser.NoSectionError, configparser.NoOptionError):
+                pass
+
+        # Command-line values overwrite defaults and config values
+        if args_value != getattr(default_args, name):
+            setattr(new_args, name, args_value)
+
+    return new_args
