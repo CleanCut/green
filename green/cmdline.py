@@ -15,6 +15,23 @@ except: # pragma: no cover
 
 # Importing from green is done after coverage initialization
 
+# Set the defaults in a re-usable way
+default_args = argparse.Namespace(
+        targets      = ['.'], # Not in configs
+        subprocesses = 1,
+        html         = False,
+        termcolor    = None,
+        notermcolor  = None,
+        debug        = 0,
+        help         = False, # Not in configs
+        logging      = False,
+        version      = False,
+        verbose      = 1,
+        config       = None,  # Not in configs
+        run_coverage = False,
+        omit         = None,
+        )
+
 
 def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
@@ -75,22 +92,6 @@ def main(testing=False, coverage_testing=False):
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
             "dir)*,*(python system packages)*'"))
-    # Set the defaults in a re-usable way
-    default_args = argparse.Namespace(
-            targets      = ['.'],
-            subprocesses = 1,
-            html         = False,
-            termcolor    = None,
-            notermcolor  = None,
-            debug        = 0,
-            help         = False,
-            logging      = False,
-            version      = False,
-            verbose      = 1,
-            config       = None,
-            run_coverage = False,
-            omit         = None,
-            )
     parser.set_defaults(**(dict(default_args._get_kwargs())))
 
     args = parser.parse_args()

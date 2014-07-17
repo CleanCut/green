@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from green import config
+from green import cmdline
 
 
 
@@ -39,7 +40,7 @@ class ModifiedEnvironment(object):
 
 
 
-class TestConfig(unittest.TestCase):
+class ConfigBase(unittest.TestCase):
 
 
     def _write_file(self, path, lines):
@@ -50,32 +51,35 @@ class TestConfig(unittest.TestCase):
 
     def setUp(self):
         self.tmpd = tempfile.mkdtemp()
-        self.defname = os.path.join(self.tmpd, ".green")
-        self._write_file(self.defname,
+        self.default_filename = os.path.join(self.tmpd, ".green")
+        self.default_logging = False
+        self.default_version = True
+        self._write_file(self.default_filename,
                         ["# this is a test config file for green",
                          "[green]",
-                         "foo = bar",
-                         "filename = %s" % self.defname,
-                         "[default_config]",
-                         "something = to be here",
+                         "logging = {}".format(str(self.default_logging)),
+                         "version = {}".format(str(self.default_version)),
+                         "omit = {}".format(self.default_filename),
                          ])
-        self.envname = os.path.join(self.tmpd, "green.env")
-        self._write_file(self.envname,
+        self.env_filename = os.path.join(self.tmpd, "green.env")
+        self.env_logging = True
+        self.env_html = True
+        self._write_file(self.env_filename,
                         ["# this is a test config file for green",
                          "[green]",
-                         "different = not the same",
-                         "filename = %s" % self.envname,
-                         "[env_config]",
-                         "this_section = ignored",
+                         "logging = {}".format(str(self.env_logging)),
+                         "omit = {}".format(self.env_filename),
+                         "html = {}".format(self.env_html),
                          ])
-        self.cmdname = os.path.join(self.tmpd, "green.cmd")
-        self._write_file(self.cmdname,
+        self.cmd_filename = os.path.join(self.tmpd, "green.cmd")
+        self.cmd_logging = True
+        self.cmd_run_coverage = True
+        self._write_file(self.cmd_filename,
                         ["# this is a test config file for green",
                          "[green]",
-                         "cmdline = yes",
-                         "filename = %s" % self.cmdname,
-                         "[cmdline_config]",
-                         "nothing = here",
+                         "logging = {}".format(str(self.cmd_logging)),
+                         "omit = {}".format(self.cmd_filename),
+                         "run-coverage = {}".format(self.cmd_run_coverage),
                          ])
 
 
@@ -83,23 +87,32 @@ class TestConfig(unittest.TestCase):
         shutil.rmtree(self.tmpd)
 
 
+
+class TestMergeConfig(ConfigBase):
+
+
+    def test_something(self):
+        pass
+
+
+
+class TestConfig(ConfigBase):
+
+
     def test_cmd_env_def(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG is set, $HOME/.green exists
         Result: load --config
         """
-        with ModifiedEnvironment(GREEN_CONFIG=self.envname, HOME=self.tmpd):
-            cfg = config.get_config(self.cmdname)
-            self.assertEqual(
-                    ["green", "default_config", "env_config", "cmdline_config"],
-                    cfg.sections())
-            self.assertEqual("yes", cfg.get("green", "cmdline"))
-            self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertEqual("not the same",  cfg.get("green", "different"))
-            self.assertEqual("bar", cfg.get("green", "foo"))
-            self.assertEqual("ignored", cfg.get("env_config", "this_section"))
-            self.assertEqual("to be here",
-                    cfg.get("default_config", "something"))
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+            cfg = config.get_config(self.cmd_filename)
+            ae = self.assertEqual
+            ae(["green"],             cfg.sections())
+            ae(self.cmd_filename,     cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ae(self.default_version,  cfg.getboolean("green", "version"))
 
 
     def test_cmd_env_nodef(self):
@@ -108,19 +121,17 @@ class TestConfig(unittest.TestCase):
             exist
         Result: load --config
         """
-        os.unlink(self.defname)
-        with ModifiedEnvironment(GREEN_CONFIG=self.envname, HOME=self.tmpd):
-            cfg = config.get_config(self.cmdname)
-            self.assertEqual(["green", "env_config", "cmdline_config"],
-                             cfg.sections())
-            self.assertEqual("yes", cfg.get("green", "cmdline"))
-            self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertEqual("not the same", cfg.get("green", "different"))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "foo")
-            self.assertEqual("ignored", cfg.get("env_config", "this_section"))
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "default_config", "something")
+        os.unlink(self.default_filename)
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+            cfg = config.get_config(self.cmd_filename)
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.cmd_filename,     cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
     def test_cmd_noenv_def(self):
@@ -128,20 +139,17 @@ class TestConfig(unittest.TestCase):
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green exists
         Result: load --config
         """
-        os.unlink(self.envname)
+        os.unlink(self.env_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config(self.cmdname)
-            self.assertEqual(["green", "default_config", "cmdline_config"],
-                             cfg.sections())
-            self.assertEqual("yes", cfg.get("green", "cmdline"))
-            self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "different")
-            self.assertEqual("bar", cfg.get("green", "foo"))
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "env_config", "this_section")
-            self.assertEqual("to be here",
-                             cfg.get("default_config", "something"))
+            cfg = config.get_config(self.cmd_filename)
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.cmd_filename,     cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ae(self.default_version,  cfg.getboolean("green", "version"))
 
 
     def test_cmd_noenv_nodef(self):
@@ -149,21 +157,18 @@ class TestConfig(unittest.TestCase):
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green does not exist
         Result: load --config
         """
-        os.unlink(self.envname)
-        os.unlink(self.defname)
+        os.unlink(self.env_filename)
+        os.unlink(self.default_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config(self.cmdname)
-            self.assertEqual(["green", "cmdline_config"], cfg.sections())
-            self.assertEqual("yes", cfg.get("green", "cmdline"))
-            self.assertEqual(self.cmdname, cfg.get("green", "filename"))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "different")
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "foo")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "env_config", "this_section")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "default_config", "something")
+            cfg = config.get_config(self.cmd_filename)
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.cmd_filename,     cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
     def test_nocmd_env_def(self):
@@ -171,20 +176,17 @@ class TestConfig(unittest.TestCase):
         Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green exists
         Result: load $GREEN_CONFIG
         """
-        os.unlink(self.cmdname)
-        with ModifiedEnvironment(GREEN_CONFIG=self.envname, HOME=self.tmpd):
+        os.unlink(self.cmd_filename)
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             cfg = config.get_config()
-            self.assertEqual(["green", "default_config", "env_config"],
-                             cfg.sections())
-            self.assertEqual("not the same", cfg.get('green', 'different'))
-            self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "cmdline")
-            self.assertEqual("bar", cfg.get("green", "foo"))
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "cmdline_config", "this_section")
-            self.assertEqual("to be here",
-                             cfg.get("default_config", "something"))
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.env_filename,     cfg.get("green", "omit"))
+            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
+            ae(self.env_logging,      cfg.getboolean("green", "logging"))
+            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ae(self.default_version,  cfg.getboolean("green", "version"))
 
 
     def test_nocmd_env_nodef(self):
@@ -193,21 +195,18 @@ class TestConfig(unittest.TestCase):
             exist
         Result: load $GREEN_CONFIG
         """
-        os.unlink(self.cmdname)
-        os.unlink(self.defname)
-        with ModifiedEnvironment(GREEN_CONFIG=self.envname, HOME=self.tmpd):
+        os.unlink(self.cmd_filename)
+        os.unlink(self.default_filename)
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             cfg = config.get_config()
-            self.assertEqual(["green", "env_config"], cfg.sections())
-            self.assertEqual("not the same", cfg.get('green', 'different'))
-            self.assertEqual(self.envname, cfg.get('green', 'filename'))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "cmdline")
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "foo")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "default_config", "something")
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.env_filename,     cfg.get("green", "omit"))
+            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
+            ae(self.env_logging,      cfg.getboolean("green", "logging"))
+            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
     def test_nocmd_noenv_def(self):
@@ -215,21 +214,18 @@ class TestConfig(unittest.TestCase):
         Setup: no --config option, $GREEN_CONFIG unset, $HOME/.green exists
         Result: load $HOME/.green
         """
-        os.unlink(self.cmdname)
-        os.unlink(self.envname)
+        os.unlink(self.cmd_filename)
+        os.unlink(self.env_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
             cfg = config.get_config()
-            self.assertEqual(["green", "default_config"], cfg.sections())
-            self.assertEqual("bar", cfg.get('green', 'foo'))
-            self.assertEqual(self.defname, cfg.get('green', 'filename'))
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "cmdline")
-            self.assertRaises(configparser.NoOptionError,
-                              cfg.get, "green", "different")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "cmdline_config", "this_section")
-            self.assertRaises(configparser.NoSectionError,
-                              cfg.get, "env_config", "something")
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],             cfg.sections())
+            ae(self.default_filename,     cfg.get("green", "omit"))
+            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
+            ae(self.default_logging,      cfg.getboolean("green", "logging"))
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ae(self.default_version,  cfg.getboolean("green", "version"))
 
 
     def test_nocmd_noenv_nodef(self):
@@ -237,9 +233,16 @@ class TestConfig(unittest.TestCase):
         Setup: no --config option, $GREEN_CONFIG unset, no $HOME/.green
         Result: empty config
         """
-        os.unlink(self.defname)
-        os.unlink(self.envname)
-        os.unlink(self.cmdname)
+        os.unlink(self.default_filename)
+        os.unlink(self.env_filename)
+        os.unlink(self.cmd_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
             cfg = config.get_config()
-            self.assertEqual([], cfg.sections())
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae([], cfg.sections())
+            ar(configparser.NoSectionError, cfg.get, "green", "omit")
+            ar(configparser.NoSectionError, cfg.get, "green", "run-coverage")
+            ar(configparser.NoSectionError, cfg.get, "green", "logging")
+            ar(configparser.NoSectionError, cfg.get, "green", "html")
+            ar(configparser.NoSectionError, cfg.get, "green", "version")
