@@ -36,7 +36,32 @@ default_args = argparse.Namespace(
 def main(testing=False, coverage_testing=False):
     parser = argparse.ArgumentParser(
             add_help=False,
-            description="Green is a clean, colorful test runner for Python unit tests.")
+            description=
+"""
+Green is a clean, colorful test runner for Python unit tests.
+""".rstrip(),
+            epilog=
+"""
+CONFIG FILES
+
+  Green will look for and process three config files if found:
+  1) $HOME/.green
+  2) $GREEN_CONFIG
+  3) A file specified with "--config FILE"
+
+  Config file format is simply "option = value" on separate lines.  "option" is
+  the same as the long options above, just without the "--".
+
+  Most values should be "True" or "False".  Accumulated values (verbose, debug) should
+  be specified as integers ("-vv" would be "verbose = 2").
+
+  Example:
+
+    verbose = 2
+    logging = True
+    omit    = myproj*,*prototype*
+""".rstrip(),
+            formatter_class=argparse.RawDescriptionHelpFormatter)
     target_args = parser.add_argument_group("Target Specification")
     target_args.add_argument('targets', action='store', nargs='*',
         help=("""Targets to test.  If blank, then discover all testcases in the
