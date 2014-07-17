@@ -2,6 +2,7 @@ try:
     import configparser
 except:
     import ConfigParser as configparser
+import copy
 import os
 import shutil
 import tempfile
@@ -13,6 +14,9 @@ from green import cmdline
 
 
 class ModifiedEnvironment(object):
+    """
+    I am a context manager that sets up environment variables for a test case.
+    """
 
 
     def __init__(self, **kwargs):
@@ -41,6 +45,10 @@ class ModifiedEnvironment(object):
 
 
 class ConfigBase(unittest.TestCase):
+    """
+    I am an abstract base class that creates and destroys configuration files
+    in a temporary directory with known values attached to self.
+    """
 
 
     def _write_file(self, path, lines):
@@ -53,7 +61,7 @@ class ConfigBase(unittest.TestCase):
         self.tmpd = tempfile.mkdtemp()
         self.default_filename = os.path.join(self.tmpd, ".green")
         self.default_logging = False
-        self.default_version = True
+        self.default_version = False
         self._write_file(self.default_filename,
                         ["# this is a test config file for green",
                          "[green]",
@@ -63,7 +71,7 @@ class ConfigBase(unittest.TestCase):
                          ])
         self.env_filename = os.path.join(self.tmpd, "green.env")
         self.env_logging = True
-        self.env_html = True
+        self.env_html = False
         self._write_file(self.env_filename,
                         ["# this is a test config file for green",
                          "[green]",
@@ -72,8 +80,8 @@ class ConfigBase(unittest.TestCase):
                          "html = {}".format(self.env_html),
                          ])
         self.cmd_filename = os.path.join(self.tmpd, "green.cmd")
-        self.cmd_logging = True
-        self.cmd_run_coverage = True
+        self.cmd_logging = False
+        self.cmd_run_coverage = False
         self._write_file(self.cmd_filename,
                         ["# this is a test config file for green",
                          "[green]",
@@ -88,15 +96,10 @@ class ConfigBase(unittest.TestCase):
 
 
 
-class TestMergeConfig(ConfigBase):
-
-
-    def test_something(self):
-        pass
-
-
-
 class TestConfig(ConfigBase):
+    """
+    All variations of config file parsing works as expected.
+    """
 
 
     def test_cmd_env_def(self):
@@ -246,3 +249,58 @@ class TestConfig(ConfigBase):
             ar(configparser.NoSectionError, cfg.get, "green", "logging")
             ar(configparser.NoSectionError, cfg.get, "green", "html")
             ar(configparser.NoSectionError, cfg.get, "green", "version")
+
+
+
+class TestMergeConfig(ConfigBase):
+    """
+    Merging config files and command-line arguments works as expected.
+    """
+
+
+    def test_overwrite(self):
+        """
+        Non-default command-line argument values overwrite config values.
+        """
+        # This config environment should set the values we look at to False and
+        # a filename in omit
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+            new_args = copy.deepcopy(cmdline.default_args)
+
+            new_args.omit         = 'omitstuff'
+            new_args.run_coverage = True
+            new_args.logging      = True
+            new_args.html         = True
+            new_args.version      = True
+
+            new_args.config = self.cmd_filename
+            computed_args = config.merge_config(new_args, cmdline.default_args)
+
+            self.assertEqual(computed_args.omit,         'omitstuff')
+            self.assertEqual(computed_args.run_coverage, new_args.run_coverage)
+            self.assertEqual(computed_args.logging,      new_args.logging)
+            self.assertEqual(computed_args.html,         new_args.html)
+            self.assertEqual(computed_args.version,      new_args.version)
+
+
+    def test_no_overwrite(self):
+        """
+        Default command-line arguments do not overwrite config values.
+        """
+        # This config environment should set logging to True
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=""):
+            # The default for logging in arguments is False
+            da = cmdline.default_args
+            computed_args = config.merge_config(da, da)
+            self.assertEqual(computed_args.logging, True)
+
+
+    def test_forgotToUpdateMerge(self):
+         """
+         merge_config raises an exception for unknown cmdline args
+         """
+         new_args = copy.deepcopy(cmdline.default_args)
+         new_args.new_option = True
+
+         self.assertRaises(NotImplementedError, config.merge_config, new_args,
+                 cmdline.default_args)
