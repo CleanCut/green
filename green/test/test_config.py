@@ -64,7 +64,6 @@ class ConfigBase(unittest.TestCase):
         self.default_version = False
         self._write_file(self.default_filename,
                         ["# this is a test config file for green",
-                         "[green]",
                          "logging = {}".format(str(self.default_logging)),
                          "version = {}".format(str(self.default_version)),
                          "omit = {}".format(self.default_filename),
@@ -74,7 +73,6 @@ class ConfigBase(unittest.TestCase):
         self.env_html = False
         self._write_file(self.env_filename,
                         ["# this is a test config file for green",
-                         "[green]",
                          "logging = {}".format(str(self.env_logging)),
                          "omit = {}".format(self.env_filename),
                          "html = {}".format(self.env_html),
@@ -84,7 +82,6 @@ class ConfigBase(unittest.TestCase):
         self.cmd_run_coverage = False
         self._write_file(self.cmd_filename,
                         ["# this is a test config file for green",
-                         "[green]",
                          "logging = {}".format(str(self.cmd_logging)),
                          "omit = {}".format(self.cmd_filename),
                          "run-coverage = {}".format(self.cmd_run_coverage),

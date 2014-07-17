@@ -12,15 +12,55 @@ of the last place the setting is seen.  So, for example, if a setting is turned
 on in ~/.green and turned off by a command-line argument, then the setting will
 be turned off.
 """
-try:           # pragma: no cover
+try:              # pragma: no cover
     import configparser
-except:        # pragma: no cover
+except:           # pragma: no cover
     import ConfigParser as configparser
 
-import copy    # pragma: no cover
-import os      # pragma: no cover
+import copy       # pragma: no cover
+import os         # pragma: no cover
 
-files_loaded = []
+# Used for debugging output in cmdline, since we can't do debug output here.
+files_loaded = [] # pragma: no cover
+
+
+
+class ConfigFile(object): # pragma: no cover
+    """
+    Filehandle wrapper that adds a "[green]" section to the start of a config
+    file so that users don't actually have to manually add a [green] section.
+
+    Works with configparser versions from both Python 2 and 3
+    """
+
+
+    def __init__(self, filepath):
+        self.first = True
+        self.lines = open(filepath).readlines()
+
+
+    # Python 2
+    def readline(self):
+        try:
+            return self.__next__()
+        except StopIteration:
+            return ''
+
+
+    # Python 3
+    def __iter__(self):
+        return self
+
+
+    def __next__(self):
+        if self.first:
+            self.first = False
+            return "[green]\n"
+        if self.lines:
+            return self.lines.pop(0)
+        raise StopIteration
+
+
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
@@ -56,7 +96,11 @@ def get_config(filepath=None): # pragma: no cover
     if filepaths:
         global files_loaded
         files_loaded = filepaths
-        parser.read(filepaths)
+        # Python 3 has parser.read_file(iterator) while Python2 has
+        # parser.readfp(obj_with_readline)
+        read_func = getattr(parser, 'read_file', getattr(parser, 'readfp'))
+        for filepath in filepaths:
+            read_func(ConfigFile(filepath))
 
     return parser
 
