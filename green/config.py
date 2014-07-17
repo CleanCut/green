@@ -20,6 +20,7 @@ except:        # pragma: no cover
 import copy    # pragma: no cover
 import os      # pragma: no cover
 
+files_loaded = []
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
@@ -53,6 +54,8 @@ def get_config(filepath=None): # pragma: no cover
         filepaths.append(filepath)
 
     if filepaths:
+        global files_loaded
+        files_loaded = filepaths
         parser.read(filepaths)
 
     return parser

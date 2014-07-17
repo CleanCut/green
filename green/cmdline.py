@@ -98,8 +98,8 @@ def main(testing=False, coverage_testing=False):
 
     # Unfortunately we can't fully cover the config module (the global part of
     # it), because we need to use it to see if we need to turn coverage on.
-    from green.config import merge_config
-    args = merge_config(args, default_args)
+    import green.config as config
+    args = config.merge_config(args, default_args)
 
     # Clear out all the passed-in-options just in case someone tries to run a
     # test that assumes sys.argv is clean.  I can't guess at the script name
@@ -124,6 +124,11 @@ def main(testing=False, coverage_testing=False):
                 format="%(asctime)s %(levelname)9s %(message)s")
     elif not args.logging:
         logging.basicConfig(filename=os.devnull)
+
+    # Add debug logging for stuff that happened before this point here
+    if config.files_loaded:
+        logging.debug("Loaded config file(s): {}".format(
+            ', '.join(config.files_loaded)))
 
     # These options both disable termcolor
     if args.html or args.notermcolor:
@@ -152,7 +157,6 @@ def main(testing=False, coverage_testing=False):
         if (not testing) or coverage_testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit)
             cov.start()
-
 
     # Set up our various main objects
     from green.loader import getTests
