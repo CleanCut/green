@@ -18,7 +18,6 @@ except:        # pragma: no cover
     import ConfigParser as configparser
 
 import copy    # pragma: no cover
-import logging # pragma: no cover
 import os      # pragma: no cover
 
 
@@ -52,7 +51,6 @@ def get_config(filepath=None):
         filepaths.append(filepath)
 
     if filepaths:
-        logging.debug("Loading config options from: " + ", ".join(filepaths))
         parser.read(filepaths)
 
     return parser
