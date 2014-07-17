@@ -77,19 +77,19 @@ def main(testing=False, coverage_testing=False):
             "dir)*,*(python system packages)*'"))
     # Set the defaults in a re-usable way
     default_args = argparse.Namespace(
-            targets = ['.'],
+            targets      = ['.'],
             subprocesses = 1,
-            html = False,
-            termcolor = None,
-            notermcolor = None,
-            debug = 0,
-            help = False,
-            logging = False,
-            version = False,
-            verbose = 1,
-            config = None,
+            html         = False,
+            termcolor    = None,
+            notermcolor  = None,
+            debug        = 0,
+            help         = False,
+            logging      = False,
+            version      = False,
+            verbose      = 1,
+            config       = None,
             run_coverage = False,
-            omit = None,
+            omit         = None,
             )
     parser.set_defaults(**(dict(default_args._get_kwargs())))
 
