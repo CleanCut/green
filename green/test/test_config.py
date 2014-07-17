@@ -126,11 +126,11 @@ class TestConfig(ConfigBase):
             cfg = config.get_config(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.cmd_filename,     cfg.get("green", "omit"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
-            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ae(["green"],                  cfg.sections())
+            ae(self.cmd_filename,          cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
+            ae(self.env_html,              cfg.getboolean("green", "html"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
@@ -144,12 +144,12 @@ class TestConfig(ConfigBase):
             cfg = config.get_config(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.cmd_filename,     cfg.get("green", "omit"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ae(["green"],                  cfg.sections())
+            ae(self.cmd_filename,          cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
-            ae(self.default_version,  cfg.getboolean("green", "version"))
+            ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
     def test_cmd_noenv_nodef(self):
@@ -163,10 +163,10 @@ class TestConfig(ConfigBase):
             cfg = config.get_config(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.cmd_filename,     cfg.get("green", "omit"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
+            ae(["green"],                  cfg.sections())
+            ae(self.cmd_filename,          cfg.get("green", "omit"))
+            ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
@@ -181,12 +181,12 @@ class TestConfig(ConfigBase):
             cfg = config.get_config()
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.env_filename,     cfg.get("green", "omit"))
+            ae(["green"],                  cfg.sections())
+            ae(self.env_filename,          cfg.get("green", "omit"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging,      cfg.getboolean("green", "logging"))
-            ae(self.env_html,         cfg.getboolean("green", "html"))
-            ae(self.default_version,  cfg.getboolean("green", "version"))
+            ae(self.env_logging,           cfg.getboolean("green", "logging"))
+            ae(self.env_html,              cfg.getboolean("green", "html"))
+            ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
     def test_nocmd_env_nodef(self):
@@ -201,11 +201,11 @@ class TestConfig(ConfigBase):
             cfg = config.get_config()
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.env_filename,     cfg.get("green", "omit"))
+            ae(["green"],                  cfg.sections())
+            ae(self.env_filename,          cfg.get("green", "omit"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging,      cfg.getboolean("green", "logging"))
-            ae(self.env_html,         cfg.getboolean("green", "html"))
+            ae(self.env_logging,           cfg.getboolean("green", "logging"))
+            ae(self.env_html,              cfg.getboolean("green", "html"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
@@ -220,12 +220,12 @@ class TestConfig(ConfigBase):
             cfg = config.get_config()
             ae = self.assertEqual
             ar = self.assertRaises
-            ae(["green"],             cfg.sections())
-            ae(self.default_filename,     cfg.get("green", "omit"))
+            ae(["green"],                  cfg.sections())
+            ae(self.default_filename,      cfg.get("green", "omit"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.default_logging,      cfg.getboolean("green", "logging"))
+            ae(self.default_logging,       cfg.getboolean("green", "logging"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
-            ae(self.default_version,  cfg.getboolean("green", "version"))
+            ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
     def test_nocmd_noenv_nodef(self):
