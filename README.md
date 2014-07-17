@@ -121,7 +121,7 @@ To run Green's own internal unit tests:
 Advanced Usage
 --------------
 
-Please see `green --help`
+For a list of all command-line and config-file options, please run `green --help`
 
 
 Unit Test Structure Tutorial
