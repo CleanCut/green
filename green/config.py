@@ -21,7 +21,9 @@ import copy    # pragma: no cover
 import os      # pragma: no cover
 
 
-def get_config(filepath=None):
+# Since this must be imported before coverage is started, we get erroneous
+# reports of not covering this function during our internal coverage tests.
+def get_config(filepath=None): # pragma: no cover
     """
     Get the Green config file settings.
 
@@ -56,7 +58,9 @@ def get_config(filepath=None):
     return parser
 
 
-def merge_config(args, default_args):
+# Since this must be imported before coverage is started, we get erroneous
+# reports of not covering this function during our internal coverage tests.
+def merge_config(args, default_args): # pragma: no cover
     """
     I take in a namespace created by the ArgumentParser in cmdline.main() and
     merge in options from configuration files.  The config items only replace
