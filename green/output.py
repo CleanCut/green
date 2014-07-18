@@ -14,10 +14,10 @@ else: # pragma: no cover
     text_type = unicode
 
 
-def debug(message, level=0):
+def debug(message, level=1):
     """So we can tune how much debug output we get when we turn it on."""
     if level <= debug_level:
-        logging.debug(message)
+        logging.debug(' ' * (level - 1) * 2 + message)
 
 
 

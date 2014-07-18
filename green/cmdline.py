@@ -146,14 +146,10 @@ CONFIG FILES
     if args.debug:
         logging.basicConfig(
                 level=logging.DEBUG,
-                format="%(asctime)s %(levelname)9s %(message)s")
+                format="%(asctime)s %(levelname)9s %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S")
     elif not args.logging:
         logging.basicConfig(filename=os.devnull)
-
-    # Add debug logging for stuff that happened before this point here
-    if config.files_loaded:
-        logging.debug("Loaded config file(s): {}".format(
-            ', '.join(config.files_loaded)))
 
     # These options both disable termcolor
     if args.html or args.notermcolor:
@@ -186,7 +182,7 @@ CONFIG FILES
     # Set up our various main objects
     from green.loader import getTests
     from green.runner import GreenTestRunner
-    from green.output import GreenStream
+    from green.output import GreenStream, debug
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
@@ -196,12 +192,17 @@ CONFIG FILES
             termcolor=args.termcolor, subprocesses=args.subprocesses,
             run_coverage=args.run_coverage, omit=omit)
 
+    # Add debug logging for stuff that happened before this point here
+    if config.files_loaded:
+        debug("Loaded config file(s): {}".format(
+            ', '.join(config.files_loaded)))
+
     # Discover/Load the TestSuite
     tests = getTests(args.targets)
 
     # We didn't even load 0 tests...
     if not tests:
-        logging.debug(
+        debug(
             "No test loading attempts succeeded.  Created an empty test suite.")
         tests = unittest.suite.TestSuite()
 
