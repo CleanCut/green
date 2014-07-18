@@ -92,7 +92,7 @@ class TestMain(unittest.TestCase):
 
 
     def test_noTestsCreatesEmptyTestSuite(self):
-        "If getTests doesn't find any tests, an empty test suite is created"
+        "If loadTargets doesn't find any tests, an empty test suite is created"
         save_TestSuite = cmdline.unittest.suite.TestSuite
         cmdline.unittest.suite.TestSuite = MagicMock()
         cmdline.sys.argv = ['', '/tmp/non-existent/path']

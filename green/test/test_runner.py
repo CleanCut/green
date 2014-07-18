@@ -5,7 +5,7 @@ import tempfile
 import time
 import unittest
 
-from green.loader import getTests
+from green.loader import loadTargets
 from green.runner import GreenTestRunner, getTestList
 from green.output import GreenStream
 
@@ -165,7 +165,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = getTests('.')
+        tests = loadTargets('.')
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         gtr.run(tests)
         self.assertIn('OK', self.stream.getvalue())
@@ -188,7 +188,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = getTests('.')
+        tests = loadTargets('.')
         os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, run_coverage=True)
         gtr.run(tests)
@@ -207,7 +207,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = getTests('.')
+        tests = loadTargets('.')
         os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         self.assertRaises(ImportError, gtr.run, (tests,))

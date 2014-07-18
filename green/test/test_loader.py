@@ -10,7 +10,7 @@ from green.runner import getTestList
 
 
 
-class TestGetTests(unittest.TestCase):
+class TestLoadTargets(unittest.TestCase):
 
     # Setup
     @classmethod
@@ -40,7 +40,7 @@ class TestGetTests(unittest.TestCase):
     # Tests
     def test_emptyDirAbsolute(self):
         "Absolute path to empty directory returns None"
-        tests = loader.getTests(self.tmpdir)
+        tests = loader.loadTargets(self.tmpdir)
         self.assertTrue(tests == None)
 
 
@@ -48,14 +48,14 @@ class TestGetTests(unittest.TestCase):
         "Relative path to empty directory returns None"
         os.chdir(self.tmpdir)
         os.chdir('..')
-        tests = loader.getTests(os.path.dirname(self.tmpdir))
+        tests = loader.loadTargets(os.path.dirname(self.tmpdir))
         self.assertEqual(tests, None)
 
 
     def test_emptyDirDot(self):
         "'.' while in an empty directory returns None"
         os.chdir(self.tmpdir)
-        tests = loader.getTests('.')
+        tests = loader.loadTargets('.')
         self.assertTrue(tests == None)
 
 
@@ -64,7 +64,7 @@ class TestGetTests(unittest.TestCase):
         os.chdir(self.tmpdir)
         os.chdir('..')
         target = os.path.join('.', os.path.basename(self.tmpdir))
-        tests = loader.getTests(target)
+        tests = loader.loadTargets(target)
         self.assertTrue(tests == None)
 
 
@@ -98,7 +98,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        test_suite = loader.getTests(pkg_name)
+        test_suite = loader.loadTargets(pkg_name)
         self.assertEqual(test_suite.countTestCases(), 1)
         # Dotted name should start with the package!
         self.assertEqual(
@@ -126,7 +126,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = os.path.basename(self.tmpdir)
-        tests = loader.getTests(module_name)
+        tests = loader.loadTargets(module_name)
         self.assertEqual(tests.countTestCases(), 1)
 
 
@@ -150,7 +150,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = basename + ".test_module_dotted_name"
-        tests = loader.getTests(module_name)
+        tests = loader.loadTargets(module_name)
         self.assertEqual(tests.countTestCases(), 1)
 
 
@@ -174,7 +174,7 @@ class A(unittest.TestCase):
         os.chdir(self.startdir)
         sys.path.insert(0, self.tmpdir)
         # Load the tests
-        tests = loader.getTests(os.path.basename(tmp_subdir))
+        tests = loader.loadTargets(os.path.basename(tmp_subdir))
         sys.path.remove(self.tmpdir)
         self.assertTrue(tests.countTestCases(), 1)
 
@@ -197,7 +197,7 @@ class A(unittest.TestCase):
 """)
         fh.close()
         # Load the tests
-        tests = loader.getTests(named_module)
+        tests = loader.loadTargets(named_module)
         try:
             self.assertEqual(tests.countTestCases(), 1)
         except:
@@ -217,7 +217,7 @@ class A(unittest.TestCase):
         fh.write("This is a malformed module.")
         fh.close()
         # Load the tests
-        tests = loader.getTests(malformed_module)
+        tests = loader.loadTargets(malformed_module)
         self.assertEqual(tests, None)
 
 
@@ -241,7 +241,7 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = basename + ".existing_module.nonexistant_object"
-        tests = loader.getTests(module_name)
+        tests = loader.loadTargets(module_name)
         self.assertEqual(tests, None)
 
 
@@ -271,7 +271,7 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = loader.getTests([pkg + '.' + 'test_target1',
+        tests = loader.loadTargets([pkg + '.' + 'test_target1',
                                  pkg + '.' + 'test_target2'])
         self.assertEqual(tests.countTestCases(), 2)
 
@@ -294,7 +294,7 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = loader.getTests([pkg + '.' + 'test_dupe_target',
+        tests = loader.loadTargets([pkg + '.' + 'test_dupe_target',
                                  pkg + '.' + 'test_dupe_target',
                                  pkg + '.' + 'test_dupe_target'])
         self.assertEqual(tests.countTestCases(), 1)

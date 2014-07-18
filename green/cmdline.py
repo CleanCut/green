@@ -182,7 +182,7 @@ CONFIG FILES
             cov.start()
 
     # Set up our various main objects
-    from green.loader import getTests
+    from green.loader import loadTargets
     from green.runner import GreenTestRunner
     from green.output import GreenStream, debug
     import green.output
@@ -200,7 +200,10 @@ CONFIG FILES
             ', '.join(config.files_loaded)))
 
     # Discover/Load the TestSuite
-    tests = getTests(args.targets)
+    if testing:
+        tests = None
+    else:
+        tests = loadTargets(args.targets)
 
     # We didn't even load 0 tests...
     if not tests:
