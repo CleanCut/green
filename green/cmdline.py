@@ -167,7 +167,8 @@ CONFIG FILES
                 '*/colorama*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
-            if 'green' not in args.targets and (False in [t.startswith('green.') for t in args.targets]):
+            if 'green' not in args.targets and (
+                    False in [t.startswith('green.') for t in args.targets]):
                 omit.extend([
                 '*Python.framework*',
                 '*site-packages*'])

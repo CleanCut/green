@@ -57,7 +57,8 @@ class TestMain(unittest.TestCase):
         cmdline.main(testing=True)
         cmdline.logging.basicConfig.assert_called_with(
             level=logging.DEBUG,
-            format="%(asctime)s %(levelname)9s %(message)s")
+            format="%(asctime)s %(levelname)9s %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S")
         cmdline.logging.basicConfig = saved_basicConfig
 
 
