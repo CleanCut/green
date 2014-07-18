@@ -3,7 +3,8 @@ VERSION=$(shell cat green/VERSION)
 clean:
 	@echo "Cleaning generated files and directories."
 	@find . -name '*.pyc' -exec rm \{\} \;
-	@rm -rf .coverage _trial_temp build dist green.egg-info
+	@find . -name '.coverage*' -exec rm \{\} \;
+	@rm -rf _trial_temp build dist green.egg-info
 
 test: clean
 	@echo "\n== CHECKING PYTHON 2.7 (SINGLE) =="
@@ -13,7 +14,7 @@ test: clean
 	@echo "\n== CHECKING PYTHON 3.4 (SINGLE) =="
 	./g 3.4 -r -s 1 green
 	@echo "\n== CHECKING PYTHON 3.4 (MULTI) =="
-	./g 3.4 -r -s 1 green
+	./g 3.4 -r -s 0 green
 
 testinstalled: clean
 	python setup.py sdist
