@@ -164,6 +164,7 @@ CONFIG FILES
             omit = [
                 '*/test*',
                 '*/termstyle*',
+                '*/colorama*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
             if 'green' not in args.targets and (False in [t.startswith('green.') for t in args.targets]):
