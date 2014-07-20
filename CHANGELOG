@@ -1,3 +1,10 @@
+Version 1.2.1 - 20 July 2014
+
+- Multiline docstrings (with -vv or -vvv) on test methods are now handled
+correctly.  Initial whitespace is first stripped.  Then lines are combined
+into one space-separated string until the first blank line.  Issue #26.
+
+
 Version 1.2.0 - 20 July 2014
 
 - Implemented custom test discovery code instead of relying on built-in
