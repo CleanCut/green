@@ -151,7 +151,7 @@ class TestProtoTest(unittest.TestCase):
                 """
                 pass
         test = proto_test(MyTests('test_stuff'))
-        self.assertIn('tricky', test.getDescription(2))
+        self.assertIn('tricky', test.getDescription(3))
 
 
     def test_multilineDocstring(self):
@@ -165,8 +165,8 @@ class TestProtoTest(unittest.TestCase):
                 """
                 pass
         test = proto_test(LongDocs('test_long'))
-        self.assertIn('tricky', test.getDescription(2))
-        self.assertNotIn('garbage', test.getDescription(2))
+        self.assertIn('tricky', test.getDescription(3))
+        self.assertNotIn('garbage', test.getDescription(3))
 
 
 
