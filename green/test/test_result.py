@@ -99,18 +99,15 @@ class TestProtoTest(unittest.TestCase):
 
     def test_ProtoTestFromTest(self):
         "Passing a test into ProtoTest copies out the relevant info."
-        module      = 'some_module'
-        class_name  = 'some_class'
+        module      = 'green.test.test_result'
+        class_name  = 'Small'
         docstr_part = 'stuff'
-        method_name = 'method()'
+        method_name = 'test_method'
 
-        t             = MagicMock()
-        t.__module__  = module
-        t.__class__.__name__  = str(class_name)
-        t.shortDescription.return_value = docstr_part
-        t.__str__.return_value = method_name
-
-        pt = ProtoTest(t)
+        class Small(unittest.TestCase):
+            def test_method(self):
+                "stuff"
+        pt = ProtoTest(Small('test_method'))
 
         for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual(locals()[i], getattr(pt, i, None))
@@ -119,27 +116,25 @@ class TestProtoTest(unittest.TestCase):
     def test_getDescription(self):
         "getDescription() returns what we expect for all verbosity levels"
         # With a docstring
-        t = MagicMock()
-        val1 = 'apple'
-        val2 = 'banana'
-        t.__str__.return_value = val1
-        t.shortDescription.return_value = val2
-        t = proto_test(t)
+        class Fruit(unittest.TestCase):
+            def test_stuff(self):
+                'apple'
+                pass
+        t = proto_test(Fruit('test_stuff'))
         self.assertEqual(t.getDescription(1), '')
-        self.assertEqual(t.getDescription(2), val1)
-        self.assertEqual(t.getDescription(3), val2)
-        self.assertEqual(t.getDescription(4), val2)
+        self.assertEqual(t.getDescription(2), 'test_stuff')
+        self.assertEqual(t.getDescription(3), 'apple')
+        self.assertEqual(t.getDescription(4), 'apple')
 
         # Without a docstring
-        t = MagicMock()
-        val1 = 'apple'
-        t.__str__.return_value = val1
-        t.shortDescription.return_value = None
-        t = proto_test(t)
+        class Vegetable(unittest.TestCase):
+            def test_stuff(self):
+                pass
+        t = proto_test(Vegetable('test_stuff'))
         self.assertEqual(t.getDescription(1), '')
-        self.assertEqual(t.getDescription(2), val1)
-        self.assertEqual(t.getDescription(3), val1)
-        self.assertEqual(t.getDescription(4), val1)
+        self.assertEqual(t.getDescription(2), 'test_stuff')
+        self.assertEqual(t.getDescription(3), 'test_stuff')
+        self.assertEqual(t.getDescription(4), 'test_stuff')
 
 
     def test_newlineDocstring(self):
@@ -223,8 +218,10 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 3)
         gtr.colors.html = True
         r = 'a fake reason'
-        t = MagicMock()
-        t.shortDescription.return_value = 'a fake test output line &nbsp; <>'
+        class Injection(unittest.TestCase):
+            def test_method(self):
+                'a fake test output line &nbsp; <>'
+        t = proto_test(Injection('test_method'))
         gtr._reportOutcome(t, '.', lambda x: x, None, r)
         self.assertTrue(r in self.stream.getvalue())
         self.assertTrue('&amp;' in self.stream.getvalue())
