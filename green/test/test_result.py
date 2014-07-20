@@ -142,6 +142,33 @@ class TestProtoTest(unittest.TestCase):
         self.assertEqual(t.getDescription(4), val1)
 
 
+    def test_newlineDocstring(self):
+        "Docstrings starting with a newline are properly handled."
+        class MyTests(unittest.TestCase):
+            def test_stuff(self):
+                """
+                tricky
+                """
+                pass
+        test = proto_test(MyTests('test_stuff'))
+        self.assertIn('tricky', test.getDescription(2))
+
+
+    def test_multilineDocstring(self):
+        "The description includes all of docstring until the first blank line."
+        class LongDocs(unittest.TestCase):
+            def test_long(self):
+                """First line is
+                tricky!
+
+                garbage
+                """
+                pass
+        test = proto_test(LongDocs('test_long'))
+        self.assertIn('tricky', test.getDescription(2))
+        self.assertNotIn('garbage', test.getDescription(2))
+
+
 
 class TestGreenTestResult(unittest.TestCase):
 
