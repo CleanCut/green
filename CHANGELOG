@@ -1,6 +1,17 @@
-Unreleased...
+Version 1.2.0 - 20 July 2014
 
-- (Nothing yet!)
+- Implemented custom test discovery code instead of relying on built-in
+unittest.discover(). So far, the new implementation  mimics the built-in
+behavior except for fixing issue #14 (which unblocks #7).  This enables
+working on #25 and any other bugs or behavior that was locked inside of
+unittest's quirky discovery implementation that we want to fix in the future.
+- Fixed travis config to exclude the example project in builds.
+- Reduced debug timestamp precision from microsecond- to second-based.
+- Exclude colorama from coverage reporting for the sake of Windows users.
+- Added some additional internal debug output.
+- Centralized internal debugging output.
+- "make clean" now cleans all .coverage* files in the project tree.
+- Many new internal tests.
 
 
 Version 1.1.0 - 17 July 2014
