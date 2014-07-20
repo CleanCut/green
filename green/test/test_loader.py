@@ -116,6 +116,22 @@ class NotReached(unittest.TestCase):
 
 
 
+class TestDiscover(unittest.TestCase):
+
+
+    def test_bad_input(self):
+        "discover() raises ImportError when passed a non-directory"
+        tmpdir = tempfile.mkdtemp()
+        self.assertRaises(ImportError, loader.discover,
+                os.path.join(tmpdir, 'garbage_in'))
+        filename = os.path.join(tmpdir, 'some_file.py')
+        fh = open(filename, 'w')
+        fh.write('pass\n')
+        fh.close()
+        self.assertRaises(ImportError, loader.discover, filename)
+        shutil.rmtree(tmpdir)
+
+
 
 class TestLoadTargets(unittest.TestCase):
 
