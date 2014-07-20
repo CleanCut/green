@@ -42,13 +42,23 @@ class ProtoTest():
         if test:
             self.module      = test.__module__
             self.class_name  = test.__class__.__name__
-            self.docstr_part = test.shortDescription()
             self.method_name = str(test).split()[0]
+            # docstr_part strips initial whitespace, then combines all lines
+            # into one string until the first completely blank line in the
+            # docstring
+            doc_segments = []
+            if test._testMethodDoc:
+                for line in test._testMethodDoc.lstrip().split('\n'):
+                    line = line.strip()
+                    if not line:
+                        break
+                    doc_segments.append(line)
+            self.docstr_part = ' '.join(doc_segments)
         else:
             self.module = ''
             self.class_name = ''
-            self.docstr_part = ''
             self.method_name = ''
+            self.docstr_part = ''
 
 
     @property
