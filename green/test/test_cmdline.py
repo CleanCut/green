@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 import logging
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 from green import cmdline
@@ -39,6 +42,26 @@ class TestMain(unittest.TestCase):
         del(self.s)
         del(self.saved_stderr)
         del(self.saved_stdout)
+
+
+    def test_notTesting(self):
+        "We actually attempt running loadTargets (coverage test)"
+        tmpdir = tempfile.mkdtemp()
+        cmdline.sys.argv = ['', tmpdir]
+        cmdline.main()
+        shutil.rmtree(tmpdir)
+
+
+    def test_configFileDebug(self):
+        "A debug message is output if a config file is loaded (coverage test)"
+        tmpdir = tempfile.mkdtemp()
+        filename = os.path.join(tmpdir, 'config')
+        fh = open(filename, 'w')
+        fh.write("debug = 2")
+        fh.close()
+        cmdline.sys.argv = ['', '-dd', '--config', filename]
+        cmdline.main(testing=True)
+        shutil.rmtree(tmpdir)
 
 
     def test_optVersion(self):
