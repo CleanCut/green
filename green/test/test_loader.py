@@ -9,6 +9,113 @@ from green import loader
 from green.runner import getTestList
 
 
+class TestIsPackage(unittest.TestCase):
+
+
+    def test_yes(self):
+        "A package is identified."
+        tmpdir = tempfile.mkdtemp()
+        fh = open(os.path.join(tmpdir, '__init__.py'), 'w')
+        fh.write('pass\n')
+        fh.close()
+        self.assertTrue(loader.isPackage(tmpdir))
+        shutil.rmtree(tmpdir)
+
+
+    def test_no(self):
+        "A non-package is identified"
+        tmpdir = tempfile.mkdtemp()
+        self.assertFalse(loader.isPackage(tmpdir))
+        shutil.rmtree(tmpdir)
+
+
+
+class TestDottedModule(unittest.TestCase):
+
+
+    def test_bad_path(self):
+        "A bad path causes an exception"
+        self.assertRaises(
+                ValueError,
+                loader.findDottedModuleAndParentDir, tempfile.tempdir)
+
+
+    def test_good_path(self):
+        "A good path gets (dotted_module, parent) properly returned"
+        tmpdir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(tmpdir, 'a', 'b', 'c', 'd'))
+        package_init = os.path.join(tmpdir, 'a', 'b', 'c', '__init__.py')
+        subpkg_init = os.path.join(tmpdir, 'a', 'b', 'c', 'd', '__init__.py')
+        module_name = 'stuff.py'
+        module = os.path.join(tmpdir, 'a', 'b', 'c', 'd', module_name)
+        for filename in [package_init, subpkg_init, module]:
+            fh = open(filename, 'w')
+            fh.write('pass\n')
+            fh.close()
+        self.assertEqual(loader.findDottedModuleAndParentDir(module),
+                         ('c.d.stuff', os.path.join(tmpdir, 'a', 'b')))
+
+
+
+class TestLoadFromTestCase(unittest.TestCase):
+
+
+    def test_runTest(self):
+        """
+        When a testcase has no matching method names, but does have a runTest,
+        use that instead.
+        """
+        class MyTestCase(unittest.TestCase):
+            def helper1(self):
+                pass
+            def helper2(self):
+                pass
+            def runTest(self):
+                pass
+        suite = loader.loadFromTestCase(MyTestCase)
+        self.assertEqual(suite.countTestCases(), 1)
+        self.assertEqual(suite._tests[0]._testMethodName, 'runTest')
+
+
+    def test_normal(self):
+        "Normal test methods get loaded"
+        class Normal(unittest.TestCase):
+            def test_method1(self):
+                pass
+            def test_method2(self):
+                pass
+        suite = loader.loadFromTestCase(Normal)
+        self.assertEqual(suite.countTestCases(), 2)
+        self.assertEqual(set([x._testMethodName for x in suite._tests]),
+                         set(['test_method1', 'test_method2']))
+
+
+
+class TestLoadFromModuleFilename(unittest.TestCase):
+
+
+    def test_skipped_module(self):
+        "A module that wants to be skipped gets skipped"
+        tmpdir = tempfile.mkdtemp()
+        filename = os.path.join(tmpdir, 'skipped_module.py')
+        fh = open(filename, 'w')
+        fh.write("""
+import unittest
+raise unittest.case.SkipTest
+class NotReached(unittest.TestCase):
+    def test_one(self):
+        pass
+    def test_two(self):
+        pass
+""")
+        fh.close()
+        suite = loader.loadFromModuleFilename(filename)
+        self.assertEqual(suite.countTestCases(), 1)
+        self.assertRaises(unittest.case.SkipTest,
+                getattr(suite._tests[0], suite._tests[0]._testMethodName))
+
+
+
 
 class TestLoadTargets(unittest.TestCase):
 

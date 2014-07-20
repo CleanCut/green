@@ -11,13 +11,17 @@ import traceback
 
 from green.output import debug
 
+python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
+
 
 def isPackage(file_path):
+    """
+    Determines whether or not a given path is a (sub)package or not.
+    """
     return (os.path.isdir(file_path) and
             os.path.isfile(os.path.join(file_path, '__init__.py')))
 
 
-python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
 def findDottedModuleAndParentDir(file_path):
     """
     I return a tuple (dotted_module, parent_dir) where dotted_module is the
@@ -82,7 +86,7 @@ def loadFromModuleFilename(filename):
         reason = str(e)
         @unittest.case.skip(reason)
         def testSkipped(self):
-            pass
+            pass # pragma: no cover
         TestClass = type(
                 str("ModuleSkipped"),
                 (unittest.case.TestCase,),
