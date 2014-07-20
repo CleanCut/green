@@ -93,7 +93,7 @@ class TestProtoTest(unittest.TestCase):
     def test_ProtoTestBlank(self):
         "ProtoTest can be instantiated empty"
         pt = ProtoTest()
-        for i in ['module', 'class_name', 'description', 'method_name']:
+        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual('', getattr(pt, i, None))
 
 
@@ -101,23 +101,23 @@ class TestProtoTest(unittest.TestCase):
         "Passing a test into ProtoTest copies out the relevant info."
         module      = 'some_module'
         class_name  = 'some_class'
-        description = 'stuff'
+        docstr_part = 'stuff'
         method_name = 'method()'
 
         t             = MagicMock()
         t.__module__  = module
         t.__class__.__name__  = str(class_name)
-        t.shortDescription.return_value = description
+        t.shortDescription.return_value = docstr_part
         t.__str__.return_value = method_name
 
         pt = ProtoTest(t)
 
-        for i in ['module', 'class_name', 'description', 'method_name']:
+        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual(locals()[i], getattr(pt, i, None))
 
 
-    def test_adjustedDescription(self):
-        "adjustedDescription() returns what we expect for all verbosity levels"
+    def test_getDescription(self):
+        "getDescription() returns what we expect for all verbosity levels"
         # With a docstring
         t = MagicMock()
         val1 = 'apple'
@@ -125,10 +125,10 @@ class TestProtoTest(unittest.TestCase):
         t.__str__.return_value = val1
         t.shortDescription.return_value = val2
         t = proto_test(t)
-        self.assertEqual(t.adjustedDescription(1), '')
-        self.assertEqual(t.adjustedDescription(2), val1)
-        self.assertEqual(t.adjustedDescription(3), val2)
-        self.assertEqual(t.adjustedDescription(4), val2)
+        self.assertEqual(t.getDescription(1), '')
+        self.assertEqual(t.getDescription(2), val1)
+        self.assertEqual(t.getDescription(3), val2)
+        self.assertEqual(t.getDescription(4), val2)
 
         # Without a docstring
         t = MagicMock()
@@ -136,10 +136,10 @@ class TestProtoTest(unittest.TestCase):
         t.__str__.return_value = val1
         t.shortDescription.return_value = None
         t = proto_test(t)
-        self.assertEqual(t.adjustedDescription(1), '')
-        self.assertEqual(t.adjustedDescription(2), val1)
-        self.assertEqual(t.adjustedDescription(3), val1)
-        self.assertEqual(t.adjustedDescription(4), val1)
+        self.assertEqual(t.getDescription(1), '')
+        self.assertEqual(t.getDescription(2), val1)
+        self.assertEqual(t.getDescription(3), val1)
+        self.assertEqual(t.getDescription(4), val1)
 
 
 
