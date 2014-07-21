@@ -35,29 +35,25 @@ default_args = argparse.Namespace(
         completions   = False,
         )
 
-class GreenArgumentParser(argparse.ArgumentParser):
 
 
-    def __init__(self, *args, **kwargs):
+class StoreOpt():
+
+
+    def __init__(self):
         self.short_options = []
         self.long_options = []
-        super(GreenArgumentParser, self).__init__(*args, **kwargs)
 
 
-    def add_argument(self, *args, **kwargs):
-        if 'store' in kwargs:
-            store = kwargs['store']
-            del(kwargs['store'])
-        action = super(GreenArgumentParser, self).add_argument(*args, **kwargs)
-        if store:
-            self.short_options.append(action.option_strings[0])
-            if len(action.option_strings) >= 2:
-                self.long_options.append(action.option_strings[1])
+    def __call__(self, action):
+        self.short_options.append(action.option_strings[0])
+        self.long_options.append(action.option_strings[1])
 
 
 
 def main(testing=False, coverage_testing=False):
-    parser = GreenArgumentParser(
+    store_opt = StoreOpt()
+    parser = argparse.ArgumentParser(
             add_help=False,
             description=
 """
@@ -97,7 +93,8 @@ CONFIG FILES
         only tests accessible from introspection of the object will be
         loaded."""))
     concurrency_args = parser.add_argument_group("Concurrency Options")
-    concurrency_args.add_argument('-s', '--subprocesses', action='store',
+    store_opt(
+        concurrency_args.add_argument('-s', '--subprocesses', action='store',
             type=int, metavar='NUM',
             help="Number of subprocesses to use to run tests.  Note that your "
             "tests need to be written to avoid using the same resources (temp "
@@ -105,49 +102,50 @@ CONFIG FILES
             "well. Default is 1, meaning try to autodetect the number of CPUs "
             "in the system.  1 will disable using subprocesses.  Note that for "
             "trivial tests (tests that take < 1ms), running everything in a "
-            "single process may be faster.")
+            "single process may be faster."))
     format_args = parser.add_argument_group("Format Options")
-    format_args.add_argument('-m', '--html', action='store_true',
-        help="HTML5 format.  Overrides terminal color options if specified.")
-    format_args.add_argument('-t', '--termcolor', action='store_true',
-        help="Force terminal colors on.  Default is to autodetect.")
-    format_args.add_argument('-T', '--notermcolor', action='store_true',
-        help="Force terminal colors off.  Default is to autodetect.")
+    store_opt(format_args.add_argument('-m', '--html', action='store_true',
+        help="HTML5 format.  Overrides terminal color options if specified."))
+    store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
+        help="Force terminal colors on.  Default is to autodetect."))
+    store_opt(
+        format_args.add_argument('-T', '--notermcolor', action='store_true',
+        help="Force terminal colors off.  Default is to autodetect."))
     out_args = parser.add_argument_group("Output Options")
-    out_args.add_argument('-d', '--debug', action='count',
+    store_opt(out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
-        "be specified up to three times for more debug output."))
-    out_args.add_argument('-h', '--help', action='store_true',
-        help="Show this help message and exit.")
-    out_args.add_argument('-l', '--logging', action='store_true',
+        "be specified up to three times for more debug output.")))
+    store_opt(out_args.add_argument('-h', '--help', action='store_true',
+        help="Show this help message and exit."))
+    store_opt(out_args.add_argument('-l', '--logging', action='store_true',
         help="Don't configure the root logger to redirect to /dev/null, "
-        "enabling internal debugging output")
-    out_args.add_argument('-V', '--version', action='store_true',
-        help="Print the version of Green and Python and exit.")
-    out_args.add_argument('-v', '--verbose', action='count',
+        "enabling internal debugging output"))
+    store_opt(out_args.add_argument('-V', '--version', action='store_true',
+        help="Print the version of Green and Python and exit."))
+    store_opt(out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more verbosity. "
-        "Recommended levels are -v and -vv."))
+        "Recommended levels are -v and -vv.")))
     other_args = parser.add_argument_group("Other Options")
-    other_args.add_argument('-c', '--config', action='store',
+    store_opt(other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file instead of the one pointed "
-        "to by environment variable GREEN_CONFIG or the default ~/.green")
+        "to by environment variable GREEN_CONFIG or the default ~/.green"))
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
-    cov_args.add_argument('-r', '--run-coverage', action='store_true',
-        help=("Produce coverage output."))
-    cov_args.add_argument('-o', '--omit', action='store',
+    store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
+        help=("Produce coverage output.")))
+    store_opt(cov_args.add_argument('-o', '--omit', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
-            "dir)*,*(python system packages)*'"))
+            "dir)*,*(python system packages)*'")))
     parser.set_defaults(**(dict(default_args._get_kwargs())))
     # These options are used by bash-completion and zsh completion.
     parser.add_argument('--short-options', action='store_true', default=False,
-            help=argparse.SUPPRESS, store=False)
+            help=argparse.SUPPRESS)
     parser.add_argument('--long-options', action='store_true', default=False,
-            help=argparse.SUPPRESS, store=False)
+            help=argparse.SUPPRESS)
     parser.add_argument('--completions', action='store_true', default=False,
-            help=argparse.SUPPRESS, store=False)
+            help=argparse.SUPPRESS)
 
     args = parser.parse_args()
 
@@ -168,11 +166,11 @@ CONFIG FILES
 
     # bash/zsh option completion?
     if args.short_options:
-        print(' '.join(parser.short_options))
+        print(' '.join(store_opt.short_options))
         return 0
 
     if args.long_options:
-        print(' '.join(parser.long_options))
+        print(' '.join(store_opt.long_options))
         return 0
 
     # Just print version and exit?
