@@ -17,22 +17,21 @@ except: # pragma: no cover
 
 # Set the defaults in a re-usable way
 default_args = argparse.Namespace(
-        targets       = ['.'], # Not in configs
-        subprocesses  = 1,
-        html          = False,
-        termcolor     = None,
-        notermcolor   = None,
-        debug         = 0,
-        help          = False, # Not in configs
-        logging       = False,
-        version       = False,
-        verbose       = 1,
-        config        = None,  # Not in configs
-        run_coverage  = False,
-        omit          = None,
-        short_options = False,
-        long_options  = False,
-        completions   = False,
+        targets      = ['.'], # Not in configs
+        subprocesses = 1,
+        html         = False,
+        termcolor    = None,
+        notermcolor  = None,
+        debug        = 0,
+        help         = False, # Not in configs
+        logging      = False,
+        version      = False,
+        verbose      = 1,
+        config       = None,  # Not in configs
+        run_coverage = False,
+        omit         = None,
+        options      = False,
+        completions  = False,
         )
 
 
@@ -41,13 +40,12 @@ class StoreOpt():
 
 
     def __init__(self):
-        self.short_options = []
-        self.long_options = []
+        self.options = []
+        self.options = []
 
 
     def __call__(self, action):
-        self.short_options.append(action.option_strings[0])
-        self.long_options.append(action.option_strings[1])
+        self.options.extend(action.option_strings[0:2])
 
 
 
@@ -140,9 +138,7 @@ CONFIG FILES
             "dir)*,*(python system packages)*'")))
     parser.set_defaults(**(dict(default_args._get_kwargs())))
     # These options are used by bash-completion and zsh completion.
-    parser.add_argument('--short-options', action='store_true', default=False,
-            help=argparse.SUPPRESS)
-    parser.add_argument('--long-options', action='store_true', default=False,
+    parser.add_argument('--options', action='store_true', default=False,
             help=argparse.SUPPRESS)
     parser.add_argument('--completions', action='store_true', default=False,
             help=argparse.SUPPRESS)
@@ -164,13 +160,9 @@ CONFIG FILES
         parser.print_help()
         return 0
 
-    # bash/zsh option completion?
-    if args.short_options:
-        print(' '.join(store_opt.short_options))
-        return 0
-
-    if args.long_options:
-        print(' '.join(store_opt.long_options))
+    # bash-completion, zsh-completion
+    if args.options:
+        print(' '.join(store_opt.options))
         return 0
 
     # Just print version and exit?

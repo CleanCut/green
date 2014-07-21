@@ -122,8 +122,7 @@ def merge_config(args, default_args): # pragma: no cover
         # Config options overwrite default options
         config_getter = None
         if name in ['html', 'termcolor', 'notermcolor', 'help', 'logging',
-                'version', 'run_coverage', 'long_options', 'short_options',
-                'completions']:
+                'version', 'run_coverage', 'options', 'completions']:
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint

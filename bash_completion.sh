@@ -4,9 +4,7 @@ _green_completion()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    shortopts="$(green --short-options)"
-    longopts="$(green --long-options)"
-    allopts="${shortopts} ${longopts}"
+    opts="$(green --options)"
  
     case "${prev}" in
         *)
@@ -14,12 +12,8 @@ _green_completion()
     esac
 
     case "${cur}" in
-        --*)
-            COMPREPLY=( $(compgen -W "${longopts}" -- ${cur}) )
-            return 0
-            ;;
         -*) 
-            COMPREPLY=( $(compgen -W "${allopts}" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
     esac
