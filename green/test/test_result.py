@@ -93,53 +93,75 @@ class TestProtoTest(unittest.TestCase):
     def test_ProtoTestBlank(self):
         "ProtoTest can be instantiated empty"
         pt = ProtoTest()
-        for i in ['module', 'class_name', 'description', 'method_name']:
+        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual('', getattr(pt, i, None))
 
 
     def test_ProtoTestFromTest(self):
         "Passing a test into ProtoTest copies out the relevant info."
-        module      = 'some_module'
-        class_name  = 'some_class'
-        description = 'stuff'
-        method_name = 'method()'
+        module      = 'green.test.test_result'
+        class_name  = 'Small'
+        docstr_part = 'stuff'
+        method_name = 'test_method'
 
-        t             = MagicMock()
-        t.__module__  = module
-        t.__class__.__name__  = str(class_name)
-        t.shortDescription.return_value = description
-        t.__str__.return_value = method_name
+        class Small(unittest.TestCase):
+            def test_method(self):
+                "stuff"
+        pt = ProtoTest(Small('test_method'))
 
-        pt = ProtoTest(t)
-
-        for i in ['module', 'class_name', 'description', 'method_name']:
+        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual(locals()[i], getattr(pt, i, None))
 
 
-    def test_adjustedDescription(self):
-        "adjustedDescription() returns what we expect for all verbosity levels"
+    def test_getDescription(self):
+        "getDescription() returns what we expect for all verbosity levels"
         # With a docstring
-        t = MagicMock()
-        val1 = 'apple'
-        val2 = 'banana'
-        t.__str__.return_value = val1
-        t.shortDescription.return_value = val2
-        t = proto_test(t)
-        self.assertEqual(t.adjustedDescription(1), '')
-        self.assertEqual(t.adjustedDescription(2), val1)
-        self.assertEqual(t.adjustedDescription(3), val2)
-        self.assertEqual(t.adjustedDescription(4), val2)
+        class Fruit(unittest.TestCase):
+            def test_stuff(self):
+                'apple'
+                pass
+        t = proto_test(Fruit('test_stuff'))
+        self.assertEqual(t.getDescription(1), '')
+        self.assertEqual(t.getDescription(2), 'test_stuff')
+        self.assertEqual(t.getDescription(3), 'apple')
+        self.assertEqual(t.getDescription(4), 'apple')
 
         # Without a docstring
-        t = MagicMock()
-        val1 = 'apple'
-        t.__str__.return_value = val1
-        t.shortDescription.return_value = None
-        t = proto_test(t)
-        self.assertEqual(t.adjustedDescription(1), '')
-        self.assertEqual(t.adjustedDescription(2), val1)
-        self.assertEqual(t.adjustedDescription(3), val1)
-        self.assertEqual(t.adjustedDescription(4), val1)
+        class Vegetable(unittest.TestCase):
+            def test_stuff(self):
+                pass
+        t = proto_test(Vegetable('test_stuff'))
+        self.assertEqual(t.getDescription(1), '')
+        self.assertEqual(t.getDescription(2), 'test_stuff')
+        self.assertEqual(t.getDescription(3), 'test_stuff')
+        self.assertEqual(t.getDescription(4), 'test_stuff')
+
+
+    def test_newlineDocstring(self):
+        "Docstrings starting with a newline are properly handled."
+        class MyTests(unittest.TestCase):
+            def test_stuff(self):
+                """
+                tricky
+                """
+                pass
+        test = proto_test(MyTests('test_stuff'))
+        self.assertIn('tricky', test.getDescription(3))
+
+
+    def test_multilineDocstring(self):
+        "The description includes all of docstring until the first blank line."
+        class LongDocs(unittest.TestCase):
+            def test_long(self):
+                """First line is
+                tricky!
+
+                garbage
+                """
+                pass
+        test = proto_test(LongDocs('test_long'))
+        self.assertIn('tricky', test.getDescription(3))
+        self.assertNotIn('garbage', test.getDescription(3))
 
 
 
@@ -196,8 +218,10 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(GreenStream(self.stream), None, 3)
         gtr.colors.html = True
         r = 'a fake reason'
-        t = MagicMock()
-        t.shortDescription.return_value = 'a fake test output line &nbsp; <>'
+        class Injection(unittest.TestCase):
+            def test_method(self):
+                'a fake test output line &nbsp; <>'
+        t = proto_test(Injection('test_method'))
         gtr._reportOutcome(t, '.', lambda x: x, None, r)
         self.assertTrue(r in self.stream.getvalue())
         self.assertTrue('&amp;' in self.stream.getvalue())

@@ -13,7 +13,7 @@ except: # pragma: no cover
     coverage = None
 
 from green.result import ProtoTest, ProtoTestResult
-from green.loader import getTests
+from green.loader import loadTargets
 
 
 class SubprocessLogger(object):
@@ -99,7 +99,7 @@ def poolRunner(test_name, coverage_number=None, omit=[]):
     result = ProtoTestResult()
     test = None
     try:
-        test = getTests(test_name)
+        test = loadTargets(test_name)
         test.run(result)
     except:
         err = sys.exc_info()

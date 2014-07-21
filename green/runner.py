@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 from __future__ import print_function
-import sys
 
 from unittest.signals import registerResult
 from unittest import TestCase
@@ -46,14 +45,12 @@ class GreenTestRunner():
     "A test runner class that displays results in Green's clean style."
 
 
-    def __init__(self, stream=None, descriptions=True, verbosity=1,
+    def __init__(self, stream, descriptions=True, verbosity=1,
                  warnings=None, html=None, termcolor=None, subprocesses=0,
                  run_coverage=False, omit=[]):
         """
         stream - Any stream passed in will be wrapped in a GreenStream
         """
-        if stream is None:
-            stream = sys.stderr
         if not issubclass(GreenStream, type(stream)):
             stream = GreenStream(stream)
         self.stream = stream

@@ -15,19 +15,78 @@ except: # pragma: no cover
 
 # Importing from green is done after coverage initialization
 
+# Set the defaults in a re-usable way
+default_args = argparse.Namespace(
+        targets       = ['.'], # Not in configs
+        subprocesses  = 1,
+        html          = False,
+        termcolor     = None,
+        notermcolor   = None,
+        debug         = 0,
+        help          = False, # Not in configs
+        logging       = False,
+        version       = False,
+        verbose       = 1,
+        config        = None,  # Not in configs
+        run_coverage  = False,
+        omit          = None,
+        short_options = False,
+        long_options  = False,
+        completions   = False,
+        )
+
+class GreenArgumentParser(argparse.ArgumentParser):
+
+
+    def __init__(self, *args, **kwargs):
+        self.short_options = []
+        self.long_options = []
+        super(GreenArgumentParser, self).__init__(*args, **kwargs)
+
+
+    def add_argument(self, *args, **kwargs):
+        if 'store' in kwargs:
+            store = kwargs['store']
+            del(kwargs['store'])
+        action = super(GreenArgumentParser, self).add_argument(*args, **kwargs)
+        if store:
+            self.short_options.append(action.option_strings[0])
+            if len(action.option_strings) >= 2:
+                self.long_options.append(action.option_strings[1])
+
+
 
 def main(testing=False, coverage_testing=False):
-    short_options = []
-    long_options = []
-    def store_option(action):
-        short_options.append(action.option_strings[0])
-        long_options.append(action.option_strings[1])
-
-    parser = argparse.ArgumentParser(
+    parser = GreenArgumentParser(
             add_help=False,
-            description="Green is a clean, colorful test runner for Python unit tests.")
+            description=
+"""
+Green is a clean, colorful test runner for Python unit tests.
+""".rstrip(),
+            epilog=
+"""
+CONFIG FILES
+
+  Green will look for and process three config files if found:
+  1) $HOME/.green
+  2) $GREEN_CONFIG
+  3) A file specified with "--config FILE"
+
+  Config file format is simply "option = value" on separate lines.  "option" is
+  the same as the long options above, just without the "--".
+
+  Most values should be "True" or "False".  Accumulated values (verbose, debug) should
+  be specified as integers ("-vv" would be "verbose = 2").
+
+  Example:
+
+    verbose = 2
+    logging = True
+    omit    = myproj*,*prototype*
+""".rstrip(),
+            formatter_class=argparse.RawDescriptionHelpFormatter)
     target_args = parser.add_argument_group("Target Specification")
-    target_args.add_argument('targets', action='store', nargs='*', default=['.'],
+    target_args.add_argument('targets', action='store', nargs='*',
         help=("""Targets to test.  If blank, then discover all testcases in the
         current directory tree.  Can be a directory (or package), file (or
         module), or fully-qualified 'dotted name' like
@@ -38,68 +97,64 @@ def main(testing=False, coverage_testing=False):
         only tests accessible from introspection of the object will be
         loaded."""))
     concurrency_args = parser.add_argument_group("Concurrency Options")
-    store_option(
-        concurrency_args.add_argument('-s', '--subprocesses', action='store',
-        type=int, default=1, metavar='NUM',
-        help="Number of subprocesses to use to run tests.  Note that your "
-        "tests need to be written to avoid using the same resources (temp "
-        "files, sockets, ports, etc.) for the multi-process mode to work "
-        "well. Default is 1, meaning try to autodetect the number of CPUs "
-        "in the system.  1 will disable using subprocesses.  Note that for "
-        "trivial tests (tests that take < 1ms), running everything in a "
-        "single process may be faster."))
+    concurrency_args.add_argument('-s', '--subprocesses', action='store',
+            type=int, metavar='NUM',
+            help="Number of subprocesses to use to run tests.  Note that your "
+            "tests need to be written to avoid using the same resources (temp "
+            "files, sockets, ports, etc.) for the multi-process mode to work "
+            "well. Default is 1, meaning try to autodetect the number of CPUs "
+            "in the system.  1 will disable using subprocesses.  Note that for "
+            "trivial tests (tests that take < 1ms), running everything in a "
+            "single process may be faster.")
     format_args = parser.add_argument_group("Format Options")
-    store_option(
-        format_args.add_argument('-m', '--html', action='store_true',
-        default=False,
-        help="HTML5 format.  Overrides terminal color options if specified."))
-    store_option(
-        format_args.add_argument('-t', '--termcolor', action='store_true',
-        default=None,
-        help="Force terminal colors on.  Default is to autodetect."))
-    store_option(
-        format_args.add_argument('-T', '--notermcolor', action='store_true',
-        default=None,
-        help="Force terminal colors off.  Default is to autodetect."))
+    format_args.add_argument('-m', '--html', action='store_true',
+        help="HTML5 format.  Overrides terminal color options if specified.")
+    format_args.add_argument('-t', '--termcolor', action='store_true',
+        help="Force terminal colors on.  Default is to autodetect.")
+    format_args.add_argument('-T', '--notermcolor', action='store_true',
+        help="Force terminal colors off.  Default is to autodetect.")
     out_args = parser.add_argument_group("Output Options")
-    store_option(
-        out_args.add_argument('-d', '--debug', action='count', default=0,
+    out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
-        "be specified up to three times for more debug output.")))
-    store_option(
-        out_args.add_argument('-h', '--help', action='store_true', default=False,
-        help="Show this help message and exit."))
-    store_option(
-        out_args.add_argument('-l', '--logging', action='store_true', default=False,
-        help="Don't configure the root logger to redirect to /dev/null"))
-    store_option(
-        out_args.add_argument('-V', '--version', action='store_true', default=False,
-        help="Print the version of Green and Python and exit."))
-    store_option(
-        out_args.add_argument('-v', '--verbose', action='count', default=1,
+        "be specified up to three times for more debug output."))
+    out_args.add_argument('-h', '--help', action='store_true',
+        help="Show this help message and exit.")
+    out_args.add_argument('-l', '--logging', action='store_true',
+        help="Don't configure the root logger to redirect to /dev/null, "
+        "enabling internal debugging output")
+    out_args.add_argument('-V', '--version', action='store_true',
+        help="Print the version of Green and Python and exit.")
+    out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more verbosity. "
-        "Recommended levels are -v and -vv.")))
+        "Recommended levels are -v and -vv."))
+    other_args = parser.add_argument_group("Other Options")
+    other_args.add_argument('-c', '--config', action='store',
+        metavar='FILE', help="Use this config file instead of the one pointed "
+        "to by environment variable GREEN_CONFIG or the default ~/.green")
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
-    store_option(
-        cov_args.add_argument('-r', '--run-coverage', action='store_true',
-        default=False,
-        help=("Produce coverage output.")))
-    store_option(
-        cov_args.add_argument('-o', '--omit', action='store', default=None,
+    cov_args.add_argument('-r', '--run-coverage', action='store_true',
+        help=("Produce coverage output."))
+    cov_args.add_argument('-o', '--omit', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
-            "dir)*,*(python system packages)*'")))
+            "dir)*,*(python system packages)*'"))
+    parser.set_defaults(**(dict(default_args._get_kwargs())))
     # These options are used by bash-completion and zsh completion.
     parser.add_argument('--short-options', action='store_true', default=False,
-            help=argparse.SUPPRESS)
+            help=argparse.SUPPRESS, store=False)
     parser.add_argument('--long-options', action='store_true', default=False,
-            help=argparse.SUPPRESS)
+            help=argparse.SUPPRESS, store=False)
     parser.add_argument('--completions', action='store_true', default=False,
-            help=argparse.SUPPRESS)
+            help=argparse.SUPPRESS, store=False)
 
     args = parser.parse_args()
+
+    # Unfortunately we can't fully cover the config module (the global part of
+    # it), because we need to use it to see if we need to turn coverage on.
+    import green.config as config
+    args = config.merge_config(args, default_args)
 
     # Clear out all the passed-in-options just in case someone tries to run a
     # test that assumes sys.argv is clean.  I can't guess at the script name
@@ -113,11 +168,11 @@ def main(testing=False, coverage_testing=False):
 
     # bash/zsh option completion?
     if args.short_options:
-        print(' '.join(short_options))
+        print(' '.join(parser.short_options))
         return 0
 
     if args.long_options:
-        print(' '.join(long_options))
+        print(' '.join(parser.long_options))
         return 0
 
     # Just print version and exit?
@@ -130,7 +185,8 @@ def main(testing=False, coverage_testing=False):
     if args.debug:
         logging.basicConfig(
                 level=logging.DEBUG,
-                format="%(asctime)s %(levelname)9s %(message)s")
+                format="%(asctime)s %(levelname)9s %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S")
     elif not args.logging:
         logging.basicConfig(filename=os.devnull)
 
@@ -147,9 +203,11 @@ def main(testing=False, coverage_testing=False):
             omit = [
                 '*/test*',
                 '*/termstyle*',
+                '*/colorama*',
                 '*/mock*',
                 tempfile.gettempdir() + '*']
-            if 'green' not in args.targets and (False in [t.startswith('green.') for t in args.targets]):
+            if 'green' not in args.targets and (
+                    False in [t.startswith('green.') for t in args.targets]):
                 omit.extend([
                 '*Python.framework*',
                 '*site-packages*'])
@@ -162,11 +220,10 @@ def main(testing=False, coverage_testing=False):
             cov = coverage.coverage(data_file='.coverage', omit=omit)
             cov.start()
 
-
     # Set up our various main objects
-    from green.loader import getTests
+    from green.loader import loadTargets
     from green.runner import GreenTestRunner
-    from green.output import GreenStream
+    from green.output import GreenStream, debug
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
@@ -184,7 +241,7 @@ def main(testing=False, coverage_testing=False):
             return 0
         target = args.targets[0]
         # First try the completion as-is.  It might be at a valid spot.
-        test_suite = getTests(target)
+        test_suite = loadTargets(target)
         if not test_suite:
             # Next, try stripping to the previous '.'
             last_dot_idx = target.rfind('.')
@@ -192,7 +249,7 @@ def main(testing=False, coverage_testing=False):
                 to_complete = '.'
             else:
                 to_complete = target[:last_dot_idx]
-            test_suite = getTests(to_complete)
+            test_suite = loadTargets(to_complete)
         if test_suite:
             # Test discovery
             test_list = []
@@ -215,17 +272,20 @@ def main(testing=False, coverage_testing=False):
             print(' '.join(test_list))
         return 0
 
+    # Add debug logging for stuff that happened before this point here
+    if config.files_loaded:
+        debug("Loaded config file(s): {}".format(
+            ', '.join(config.files_loaded)))
+
     # Discover/Load the TestSuite
-    test_suite = getTests(args.targets)
-
-
-
-
-
+    if testing:
+        test_suite = None
+    else:
+        test_suite = loadTargets(args.targets)
 
     # We didn't even load 0 tests...
     if not test_suite:
-        logging.debug(
+        debug(
             "No test loading attempts succeeded.  Created an empty test suite.")
         test_suite = unittest.suite.TestSuite()
 

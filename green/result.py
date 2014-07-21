@@ -42,13 +42,23 @@ class ProtoTest():
         if test:
             self.module      = test.__module__
             self.class_name  = test.__class__.__name__
-            self.description = test.shortDescription()
             self.method_name = str(test).split()[0]
+            # docstr_part strips initial whitespace, then combines all lines
+            # into one string until the first completely blank line in the
+            # docstring
+            doc_segments = []
+            if test._testMethodDoc:
+                for line in test._testMethodDoc.lstrip().split('\n'):
+                    line = line.strip()
+                    if not line:
+                        break
+                    doc_segments.append(line)
+            self.docstr_part = ' '.join(doc_segments)
         else:
             self.module = ''
             self.class_name = ''
-            self.description = ''
             self.method_name = ''
+            self.docstr_part = ''
 
 
     @property
@@ -56,11 +66,11 @@ class ProtoTest():
         return self.module + '.' + self.class_name + '.' + self.method_name
 
 
-    def adjustedDescription(self, verbosity):
+    def getDescription(self, verbosity):
         if verbosity == 2:
             return self.method_name
         elif verbosity > 2:
-            return self.description or self.method_name
+            return self.docstr_part or self.method_name
         else:
             return ''
 
@@ -261,7 +271,7 @@ class GreenTestResult():
                 self.stream.write(
                     self.colors.bold(
                         self.stream.formatLine(
-                            test.adjustedDescription(self.verbosity),
+                            test.getDescription(self.verbosity),
                             indent=2)))
             self.stream.flush()
 
@@ -284,7 +294,7 @@ class GreenTestResult():
             if not self.colors.html:
                 self.stream.write('\r')
             # Escape the HTML that may be in the docstring
-            test_description = test.adjustedDescription(self.verbosity)
+            test_description = test.getDescription(self.verbosity)
             if self.colors.html:
                 test_description = escape(test_description)
             self.stream.write(

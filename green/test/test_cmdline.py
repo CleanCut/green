@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 import logging
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 from green import cmdline
@@ -41,6 +44,26 @@ class TestMain(unittest.TestCase):
         del(self.saved_stdout)
 
 
+    def test_notTesting(self):
+        "We actually attempt running loadTargets (coverage test)"
+        tmpdir = tempfile.mkdtemp()
+        cmdline.sys.argv = ['', tmpdir]
+        cmdline.main()
+        shutil.rmtree(tmpdir)
+
+
+    def test_configFileDebug(self):
+        "A debug message is output if a config file is loaded (coverage test)"
+        tmpdir = tempfile.mkdtemp()
+        filename = os.path.join(tmpdir, 'config')
+        fh = open(filename, 'w')
+        fh.write("debug = 2")
+        fh.close()
+        cmdline.sys.argv = ['', '-dd', '--config', filename]
+        cmdline.main(testing=True)
+        shutil.rmtree(tmpdir)
+
+
     def test_optVersion(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']
@@ -57,7 +80,8 @@ class TestMain(unittest.TestCase):
         cmdline.main(testing=True)
         cmdline.logging.basicConfig.assert_called_with(
             level=logging.DEBUG,
-            format="%(asctime)s %(levelname)9s %(message)s")
+            format="%(asctime)s %(levelname)9s %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S")
         cmdline.logging.basicConfig = saved_basicConfig
 
 
@@ -91,7 +115,7 @@ class TestMain(unittest.TestCase):
 
 
     def test_noTestsCreatesEmptyTestSuite(self):
-        "If getTests doesn't find any tests, an empty test suite is created"
+        "If loadTargets doesn't find any tests, an empty test suite is created"
         save_TestSuite = cmdline.unittest.suite.TestSuite
         cmdline.unittest.suite.TestSuite = MagicMock()
         cmdline.sys.argv = ['', '/tmp/non-existent/path']

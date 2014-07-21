@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import platform
 import os
 import sys
 
@@ -6,12 +7,16 @@ version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read
 
 long_description = open('README-pypi.rst').read()
 
+# Calculate dependencies
 dependencies = [
     'python-termstyle'
 ]
+if platform.system() == 'Windows':
+    dependencies.append('colorama')
 if sys.version_info[0] == 2:
     dependencies.append('mock')
 
+# Actual setup call
 setup(
     name = 'green',
     packages = find_packages(),
@@ -33,7 +38,9 @@ setup(
     license = 'MIT',
     url = 'https://github.com/CleanCut/green',
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
-    keywords = ['nose', 'nose2', 'trial', 'tox', 'green', 'test', 'tests', 'functional test', 'system test', 'unit test', 'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
+    keywords = ['nose', 'nose2', 'trial', 'pytest', 'py.test', 'tox', 'green',
+        'tdd', 'test', 'tests', 'functional test', 'system test', 'unit test',
+        'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

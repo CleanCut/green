@@ -9,7 +9,7 @@ install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
 script:
-  - "./g -vvv"
-  - "./g -s 0 -r -vvv" # The one used for coverage
+  - "./g -vvv green"
+  - "./g -s 0 -r -vvv green" # The one used for coverage
   - "make testinstalled"
 after_success: coveralls

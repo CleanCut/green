@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+import platform
 import sys
 import termstyle
 
@@ -13,10 +14,10 @@ else: # pragma: no cover
     text_type = unicode
 
 
-def debug(message, level=0):
+def debug(message, level=1):
     """So we can tune how much debug output we get when we turn it on."""
     if level <= debug_level:
-        logging.debug(message)
+        logging.debug(' ' * (level - 1) * 2 + message)
 
 
 
@@ -44,6 +45,7 @@ class Colors:
             self.termcolor = bool(termstyle.bold(""))
         else:
             self.termcolor = termcolor
+
         self._restoreColor()
 
 
@@ -150,6 +152,9 @@ class GreenStream(object):
 
     def __init__(self, stream, html=False):
         self.stream = stream
+        if platform.system() == 'Windows': # pragma: no cover
+            from colorama.initialise import wrap_stream
+            self.stream = wrap_stream(self.stream, None, None, None, True)
         self.html = html
 
 
