@@ -160,11 +160,6 @@ CONFIG FILES
         parser.print_help()
         return 0
 
-    # bash-completion, zsh-completion
-    if args.options:
-        print(' '.join(store_opt.options))
-        return 0
-
     # Just print version and exit?
     if args.version:
         from green.version import pretty_version
@@ -223,43 +218,15 @@ CONFIG FILES
             termcolor=args.termcolor, subprocesses=args.subprocesses,
             run_coverage=args.run_coverage, omit=omit)
 
-    # bash/zsh dotted name completion
+    # Option-completion for bash and zsh
+    if args.options:
+        print(' '.join(store_opt.options))
+        return 0
+
+    # Argument-completion for bash and zsh (for test-target completion)
     if args.completions:
-        from green.runner import getTestList
-        # This option expects 0 or 1 targets
-        if not args.targets:
-            return 0
-        target = args.targets[0]
-        # First try the completion as-is.  It might be at a valid spot.
-        test_suite = loadTargets(target)
-        if not test_suite:
-            # Next, try stripping to the previous '.'
-            last_dot_idx = target.rfind('.')
-            if last_dot_idx < 1:
-                to_complete = '.'
-            else:
-                to_complete = target[:last_dot_idx]
-            test_suite = loadTargets(to_complete)
-        if test_suite:
-            # Test discovery
-            test_list = []
-            for test in [x.dotted_name for x in getTestList(test_suite)]:
-                # Test discovery sometimes doesn't prepend the passed-in target
-                if (target != '.') and (not test.startswith(target)):
-                    test = (target.rstrip('.')) + '.' + test
-                test_list.append(test)
-            # We have the fully dotted test names.  Now add the intermediate
-            # completions.
-            intermediates = set()
-            for test in test_list:
-                while True:
-                    idx = test.rfind('.')
-                    if idx == -1:
-                        break
-                    test = test[:idx]
-                    intermediates.add(test)
-            test_list.extend(list(intermediates))
-            print(' '.join(test_list))
+        from green.loader import printCompletions
+        printCompletions(args.targets)
         return 0
 
     # Add debug logging for stuff that happened before this point here

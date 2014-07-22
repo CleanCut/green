@@ -6,19 +6,13 @@ import time
 import unittest
 
 from green.loader import loadTargets
-from green.runner import GreenTestRunner, getTestList
+from green.runner import GreenTestRunner
 from green.output import GreenStream
 
 try:
     from io import StringIO
 except:
     from StringIO import StringIO
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
-
 
 class TestGreenTestRunner(unittest.TestCase):
 
@@ -211,15 +205,3 @@ class A(unittest.TestCase):
         os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         self.assertRaises(ImportError, gtr.run, (tests,))
-
-
-
-class TestGetTestList(unittest.TestCase):
-
-
-    def test_moduleImportFailure(self):
-        suite = MagicMock()
-        suite.__class__.__name__ = str('ModuleImportFailure')
-        suite.__str__.return_value = "exception_method other_stuff"
-        suite.exception_method.side_effect = AttributeError
-        self.assertRaises(AttributeError, getTestList, (suite,))

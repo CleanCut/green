@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from fnmatch import fnmatch
 import functools
+import glob
 import importlib
 import os
 import re
@@ -10,8 +11,70 @@ import unittest
 import traceback
 
 from green.output import debug
+from green.result import proto_test
 
 python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
+
+
+def toProtoTestList(suite_part, test_list=None):
+    """
+    Take a TestSuite and turn it into a list of ProtoTests.
+
+    This function is recursive.  Pass it a suite, and it will re-call itself
+    with smaller parts of the suite.
+    """
+    if test_list == None:
+        test_list = []
+    # Python's lousy handling of module import failures during loader discovery
+    # makes this crazy special case necessary.  See _make_failed_import_test in
+    # the source code for unittest.loader
+    if suite_part.__class__.__name__ == 'ModuleImportFailure':
+        exception_method = str(suite_part).split()[0]
+        getattr(suite_part, exception_method)()
+    # On to the real stuff
+    if issubclass(type(suite_part), unittest.TestCase):
+        test_list.append(proto_test(suite_part))
+    else:
+        for i in suite_part:
+            toProtoTestList(i, test_list)
+        return test_list
+
+
+def printCompletions(targets):
+        # This option expects 0 or 1 targets
+        if not targets:
+            return 0
+        target = targets[0]
+        # First try the completion as-is.  It might be at a valid spot.
+        test_suite = loadTargets(target)
+        if not test_suite:
+            # Next, try stripping to the previous '.'
+            last_dot_idx = target.rfind('.')
+            if last_dot_idx > 0:
+                to_complete = target[:last_dot_idx]
+            elif len(target):
+                # Oops, there was no previous '.' -- try filesystem matches
+                to_complete = glob.glob(target + '*')
+            if not to_complete:
+                to_complete = '.'
+            test_suite = loadTargets(to_complete)
+        if test_suite:
+            # Test discovery
+            test_list = []
+            for test in [x.dotted_name for x in toProtoTestList(test_suite)]:
+                test_list.append(test)
+            # We have the fully dotted test names.  Now add the intermediate
+            # completions.
+            intermediates = set()
+            for test in test_list:
+                while True:
+                    idx = test.rfind('.')
+                    if idx == -1:
+                        break
+                    test = test[:idx]
+                    intermediates.add(test)
+            test_list.extend(list(intermediates))
+            print(' '.join(test_list))
 
 
 def isPackage(file_path):

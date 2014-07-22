@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from unittest.signals import registerResult
-from unittest import TestCase
 import warnings
 
 try: # pragma: no cover
@@ -10,34 +9,10 @@ try: # pragma: no cover
 except: # pragma: no cover
     coverage = None
 
+from green.loader import toProtoTestList
 from green.output import GreenStream
-from green.result import GreenTestResult, proto_test
+from green.result import GreenTestResult
 from green.subprocess import LoggingDaemonlessPool, poolRunner
-
-
-
-def getTestList(suite_part, test_list=None):
-    """
-    Take a TestSuite and turn it into a list of ProtoTests.
-
-    This function is recursive.  Pass it a suite, and it will re-call itself
-    with smaller parts of the suite.
-    """
-    if test_list == None:
-        test_list = []
-    # Python's lousy handling of module import failures during loader discovery
-    # makes this crazy special case necessary.  See _make_failed_import_test in
-    # the source code for unittest.loader
-    if suite_part.__class__.__name__ == 'ModuleImportFailure':
-        exception_method = str(suite_part).split()[0]
-        getattr(suite_part, exception_method)()
-    # On to the real stuff
-    if issubclass(type(suite_part), TestCase):
-        test_list.append(proto_test(suite_part))
-    else:
-        for i in suite_part:
-            getTestList(i, test_list)
-        return test_list
 
 
 
@@ -89,7 +64,7 @@ class GreenTestRunner():
             if self.subprocesses == 1:
                 suite.run(result)
             else:
-                tests = getTestList(suite)
+                tests = toProtoTestList(suite)
                 pool = LoggingDaemonlessPool(processes=self.subprocesses)
                 if tests:
                     async_responses = []

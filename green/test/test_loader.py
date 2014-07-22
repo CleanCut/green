@@ -4,9 +4,27 @@ import shutil
 import sys
 import tempfile
 import unittest
+try:
+    from unittest.mock import MagicMock
+except:
+    from mock import MagicMock
+
+
 
 from green import loader
-from green.runner import getTestList
+
+
+
+class TestToProtoTestList(unittest.TestCase):
+
+
+    def test_moduleImportFailure(self):
+        suite = MagicMock()
+        suite.__class__.__name__ = str('ModuleImportFailure')
+        suite.__str__.return_value = "exception_method other_stuff"
+        suite.exception_method.side_effect = AttributeError
+        self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
+
 
 
 class TestIsPackage(unittest.TestCase):
@@ -226,7 +244,7 @@ class A(unittest.TestCase):
         # Dotted name should start with the package!
         self.assertEqual(
                 pkg_name + '.test.test_target_module.A.testPass',
-                getTestList(test_suite)[0].dotted_name)
+                loader.toProtoTestList(test_suite)[0].dotted_name)
 
 
     def test_DirWithInit(self):
