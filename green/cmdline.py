@@ -136,13 +136,16 @@ CONFIG FILES
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
             "dir)*,*(python system packages)*'")))
-    parser.set_defaults(**(dict(default_args._get_kwargs())))
     # These options are used by bash-completion and zsh completion.
-    parser.add_argument('--options', action='store_true', default=False,
-            help=argparse.SUPPRESS)
-    parser.add_argument('--completions', action='store_true', default=False,
-            help=argparse.SUPPRESS)
+    integration_args = parser.add_argument_group("Integration Options")
+    store_opt(integration_args.add_argument('--options', action='store_true',
+        help="Output all options.  Used by bash- and zsh-completion."))
+    store_opt(integration_args.add_argument('--completions',
+        action='store_true',
+        help=("Output possible completions of the given target.  Used by bash- "
+        "and zsh-completion.")))
 
+    parser.set_defaults(**(dict(default_args._get_kwargs())))
     args = parser.parse_args()
 
     # Unfortunately we can't fully cover the config module (the global part of

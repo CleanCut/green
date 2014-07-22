@@ -1,5 +1,4 @@
-_green_completion() 
-{
+_green_completion() {
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -18,6 +17,6 @@ _green_completion()
             ;;
     esac
 
-    COMPREPLY=( $(compgen -W "$(green --completions ${cur})" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "$(green --completions ${cur} | tr '\n' ' ')" -- ${cur}) )
 }
 complete -F _green_completion green

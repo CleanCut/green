@@ -45,6 +45,9 @@ def getCompletions(targets):
         if not targets:
             return 0
         target = targets[0]
+
+        # Discover tests and load them into a suite
+
         # First try the completion as-is.  It might be at a valid spot.
         test_suite = loadTargets(target)
         if not test_suite:
@@ -58,22 +61,28 @@ def getCompletions(targets):
             if not to_complete:
                 to_complete = '.'
             test_suite = loadTargets(to_complete)
-        test_list = []
+
+        # Reduce the suite to a list of relevant dotted names
+
+        dotted_names = set()
         if test_suite:
-            for test in [x.dotted_name for x in toProtoTestList(test_suite)]:
-                test_list.append(test)
+            for dotted_name in [x.dotted_name for x in toProtoTestList(test_suite)]:
+                if dotted_name.startswith(target):
+                    dotted_names.add(dotted_name)
             # We have the fully dotted test names.  Now add the intermediate
-            # completions.
-            intermediates = set()
-            for test in test_list:
+            # completions.  bash and zsh will filter out the intermediats that
+            # don't match.
+            for dotted_name in list(dotted_names):
                 while True:
-                    idx = test.rfind('.')
+                    idx = dotted_name.rfind('.')
                     if idx == -1:
                         break
-                    test = test[:idx]
-                    intermediates.add(test)
-            test_list.extend(list(intermediates))
-        return(' '.join(test_list))
+                    dotted_name = dotted_name[:idx]
+                    if dotted_name.startswith(target):
+                        dotted_names.add(dotted_name)
+                    else:
+                        break
+        return('\n'.join(sorted(list(dotted_names))))
 
 
 def isPackage(file_path):
