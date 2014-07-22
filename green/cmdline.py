@@ -225,8 +225,8 @@ CONFIG FILES
 
     # Argument-completion for bash and zsh (for test-target completion)
     if args.completions:
-        from green.loader import printCompletions
-        printCompletions(args.targets)
+        from green.loader import getCompletions
+        print(getCompletions(args.targets))
         return 0
 
     # Add debug logging for stuff that happened before this point here

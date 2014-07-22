@@ -40,7 +40,7 @@ def toProtoTestList(suite_part, test_list=None):
         return test_list
 
 
-def printCompletions(targets):
+def getCompletions(targets):
         # This option expects 0 or 1 targets
         if not targets:
             return 0
@@ -58,9 +58,8 @@ def printCompletions(targets):
             if not to_complete:
                 to_complete = '.'
             test_suite = loadTargets(to_complete)
+        test_list = []
         if test_suite:
-            # Test discovery
-            test_list = []
             for test in [x.dotted_name for x in toProtoTestList(test_suite)]:
                 test_list.append(test)
             # We have the fully dotted test names.  Now add the intermediate
@@ -74,7 +73,7 @@ def printCompletions(targets):
                     test = test[:idx]
                     intermediates.add(test)
             test_list.extend(list(intermediates))
-            print(' '.join(test_list))
+        return(' '.join(test_list))
 
 
 def isPackage(file_path):
