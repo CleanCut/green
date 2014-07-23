@@ -40,11 +40,10 @@ def toProtoTestList(suite_part, test_list=None):
         return test_list
 
 
-def getCompletions(targets):
+def getCompletions(target):
         # This option expects 0 or 1 targets
-        if not targets:
-            return 0
-        target = targets[0]
+        if type(target) == list:
+            target = target[0]
 
         # Discover tests and load them into a suite
 

@@ -67,6 +67,9 @@ ENABLING SHELL COMPLETION
 
     which green > /dev/null && source "$( green --completion_file )"
 
+  Warning!  Generating a completion list actually discovers and loads tests
+  -- this can be very slow if you run it in huge directories!
+
 CONFIG FILES
 
   Green will look for and process three config files if found:

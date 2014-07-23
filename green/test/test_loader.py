@@ -27,6 +27,59 @@ class TestToProtoTestList(unittest.TestCase):
 
 
 
+class TestCompletions(unittest.TestCase):
+
+
+    def test_completionBad(self):
+        "Bad match generates no completions"
+        self.assertEqual('', loader.getCompletions('garbage.in'))
+
+
+    def test_completionExact(self):
+        "Correct completions are generated for an exact match."
+        c = set(loader.getCompletions('green').split('\n'))
+        self.assertIn('green', c)
+        self.assertIn('green.test', c)
+        self.assertIn('green.test.test_loader', c)
+        self.assertIn('green.test.test_loader.TestCompletions', c)
+        self.assertIn(
+                'green.test.test_loader.TestCompletions.test_completionExact', c)
+
+
+    def test_completionPartialShort(self):
+        "Correct completions generated for short partial match."
+        c = set(loader.getCompletions('gre').split('\n'))
+        self.assertIn('green', c)
+        self.assertIn('green.test', c)
+        self.assertIn('green.test.test_loader', c)
+        self.assertIn('green.test.test_loader.TestCompletions', c)
+        self.assertIn(
+            'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
+
+
+    def test_completionPartial(self):
+        "Correct completions generated for partial match.  2nd target ignored."
+        c = set(loader.getCompletions(['green.te', 'green']).split('\n'))
+        self.assertIn('green.test', c)
+        self.assertIn('green.test.test_loader', c)
+        self.assertIn('green.test.test_loader.TestCompletions', c)
+        self.assertIn(
+            'green.test.test_loader.TestCompletions.test_completionPartial', c)
+        self.assertNotIn('green', c)
+
+
+    def test_completionEmpty(self):
+        os.chdir('green')
+        c = set(loader.getCompletions('').split('\n'))
+        self.assertIn('green', c)
+        self.assertIn('green.test', c)
+        self.assertIn('green.test.test_loader', c)
+        self.assertIn('green.test.test_loader.TestCompletions', c)
+        self.assertIn(
+            'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
+        os.chdir('..')
+
+
 class TestIsPackage(unittest.TestCase):
 
 
