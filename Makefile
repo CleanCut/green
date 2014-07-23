@@ -4,7 +4,7 @@ clean:
 	@echo "Cleaning generated files and directories."
 	@find . -name '*.pyc' -exec rm \{\} \;
 	@find . -name '.coverage*' -exec rm \{\} \;
-	@rm -rf _trial_temp build dist green.egg-info
+	@rm -rf _trial_temp build dist green.egg-info green-*
 
 test: clean
 	@echo "\n== CHECKING PYTHON 2.7 (SINGLE) =="

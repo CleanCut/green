@@ -48,6 +48,8 @@ class TestCompletions(unittest.TestCase):
 
     def test_completionPartialShort(self):
         "Correct completions generated for short partial match."
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(os.path.dirname(__file__)))
         c = set(loader.getCompletions('gre').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
@@ -55,6 +57,7 @@ class TestCompletions(unittest.TestCase):
         self.assertIn('green.test.test_loader.TestCompletions', c)
         self.assertIn(
             'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
+        os.chdir(cwd)
 
 
     def test_completionPartial(self):
@@ -70,7 +73,8 @@ class TestCompletions(unittest.TestCase):
 
     def test_completionEmpty(self):
         "An empty target generates completions for the whole directory"
-        os.chdir('green')
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(__file__))
         c = set(loader.getCompletions('').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
@@ -78,7 +82,7 @@ class TestCompletions(unittest.TestCase):
         self.assertIn('green.test.test_loader.TestCompletions', c)
         self.assertIn(
             'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
-        os.chdir('..')
+        os.chdir(cwd)
 
 
 class TestIsPackage(unittest.TestCase):

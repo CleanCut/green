@@ -73,11 +73,12 @@ class TestMain(unittest.TestCase):
 
     def test_completions(self):
         "--completions returns completions (the loader module tests deeper)"
-        os.chdir('green')
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(os.path.dirname(__file__)))
         cmdline.sys.argv = ['', '--completions']
         cmdline.main(testing=True)
         self.assertIn('green.test', self.s.getvalue())
-        os.chdir('..')
+        os.chdir(cwd)
 
 
     def test_options(self):
