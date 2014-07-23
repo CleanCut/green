@@ -64,6 +64,30 @@ class TestMain(unittest.TestCase):
         shutil.rmtree(tmpdir)
 
 
+    def test_completionFile(self):
+        "--completion-file causes a version string to be output"
+        cmdline.sys.argv = ['', '--completion-file']
+        cmdline.main(testing=True)
+        self.assertIn('shell_completion.sh', self.s.getvalue())
+
+
+    def test_completions(self):
+        "--completions returns completions (the loader module tests deeper)"
+        os.chdir('green')
+        cmdline.sys.argv = ['', '--completions']
+        cmdline.main(testing=True)
+        self.assertIn('green.test', self.s.getvalue())
+        os.chdir('..')
+
+
+    def test_options(self):
+        "--options causes options to be output"
+        cmdline.sys.argv = ['', '--options']
+        cmdline.main(testing=True)
+        self.assertIn('--options', self.s.getvalue())
+        self.assertIn('--version', self.s.getvalue())
+
+
     def test_version(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']

@@ -44,6 +44,8 @@ def getCompletions(target):
         # This option expects 0 or 1 targets
         if type(target) == list:
             target = target[0]
+        if target == '.':
+            target = ''
 
         # Discover tests and load them into a suite
 
