@@ -1,3 +1,9 @@
+Version 1.3.1 - 23 July 2014
+
+- Fixed the new tests that failed if you ran them in-place on an installed
+version of green.  Forgot to check the build status before I did the last
+release!
+
 Version 1.3.0 - 23 July 2014
 
 - Bash-completion and ZSH-completion support for options and test targets.
