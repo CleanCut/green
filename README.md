@@ -30,6 +30,7 @@ Features
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.
+- **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
 - **Modern** - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
@@ -66,6 +67,17 @@ green test_stuff.py
 # Assuming you want to run TestClass.test_function inside
 # package/test/test_module.py ...
 green package.test.test_module.TestClass.test_function
+```
+
+Bash-Completion / ZSH-Completion
+--------------------------------
+
+To enable completion of options and test targets when you press `Tab` in your
+terminal, add the following line to the Bash or ZSH config file of your choice
+(usually `~/.bashrc` or `~/.zshrc`)
+
+```bash
+which green > /dev/null && source "$( green --completion-file )"
 ```
 
 Basic Troubleshooting
