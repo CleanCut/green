@@ -39,8 +39,8 @@ setup(
     url = 'https://github.com/CleanCut/green',
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nose2', 'trial', 'pytest', 'py.test', 'tox', 'green',
-        'tdd', 'test', 'tests', 'functional test', 'system test', 'unit test',
-        'unittest', 'color', 'tabular', 'clean', 'red', 'rednose'],
+        'tdd', 'test', 'tests', 'functional', 'system', 'unit', 'unittest',
+        'color', 'tabular', 'clean', 'red', 'rednose', 'regression', 'runner'],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

@@ -64,7 +64,7 @@ class TestMain(unittest.TestCase):
         shutil.rmtree(tmpdir)
 
 
-    def test_optVersion(self):
+    def test_version(self):
         "--version causes a version string to be output"
         cmdline.sys.argv = ['', '--version']
         cmdline.main(testing=True)

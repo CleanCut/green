@@ -69,6 +69,7 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionEmpty(self):
+        "An empty target generates completions for the whole directory"
         os.chdir('green')
         c = set(loader.getCompletions('').split('\n'))
         self.assertIn('green', c)
