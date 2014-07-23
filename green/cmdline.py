@@ -65,7 +65,7 @@ ENABLING SHELL COMPLETION
   To enable bash- or zsh-completion, add the line below to the end of your
   .bashrc or .zshrc file (or equivalent config file):
 
-    which green > /dev/null && source "$( green --completion_file )"
+    which green > /dev/null && source "$( green --completion-file )"
 
   Warning!  Generating a completion list actually discovers and loads tests
   -- this can be very slow if you run it in huge directories!
@@ -149,7 +149,7 @@ CONFIG FILES
             "dir)*,*(python system packages)*'")))
     # These options are used by bash-completion and zsh completion.
     integration_args = parser.add_argument_group("Integration Options")
-    store_opt(integration_args.add_argument('--completion_file',
+    store_opt(integration_args.add_argument('--completion-file',
         action='store_true', help=("Location of the bash- and zsh-completion "
             "file.  To enable bash- or zsh-completion, see ENABLING SHELL "
             "COMPLETION below."
