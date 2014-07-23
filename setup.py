@@ -20,7 +20,7 @@ if sys.version_info[0] == 2:
 setup(
     name = 'green',
     packages = find_packages(),
-    package_data = {'green' : ['VERSION']},
+    package_data = {'green' : ['VERSION', 'shell_completion.sh']},
     version = version,
     install_requires = dependencies,
     entry_points = {

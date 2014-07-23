@@ -53,6 +53,7 @@ def getCompletions(targets):
         if not test_suite:
             # Next, try stripping to the previous '.'
             last_dot_idx = target.rfind('.')
+            to_complete = None
             if last_dot_idx > 0:
                 to_complete = target[:last_dot_idx]
             elif len(target):
