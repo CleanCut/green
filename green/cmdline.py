@@ -17,21 +17,22 @@ except: # pragma: no cover
 
 # Set the defaults in a re-usable way
 default_args = argparse.Namespace(
-        targets      = ['.'], # Not in configs
-        subprocesses = 1,
-        html         = False,
-        termcolor    = None,
-        notermcolor  = None,
-        debug        = 0,
-        help         = False, # Not in configs
-        logging      = False,
-        version      = False,
-        verbose      = 1,
-        config       = None,  # Not in configs
-        run_coverage = False,
-        omit         = None,
-        options      = False,
-        completions  = False,
+        targets         = ['.'], # Not in configs
+        subprocesses    = 1,
+        html            = False,
+        termcolor       = None,
+        notermcolor     = None,
+        debug           = 0,
+        help            = False, # Not in configs
+        logging         = False,
+        version         = False,
+        verbose         = 1,
+        config          = None,  # Not in configs
+        run_coverage    = False,
+        omit            = None,
+        completion_file = False,
+        completions     = False,
+        options         = False,
         )
 
 
@@ -59,6 +60,13 @@ Green is a clean, colorful test runner for Python unit tests.
 """.rstrip(),
             epilog=
 """
+ENABLING SHELL COMPLETION
+
+  To enable bash- or zsh-completion, add the line below to the end of your
+  .bashrc or .zshrc file (or equivalent config file):
+
+    which green > /dev/null && source "$( green --completion_file )"
+
 CONFIG FILES
 
   Green will look for and process three config files if found:
@@ -69,8 +77,8 @@ CONFIG FILES
   Config file format is simply "option = value" on separate lines.  "option" is
   the same as the long options above, just without the "--".
 
-  Most values should be "True" or "False".  Accumulated values (verbose, debug) should
-  be specified as integers ("-vv" would be "verbose = 2").
+  Most values should be "True" or "False".  Accumulated values (verbose, debug)
+  should be specified as integers ("-vv" would be "verbose = 2").
 
   Example:
 
@@ -138,12 +146,17 @@ CONFIG FILES
             "dir)*,*(python system packages)*'")))
     # These options are used by bash-completion and zsh completion.
     integration_args = parser.add_argument_group("Integration Options")
-    store_opt(integration_args.add_argument('--options', action='store_true',
-        help="Output all options.  Used by bash- and zsh-completion."))
+    store_opt(integration_args.add_argument('--completion_file',
+        action='store_true', help=("Location of the bash- and zsh-completion "
+            "file.  To enable bash- or zsh-completion, see ENABLING SHELL "
+            "COMPLETION below."
+            )))
     store_opt(integration_args.add_argument('--completions',
         action='store_true',
         help=("Output possible completions of the given target.  Used by bash- "
         "and zsh-completion.")))
+    store_opt(integration_args.add_argument('--options', action='store_true',
+        help="Output all options.  Used by bash- and zsh-completion."))
 
     parser.set_defaults(**(dict(default_args._get_kwargs())))
     args = parser.parse_args()
@@ -221,15 +234,20 @@ CONFIG FILES
             termcolor=args.termcolor, subprocesses=args.subprocesses,
             run_coverage=args.run_coverage, omit=omit)
 
-    # Option-completion for bash and zsh
-    if args.options:
-        print(' '.join(store_opt.options))
+    # Location of shell completion file
+    if args.completion_file:
+        print(os.path.join(os.path.dirname(__file__), 'shell_completion.sh'))
         return 0
 
     # Argument-completion for bash and zsh (for test-target completion)
     if args.completions:
         from green.loader import getCompletions
         print(getCompletions(args.targets))
+        return 0
+
+    # Option-completion for bash and zsh
+    if args.options:
+        print('\n'.join(sorted(store_opt.options)))
         return 0
 
     # Add debug logging for stuff that happened before this point here
