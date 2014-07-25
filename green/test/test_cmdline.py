@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 import logging
 import os
 import shutil
-import sys
 import tempfile
 import unittest
 
 from green import cmdline
+from green import config
 from green.output import GreenStream
 
 try:
@@ -27,17 +27,17 @@ class TestMain(unittest.TestCase):
     def setUp(self):
         self.s = StringIO()
         self.gs = GreenStream(self.s)
-        self.saved_stdout = sys.stdout
-        self.saved_stderr = cmdline.sys.stderr
-        self.saved_argv = sys.argv
-        sys.stdout = self.gs
-        cmdline.sys.stderr = self.gs
+        self.saved_stdout = config.sys.stdout
+        self.saved_stderr = config.sys.stderr
+        self.saved_argv = config.sys.argv
+        config.sys.stdout = self.gs
+        config.sys.stderr = self.gs
 
 
     def tearDown(self):
-        sys.stdout = self.saved_stdout
-        cmdline.sys.stderr = self.saved_stderr
-        sys.argv = self.saved_argv
+        config.sys.stdout = self.saved_stdout
+        config.sys.stderr = self.saved_stderr
+        config.sys.argv = self.saved_argv
         del(self.gs)
         del(self.s)
         del(self.saved_stderr)
@@ -47,8 +47,11 @@ class TestMain(unittest.TestCase):
     def test_notTesting(self):
         "We actually attempt running loadTargets (coverage test)"
         tmpdir = tempfile.mkdtemp()
-        cmdline.sys.argv = ['', tmpdir]
+        cwd = os.getcwd()
+        os.chdir(tmpdir)
+        config.sys.argv = ['', tmpdir]
         cmdline.main()
+        os.chdir(cwd)
         shutil.rmtree(tmpdir)
 
 
@@ -99,15 +102,15 @@ class TestMain(unittest.TestCase):
 
     def test_debug(self):
         "--debug causes the log-level to be set to debug"
-        cmdline.sys.argv = ['', '--debug']
-        saved_basicConfig = cmdline.logging.basicConfig
-        cmdline.logging.basicConfig = MagicMock()
+        config.sys.argv = ['', '--debug']
+        saved_basicConfig = config.logging.basicConfig
+        config.logging.basicConfig = MagicMock()
         cmdline.main(testing=True)
-        cmdline.logging.basicConfig.assert_called_with(
+        config.logging.basicConfig.assert_called_with(
             level=logging.DEBUG,
             format="%(asctime)s %(levelname)9s %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S")
-        cmdline.logging.basicConfig = saved_basicConfig
+        config.logging.basicConfig = saved_basicConfig
 
 
     def test_disableTermcolor(self):
@@ -118,25 +121,25 @@ class TestMain(unittest.TestCase):
 
     def test_noCoverage(self):
         "The absence of coverage prompts a return code of 3"
-        save_stderr = cmdline.sys.stderr
-        cmdline.sys.stderr = MagicMock()
-        save_coverage = cmdline.coverage
-        cmdline.coverage = None
-        cmdline.sys.argv = ['', '--run-coverage']
+        save_stderr = config.sys.stderr
+        config.sys.stderr = MagicMock()
+        save_coverage = config.coverage
+        config.coverage = None
+        config.sys.argv = ['', '--run-coverage']
         self.assertEqual(cmdline.main(), 3)
-        cmdline.coverage = save_coverage
-        cmdline.sys.stderr = save_stderr
+        config.coverage = save_coverage
+        config.sys.stderr = save_stderr
 
 
     def test_coverage(self):
         "If coverage and --run-coverage, then coverage is started"
-        save_coverage = cmdline.coverage
-        cmdline.coverage = MagicMock()
-        cmdline.sys.argv = ['', '--run-coverage', '--omit=abc']
+        save_coverage = config.coverage
+        config.coverage = MagicMock()
+        config.sys.argv = ['', '--run-coverage', '--omit=abc']
         cmdline.main(testing=True, coverage_testing=True)
-        cmdline.coverage.coverage.assert_called_with(
+        config.coverage.coverage.assert_called_with(
                 data_file=u'.coverage', omit=['abc'])
-        cmdline.coverage = save_coverage
+        config.coverage = save_coverage
 
 
     def test_noTestsCreatesEmptyTestSuite(self):
@@ -151,14 +154,14 @@ class TestMain(unittest.TestCase):
 
     def test_omit(self):
         "Omit pattern gets parsed"
-        save_coverage = cmdline.coverage
-        cmdline.coverage = MagicMock()
+        save_coverage = config.coverage
+        config.coverage = MagicMock()
         cov = MagicMock()
-        cmdline.coverage.coverage.return_value = cov
-        cmdline.sys.argv = ['', '--run-coverage', '--omit', 'a,b']
+        config.coverage.coverage.return_value = cov
+        config.sys.argv = ['', '--run-coverage', '--omit', 'a,b']
         cmdline.main(testing=True, coverage_testing=True)
         self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
-        cmdline.coverage = save_coverage
+        config.coverage = save_coverage
 
 
     def test_import_cmdline_module(self):

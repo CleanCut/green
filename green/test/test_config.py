@@ -9,7 +9,6 @@ import tempfile
 import unittest
 
 from green import config
-from green import cmdline
 
 
 
@@ -105,7 +104,7 @@ class TestConfig(ConfigBase):
         Result: load --config
         """
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            cfg = config.get_config(self.cmd_filename)
+            cfg = config.getConfig(self.cmd_filename)
             ae = self.assertEqual
             ae(["green"],             cfg.sections())
             ae(self.cmd_filename,     cfg.get("green", "omit"))
@@ -123,7 +122,7 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.default_filename)
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            cfg = config.get_config(self.cmd_filename)
+            cfg = config.getConfig(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -141,7 +140,7 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.env_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config(self.cmd_filename)
+            cfg = config.getConfig(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -160,7 +159,7 @@ class TestConfig(ConfigBase):
         os.unlink(self.env_filename)
         os.unlink(self.default_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config(self.cmd_filename)
+            cfg = config.getConfig(self.cmd_filename)
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -178,7 +177,7 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.cmd_filename)
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            cfg = config.get_config()
+            cfg = config.getConfig()
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -198,7 +197,7 @@ class TestConfig(ConfigBase):
         os.unlink(self.cmd_filename)
         os.unlink(self.default_filename)
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            cfg = config.get_config()
+            cfg = config.getConfig()
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -217,7 +216,7 @@ class TestConfig(ConfigBase):
         os.unlink(self.cmd_filename)
         os.unlink(self.env_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config()
+            cfg = config.getConfig()
             ae = self.assertEqual
             ar = self.assertRaises
             ae(["green"],                  cfg.sections())
@@ -237,7 +236,7 @@ class TestConfig(ConfigBase):
         os.unlink(self.env_filename)
         os.unlink(self.cmd_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
-            cfg = config.get_config()
+            cfg = config.getConfig()
             ae = self.assertEqual
             ar = self.assertRaises
             ae([], cfg.sections())
@@ -262,7 +261,7 @@ class TestMergeConfig(ConfigBase):
         # This config environment should set the values we look at to False and
         # a filename in omit
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            new_args = copy.deepcopy(cmdline.default_args)
+            new_args = copy.deepcopy(config.default_args)
 
             new_args.omit         = 'omitstuff'
             new_args.run_coverage = True
@@ -271,7 +270,7 @@ class TestMergeConfig(ConfigBase):
             new_args.version      = True
 
             new_args.config = self.cmd_filename
-            computed_args = config.merge_config(new_args, cmdline.default_args)
+            computed_args = config.mergeConfig(new_args, config.default_args)
 
             self.assertEqual(computed_args.omit,         'omitstuff')
             self.assertEqual(computed_args.run_coverage, new_args.run_coverage)
@@ -287,17 +286,17 @@ class TestMergeConfig(ConfigBase):
         # This config environment should set logging to True
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=""):
             # The default for logging in arguments is False
-            da = cmdline.default_args
-            computed_args = config.merge_config(da, da)
+            da = config.default_args
+            computed_args = config.mergeConfig(da, da)
             self.assertEqual(computed_args.logging, True)
 
 
     def test_forgotToUpdateMerge(self):
          """
-         merge_config raises an exception for unknown cmdline args
+         mergeConfig raises an exception for unknown cmdline args
          """
-         new_args = copy.deepcopy(cmdline.default_args)
+         new_args = copy.deepcopy(config.default_args)
          new_args.new_option = True
 
-         self.assertRaises(NotImplementedError, config.merge_config, new_args,
-                 cmdline.default_args)
+         self.assertRaises(NotImplementedError, config.mergeConfig, new_args,
+                 config.default_args)
