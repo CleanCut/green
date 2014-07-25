@@ -69,8 +69,10 @@ try:
 
             Returns the number of tests that failed.
             """
-            print("La la la")
+            # Django setup
             self.setup_test_environment()
+
+            # Green
             if test_labels:
                 test_labels = list(test_labels)
             else:
@@ -82,9 +84,10 @@ try:
             stream = GreenStream(sys.stderr, html = args.html)
             runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
                 termcolor=args.termcolor, subprocesses=args.subprocesses,
-                run_coverage=args.run_coverage, omit='')
+                run_coverage=args.run_coverage, omit=args.omit)
             result = runner.run(suite)
 
+            # Django teardown
             self.teardown_databases(old_config)
             self.teardown_test_environment()
             return self.suite_result(suite, result)
