@@ -12,6 +12,17 @@ from green import config
 
 
 
+class ParseArguments(unittest.TestCase):
+
+
+    def test_target(self):
+        "The specified target gets parsed"
+        config.sys.argv = ['', 'target1', 'target2']
+        args = config.parseArguments()
+        self.assertEqual(args.targets, ['target1', 'target2'])
+
+
+
 class ModifiedEnvironment(object):
     """
     I am a context manager that sets up environment variables for a test case.
@@ -289,6 +300,15 @@ class TestMergeConfig(ConfigBase):
             da = config.default_args
             computed_args = config.mergeConfig(da, da)
             self.assertEqual(computed_args.logging, True)
+
+
+    def test_targets(self):
+        "The targets passed in make it through mergeConfig"
+        "The specified target gets parsed"
+        config.sys.argv = ['', 'target1', 'target2']
+        args = config.parseArguments()
+        args = config.mergeConfig(args)
+        self.assertEqual(args.targets, ['target1', 'target2'])
 
 
     def test_forgotToUpdateMerge(self):

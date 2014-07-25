@@ -317,9 +317,9 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         elif name in ['omit']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
-            continue # Some options only make sense coming on the command-line.
+            pass # Some options only make sense coming on the command-line.
         elif name in ['store_opt', 'parser']:
-            continue # These are added members we need to ignore
+            pass # These are convenience objects, not actual settings
         else:
             raise NotImplementedError(name)
 
@@ -337,9 +337,6 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     new_args.shouldExit = False
     new_args.exitCode = 0
     new_args.cov = None
-    # These two were added in getParser()
-    new_args.parser = args.parser
-    new_args.store_opt = args.store_opt
 
     # Help?
     if new_args.help: # pragma: no cover
