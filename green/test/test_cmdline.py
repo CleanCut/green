@@ -69,19 +69,17 @@ class TestMain(unittest.TestCase):
 
     def test_completionFile(self):
         "--completion-file causes a version string to be output"
-        cmdline.sys.argv = ['', '--completion-file']
+        config.sys.argv = ['', '--completion-file']
         cmdline.main(testing=True)
         self.assertIn('shell_completion.sh', self.s.getvalue())
 
 
+
     def test_completions(self):
         "--completions returns completions (the loader module tests deeper)"
-        cwd = os.getcwd()
-        os.chdir(os.path.dirname(os.path.dirname(__file__)))
         cmdline.sys.argv = ['', '--completions']
         cmdline.main(testing=True)
         self.assertIn('green.test', self.s.getvalue())
-        os.chdir(cwd)
 
 
     def test_options(self):
