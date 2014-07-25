@@ -3,12 +3,17 @@ try:
 except:
     import ConfigParser as configparser
 import copy
+try:
+    from io import StringIO
+except:
+    from StringIO import StringIO
 import os
 import shutil
 import tempfile
 import unittest
 
 from green import config
+from green.output import GreenStream
 
 
 
@@ -271,6 +276,10 @@ class TestMergeConfig(ConfigBase):
         """
         # This config environment should set the values we look at to False and
         # a filename in omit
+        s = StringIO()
+        gs = GreenStream(s)
+        saved_stdout = config.sys.stdout
+        config.sys.stdout = gs
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             new_args = copy.deepcopy(config.default_args)
 
@@ -288,6 +297,7 @@ class TestMergeConfig(ConfigBase):
             self.assertEqual(computed_args.logging,      new_args.logging)
             self.assertEqual(computed_args.html,         new_args.html)
             self.assertEqual(computed_args.version,      new_args.version)
+        config.sys.stdout = saved_stdout
 
 
     def test_no_overwrite(self):
