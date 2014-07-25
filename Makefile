@@ -23,6 +23,8 @@ testinstalled: clean
 	bash -c "cd green-$(VERSION) && python setup.py install"
 	bash -c "cd && green -vvv green"
 	bash -c "cd && green -s 0 -vvv green"
+	pip uninstall -y green
+	make clean
 
 sanity-checks:
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
