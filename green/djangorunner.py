@@ -1,8 +1,7 @@
 import os
 import sys
 
-from green.cmdline import default_args
-from green.config import merge_config
+from green.config import default_args, mergeConfig
 from green.loader import loadTargets
 from green.output import GreenStream
 from green.runner import GreenTestRunner
@@ -79,7 +78,7 @@ try:
             suite = loadTargets(test_labels)
             old_config = self.setup_databases()
 
-            args = merge_config(default_args, default_args)
+            args = mergeConfig(default_args, default_args)
             stream = GreenStream(sys.stderr, html = args.html)
             runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
                 termcolor=args.termcolor, subprocesses=args.subprocesses,
