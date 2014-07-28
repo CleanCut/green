@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import os
+from os.path import dirname
 import shutil
 import sys
 import tempfile
@@ -49,7 +50,8 @@ class TestCompletions(unittest.TestCase):
     def test_completionPartialShort(self):
         "Correct completions generated for short partial match."
         cwd = os.getcwd()
-        os.chdir(os.path.dirname(os.path.dirname(__file__)))
+        green_parent = dirname(dirname(dirname(os.path.abspath(__file__))))
+        os.chdir(green_parent)
         c = set(loader.getCompletions('gre').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
@@ -74,7 +76,7 @@ class TestCompletions(unittest.TestCase):
     def test_completionEmpty(self):
         "An empty target generates completions for the whole directory"
         cwd = os.getcwd()
-        os.chdir(os.path.dirname(__file__))
+        os.chdir(dirname(dirname(dirname(os.path.abspath(__file__)))))
         c = set(loader.getCompletions('').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)

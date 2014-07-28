@@ -169,8 +169,8 @@ def loadFromModuleFilename(filename):
         # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
         # refactor it and simplify it after we make sure it works.
         # This is a cause of the traceback mangling I observed.
-        message = 'Failed to import test module: {}\n{}'.format(
-                filename, traceback.format_exc())
+        message = ('Failed to import {} computed from filename {}\n{}').format(
+                       dotted_module, filename, traceback.format_exc())
         def testFailure(self):
             raise ImportError(message)
         TestClass = type(
