@@ -80,7 +80,7 @@ class TestMain(unittest.TestCase):
         cwd = os.getcwd()
         path = os.path.abspath(__file__)
         os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(path))))
-        config.sys.argv = ['', '--completions']
+        config.sys.argv = ['', '--completions', 'green']
         cmdline.main(testing=True)
         os.chdir(cwd)
         self.assertIn('green.test', self.s.getvalue())
