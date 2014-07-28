@@ -364,7 +364,9 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     if new_args.html or new_args.notermcolor:
         new_args.termcolor = False
 
-    # Coverage?
+    # Coverage.  We must enable it here because we cannot cover module-level
+    # code after it is imported, and this is the earliest place we can turn on
+    # coverage.
     omit = []
     if new_args.omit:
         omit = new_args.omit.split(',')
