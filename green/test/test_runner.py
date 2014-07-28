@@ -205,3 +205,10 @@ class A(unittest.TestCase):
         os.chdir(TestSubprocesses.startdir)
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         self.assertRaises(ImportError, gtr.run, (tests,))
+
+
+    def test_empty(self):
+        "GreenTestRunner.run() does not crash with empty suite and subprocesses"
+        suite = unittest.TestSuite()
+        gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
+        gtr.run(suite)
