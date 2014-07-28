@@ -77,12 +77,12 @@ class GreenTestRunner():
                             poolRunner,
                             (test.dotted_name, coverage_number, self.omit)))
                     pool.close()
-                for test, async_response in zip(tests, async_responses):
-                    # Prints out the white 'processing...' version of the output
-                    result.startTest(test)
-                    # This blocks until the worker who is processing this
-                    # particular test actually finishes
-                    result.addProtoTestResult(async_response.get())
+                    for test, async_response in zip(tests, async_responses):
+                        # Prints out the white 'processing...' version of the output
+                        result.startTest(test)
+                        # This blocks until the worker who is processing this
+                        # particular test actually finishes
+                        result.addProtoTestResult(async_response.get())
 
             result.stopTestRun()
 
