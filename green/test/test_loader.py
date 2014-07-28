@@ -76,15 +76,32 @@ class TestCompletions(unittest.TestCase):
     def test_completionEmpty(self):
         "An empty target generates completions for the whole directory"
         cwd = os.getcwd()
-        os.chdir(dirname(dirname(dirname(os.path.abspath(__file__)))))
+        tmpdir = tempfile.mkdtemp()
+        os.chdir(tmpdir)
+        os.mkdir('the_pkg')
+        fh = open(os.path.join('the_pkg', '__init__.py'), 'w')
+        fh.write('')
+        fh.close()
+        fh = open(os.path.join('the_pkg', 'test_things.py'), 'w')
+        fh.write(
+"""
+import unittest
+
+class A(unittest.TestCase):
+    def testOne(self):
+        pass
+    def testTwo(self):
+        pass
+""")
+        fh.close()
         c = set(loader.getCompletions('').split('\n'))
-        self.assertIn('green', c)
-        self.assertIn('green.test', c)
-        self.assertIn('green.test.test_loader', c)
-        self.assertIn('green.test.test_loader.TestCompletions', c)
-        self.assertIn(
-            'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
+        self.assertIn('the_pkg', c)
+        self.assertIn('the_pkg.test_things', c)
+        self.assertIn('the_pkg.test_things.A.testOne', c)
+        self.assertIn('the_pkg.test_things.A.testTwo', c)
         os.chdir(cwd)
+        shutil.rmtree(tmpdir)
+
 
 
 class TestIsPackage(unittest.TestCase):
