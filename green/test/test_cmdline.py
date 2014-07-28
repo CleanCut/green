@@ -28,19 +28,15 @@ class TestMain(unittest.TestCase):
         self.s = StringIO()
         self.gs = GreenStream(self.s)
         self.saved_stdout = config.sys.stdout
-        self.saved_stderr = config.sys.stderr
         self.saved_argv = config.sys.argv
         config.sys.stdout = self.gs
-        config.sys.stderr = self.gs
 
 
     def tearDown(self):
         config.sys.stdout = self.saved_stdout
-        config.sys.stderr = self.saved_stderr
         config.sys.argv = self.saved_argv
         del(self.gs)
         del(self.s)
-        del(self.saved_stderr)
         del(self.saved_stdout)
 
 
@@ -123,14 +119,14 @@ class TestMain(unittest.TestCase):
 
     def test_noCoverage(self):
         "The absence of coverage prompts a return code of 3"
-        save_stderr = config.sys.stderr
-        config.sys.stderr = MagicMock()
+        save_stdout = config.sys.stdout
+        config.sys.stdout = MagicMock()
         save_coverage = config.coverage
         config.coverage = None
         config.sys.argv = ['', '--run-coverage']
         self.assertEqual(cmdline.main(), 3)
         config.coverage = save_coverage
-        config.sys.stderr = save_stderr
+        config.sys.stdout = save_stdout
 
 
     def test_coverage(self):

@@ -386,9 +386,9 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
 
     if new_args.run_coverage:
         if not coverage:
-            sys.stderr.write(
+            print(
                 "Fatal: The 'coverage' module is not installed.  Have you "
-                "run 'pip install coverage'???")
+                "run 'pip install coverage' ???")
             args.shouldExit = True
             args.exitCode = 3
             return args

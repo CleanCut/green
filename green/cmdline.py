@@ -34,7 +34,7 @@ def main(testing=False, coverage_testing=False):
     if args.debug:
         green.output.debug_level = args.debug
 
-    stream = GreenStream(sys.stderr, html = args.html)
+    stream = GreenStream(sys.stdout, html = args.html)
     runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
             termcolor=args.termcolor, subprocesses=args.subprocesses,
             run_coverage=args.run_coverage, omit=args.omit)

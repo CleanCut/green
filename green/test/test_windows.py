@@ -19,7 +19,7 @@ class TestWindows(unittest.TestCase):
         Color output functions on windows
         """
         import colorama
-        gs = GreenStream(sys.stderr)
+        gs = GreenStream(sys.stdout)
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
 

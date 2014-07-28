@@ -81,7 +81,7 @@ try:
             old_config = self.setup_databases()
 
             args = mergeConfig(default_args, default_args)
-            stream = GreenStream(sys.stderr, html = args.html)
+            stream = GreenStream(sys.stdout, html = args.html)
             runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
                 termcolor=args.termcolor, subprocesses=args.subprocesses,
                 run_coverage=args.run_coverage, omit=args.omit)
