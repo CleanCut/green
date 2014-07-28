@@ -8,8 +8,15 @@ if [ "${TESTS}" == "" ] ; then
     exit 2
 fi
 
+if [ "${PYTHON_VERSIONS_IN_PATH}" == "" ] ; then
+    PYTHON_VERSIONS_IN_PATH="default"
+fi
+
 for TEST in ${TESTS} ; do
     for PYTHON_VERSION in ${PYTHON_VERSIONS_IN_PATH} ; do
+        if [ "${PYTHON_VERSION}" == "default" ] ; then
+            PYTHON_VERSION=""
+        fi
         for PROCESS_NUM in 1 8 ; do
             echo ""
             set -x
