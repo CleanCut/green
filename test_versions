@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+PYTHON_VERSIONS_IN_PATH="$(find -E `echo $PATH | tr : ' '` -regex '.*/python(2.7|3.3|3.4)' 2>/dev/null | sed -e 's/.*python//')"
+TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
+
+if [ "${TESTS}" == "" ] ; then
+    echo "No tests found!"
+    exit 2
+fi
+
+for TEST in ${TESTS} ; do
+    for PYTHON_VERSION in ${PYTHON_VERSIONS_IN_PATH} ; do
+        for PROCESS_NUM in 1 8 ; do
+            echo ""
+            set -x
+            if ! ./g ${PYTHON_VERSION} -s ${PROCESS_NUM} ${TEST} ; then
+                exit 3
+            fi
+            { set +x; } 2>/dev/null
+        done
+    done
+done
+
+echo -e "\nCompleted internal test suite for Python(s):\n${PYTHON_VERSIONS_IN_PATH}\n"
