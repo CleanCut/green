@@ -103,7 +103,7 @@ class TestSubprocesses(unittest.TestCase):
 
 
     def tearDown(self):
-        os.chdir(self.container_dir)
+        os.chdir(self.startdir)
         # On windows, the subprocesses block access to the files while
         # they take a bit to clean themselves up.
         for i in range(20):
