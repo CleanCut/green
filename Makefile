@@ -12,7 +12,7 @@ clean-silent:
 
 test: test-versions test-installed test-coverage
 	# test-coverage needs to be last in deps, don't clean after it runs!
-	@echo "\n(test) passes\n"
+	@echo "\n(test) completed\n"
 
 test-local:
 	@sudo make test-installed
@@ -27,7 +27,7 @@ test-coverage:
 	@make clean-silent
 	# Generate coverage files for travis builds (don't clean after this!)
 	./g -s 0 -r -vvv green
-	@echo "\n(test-coverage) passes\n"
+	@echo "\n(test-coverage) completed\n"
 
 test-installed:
 	# Install under the default python and run self-tests
@@ -40,14 +40,14 @@ test-installed:
 	bash -c "cd && green -s 0 -vvv green"
 	pip uninstall -y green
 	@make clean-silent
-	@echo "\n(test-installed) passes\n"
+	@echo "\n(test-installed) completed\n"
 
 test-versions:
 	# Run the in-place stub under all python versions in the path
 	@make clean-silent
 	./test_versions
 	@make clean-silent
-	@echo "\n(test-versions) passes\n"
+	@echo "\n(test-versions) completed\n"
 
 sanity-checks:
 	@if ! ./g -r green | grep TOTAL | grep "0   100%" ; then echo 'Coverage needs to be at 100% for a release!' && exit 1; fi
@@ -58,7 +58,7 @@ sanity-checks:
 	@printf "\nIs everything committed?  (Ctrl-C if not!) "
 	@read
 
-release-test: test sanity-checks
+release-test: test-local sanity-checks
 	@echo "\n== CHECKING PyPi-Test =="
 	python3 setup.py sdist upload -r pypi-test
 	if [ "`git diff MANIFEST`" != "" ] ; then git add MANIFEST && git commit -m "Added the updated MANIFEST file." ; fi
