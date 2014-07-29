@@ -29,16 +29,16 @@ except: # pragma: no cover
     coverage_version = "Coverage Not Installed"
 
 import copy       # pragma: no cover
-import logging
+import logging    # pragma: no cover
 import os         # pragma: no cover
-import sys
-import tempfile
+import sys        # pragma: no cover
+import tempfile   # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.
 files_loaded = [] # pragma: no cover
 
 # Set the defaults in a re-usable way
-default_args = argparse.Namespace(
+default_args = argparse.Namespace( # pragma: no cover
         targets         = ['.'], # Not in configs
         subprocesses    = 1,
         html            = False,
@@ -79,7 +79,7 @@ class StoreOpt(): # pragma: no cover
 
 
 
-def parseArguments():
+def parseArguments(): # pragma: no cover
     """
     I parse arguments in sys.argv and return the args object.  The parser
     itself is available as args.parser.
