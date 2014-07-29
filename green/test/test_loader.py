@@ -103,6 +103,36 @@ class A(unittest.TestCase):
         shutil.rmtree(tmpdir)
 
 
+    def test_completionDot(self):
+        "A '.' target generates completions for the whole directory"
+        cwd = os.getcwd()
+        tmpdir = tempfile.mkdtemp()
+        os.chdir(tmpdir)
+        os.mkdir('my_pkg')
+        fh = open(os.path.join('my_pkg', '__init__.py'), 'w')
+        fh.write('')
+        fh.close()
+        fh = open(os.path.join('my_pkg', 'test_things.py'), 'w')
+        fh.write(
+"""
+import unittest
+
+class A(unittest.TestCase):
+    def testOne(self):
+        pass
+    def testTwo(self):
+        pass
+""")
+        fh.close()
+        c = set(loader.getCompletions('.').split('\n'))
+        self.assertIn('my_pkg', c)
+        self.assertIn('my_pkg.test_things', c)
+        self.assertIn('my_pkg.test_things.A.testOne', c)
+        self.assertIn('my_pkg.test_things.A.testTwo', c)
+        os.chdir(cwd)
+        shutil.rmtree(tmpdir)
+
+
 
 class TestIsPackage(unittest.TestCase):
 
