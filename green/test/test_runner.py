@@ -14,6 +14,8 @@ try:
 except:
     from StringIO import StringIO
 
+
+
 class TestGreenTestRunner(unittest.TestCase):
 
 
@@ -26,13 +28,17 @@ class TestGreenTestRunner(unittest.TestCase):
 
 
     def test_instantiate(self):
-        "GreenTestRunner can be instantiated and creates a default stream."
+        """
+        GreenTestRunner can be instantiated and creates a default stream.
+        """
         gtr = GreenTestRunner(self.stream)
         self.assertTrue(type(gtr.stream), GreenStream)
 
 
     def test_HTML(self):
-        "html=True causes html output"
+        """
+        html=True causes html output
+        """
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -42,7 +48,9 @@ class TestGreenTestRunner(unittest.TestCase):
 
 
     def test_verbose3(self):
-        "verbose=3 causes version output, and an empty test case passes."
+        """
+        verbose=3 causes version output, and an empty test case passes.
+        """
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -53,7 +61,9 @@ class TestGreenTestRunner(unittest.TestCase):
 
 
     def test_warnings(self):
-        "setting warnings='always' doesn't crash"
+        """
+        setting warnings='always' doesn't crash
+        """
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -62,14 +72,18 @@ class TestGreenTestRunner(unittest.TestCase):
 
 
     def test_noTestsFound(self):
-        "When we don't find any tests, we say so."
+        """
+        When we don't find any tests, we say so.
+        """
         gtr = GreenTestRunner(self.stream, subprocesses=1)
         gtr.run(unittest.TestSuite())
         self.assertTrue('No Tests Found' in self.stream.getvalue())
 
 
     def test_failedSaysSo(self):
-        "A failing test case causes the whole run to report 'FAILED'"
+        """
+        A failing test case causes the whole run to report 'FAILED'
+        """
         class FailCase(unittest.TestCase):
             def runTest(self):
                 self.assertTrue(False)
@@ -116,7 +130,10 @@ class TestSubprocesses(unittest.TestCase):
 
 
     def test_collisionProtection(self):
-        "If tempfile.gettempdir() is used for dir, using same testfile name will not collide"
+        """
+        If tempfile.gettempdir() is used for dir, using same testfile name will
+        not collide.
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # Child setup
         # pkg/__init__.py
@@ -166,7 +183,9 @@ class A(unittest.TestCase):
 
 
     def test_runCoverage(self):
-        "Running coverage in subprocess mode doesn't crash"
+        """
+        Running coverage in subprocess mode doesn't crash
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
@@ -189,7 +208,9 @@ class A(unittest.TestCase):
 
 
     def test_badTest(self):
-        "Bad syntax in a testfile is caught as a test error."
+        """
+        Bad syntax in a testfile is caught as a test error.
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
@@ -208,7 +229,9 @@ class A(unittest.TestCase):
 
 
     def test_empty(self):
-        "GreenTestRunner.run() does not crash with empty suite and subprocesses"
+        """
+        GreenTestRunner.run() does not crash with empty suite and subprocesses
+        """
         suite = unittest.TestSuite()
         gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
         gtr.run(suite)
