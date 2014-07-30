@@ -2,7 +2,13 @@ Version ? - ?
 
 User Stuff
 
-- Django...
+- Django integration!  There are two ways to use green while running Django
+unit tests:
+1) To just try it out, use the --testrunner option:
+    ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+2) Make it persistent by adding the following line to your settings.py:
+    TEST_RUNNER=green.djangorunner.DjangoRunner
+(Use green config files to customize the output)
 - Switched from using stderr to stdout.  This makes piping output to another
 program much easier, and reserves stderr for actual errors running green
 itself.

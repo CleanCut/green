@@ -136,6 +136,17 @@ Advanced Usage
 For a list of all command-line and config-file options, please run `green --help`
 
 
+Integration
+-----------
+
+### Django
+
+- To just try it out, use the --testrunner option of `manage.py`:
+    ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+- Make it persistent by adding the following line to your `settings.py`:
+    TEST_RUNNER=green.djangorunner.DjangoRunner
+
+
 Unit Test Structure Tutorial
 ----------------------------
 

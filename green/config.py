@@ -376,6 +376,9 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             '*/termstyle*',
             '*/colorama*',
             '*/mock*',
+            '*/django/*',
+            '*/pytz*',          # pulled in by django
+            '*/pkg_resources*', # pulled in by django
             tempfile.gettempdir() + '*']
         if 'green' not in new_args.targets and (
                 False in [t.startswith('green.') for t in new_args.targets]):

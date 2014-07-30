@@ -1,3 +1,14 @@
+from __future__ import unicode_literals
+"""
+To try running Django tests using green you can run:
+
+    ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+
+To make the change permanent for your project, in settings.py add:
+
+    TEST_RUNNER=green.djangorunner.DjangoRunner
+"""
+
 import os
 import sys
 
@@ -48,15 +59,21 @@ STATIC_URL = '/static/'
 # End of django fake config stuff
 
 
-DjangoRunner = None
+def django_missing():
+    raise ImportError("No django module installed")
+
 
 try:
     import django
-    if django.VERSION[:2] < (1, 6):
+    if django.VERSION[:2] < (1, 6): # pragma: no cover
         raise ImportError("Green integration supports Django 1.6+")
     from django.test.runner import DiscoverRunner
 
+
+
     class DjangoRunner(DiscoverRunner):
+
+
         def run_tests(self, test_labels, extra_tests=None, **kwargs):
             """
             Run the unit tests for all the test labels in the provided list.
@@ -71,26 +88,31 @@ try:
             """
             # Django setup
             self.setup_test_environment()
+            django_db = self.setup_databases()
 
             # Green
-            if test_labels:
+            if type(test_labels) == tuple:
                 test_labels = list(test_labels)
             else:
+                raise ValueError("test_labels should be a tuple of strings")
+            if not test_labels:
                 test_labels = ['.']
-            suite = loadTargets(test_labels)
-            old_config = self.setup_databases()
 
             args = mergeConfig(default_args, default_args)
+            args.targets = test_labels
             stream = GreenStream(sys.stdout, html = args.html)
             runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
                 termcolor=args.termcolor, subprocesses=args.subprocesses,
                 run_coverage=args.run_coverage, omit=args.omit)
+            suite = loadTargets(args.targets)
             result = runner.run(suite)
 
             # Django teardown
-            self.teardown_databases(old_config)
+            self.teardown_databases(django_db)
             self.teardown_test_environment()
             return self.suite_result(suite, result)
 
-except ImportError:
-    pass
+
+
+except ImportError: # pragma: no cover
+    DjangoRunner = django_missing
