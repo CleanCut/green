@@ -18,6 +18,18 @@ except:
 
 
 
+class MyProtoTest(ProtoTest):
+    """
+    For quickly making a ProtoTest
+    """
+    def __init__(self):
+        self.module      = "my_module"
+        self.class_name  = "MyClass"
+        self.method_name = "myMethod"
+        self.docstr_part = "My docstring"
+
+
+
 class TestProtoTestResult(unittest.TestCase):
 
 
@@ -215,9 +227,9 @@ class TestGreenTestResult(unittest.TestCase):
         #   FakeCase
         #     test_it
         self.assertEqual(len(output_lines), 3)
-        self.assertFalse(' ' in output_lines[0])
-        self.assertTrue('  ' in output_lines[1])
-        self.assertTrue('    ' in output_lines[2])
+        self.assertNotIn(' ', output_lines[0])
+        self.assertIn('  ', output_lines[1])
+        self.assertIn('    ', output_lines[2])
 
 
     def test_reportOutcome(self):
@@ -226,7 +238,7 @@ class TestGreenTestResult(unittest.TestCase):
         """
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         gtr._reportOutcome(None, '.', lambda x: x)
-        self.assertTrue('.' in self.stream.getvalue())
+        self.assertIn('.', self.stream.getvalue())
 
 
     def test_reportOutcomeVerbose(self):
@@ -238,7 +250,7 @@ class TestGreenTestResult(unittest.TestCase):
         t = MagicMock()
         t.__str__.return_value = 'junk'
         gtr._reportOutcome(t, '.', lambda x: x, None, r)
-        self.assertTrue(r in self.stream.getvalue())
+        self.assertIn(r, self.stream.getvalue())
 
 
     def test_reportOutcomeVerboseHTML(self):
@@ -270,14 +282,14 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), None, 1)
-        test = MagicMock()
-        gtr.addError(test, proto_error(err))
+        gtr = GreenTestResult(GreenStream(self.stream), None, 1, False, False)
+        gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
-        self.assertTrue('\n\n' in self.stream.getvalue())
-        self.assertTrue('test_printErrorsDots' in self.stream.getvalue())
-        self.assertTrue('raise Exception' in self.stream.getvalue())
-        self.assertTrue('Error' in self.stream.getvalue())
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
+        self.assertIn('test_printErrorsDots', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
 
 
     def test_printErrorsVerbose2(self):
@@ -288,15 +300,32 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), None, 2)
-        gtr.test_output_line = "   some test output"
-        test = MagicMock()
-        gtr.addError(test, proto_error(err))
+        gtr = GreenTestResult(GreenStream(self.stream), None, 2, False, False)
+        gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
-        self.assertTrue('\n\n' in self.stream.getvalue())
-        self.assertTrue('test_printErrorsVerbose2' in self.stream.getvalue())
-        self.assertTrue('raise Exception' in self.stream.getvalue())
-        self.assertTrue('Error' in self.stream.getvalue())
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
+        self.assertIn('test_printErrorsVerbose2', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
+
+
+    def test_printErrorsVerbose3(self):
+        """
+        printErrors() looks correct in verbose=3 mode
+        """
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(GreenStream(self.stream), None, 3, False, False)
+        gtr.addError(MyProtoTest(), proto_error(err))
+        gtr.printErrors()
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
+        self.assertIn('test_printErrorsVerbose3', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
 
 
     def test_printErrorsVerbose4(self):
@@ -307,16 +336,15 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), None, 4)
-        gtr.test_output_line = "   some test output"
-        test = MagicMock()
-        gtr.addError(test, err)
+        gtr = GreenTestResult(GreenStream(self.stream), None, 4, False, False)
+        gtr.addError(MyProtoTest(), err)
         gtr.printErrors()
-        self.assertTrue('\n\n' in self.stream.getvalue())
-        self.assertTrue('(most recent call last)' in self.stream.getvalue())
-        self.assertTrue('test_printErrorsVerbose4' in self.stream.getvalue())
-        self.assertTrue('raise Exception' in self.stream.getvalue())
-        self.assertTrue('Error' in self.stream.getvalue())
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('(most recent call last)', self.stream.getvalue())
+        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
+        self.assertIn('test_printErrorsVerbose4', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
 
 
     def test_printErrorsZHTML(self):
@@ -329,17 +357,16 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         gtr = GreenTestResult(GreenStream(self.stream), None, 4)
         gtr.colors.html = True
-        gtr.test_output_line = "   some test output"
         test = MagicMock()
         gtr.addError(test, proto_error(err))
         gtr.printErrors()
-        self.assertTrue('\n\n' in self.stream.getvalue())
-        self.assertTrue('(most recent call last)' in self.stream.getvalue())
-        self.assertTrue('test_printErrorsZHTML' in self.stream.getvalue())
-        self.assertTrue('raise Exception' in self.stream.getvalue())
-        self.assertTrue('Error' in self.stream.getvalue())
-        self.assertTrue('<span' in self.stream.getvalue())
-        self.assertTrue('color: rgb(' in self.stream.getvalue())
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('(most recent call last)', self.stream.getvalue())
+        self.assertIn('test_printErrorsZHTML', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn('<span', self.stream.getvalue())
+        self.assertIn('color: rgb(', self.stream.getvalue())
 
 
     def test_addProtoTestResult(self):

@@ -372,8 +372,7 @@ class GreenTestResult():
             # Header Line
             self.stream.writeln(
                     '\n' + color_func(outcome) +
-                    ' in ' + self.colors.bold(test.method_name) +
-                    ' from ' + test.module)
+                    ' in ' + self.colors.bold(test.dotted_name))
 
             # Frame Line
             relevant_frames = []
