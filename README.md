@@ -38,7 +38,6 @@ Features
   [coverage](http://nedbatchelder.com/code/coverage/).
 - **Modern** - Supports Python 2.7, 3.3, 3.4, and [PyPy](http://pypy.org)
 - **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
-- **Flexible** - Optional HTML output.
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG)
 
@@ -332,7 +331,7 @@ shines when you start getting more verbose:
 
 **In a real terminal, this output is syntax highlighted**
 
-    $ green -v proj
+    $ green -vv proj
     test.test_foo
       TestAnswer
     .   answer() returns 42

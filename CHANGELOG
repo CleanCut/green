@@ -1,3 +1,11 @@
+Version 1.4.1 - 30 July 2014
+
+- We now use the fully-dotted test name at the start of each traceback in the
+error listing.  Issue #28.
+- PyPy libraries are now omitted from coverage by default.
+- More cleanup on internal tests.
+
+
 Version 1.4.0 - 30 July 2014
 
 User Stuff
