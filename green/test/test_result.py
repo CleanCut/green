@@ -22,7 +22,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addSuccess(self):
-        "addSuccess adds a test correctly"
+        """
+        addSuccess adds a test correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         ptr.addSuccess(test)
@@ -30,7 +32,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addError(self):
-        "addError adds a test and error correctly"
+        """
+        addError adds a test and error correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -43,7 +47,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addFailure(self):
-        "addFailure adds a test and error correctly"
+        """
+        addFailure adds a test and error correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -56,7 +62,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addSkip(self):
-        "addSkip adds a test and reason correctly"
+        """
+        addSkip adds a test and reason correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         reason = "some plausible reason"
@@ -66,7 +74,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addExpectedFailure(self):
-        "addExpectedFailure adds a test and error correctly"
+        """
+        addExpectedFailure adds a test and error correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         try:
@@ -79,7 +89,9 @@ class TestProtoTestResult(unittest.TestCase):
 
 
     def test_addUnexpectedSuccess(self):
-        "addUnexpectedSuccess adds a test correctly"
+        """
+        addUnexpectedSuccess adds a test correctly
+        """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
         ptr.addUnexpectedSuccess(test)
@@ -91,14 +103,18 @@ class TestProtoTest(unittest.TestCase):
 
 
     def test_ProtoTestBlank(self):
-        "ProtoTest can be instantiated empty"
+        """
+        ProtoTest can be instantiated empty
+        """
         pt = ProtoTest()
         for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual('', getattr(pt, i, None))
 
 
     def test_ProtoTestFromTest(self):
-        "Passing a test into ProtoTest copies out the relevant info."
+        """
+        Passing a test into ProtoTest copies out the relevant info.
+        """
         module      = 'green.test.test_result'
         class_name  = 'Small'
         docstr_part = 'stuff'
@@ -114,7 +130,9 @@ class TestProtoTest(unittest.TestCase):
 
 
     def test_getDescription(self):
-        "getDescription() returns what we expect for all verbosity levels"
+        """
+        getDescription() returns what we expect for all verbosity levels
+        """
         # With a docstring
         class Fruit(unittest.TestCase):
             def test_stuff(self):
@@ -138,7 +156,9 @@ class TestProtoTest(unittest.TestCase):
 
 
     def test_newlineDocstring(self):
-        "Docstrings starting with a newline are properly handled."
+        """
+        Docstrings starting with a newline are properly handled.
+        """
         class MyTests(unittest.TestCase):
             def test_stuff(self):
                 """
@@ -150,7 +170,9 @@ class TestProtoTest(unittest.TestCase):
 
 
     def test_multilineDocstring(self):
-        "The description includes all of docstring until the first blank line."
+        """
+        The description includes all of docstring until the first blank line.
+        """
         class LongDocs(unittest.TestCase):
             def test_long(self):
                 """First line is
@@ -177,7 +199,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_startTestVerbose(self):
-        "startTest() contains output we expect in verbose mode"
+        """
+        startTest() contains output we expect in verbose mode
+        """
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -197,14 +221,18 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_reportOutcome(self):
-        "_reportOutcome contains output we expect"
+        """
+        _reportOutcome contains output we expect
+        """
         gtr = GreenTestResult(GreenStream(self.stream), None, 1)
         gtr._reportOutcome(None, '.', lambda x: x)
         self.assertTrue('.' in self.stream.getvalue())
 
 
     def test_reportOutcomeVerbose(self):
-        "_reportOutcome contains output we expect in verbose mode"
+        """
+        _reportOutcome contains output we expect in verbose mode
+        """
         gtr = GreenTestResult(GreenStream(self.stream), None, 2)
         r = 'a fake reason'
         t = MagicMock()
@@ -214,7 +242,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_reportOutcomeVerboseHTML(self):
-        "html=True causes _reportOutcome() to escape HTML in docstrings"
+        """
+        html=True causes _reportOutcome() to escape HTML in docstrings
+        """
         gtr = GreenTestResult(GreenStream(self.stream), None, 3)
         gtr.colors.html = True
         r = 'a fake reason'
@@ -233,7 +263,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_printErrorsDots(self):
-        "printErrors() looks correct in verbose=1 (dots) mode"
+        """
+        printErrors() looks correct in verbose=1 (dots) mode
+        """
         try:
             raise Exception
         except:
@@ -249,7 +281,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_printErrorsVerbose2(self):
-        "printErrors() looks correct in verbose=2 mode"
+        """
+        printErrors() looks correct in verbose=2 mode
+        """
         try:
             raise Exception
         except:
@@ -266,7 +300,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_printErrorsVerbose4(self):
-        "printErrors() looks correct in verbose=4 mode"
+        """
+        printErrors() looks correct in verbose=4 mode
+        """
         try:
             raise Exception
         except:
@@ -284,7 +320,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_printErrorsZHTML(self):
-        "printErrors() looks correct in html mode"
+        """
+        printErrors() looks correct in html mode
+        """
         try:
             raise Exception
         except:
@@ -305,7 +343,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def test_addProtoTestResult(self):
-        "addProtoTestResult adds the correct things to the correct places"
+        """
+        addProtoTestResult adds the correct things to the correct places
+        """
         ptr = ProtoTestResult()
 
         err_t = proto_test(MagicMock())
@@ -366,7 +406,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addSuccess(self):
-        "addSuccess() makes the correct calls to other functions."
+        """
+        addSuccess() makes the correct calls to other functions.
+        """
         test = MagicMock()
         test.shortDescription.return_value = 'a'
         test.__str__.return_value = 'b'
@@ -377,7 +419,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addError(self):
-        "addError() makes the correct calls to other functions."
+        """
+        addError() makes the correct calls to other functions.
+        """
         try:
             raise Exception
         except:
@@ -390,7 +434,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addFailure(self):
-        "addFailure() makes the correct calls to other functions."
+        """
+        addFailure() makes the correct calls to other functions.
+        """
         err = None
         try:
             raise Exception
@@ -404,7 +450,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addSkip(self):
-        "addSkip() makes the correct calls to other functions."
+        """
+        addSkip() makes the correct calls to other functions.
+        """
         test = proto_test(MagicMock())
         reason = 'skip reason'
         self.gtr.addSkip(test, reason)
@@ -413,7 +461,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addExpectedFailure(self):
-        "addExpectedFailure() makes the correct calls to other functions."
+        """
+        addExpectedFailure() makes the correct calls to other functions.
+        """
         try:
             raise Exception
         except:
@@ -426,7 +476,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_addUnexpectedSuccess(self):
-        "addUnexpectedSuccess() makes the correct calls to other functions."
+        """
+        addUnexpectedSuccess() makes the correct calls to other functions.
+        """
         test = proto_test(MagicMock())
         self.gtr.addUnexpectedSuccess(test)
         self.gtr._reportOutcome.assert_called_with(

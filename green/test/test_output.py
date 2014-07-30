@@ -16,7 +16,9 @@ class TestDebug(unittest.TestCase):
 
 
     def testDebug(self):
-        "debug() works as we expect"
+        """
+        debug() works as we expect
+        """
         orig_logging = green.output.logging.debug
         s = StringIO()
         green.output.logging.debug = s.write
@@ -36,32 +38,42 @@ class TestColors(unittest.TestCase):
 
 
     def testTermcolorTrue(self):
-        "termcolor=True results in terminal output"
+        """
+        termcolor=True results in terminal output
+        """
         c = Colors(termcolor=True)
         self.assertTrue(c.termcolor)
         self.assertTrue(len(c.bold("")) > 0)
 
 
     def testTermcolorFalse(self):
-        "termcolor=False results in no terminal output"
+        """
+        termcolor=False results in no terminal output
+        """
         c = Colors(termcolor=False)
         self.assertFalse(c.termcolor)
         self.assertFalse(len(c.bold("")) > 0)
 
 
     def testTermcolorAuto(self):
-        "termcolor=None causes termcolor autodetected and set to True or False"
+        """
+        termcolor=None causes termcolor autodetected and set to True or False
+        """
         c = Colors()
         self.assertTrue(c.termcolor in [True, False])
 
 
     def testEnableHTML(self):
-        "html=True causes HTML output"
+        """
+        html=True causes HTML output
+        """
         c = Colors(html=True)
         self.assertEqual(c.bold(''),  '<span style="color: rgb(255,255,255);"></span>')
 
     def testTermstyleColorsDoNotCrash(self):
-        "termstyle-based colors don't crash and output something"
+        """
+        termstyle-based colors don't crash and output something
+        """
         c = Colors(termcolor=True)
         for func in [c.bold, c.blue, c.green, c.red, c.yellow, c.passing,
                 c.failing, c.error, c.skipped, c.unexpectedSuccess,
@@ -72,7 +84,9 @@ class TestColors(unittest.TestCase):
 
 
     def testHTMLColorsDoNotCrash(self):
-        "termstyle-based colors don't crash and output something"
+        """
+        termstyle-based colors don't crash and output something
+        """
         c = Colors(html=True)
         for func in [c.bold, c.blue, c.green, c.red, c.yellow, c.passing,
                 c.failing, c.error, c.skipped, c.unexpectedSuccess,
@@ -88,7 +102,9 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testHTMLWriteNewlines(self):
-        "html=True causes write() to transate newlines into '<br>\\n'"
+        """
+        html=True causes write() to transate newlines into '<br>\\n'
+        """
         s = StringIO()
         gs = GreenStream(s, html=True)
         gs.write(u'\n')
@@ -96,7 +112,9 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testFormatText(self):
-        "formatText returns the input text by default"
+        """
+        formatText returns the input text by default
+        """
         s = StringIO()
         gs = GreenStream(s)
         msg = u"Unindented line.\n  Indented.\n    Double-indented.\n\n\n"
@@ -104,7 +122,9 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testHTMLFormatLine(self):
-        "html=True causes formatLine() to add HTML '&nbsp;' instead of spaces"
+        """
+        html=True causes formatLine() to add HTML '&nbsp;' instead of spaces
+        """
         s = StringIO()
         gs = GreenStream(s, html=True)
         msg = u"  Indented"
@@ -112,7 +132,9 @@ class TestGreenStream(unittest.TestCase):
 
 
     def testBadStringType(self):
-        "passing the wrong stream type to GreenStream gets auto-converted"
+        """
+        passing the wrong stream type to GreenStream gets auto-converted
+        """
         s = StringIO()
         gs = GreenStream(s)
         msg = "some string"
