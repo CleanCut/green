@@ -1,9 +1,9 @@
-Version ? - ?
+Version 1.4.0 - 30 July 2014
 
 User Stuff
 
-- Django integration!  There are two ways to use green while running Django
-unit tests:
+- Django integration!  Issue #21.  There are two ways to use green while
+running Django unit tests:
 1) To just try it out, use the --testrunner option:
     ./manage.py test --testrunner=green.djangorunner.DjangoRunner
 2) Make it persistent by adding the following line to your settings.py:
