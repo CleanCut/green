@@ -17,8 +17,9 @@ Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
 4. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
 5. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
 6. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
-7. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
-8. [Origin Story](https://github.com/CleanCut/green#origin-story)
+7. [Integration](https://github.com/CleanCut/green#integration)
+8. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
+9. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
 
 Features
@@ -142,9 +143,13 @@ Integration
 ### Django
 
 - To just try it out, use the --testrunner option of `manage.py`:
-    ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+```bash
+$ ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+```
 - Make it persistent by adding the following line to your `settings.py`:
-    TEST_RUNNER=green.djangorunner.DjangoRunner
+```python
+TEST_RUNNER=green.djangorunner.DjangoRunner
+```
 
 
 Unit Test Structure Tutorial
