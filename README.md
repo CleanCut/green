@@ -143,12 +143,12 @@ Integration
 ### Django
 
 - To just try it out, use the --testrunner option of `manage.py`:
-```bash
-$ ./manage.py test --testrunner=green.djangorunner.DjangoRunner
+```
+./manage.py test --testrunner=green.djangorunner.DjangoRunner
 ```
 - Make it persistent by adding the following line to your `settings.py`:
 ```python
-TEST_RUNNER=green.djangorunner.DjangoRunner
+TEST_RUNNER="green.djangorunner.DjangoRunner"
 ```
 
 
