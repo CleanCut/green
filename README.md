@@ -18,6 +18,8 @@ Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
 5. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
 6. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
 7. [Integration](https://github.com/CleanCut/green#integration)
+  - [Bash and Zsh](https://github.com/CleanCut/green#bash-and-zsh)
+  - [Django](https://github.com/CleanCut/green#django)
 8. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
 9. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
@@ -68,17 +70,6 @@ green test_stuff.py
 # Assuming you want to run TestClass.test_function inside
 # package/test/test_module.py ...
 green package.test.test_module.TestClass.test_function
-```
-
-Bash-Completion / ZSH-Completion
---------------------------------
-
-To enable completion of options and test targets when you press `Tab` in your
-terminal, add the following line to the Bash or ZSH config file of your choice
-(usually `~/.bashrc` or `~/.zshrc`)
-
-```bash
-which green > /dev/null && source "$( green --completion-file )"
 ```
 
 Basic Troubleshooting
@@ -140,7 +131,20 @@ For a list of all command-line and config-file options, please run `green --help
 Integration
 -----------
 
+### Bash and Zsh
+
+To enable bash-completion and zsh-completion of options and test targets when
+you press `Tab` in your terminal, add the following line to the Bash or ZSH
+config file of your choice (usually `~/.bashrc` or `~/.zshrc`)
+
+```bash
+which green > /dev/null && source "$( green --completion-file )"
+```
+
+
 ### Django
+
+Django can use green as the test runner for running tests.
 
 - To just try it out, use the --testrunner option of `manage.py`:
 ```
