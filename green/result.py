@@ -47,7 +47,7 @@ class ProtoTest():
             # into one string until the first completely blank line in the
             # docstring
             doc_segments = []
-            if test._testMethodDoc:
+            if getattr(test, "_testMethodDoc", None):
                 for line in test._testMethodDoc.lstrip().split('\n'):
                     line = line.strip()
                     if not line:
