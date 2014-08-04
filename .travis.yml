@@ -1,4 +1,7 @@
-language: python
+os:
+  - "linux"
+  - "os x"
+language: "python"
 python:
   - "2.7"
   - "3.3"
@@ -11,4 +14,4 @@ install:
   - "pip install django"
 script:
   - "make test"
-after_success: coveralls
+after_success: "coveralls"
