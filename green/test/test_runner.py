@@ -120,12 +120,7 @@ class TestSubprocesses(unittest.TestCase):
         os.chdir(self.startdir)
         # On windows, the subprocesses block access to the files while
         # they take a bit to clean themselves up.
-        for i in range(20):
-            try:
-                shutil.rmtree(self.tmpdir)
-                break
-            except PermissionError:
-                time.sleep(.01)
+        shutil.rmtree(self.tmpdir)
         del(self.stream)
 
 

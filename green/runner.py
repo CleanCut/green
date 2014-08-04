@@ -83,6 +83,8 @@ class GreenTestRunner():
                         # This blocks until the worker who is processing this
                         # particular test actually finishes
                         result.addProtoTestResult(async_response.get())
+                pool.terminate()
+                pool.join()
 
             result.stopTestRun()
 
