@@ -16,3 +16,4 @@ test_script:
       - "%PYTHON%/Scripts/green.exe -vvv green"
 platform:
     - AnyCPU
+version: {build}
