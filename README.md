@@ -137,7 +137,7 @@ you press `Tab` in your terminal, add the following line to the Bash or ZSH
 config file of your choice (usually `~/.bashrc` or `~/.zshrc`)
 
 ```bash
-which green > /dev/null && source "$( green --completion-file )"
+which green >& /dev/null && source "$( green --completion-file )"
 ```
 
 

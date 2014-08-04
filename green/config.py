@@ -102,7 +102,7 @@ ENABLING SHELL COMPLETION
   To enable bash- or zsh-completion, add the line below to the end of your
   .bashrc or .zshrc file (or equivalent config file):
 
-    which green > /dev/null && source "$( green --completion-file )"
+    which green >& /dev/null && source "$( green --completion-file )"
 
   Warning!  Generating a completion list actually discovers and loads tests
   -- this can be very slow if you run it in huge directories!
