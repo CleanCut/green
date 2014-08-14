@@ -149,8 +149,8 @@ Integration
 
 ### Bash and Zsh
 
-To enable bash-completion and zsh-completion of options and test targets when
-you press `Tab` in your terminal, add the following line to the Bash or ZSH
+To enable Bash-completion and Zsh-completion of options and test targets when
+you press `Tab` in your terminal, add the following line to the Bash or Zsh
 config file of your choice (usually `~/.bashrc` or `~/.zshrc`)
 
 ```bash
