@@ -90,6 +90,7 @@ def parseArguments(): # pragma: no cover
     """
     store_opt = StoreOpt()
     parser = argparse.ArgumentParser(
+            prog='green',
             add_help=False,
             description=
 """
@@ -129,15 +130,16 @@ CONFIG FILES
             formatter_class=argparse.RawDescriptionHelpFormatter)
     target_args = parser.add_argument_group("Target Specification")
     target_args.add_argument('targets', action='store', nargs='*',
-        help=("""Targets to test.  If blank, then discover all testcases in the
-        current directory tree.  Can be a directory (or package), file (or
-        module), or fully-qualified 'dotted name' like
-        proj.tests.test_things.TestStuff.  If a directory (or package)
-        is specified, then we will attempt to discover all tests under the
-        directory (even if the directory is a package and the tests would not
-        be accessible through the package's scope).  In all other cases,
-        only tests accessible from introspection of the object will be
-        loaded."""))
+        metavar='target',
+        help=("""Targets to test.  Any number of targets may be specified.  If
+        blank, then discover all testcases in the current directory tree.  Can
+        be a directory (or package), file (or module), or fully-qualified
+        'dotted name' like proj.tests.test_things.TestStuff.  If a directory
+        (or package) is specified, then we will attempt to discover all tests
+        under the directory (even if the directory is a package and the tests
+        would not be accessible through the package's scope).  In all other
+        cases, only tests accessible from introspection of the object will
+        be loaded."""))
     concurrency_args = parser.add_argument_group("Concurrency Options")
     store_opt(
         concurrency_args.add_argument('-s', '--subprocesses', action='store',
