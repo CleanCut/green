@@ -1,5 +1,8 @@
-Version ? - ?
+Version 1.4.2 - 14 August 2014
 
+- Automated generation of the CLI documentation.
+- Improved the suggest command for Bash-/Zsh-completion integration.
+- Improved the README file.
 - Fixed a crash that could occur if an exception was raised during a test
 case's setUpClass() or tearDownClass()
 - We now explicitly terminate the thread pool and join() it.  This makes
