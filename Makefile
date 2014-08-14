@@ -53,6 +53,7 @@ sanity-checks:
 	@if ! ./g -r green | grep TOTAL | grep "0   100%" ; then echo 'Coverage needs to be at 100% for a release!' && exit 1; fi
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
 	@if [[ $(shell git rev-parse --abbrev-ref HEAD) != "master" ]] ; then echo "\nYou need to be on the master branch to release.\n" && exit 1 ; fi
+	@./g -h > help.txt
 	@printf "\n== SANITY CHECK: GIT STATUS ==\n"
 	@git status
 	@printf "\nIs everything committed?  (Ctrl-C if not!) "
