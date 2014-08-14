@@ -1,0 +1,97 @@
+usage: green [-s NUM] [-m] [-t] [-T] [-d] [-h] [-l] [-V] [-v] [-c FILE] [-r]
+             [-o PATTERN] [--completion-file] [--completions] [--options]
+             [target [target ...]]
+
+Green is a clean, colorful test runner for Python unit tests.
+
+Target Specification:
+  target                Targets to test. Any number of targets may be
+                        specified. If blank, then discover all testcases in
+                        the current directory tree. Can be a directory (or
+                        package), file (or module), or fully-qualified 'dotted
+                        name' like proj.tests.test_things.TestStuff. If a
+                        directory (or package) is specified, then we will
+                        attempt to discover all tests under the directory
+                        (even if the directory is a package and the tests
+                        would not be accessible through the package's scope).
+                        In all other cases, only tests accessible from
+                        introspection of the object will be loaded.
+
+Concurrency Options:
+  -s NUM, --subprocesses NUM
+                        Number of subprocesses to use to run tests. Note that
+                        your tests need to be written to avoid using the same
+                        resources (temp files, sockets, ports, etc.) for the
+                        multi-process mode to work well. Default is 1, meaning
+                        try to autodetect the number of CPUs in the system. 1
+                        will disable using subprocesses. Note that for trivial
+                        tests (tests that take < 1ms), running everything in a
+                        single process may be faster.
+
+Format Options:
+  -m, --html            HTML5 format. Overrides terminal color options if
+                        specified.
+  -t, --termcolor       Force terminal colors on. Default is to autodetect.
+  -T, --notermcolor     Force terminal colors off. Default is to autodetect.
+
+Output Options:
+  -d, --debug           Enable internal debugging statements. Implies
+                        --logging. Can be specified up to three times for more
+                        debug output.
+  -h, --help            Show this help message and exit.
+  -l, --logging         Don't configure the root logger to redirect to
+                        /dev/null, enabling internal debugging output
+  -V, --version         Print the version of Green and Python and exit.
+  -v, --verbose         Verbose. Can be specified up to three times for more
+                        verbosity. Recommended levels are -v and -vv.
+
+Other Options:
+  -c FILE, --config FILE
+                        Use this config file instead of the one pointed to by
+                        environment variable GREEN_CONFIG or the default
+                        ~/.green
+
+Coverage Options (Coverage 3.7.1):
+  -r, --run-coverage    Produce coverage output.
+  -o PATTERN, --omit PATTERN
+                        Comma-separated file-patterns to omit from coverage.
+                        Default is something like
+                        '*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python
+                        system packages)*'
+
+Integration Options:
+  --completion-file     Location of the bash- and zsh-completion file. To
+                        enable bash- or zsh-completion, see ENABLING SHELL
+                        COMPLETION below.
+  --completions         Output possible completions of the given target. Used
+                        by bash- and zsh-completion.
+  --options             Output all options. Used by bash- and zsh-completion.
+
+ENABLING SHELL COMPLETION
+
+  To enable bash- or zsh-completion, add the line below to the end of your
+  .bashrc or .zshrc file (or equivalent config file):
+
+    which green >& /dev/null && source "$( green --completion-file )"
+
+  Warning!  Generating a completion list actually discovers and loads tests
+  -- this can be very slow if you run it in huge directories!
+
+CONFIG FILES
+
+  Green will look for and process three config files if found:
+  1) $HOME/.green
+  2) $GREEN_CONFIG
+  3) A file specified with "--config FILE"
+
+  Config file format is simply "option = value" on separate lines.  "option" is
+  the same as the long options above, just without the "--".
+
+  Most values should be "True" or "False".  Accumulated values (verbose, debug)
+  should be specified as integers ("-vv" would be "verbose = 2").
+
+  Example:
+
+    verbose = 2
+    logging = True
+    omit    = myproj*,*prototype*
