@@ -13,6 +13,7 @@ Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
 #### Table of Contents
 
 1. [Features](https://github.com/CleanCut/green#features)
+2. [Getting Help](https://github.com/CleanCut/green#getting-help)
 2. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
 3. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
 4. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
@@ -41,6 +42,19 @@ Features
 - **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG)
+
+
+Getting Help
+------------
+
+Please post your questions about Green to [Stack
+Overflow](http://stackoverflow.com/questions/ask?tags=green).  That gives a
+large audience a chance to participate, and also make it much more likely that
+the question will show up in search engines.
+
+For feature requests or bug reports, please [submit an
+issue](https://github.com/CleanCut/green/issues/new) to the GitHub issue
+tracker for Green.
 
 
 Basic Usage
