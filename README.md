@@ -141,7 +141,9 @@ To run Green's own internal unit tests:
 Advanced Usage
 --------------
 
-For a list of all command-line and config-file options, please run `green --help`
+See the [complete command-line
+options](https://github.com/CleanCut/silk/blob/master/cli-option.txt) or run
+`green --help`.
 
 
 Integration
@@ -352,7 +354,7 @@ shines when you start getting more verbose:
 **In a real terminal, this output is syntax highlighted**
 
     $ green -vv proj
-    test.test_foo
+    proj.test.test_foo
       TestAnswer
     .   answer() returns 42
     .   answer() returns an integer
@@ -368,9 +370,11 @@ Notes:
 
 1. Green outputs clean, heirarchical output.
 
-2. Test status is aligned on the _left_
+2. Test status is aligned on the _left_ (the four periods correspond to four
+   passing tests)
 
-3. Method names are replaced with docstrings when present.
+3. Method names are replaced with docstrings when present.  The first two tests
+   have docstrings you can see.
 
 4. Green always outputs a summary of statuses that will add up to the total
    number of tests that were run.  For some reason, many test runners forget
