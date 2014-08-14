@@ -94,8 +94,10 @@ directory of the directory your python code is in.  Then pass green the
 directory your code is in and let it autodiscover the tests (see the Tutorial below
 for tips on making your tests discoverable).
 
-    cd /parent/directory
-    green code_directory
+```bash
+cd /parent/directory
+green code_directory
+```
 
 Another way to address importing problems is to carefully set up your
 `PYTHONPATH` environment variable to include the parent path of your code
