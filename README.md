@@ -316,14 +316,17 @@ class TestSchool(unittest.TestCase):
 
 Notes:
 
-1. Start all your test class names with `Test`, and always subclass
-   `unittest.TestCase`
+1. Your test class must subclass `unittest.TestCase`.  Technically, neither
+   unittest nor Green care what the test class is named, but to be consistent
+   with the naming requirements for directories, modules, and methods we
+   suggest you start your test class with `Test`.
 
 2. Start all your test method names with `test`.
 
 3. What a test class and/or its methods _actually test_ is entirely up to you.
    In some sense it is an artform.  Just use the test classes to group a bunch
-   of methods that seem logical to go together.
+   of methods that seem logical to go together.  We suggest you try to test one
+   thing with each method.
 
 4. The methods of `TestAnswer` have docstrings, while the methods on
    `TestSchool` do not.  For more verbose output modes, green will use the
