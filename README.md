@@ -142,7 +142,7 @@ Advanced Usage
 --------------
 
 See the [complete command-line
-options](https://github.com/CleanCut/silk/blob/master/cli-options.txt) or run
+options](https://github.com/CleanCut/green/blob/master/cli-options.txt) or run
 `green --help`.
 
 
