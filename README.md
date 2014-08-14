@@ -47,14 +47,14 @@ Features
 Getting Help
 ------------
 
-Please post your questions about Green to [Stack
+Submit **questions** about Green to [Stack
 Overflow](http://stackoverflow.com/questions/ask?tags=green).  That gives a
 large audience a chance to participate, and also make it much more likely that
 the question will show up in search engines.
 
-For feature requests or bug reports, please [submit an
-issue](https://github.com/CleanCut/green/issues/new) to the GitHub issue
-tracker for Green.
+For **feature requests** and **bug reports** [submit an issue
+](https://github.com/CleanCut/green/issues/new) to the GitHub issue tracker for
+Green.
 
 
 Basic Usage
