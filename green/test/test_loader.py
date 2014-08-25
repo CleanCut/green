@@ -527,11 +527,9 @@ class A(unittest.TestCase):
     def test_duplicate_targets(self):
         "Specifying duplicate targets does not cause duplicate loading."
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_dupe_target.py
         fh = open(os.path.join(sub_tmpdir, 'test_dupe_target.py'), 'w')
         fh.write("""
 import unittest
@@ -539,10 +537,26 @@ class A(unittest.TestCase):
     def testPasses(self):
         pass""")
         fh.close()
-        # Load the tests
+
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
         tests = loader.loadTargets([pkg + '.' + 'test_dupe_target',
                                  pkg + '.' + 'test_dupe_target',
                                  pkg + '.' + 'test_dupe_target'])
         self.assertEqual(tests.countTestCases(), 1)
+
+
+    def test_explicit_filename_error(self):
+        """
+        Loading a module by name with a syntax error produces a failure, not a
+        silent absence of its tests.
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'mod_with_import_error.py'))
+        fh.write('import module_that_does_not_exist')
+        fh.close()
+
+        os.chdir(sub_tmpdir)
+        tests = loader.loadTargets('mod_with_import_error')
+        self.assertEqual(tests.countTestCases(), 1)
+
