@@ -1,3 +1,16 @@
+Version 1.4.4 - 26 August 2014
+
+- File handles are now explicitly closed in setup.py.  Contributed by Simeon
+Visser.
+
+
+Version 1.4.3 - 26 August 2014
+
+- Trying to import a module by name that raises an exception during import now
+manufactures a test that reports an ImportError instead of just silently
+ignoring the file.  Issue #31.
+
+
 Version 1.4.2 - 14 August 2014
 
 - Automated generation of the CLI documentation.
