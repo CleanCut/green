@@ -455,7 +455,9 @@ class A(unittest.TestCase):
 
 
     def test_MalformedModuleByName(self):
-        "We don't crash attempting to load a module with a SyntaxError"
+        """
+        Don't crash discovering tests in package with module with SyntaxError.
+        """
         fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
@@ -466,7 +468,10 @@ class A(unittest.TestCase):
         fh.close()
         # Load the tests
         tests = loader.loadTargets(malformed_module)
-        self.assertEqual(tests, None)
+        self.assertEqual(tests.countTestCases(), 1)
+        test = tests._tests[0]._tests[0]
+        test_method = getattr(test, test._testMethodName)
+        self.assertRaises(ImportError, test_method)
 
 
     def test_partiallyGoodName(self):
@@ -553,7 +558,7 @@ class A(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'mod_with_import_error.py'), 'w')
-        fh.write('import module_that_does_not_exist')
+        fh.write('this is a syntax error')
         fh.close()
 
         os.chdir(sub_tmpdir)

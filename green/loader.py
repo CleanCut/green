@@ -284,7 +284,7 @@ def loadTarget(target, file_pattern='test*.py'):
             filename = importlib.import_module(target).__file__
             if '__init__.py' in filename:
                 pkg_in_path_dir = os.path.dirname(filename)
-        except (ImportError, KeyError):
+        except:
             pkg_in_path_dir = None
 
     # => DISCOVER DIRS
@@ -305,7 +305,7 @@ def loadTarget(target, file_pattern='test*.py'):
     if target and (target[0] != '.'): # We don't handle relative dot objects
         try:
             tests = loader.loadTestsFromName(target)
-        except (ImportError, AttributeError):
+        except:
             pass
         if tests and tests.countTestCases():
             debug("Load method: DOTTED OBJECT - {}".format(target))
@@ -328,10 +328,21 @@ def loadTarget(target, file_pattern='test*.py'):
             need_cleanup = True
             sys.path.insert(0, cwd)
         try:
-            slashed_path = target.replace('.py', '').replace(os.sep, '.')
-            tests = loader.loadTestsFromName(slashed_path)
+            dotted_path = target.replace('.py', '').replace(os.sep, '.')
+            tests = loader.loadTestsFromName(dotted_path)
         except: # Any exception could occur here
-            pass
+            # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
+            # refactor it and simplify it after we make sure it works.
+            # This is a cause of the traceback mangling I observed.
+            message = ('Failed to import {}:\n{}').format(
+                           dotted_path, traceback.format_exc())
+            def testFailure(self):
+                raise ImportError(message)
+            TestClass = type(
+                    str("ModuleImportFailure"),
+                    (unittest.case.TestCase,),
+                    {dotted_path: testFailure})
+            return unittest.suite.TestSuite((TestClass(dotted_path),))
         if need_cleanup:
             sys.path.remove(cwd)
         if tests and tests.countTestCases():
