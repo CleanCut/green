@@ -3,9 +3,11 @@ import platform
 import os
 import sys
 
-version = open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')).read().strip()
+with open(os.path.join(os.path.dirname(__file__), 'green', 'VERSION')) as version_file:
+    version = version_file.read().strip()
 
-long_description = open('README-pypi.rst').read()
+with open('README-pypi.rst') as readme_file:
+    long_description = readme_file.read()
 
 # Calculate dependencies
 dependencies = [
