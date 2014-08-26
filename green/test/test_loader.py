@@ -552,7 +552,7 @@ class A(unittest.TestCase):
         silent absence of its tests.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, 'mod_with_import_error.py'))
+        fh = open(os.path.join(sub_tmpdir, 'mod_with_import_error.py'), 'w')
         fh.write('import module_that_does_not_exist')
         fh.close()
 
