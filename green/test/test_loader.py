@@ -557,6 +557,6 @@ class A(unittest.TestCase):
         fh.close()
 
         os.chdir(sub_tmpdir)
-        tests = loader.loadTargets('mod_with_import_error')
+        tests = loader.loadTargets('mod_with_import_error.py')
         self.assertEqual(tests.countTestCases(), 1)
 
