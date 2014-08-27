@@ -456,7 +456,7 @@ class A(unittest.TestCase):
 
     def test_MalformedModuleByName(self):
         """
-        Don't crash discovering tests in package with module with SyntaxError.
+        Importing malformed module by name creates test that raises ImportError.
         """
         fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
         fh.write('\n')
