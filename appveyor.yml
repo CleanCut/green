@@ -3,18 +3,15 @@ build: false
 environment:
     matrix:
         - PYTHON: "C:/Python27"
-
         - PYTHON: "C:/Python33"
-
         - PYTHON: "C:/Python34"
-          PYTHON_VERSION: "3.4.1"
-          PYTHON_ARCH: "64"
 init:
     - "ECHO %PYTHON%"
     - ps: "ls C:/Python*"
 install:
       - ps: (new-object net.webclient).DownloadFile('https://raw.github.com/pypa/pip/master/contrib/get-pip.py', 'C:/get-pip.py')
       - "%PYTHON%/python.exe C:/get-pip.py"
+      - "%PYTHON%/python.exe -m pip install --upgrade pip"
       - "%PYTHON%/Scripts/pip.exe install ."
 test_script:
       - "%PYTHON%/Scripts/green.exe -vvv green"
