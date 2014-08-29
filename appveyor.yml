@@ -13,6 +13,6 @@ install:
       - "%PYTHON%/python.exe C:/get-pip.py"
       - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
 test_script:
-      - "%PYTHON% -m green.cmdline -vvv green"
+      - "%PYTHON%/python.exe -m green.cmdline -vvv green"
 platform:
     - AnyCPU
