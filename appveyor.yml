@@ -10,10 +10,8 @@ init:
     - ps: "ls C:/Python*"
 install:
       - ps: (new-object net.webclient).DownloadFile('https://raw.github.com/pypa/pip/master/contrib/get-pip.py', 'C:/get-pip.py')
-      - ps: "ls %APPVEYOR_BUILD_FOLDER%"
       - "%PYTHON%/python.exe C:/get-pip.py"
       - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
-      - "set PYTHONPATH=%PYTHONPATH%;%APPVEYOR_BUILD_FOLDER%"
 test_script:
       - "%PYTHON% -m green.cmdline -vvv green"
 platform:
