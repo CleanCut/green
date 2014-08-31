@@ -183,6 +183,10 @@ class GreenTestResult():
         self.all_errors = []
 
 
+    def stop(self):
+        self.shouldStop = True
+
+
     def addProtoTestResult(self, protoTestResult):
         for test, err in protoTestResult.errors:
             self.addError(test, err)

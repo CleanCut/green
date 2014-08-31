@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from unittest.signals import registerResult
+from unittest.signals import registerResult, installHandler
 import warnings
 
 try: # pragma: no cover
@@ -44,6 +44,7 @@ class GreenTestRunner():
         result = GreenTestResult(
                 self.stream, self.descriptions, self.verbosity, html=self.html,
                 termcolor=self.termcolor)
+        installHandler()
         registerResult(result)
         with warnings.catch_warnings():
             if self.warnings:
