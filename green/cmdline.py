@@ -14,7 +14,6 @@ except: # pragma: no cover
 import green.config as config
 
 
-
 def main(testing=False, coverage_testing=False):
     args = config.parseArguments()
     args = config.mergeConfig(args, testing, coverage_testing)
@@ -28,16 +27,13 @@ def main(testing=False, coverage_testing=False):
 
     # Set up our various main objects
     from green.loader import loadTargets
-    from green.runner import GreenTestRunner
+    from green.runner import run
     from green.output import GreenStream, debug
     import green.output
     if args.debug:
         green.output.debug_level = args.debug
 
     stream = GreenStream(sys.stdout, html = args.html)
-    runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-            termcolor=args.termcolor, subprocesses=args.subprocesses,
-            run_coverage=args.run_coverage, omit=args.omit)
 
     # Location of shell completion file
     if args.completion_file:
@@ -77,7 +73,7 @@ def main(testing=False, coverage_testing=False):
         result = lambda: None
         result.wasSuccessful = lambda: 0
     else:
-        result = runner.run(test_suite) # pragma: no cover
+        result = run(test_suite, stream, args) # pragma: no cover
 
     if args.run_coverage and ((not testing) or coverage_testing):
         stream.writeln()

@@ -15,7 +15,7 @@ import sys
 from green.config import default_args, mergeConfig
 from green.loader import loadTargets
 from green.output import GreenStream
-from green.runner import GreenTestRunner
+from green.runner import run
 
 # If we're not being run from an actual django project, set up django config
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'green.djangorunner')
@@ -101,11 +101,8 @@ try:
             args = mergeConfig(default_args, default_args)
             args.targets = test_labels
             stream = GreenStream(sys.stdout, html = args.html)
-            runner = GreenTestRunner(verbosity = args.verbose, stream = stream,
-                termcolor=args.termcolor, subprocesses=args.subprocesses,
-                run_coverage=args.run_coverage, omit=args.omit)
             suite = loadTargets(args.targets)
-            result = runner.run(suite)
+            result = run(suite, stream, args)
 
             # Django teardown
             self.teardown_databases(django_db)

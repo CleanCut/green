@@ -58,6 +58,8 @@ default_args = argparse.Namespace( # pragma: no cover
         # These are not really options, they are added later for convenience
         parser          = None,
         store_opt       = None,
+        # not implemented, but unittest stub in place
+        warnings        = '',
         )
 
 
@@ -316,7 +318,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit']:
+        elif name in ['omit', 'warnings']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.

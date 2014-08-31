@@ -1,13 +1,15 @@
 from __future__ import unicode_literals
+import copy
 import os
 import shutil
+import sys
 import tempfile
-import time
 import unittest
 
+from green.config import default_args
 from green.loader import loadTargets
-from green.runner import GreenTestRunner
 from green.output import GreenStream
+from green.runner import run
 
 try:
     from io import StringIO
@@ -15,11 +17,18 @@ except:
     from StringIO import StringIO
 
 
+GreenTestRunner = None
+class FakeCase(unittest.TestCase):
+    def runTest(self):
+        pass
 
-class TestGreenTestRunner(unittest.TestCase):
+
+
+class TestRun(unittest.TestCase):
 
 
     def setUp(self):
+        self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
 
 
@@ -27,23 +36,32 @@ class TestGreenTestRunner(unittest.TestCase):
         del(self.stream)
 
 
-    def test_instantiate(self):
+    def test_stdout(self):
         """
-        GreenTestRunner can be instantiated and creates a default stream.
+        run() can use sys.stdout as the stream.
         """
-        gtr = GreenTestRunner(self.stream)
-        self.assertTrue(type(gtr.stream), GreenStream)
+        saved_stdout = sys.stdout
+        sys.stdout = self.stream
+        run(unittest.TestSuite(), sys.stdout, args=self.args)
+        sys.stdout = saved_stdout
+        self.assertIn('No Tests Found', self.stream.getvalue())
+
+
+    def test_GreenStream(self):
+        """
+        run() can use a GreenStream for output.
+        """
+        gs = GreenStream(self.stream)
+        run(unittest.TestSuite(), gs, args=self.args)
+        self.assertIn('No Tests Found', self.stream.getvalue())
 
 
     def test_HTML(self):
         """
         html=True causes html output
         """
-        class FakeCase(unittest.TestCase):
-            def runTest(self):
-                pass
-        gtr = GreenTestRunner(self.stream, html=True, subprocesses=1)
-        gtr.run(FakeCase())
+        self.args.html = True
+        run(FakeCase(), self.stream, self.args)
         self.assertIn('<', self.stream.getvalue())
 
 
@@ -51,33 +69,27 @@ class TestGreenTestRunner(unittest.TestCase):
         """
         verbose=3 causes version output, and an empty test case passes.
         """
-        class FakeCase(unittest.TestCase):
-            def runTest(self):
-                pass
-        gtr = GreenTestRunner(self.stream, verbosity=3, subprocesses=1)
-        gtr.run(FakeCase())
-        self.assertTrue('Green' in self.stream.getvalue())
-        self.assertTrue('OK' in self.stream.getvalue())
+        self.args.verbose = 3
+        run(FakeCase(), self.stream, self.args)
+        self.assertIn('Green', self.stream.getvalue())
+        self.assertIn('OK', self.stream.getvalue())
 
 
     def test_warnings(self):
         """
         setting warnings='always' doesn't crash
         """
-        class FakeCase(unittest.TestCase):
-            def runTest(self):
-                pass
-        gtr = GreenTestRunner(self.stream, warnings='always', subprocesses=1)
-        gtr.run(FakeCase())
+        self.args.warnings = 'always'
+        run(FakeCase(), self.stream, self.args)
+        self.assertIn('OK', self.stream.getvalue())
 
 
     def test_noTestsFound(self):
         """
         When we don't find any tests, we say so.
         """
-        gtr = GreenTestRunner(self.stream, subprocesses=1)
-        gtr.run(unittest.TestSuite())
-        self.assertTrue('No Tests Found' in self.stream.getvalue())
+        run(unittest.TestSuite(), self.stream, self.args)
+        self.assertIn('No Tests Found', self.stream.getvalue())
 
 
     def test_failedSaysSo(self):
@@ -87,9 +99,8 @@ class TestGreenTestRunner(unittest.TestCase):
         class FailCase(unittest.TestCase):
             def runTest(self):
                 self.assertTrue(False)
-        gtr = GreenTestRunner(self.stream, subprocesses=1)
-        gtr.run(FailCase())
-        self.assertTrue('FAILED' in self.stream.getvalue())
+        run(FailCase(), self.stream, self.args)
+        self.assertIn('FAILED', self.stream.getvalue())
 
 
 
@@ -114,6 +125,7 @@ class TestSubprocesses(unittest.TestCase):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
         self.stream = StringIO()
+        self.args = copy.deepcopy(default_args)
 
 
     def tearDown(self):
@@ -172,8 +184,9 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
-        gtr.run(tests)
+        self.args.subprocesses = 2
+        self.args.termcolor = False
+        run(tests, self.stream, self.args)
         self.assertIn('OK', self.stream.getvalue())
 
 
@@ -198,8 +211,10 @@ class A(unittest.TestCase):
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
         os.chdir(TestSubprocesses.startdir)
-        gtr = GreenTestRunner(self.stream, subprocesses=2, run_coverage=True)
-        gtr.run(tests)
+        self.args.subprocesses = 2
+        self.args.run_coverage = True
+        run(tests, self.stream, self.args)
+        self.assertIn('OK', self.stream.getvalue())
 
 
     def test_badTest(self):
@@ -219,8 +234,8 @@ class A(unittest.TestCase):
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
         os.chdir(TestSubprocesses.startdir)
-        gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
-        self.assertRaises(ImportError, gtr.run, (tests,))
+        self.args.subprocesses = 2
+        self.assertRaises(ImportError, run, tests, self.stream, self.args)
 
 
     def test_empty(self):
@@ -228,5 +243,6 @@ class A(unittest.TestCase):
         GreenTestRunner.run() does not crash with empty suite and subprocesses
         """
         suite = unittest.TestSuite()
-        gtr = GreenTestRunner(self.stream, subprocesses=2, termcolor=False)
-        gtr.run(suite)
+        self.args.subprocesses = 2
+        self.args.termcolor = False
+        run(suite, self.stream, self.args)

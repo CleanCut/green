@@ -66,10 +66,10 @@ class ProtoTest():
         return self.module + '.' + self.class_name + '.' + self.method_name
 
 
-    def getDescription(self, verbosity):
-        if verbosity == 2:
+    def getDescription(self, verbose):
+        if verbose == 2:
             return self.method_name
-        elif verbosity > 2:
+        elif verbose > 2:
             return self.docstr_part or self.method_name
         else:
             return ''
@@ -157,16 +157,15 @@ class GreenTestResult():
     "Aggregates test results and outputs them to a stream."
 
 
-    def __init__(self, stream, descriptions, verbosity, html=False,
+    def __init__(self, stream, verbose, html=False,
             termcolor=None):
-        """stream, descriptions, and verbosity are as in
+        """stream and verbose are as in
         unittest.runner.TextTestRunner.
         """
         self.stream       = stream
-        self.showAll      = verbosity > 1
-        self.dots         = verbosity == 1
-        self.verbosity    = verbosity
-        self.descriptions = descriptions
+        self.showAll      = verbose > 1
+        self.dots         = verbose == 1
+        self.verbose      = verbose
         self.colors       = Colors(termcolor, html)
         self.last_module  = ''
         self.last_class   = ''
@@ -209,7 +208,7 @@ class GreenTestResult():
         if self.colors.html:
             self.stream.write(
                     '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
-        if self.verbosity > 2:
+        if self.verbose > 2:
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
 
 
@@ -275,7 +274,7 @@ class GreenTestResult():
                 self.stream.write(
                     self.colors.bold(
                         self.stream.formatLine(
-                            test.getDescription(self.verbosity),
+                            test.getDescription(self.verbose),
                             indent=2)))
             self.stream.flush()
 
@@ -298,7 +297,7 @@ class GreenTestResult():
             if not self.colors.html:
                 self.stream.write('\r')
             # Escape the HTML that may be in the docstring
-            test_description = test.getDescription(self.verbosity)
+            test_description = test.getDescription(self.verbose)
             if self.colors.html:
                 test_description = escape(test_description)
             self.stream.write(
@@ -384,7 +383,7 @@ class GreenTestResult():
                 debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
                       + "\n{}".format(self.colors.yellow(frame)), level = 3)
                 # Ignore useless frames
-                if self.verbosity < 4:
+                if self.verbose < 4:
                     if frame.strip() == "Traceback (most recent call last):":
                         continue
                 reindented_lines = []
