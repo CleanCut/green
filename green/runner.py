@@ -49,7 +49,7 @@ def run(suite, stream, args):
             suite.run(result)
         else:
             tests = toProtoTestList(suite)
-            pool = LoggingDaemonlessPool(processes=args.subprocesses)
+            pool = LoggingDaemonlessPool(processes=args.subprocesses or None)
             if tests:
                 async_responses = []
                 for index, test in enumerate(tests):

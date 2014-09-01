@@ -190,6 +190,32 @@ class A(unittest.TestCase):
         self.assertIn('OK', self.stream.getvalue())
 
 
+    def test_detectNumSubprocesses(self):
+        """
+        args.subprocesses = 0 causes auto-detection of number of subprocesses.
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'test_autosubprocesses.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        tests = loadTargets('.')
+        os.chdir(TestSubprocesses.startdir)
+        self.args.subprocesses = 0
+        run(tests, self.stream, self.args)
+        self.assertIn('OK', self.stream.getvalue())
+
+
     def test_runCoverage(self):
         """
         Running coverage in subprocess mode doesn't crash
