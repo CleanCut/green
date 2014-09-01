@@ -187,6 +187,7 @@ class A(unittest.TestCase):
         self.args.subprocesses = 2
         self.args.termcolor = False
         run(tests, self.stream, self.args)
+        os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
 
@@ -210,9 +211,9 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        os.chdir(TestSubprocesses.startdir)
         self.args.subprocesses = 0
         run(tests, self.stream, self.args)
+        os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
 
@@ -236,10 +237,10 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        os.chdir(TestSubprocesses.startdir)
         self.args.subprocesses = 2
         self.args.run_coverage = True
         run(tests, self.stream, self.args)
+        os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
 
@@ -259,9 +260,9 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        os.chdir(TestSubprocesses.startdir)
         self.args.subprocesses = 2
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
+        os.chdir(TestSubprocesses.startdir)
 
 
     def test_empty(self):
