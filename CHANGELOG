@@ -1,3 +1,12 @@
+Version 1.5.0 - 31 August 2014
+
+- You can press Ctrl-C once while tests are running to cleanly terminate the
+test run.
+- Some internal refactoring.
+- Python 3.3 is no longer supported on Windows.  It might work still--it's
+just not supported.
+- Windows CI with AppVeyor is now passing.
+
 Version 1.4.4 - 26 August 2014
 
 - File handles are now explicitly closed in setup.py.  Contributed by Simeon
