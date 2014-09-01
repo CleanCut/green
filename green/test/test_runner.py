@@ -35,20 +35,18 @@ class TestRun(unittest.TestCase):
 
     def test_catchSIGINT(self):
         """
-        run() can catch SIGINT if it wants to.
+        run() can catch SIGINT.
         """
         # Mock the list of TestResult instances that should be stopped,
-        # otherwise if we are running green with --catch then the actual
-        # TestResult that is running this test will be told to stop when we
-        # send SIGINT
+        # otherwise the actual TestResult that is running this test will be
+        # told to stop when we send SIGINT
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
         class KBICase(unittest.TestCase):
             def runTest(self):
                 os.kill(os.getpid(), signal.SIGINT)
         kc = KBICase()
-        self.args.catch = True
-        run(kc, self.stream, self.args, testing=True)
+        run(kc, self.stream, self.args)
         unittest.signals._results = saved__results
 
     def test_stdout(self):
@@ -142,12 +140,11 @@ class TestSubprocesses(unittest.TestCase):
 
     def test_catchSubprocessSIGINT(self):
         """
-        run() can catch SIGINT while running a subprocess if it wants to.
+        run() can catch SIGINT while running a subprocess.
         """
         # Mock the list of TestResult instances that should be stopped,
-        # otherwise if we are running green with --catch then the actual
-        # TestResult that is running this test will be told to stop when we
-        # send SIGINT
+        # otherwise the actual TestResult that is running this test will be
+        # told to stop when we send SIGINT
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
@@ -163,7 +160,6 @@ class SIGINTCase(unittest.TestCase):
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_sigint')
-        self.args.catch = True
         self.args.subprocesses = 2
         run(tests, self.stream, self.args)
         unittest.signals._results = saved__results

@@ -55,7 +55,6 @@ default_args = argparse.Namespace( # pragma: no cover
         completion_file = False,
         completions     = False,
         options         = False,
-        catch           = False,
         # These are not really options, they are added later for convenience
         parser          = None,
         store_opt       = None,
@@ -202,10 +201,6 @@ CONFIG FILES
         "and zsh-completion.")))
     store_opt(integration_args.add_argument('--options', action='store_true',
         help="Output all options.  Used by bash- and zsh-completion."))
-    store_opt(integration_args.add_argument('-k', '--catch', action='store_true',
-        default=False, help=("Catch Ctrl-C and exit once the currently running "
-        "test (or tests) has completed.  Ctrl-C a second time will kill the "
-        "program.")))
     parser.set_defaults(**(dict(default_args._get_kwargs())))
     args = parser.parse_args()
 
@@ -318,7 +313,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         config_getter = None
         if name in ['html', 'termcolor', 'notermcolor', 'help', 'logging',
                 'version', 'run_coverage', 'options', 'completions',
-                'completion_file', 'catch']:
+                'completion_file']:
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint

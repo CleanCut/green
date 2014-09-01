@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from unittest.signals import (
-        registerResult, installHandler, removeResult, removeHandler)
+        registerResult, installHandler, removeResult)
 import warnings
 
 try: # pragma: no cover
@@ -17,7 +17,7 @@ from green.subprocess import LoggingDaemonlessPool, poolRunner
 
 
 
-def run(suite, stream, args, testing=False):
+def run(suite, stream, args):
     """
     Run the given test case or test suite with the specified arguments.
 
@@ -29,9 +29,8 @@ def run(suite, stream, args, testing=False):
             stream, args.verbose, html=args.html,
             termcolor=args.termcolor)
 
-    if args.catch:
-        installHandler()
-        registerResult(result)
+    installHandler()
+    registerResult(result)
 
     with warnings.catch_warnings():
         if args.warnings:
@@ -73,8 +72,7 @@ def run(suite, stream, args, testing=False):
                     try:
                         result.addProtoTestResult(async_response.get())
                     except KeyboardInterrupt:
-                        if args.catch:
-                            result.shouldStop = True
+                        result.shouldStop = True
                     if result.shouldStop:
                         break
             pool.terminate()
@@ -82,9 +80,6 @@ def run(suite, stream, args, testing=False):
 
         result.stopTestRun()
 
-    if args.catch:
-        removeResult(result)
-        if not testing:
-            removeHandler()
+    removeResult(result)
 
     return result
