@@ -217,7 +217,12 @@ class GreenTestResult():
         self.stopTime = time.time()
         self.timeTaken = self.stopTime - self.startTime
         self.printErrors()
-        if self.testsRun:
+        if self.testsRun and not self.shouldStop:
+            self.stream.writeln()
+        if self.shouldStop:
+            self.stream.writeln()
+            self.stream.writeln(self.colors.yellow(
+                "Warning: Test run terminated early by user command."))
             self.stream.writeln()
         self.stream.writeln("Ran %s test%s in %ss" %
             (self.colors.bold(str(self.testsRun)),

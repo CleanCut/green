@@ -2,9 +2,11 @@ from __future__ import unicode_literals
 import copy
 import os
 import shutil
+import signal
 import sys
 import tempfile
 import unittest
+import weakref
 
 from green.config import default_args
 from green.loader import loadTargets
@@ -17,24 +19,37 @@ except:
     from StringIO import StringIO
 
 
-GreenTestRunner = None
 class FakeCase(unittest.TestCase):
     def runTest(self):
         pass
 
 
-
 class TestRun(unittest.TestCase):
-
 
     def setUp(self):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
 
-
     def tearDown(self):
         del(self.stream)
 
+    def test_catchSIGINT(self):
+        """
+        run() can catch SIGINT if it wants to.
+        """
+        # Mock the list of TestResult instances that should be stopped,
+        # otherwise if we are running green with --catch then the actual
+        # TestResult that is running this test will be told to stop when we
+        # send SIGINT
+        saved__results = unittest.signals._results
+        unittest.signals._results = weakref.WeakKeyDictionary()
+        class KBICase(unittest.TestCase):
+            def runTest(self):
+                os.kill(os.getpid(), signal.SIGINT)
+        kc = KBICase()
+        self.args.catch = True
+        run(kc, self.stream, self.args, testing=True)
+        unittest.signals._results = saved__results
 
     def test_stdout(self):
         """
@@ -46,7 +61,6 @@ class TestRun(unittest.TestCase):
         sys.stdout = saved_stdout
         self.assertIn('No Tests Found', self.stream.getvalue())
 
-
     def test_GreenStream(self):
         """
         run() can use a GreenStream for output.
@@ -55,7 +69,6 @@ class TestRun(unittest.TestCase):
         run(unittest.TestSuite(), gs, args=self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
 
-
     def test_HTML(self):
         """
         html=True causes html output
@@ -63,7 +76,6 @@ class TestRun(unittest.TestCase):
         self.args.html = True
         run(FakeCase(), self.stream, self.args)
         self.assertIn('<', self.stream.getvalue())
-
 
     def test_verbose3(self):
         """
@@ -74,7 +86,6 @@ class TestRun(unittest.TestCase):
         self.assertIn('Green', self.stream.getvalue())
         self.assertIn('OK', self.stream.getvalue())
 
-
     def test_warnings(self):
         """
         setting warnings='always' doesn't crash
@@ -83,14 +94,12 @@ class TestRun(unittest.TestCase):
         run(FakeCase(), self.stream, self.args)
         self.assertIn('OK', self.stream.getvalue())
 
-
     def test_noTestsFound(self):
         """
         When we don't find any tests, we say so.
         """
         run(unittest.TestSuite(), self.stream, self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
-
 
     def test_failedSaysSo(self):
         """
@@ -103,7 +112,6 @@ class TestRun(unittest.TestCase):
         self.assertIn('FAILED', self.stream.getvalue())
 
 
-
 class TestSubprocesses(unittest.TestCase):
 
     # Setup
@@ -112,7 +120,6 @@ class TestSubprocesses(unittest.TestCase):
         cls.startdir = os.getcwd()
         cls.container_dir = tempfile.mkdtemp()
 
-
     @classmethod
     def tearDownClass(cls):
         if os.getcwd() != cls.startdir:
@@ -120,13 +127,11 @@ class TestSubprocesses(unittest.TestCase):
         cls.startdir = None
         shutil.rmtree(cls.container_dir)
 
-
     def setUp(self):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
         self.stream = StringIO()
         self.args = copy.deepcopy(default_args)
-
 
     def tearDown(self):
         os.chdir(self.startdir)
@@ -135,6 +140,34 @@ class TestSubprocesses(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
         del(self.stream)
 
+    def test_catchSubprocessSIGINT(self):
+        """
+        run() can catch SIGINT while running a subprocess if it wants to.
+        """
+        # Mock the list of TestResult instances that should be stopped,
+        # otherwise if we are running green with --catch then the actual
+        # TestResult that is running this test will be told to stop when we
+        # send SIGINT
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        saved__results = unittest.signals._results
+        unittest.signals._results = weakref.WeakKeyDictionary()
+        fh = open(os.path.join(sub_tmpdir, 'test_sigint.py'), 'w')
+        fh.write("""
+import os
+import signal
+import unittest
+class SIGINTCase(unittest.TestCase):
+    def test00(self):
+        os.kill({}, signal.SIGINT)
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_sigint')
+        self.args.catch = True
+        self.args.subprocesses = 2
+        run(tests, self.stream, self.args)
+        unittest.signals._results = saved__results
+        os.chdir(TestSubprocesses.startdir)
 
     def test_collisionProtection(self):
         """
@@ -186,10 +219,12 @@ class A(unittest.TestCase):
         tests = loadTargets('.')
         self.args.subprocesses = 2
         self.args.termcolor = False
-        run(tests, self.stream, self.args)
+        try:
+            run(tests, self.stream, self.args)
+        except KeyboardInterrupt:
+            os.kill(os.getpid(), signal.SIGINT)
         os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
-
 
     def test_detectNumSubprocesses(self):
         """
@@ -215,7 +250,6 @@ class A(unittest.TestCase):
         run(tests, self.stream, self.args)
         os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
-
 
     def test_runCoverage(self):
         """
@@ -243,7 +277,6 @@ class A(unittest.TestCase):
         os.chdir(TestSubprocesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
-
     def test_badTest(self):
         """
         Bad syntax in a testfile is caught as a test error.
@@ -264,10 +297,9 @@ class A(unittest.TestCase):
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
         os.chdir(TestSubprocesses.startdir)
 
-
     def test_empty(self):
         """
-        GreenTestRunner.run() does not crash with empty suite and subprocesses
+        run() does not crash with empty suite and subprocesses
         """
         suite = unittest.TestSuite()
         self.args.subprocesses = 2
