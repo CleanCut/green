@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import copy
 import os
+import platform
 import shutil
 import signal
 import sys
@@ -37,6 +38,8 @@ class TestRun(unittest.TestCase):
         """
         run() can catch SIGINT.
         """
+        if platform.system() == 'Windows':
+            self.skipTest('This test is for posix-specific behavior.')
         # Mock the list of TestResult instances that should be stopped,
         # otherwise the actual TestResult that is running this test will be
         # told to stop when we send SIGINT
@@ -142,6 +145,8 @@ class TestSubprocesses(unittest.TestCase):
         """
         run() can catch SIGINT while running a subprocess.
         """
+        if platform.system() == 'Windows':
+            self.skipTest('This test is for posix-specific behavior.')
         # Mock the list of TestResult instances that should be stopped,
         # otherwise the actual TestResult that is running this test will be
         # told to stop when we send SIGINT
