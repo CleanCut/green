@@ -25,9 +25,7 @@ def run(suite, stream, args):
     """
     if not issubclass(GreenStream, type(stream)):
         stream = GreenStream(stream)
-    result = GreenTestResult(
-            stream, args.verbose, html=args.html,
-            termcolor=args.termcolor)
+    result = GreenTestResult(args, stream)
 
     # Note: Catching SIGINT isn't supported by Python on windows (python
     # "WONTFIX" issue 18040)

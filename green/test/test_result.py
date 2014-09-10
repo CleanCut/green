@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
+import copy
 import sys
 import unittest
 
+from green.config import default_args
 from green.output import GreenStream
 from green.result import GreenTestResult, proto_test, \
         ProtoTest, proto_error, ProtoTestResult
@@ -203,11 +205,57 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def setUp(self):
+        self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
 
 
     def tearDown(self):
         del(self.stream)
+        del(self.args)
+
+
+    def test_failfastAddError(self):
+        """
+        addError triggers failfast when it is set
+        """
+        self.args.failfast = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        self.assertEqual(gtr.failfast, True)
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        self.assertEqual(gtr.shouldStop, False)
+        gtr.addError(MyProtoTest(), proto_error(err))
+        self.assertEqual(gtr.shouldStop, True)
+
+
+    def test_failfastAddFailure(self):
+        """
+        addFailure triggers failfast when it is set
+        """
+        self.args.failfast = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        self.assertEqual(gtr.failfast, True)
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        self.assertEqual(gtr.shouldStop, False)
+        gtr.addFailure(MyProtoTest(), proto_error(err))
+        self.assertEqual(gtr.shouldStop, True)
+
+
+    def test_failfastAddUnexpectedSuccess(self):
+        """
+        addUnexpectedSuccess triggers failfast when it is set
+        """
+        self.args.failfast = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        self.assertEqual(gtr.failfast, True)
+        self.assertEqual(gtr.shouldStop, False)
+        gtr.addUnexpectedSuccess(MyProtoTest())
+        self.assertEqual(gtr.shouldStop, True)
 
 
     def test_startTestVerbose(self):
@@ -217,7 +265,8 @@ class TestGreenTestResult(unittest.TestCase):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
-        gtr = GreenTestResult(GreenStream(self.stream), 2)
+        self.args.verbose = 2
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         tc = FakeCase()
         gtr.startTest(tc)
         output = self.stream.getvalue()
@@ -236,7 +285,8 @@ class TestGreenTestResult(unittest.TestCase):
         """
         _reportOutcome contains output we expect
         """
-        gtr = GreenTestResult(GreenStream(self.stream), 1)
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr._reportOutcome(None, '.', lambda x: x)
         self.assertIn('.', self.stream.getvalue())
 
@@ -245,7 +295,8 @@ class TestGreenTestResult(unittest.TestCase):
         """
         _reportOutcome contains output we expect in verbose mode
         """
-        gtr = GreenTestResult(GreenStream(self.stream), 2)
+        self.args.verbose = 2
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         r = 'a fake reason'
         t = MagicMock()
         t.__str__.return_value = 'junk'
@@ -257,7 +308,8 @@ class TestGreenTestResult(unittest.TestCase):
         """
         html=True causes _reportOutcome() to escape HTML in docstrings
         """
-        gtr = GreenTestResult(GreenStream(self.stream), 3)
+        self.args.verbose = 3
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.colors.html = True
         r = 'a fake reason'
         class Injection(unittest.TestCase):
@@ -282,7 +334,10 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), 1, False, False)
+        self.args.verbose = 1
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
         self.assertIn('\n\n', self.stream.getvalue())
@@ -300,7 +355,10 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), 2, False, False)
+        self.args.verbose = 2
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
         self.assertIn('\n\n', self.stream.getvalue())
@@ -318,7 +376,10 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), 3, False, False)
+        self.args.verbose = 3
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
         self.assertIn('\n\n', self.stream.getvalue())
@@ -336,7 +397,10 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), 4, False, False)
+        self.args.verbose = 4
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), err)
         gtr.printErrors()
         self.assertIn('\n\n', self.stream.getvalue())
@@ -355,7 +419,8 @@ class TestGreenTestResult(unittest.TestCase):
             raise Exception
         except:
             err = sys.exc_info()
-        gtr = GreenTestResult(GreenStream(self.stream), 4)
+        self.args.verbose = 4
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.colors.html = True
         test = MagicMock()
         gtr.addError(test, proto_error(err))
@@ -406,7 +471,8 @@ class TestGreenTestResult(unittest.TestCase):
         us_t = proto_test(MagicMock())
         ptr.addUnexpectedSuccess(us_t)
 
-        gtr = GreenTestResult(GreenStream(self.stream), 0)
+        self.args.verbose = 0
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addProtoTestResult(ptr)
 
         self.assertEqual(gtr.errors, [(err_t, err_e)])
@@ -423,7 +489,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def setUp(self):
         self.stream = StringIO()
-        self.gtr = GreenTestResult(GreenStream(self.stream), 0)
+        self.args = copy.deepcopy(default_args)
+        self.args.verbose = 0
+        self.gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.gtr._reportOutcome = MagicMock()
 
 
@@ -514,7 +582,8 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
     def test_wasSuccessful(self):
         "wasSuccessful returns what we expect"
-        gtr = GreenTestResult(GreenStream(self.stream), 1)
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.assertEqual(gtr.wasSuccessful(), True)
         gtr.all_errors.append('anything')
         self.assertEqual(gtr.wasSuccessful(), False)

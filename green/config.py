@@ -49,6 +49,7 @@ default_args = argparse.Namespace( # pragma: no cover
         logging         = False,
         version         = False,
         verbose         = 1,
+        failfast        = False,
         config          = None,  # Not in configs
         run_coverage    = False,
         omit            = None,
@@ -176,6 +177,10 @@ CONFIG FILES
         help=("Verbose. Can be specified up to three times for more verbosity. "
         "Recommended levels are -v and -vv.")))
     other_args = parser.add_argument_group("Other Options")
+    store_opt(other_args.add_argument('-f', '--failfast', action='store_true',
+        default=False,
+        help=("Stop execution at the first test that fails, errors, or "
+        "unexpectedly succeeds.")))
     store_opt(other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green"))
@@ -312,8 +317,8 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         # Config options overwrite default options
         config_getter = None
         if name in ['html', 'termcolor', 'notermcolor', 'help', 'logging',
-                'version', 'run_coverage', 'options', 'completions',
-                'completion_file']:
+                'version', 'failfast', 'run_coverage', 'options',
+                'completions', 'completion_file']:
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint

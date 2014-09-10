@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import time
 import traceback
+from unittest.result import failfast
 
 from green.output import Colors, debug
 from green.version import pretty_version
@@ -157,18 +158,18 @@ class GreenTestResult():
     "Aggregates test results and outputs them to a stream."
 
 
-    def __init__(self, stream, verbose, html=False,
-            termcolor=None):
+    def __init__(self, args, stream):
         """stream and verbose are as in
         unittest.runner.TextTestRunner.
         """
         self.stream       = stream
-        self.showAll      = verbose > 1
-        self.dots         = verbose == 1
-        self.verbose      = verbose
-        self.colors       = Colors(termcolor, html)
+        self.showAll      = args.verbose > 1
+        self.dots         = args.verbose == 1
+        self.verbose      = args.verbose
+        self.colors       = Colors(args.termcolor, args.html)
         self.last_module  = ''
         self.last_class   = ''
+        self.failfast     = args.failfast
         self.shouldStop   = False
         self.testsRun     = 0
         # Individual lists
@@ -222,7 +223,7 @@ class GreenTestResult():
         if self.shouldStop:
             self.stream.writeln()
             self.stream.writeln(self.colors.yellow(
-                "Warning: Test run terminated early by user command."))
+                "Warning: Some tests may not have been run."))
             self.stream.writeln()
         self.stream.writeln("Ran %s test%s in %ss" %
             (self.colors.bold(str(self.testsRun)),
@@ -329,6 +330,7 @@ class GreenTestResult():
         self._reportOutcome(test, '.', self.colors.passing)
 
 
+    @failfast
     def addError(self, test, err):
         "Called when a test raises an exception"
         test = proto_test(test)
@@ -338,6 +340,7 @@ class GreenTestResult():
         self._reportOutcome(test, 'E', self.colors.error, err)
 
 
+    @failfast
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
         test = proto_test(test)
@@ -363,6 +366,7 @@ class GreenTestResult():
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
 
+    @failfast
     def addUnexpectedSuccess(self, test):
         "Called when a test passed, but we expected a failure"
         test = proto_test(test)

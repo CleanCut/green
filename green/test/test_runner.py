@@ -27,11 +27,23 @@ class FakeCase(unittest.TestCase):
 
 class TestRun(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.startdir = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.getcwd() != cls.startdir:
+            os.chdir(cls.startdir)
+        cls.startdir = None
+
     def setUp(self):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
+        self.tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
+        del(self.tmpdir)
         del(self.stream)
 
     def test_catchSIGINT(self):
@@ -111,6 +123,28 @@ class TestRun(unittest.TestCase):
                 self.assertTrue(False)
         run(FailCase(), self.stream, self.args)
         self.assertIn('FAILED', self.stream.getvalue())
+
+    def test_failfast(self):
+        """
+        failfast causes the testing to stop after the first failure.
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_failfast.py'), 'w')
+        fh.write("""
+import unittest
+class SIGINTCase(unittest.TestCase):
+    def test00(self):
+        raise Exception
+    def test01(self):
+        pass
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_failfast')
+        self.args.failfast = True
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(result.testsRun, 1)
 
 
 class TestSubprocesses(unittest.TestCase):
