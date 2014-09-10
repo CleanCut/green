@@ -71,7 +71,7 @@ def run(suite, stream, args):
                     # particular test actually finishes
                     try:
                         result.addProtoTestResult(async_response.get())
-                    except KeyboardInterrupt:
+                    except KeyboardInterrupt: # pragma: no cover
                         result.shouldStop = True
                     if result.shouldStop:
                         break

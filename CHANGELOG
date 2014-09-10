@@ -2,6 +2,7 @@ Version 1.6.0 - 10 September 2014
 
 - Added -f/--failfast to stop executing tests after the first error, failure,
 or unexpected successes.
+- Simplified the usage line in the help output.
 
 Version 1.5.0 - 31 August 2014
 

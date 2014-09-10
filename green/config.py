@@ -94,6 +94,7 @@ def parseArguments(): # pragma: no cover
     store_opt = StoreOpt()
     parser = argparse.ArgumentParser(
             prog='green',
+            usage='%(prog)s [options] [target [target2 ...]]',
             add_help=False,
             description=
 """

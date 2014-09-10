@@ -1,6 +1,4 @@
-usage: green [-s NUM] [-m] [-t] [-T] [-d] [-h] [-l] [-V] [-v] [-c FILE] [-r]
-             [-o PATTERN] [--completion-file] [--completions] [--options]
-             [target [target ...]]
+usage: green [options] [target [target2 ...]]
 
 Green is a clean, colorful test runner for Python unit tests.
 
@@ -46,6 +44,8 @@ Output Options:
                         verbosity. Recommended levels are -v and -vv.
 
 Other Options:
+  -f, --failfast        Stop execution at the first test that fails, errors,
+                        or unexpectedly succeeds.
   -c FILE, --config FILE
                         Use this config file instead of the one pointed to by
                         environment variable GREEN_CONFIG or the default

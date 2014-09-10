@@ -48,7 +48,7 @@ class TestRun(unittest.TestCase):
 
     def test_catchSIGINT(self):
         """
-        run() can catch SIGINT.
+        run() can catch SIGINT with just one process.
         """
         if platform.system() == 'Windows':
             self.skipTest('This test is for posix-specific behavior.')
