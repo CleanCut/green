@@ -156,6 +156,7 @@ class GreenStream(object):
             from colorama.initialise import wrap_stream
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.html = html
+        self.closed = False
 
 
     def flush(self):
