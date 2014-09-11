@@ -13,6 +13,7 @@ from green.config import default_args
 from green.loader import loadTargets
 from green.output import GreenStream
 from green.runner import run
+from green.suite import GreenTestSuite
 
 try:
     from io import StringIO
@@ -70,7 +71,7 @@ class TestRun(unittest.TestCase):
         """
         saved_stdout = sys.stdout
         sys.stdout = self.stream
-        run(unittest.TestSuite(), sys.stdout, args=self.args)
+        run(GreenTestSuite(), sys.stdout, args=self.args)
         sys.stdout = saved_stdout
         self.assertIn('No Tests Found', self.stream.getvalue())
 
@@ -79,7 +80,7 @@ class TestRun(unittest.TestCase):
         run() can use a GreenStream for output.
         """
         gs = GreenStream(self.stream)
-        run(unittest.TestSuite(), gs, args=self.args)
+        run(GreenTestSuite(), gs, args=self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
 
     def test_HTML(self):
@@ -111,7 +112,7 @@ class TestRun(unittest.TestCase):
         """
         When we don't find any tests, we say so.
         """
-        run(unittest.TestSuite(), self.stream, self.args)
+        run(GreenTestSuite(), self.stream, self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
 
     def test_failedSaysSo(self):
@@ -336,7 +337,7 @@ class A(unittest.TestCase):
         """
         run() does not crash with empty suite and subprocesses
         """
-        suite = unittest.TestSuite()
+        suite = GreenTestSuite()
         self.args.subprocesses = 2
         self.args.termcolor = False
         run(suite, self.stream, self.args)

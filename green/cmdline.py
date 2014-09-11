@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import os
 import sys
-import unittest
 
 try: # pragma: no cover
     import coverage
@@ -30,6 +29,8 @@ def main(testing=False, coverage_testing=False):
     from green.runner import run
     from green.output import GreenStream, debug
     import green.output
+    from green.suite import GreenTestSuite
+
     if args.debug:
         green.output.debug_level = args.debug
 
@@ -56,7 +57,7 @@ def main(testing=False, coverage_testing=False):
         debug("Loaded config file(s): {}".format(
             ', '.join(config.files_loaded)))
 
-    # Discover/Load the TestSuite
+    # Discover/Load the test suite
     if testing:
         test_suite = None
     else:
@@ -66,7 +67,7 @@ def main(testing=False, coverage_testing=False):
     if not test_suite:
         debug(
             "No test loading attempts succeeded.  Created an empty test suite.")
-        test_suite = unittest.suite.TestSuite()
+        test_suite = GreenTestSuite(args=args)
 
     # Actually run the test_suite
     if testing:

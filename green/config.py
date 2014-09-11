@@ -44,6 +44,7 @@ default_args = argparse.Namespace( # pragma: no cover
         html            = False,
         termcolor       = None,
         notermcolor     = None,
+        allow_stdout    = False,
         debug           = 0,
         help            = False, # Not in configs
         logging         = False,
@@ -317,8 +318,8 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     for name, args_value in dict(args._get_kwargs()).items():
         # Config options overwrite default options
         config_getter = None
-        if name in ['html', 'termcolor', 'notermcolor', 'help', 'logging',
-                'version', 'failfast', 'run_coverage', 'options',
+        if name in ['html', 'termcolor', 'notermcolor', 'allow_stdout', 'help',
+                'logging', 'version', 'failfast', 'run_coverage', 'options',
                 'completions', 'completion_file']:
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
