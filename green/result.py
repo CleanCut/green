@@ -95,8 +95,22 @@ class ProtoError():
         self.traceback_lines = traceback.format_exception(*err)
 
 
+class BaseTestResult():
+    """
+    I am inherited by ProtoTestResult and GreenTestResult.
+    """
 
-class ProtoTestResult():
+    def recordStdout(self, test, output):
+        """
+        Called with stdout that the suite decided to capture so we can report
+        the captured output somewhere.
+        """
+        if output:
+            test = proto_test(test)
+            self.stdout_output[test] = output
+
+
+class ProtoTestResult(BaseTestResult):
     """
     I'm the TestResult object for a single unit test run in a subprocess.
     """
@@ -121,7 +135,6 @@ class ProtoTestResult():
                 "passing" + str(self.passing) + ', ' +
                 "skipped" + str(self.skipped) + ', ' +
                 "unexpectedSuccesses" + str(self.unexpectedSuccesses))
-
 
     def startTest(self, test):
         "Called before each test runs"
@@ -162,7 +175,7 @@ class ProtoTestResult():
 
 
 
-class GreenTestResult():
+class GreenTestResult(BaseTestResult):
     "Aggregates test results and outputs them to a stream."
 
 
