@@ -133,6 +133,7 @@ CONFIG FILES
     omit    = myproj*,*prototype*
 """.rstrip(),
             formatter_class=argparse.RawDescriptionHelpFormatter)
+
     target_args = parser.add_argument_group("Target Specification")
     target_args.add_argument('targets', action='store', nargs='*',
         metavar='target',
@@ -145,6 +146,7 @@ CONFIG FILES
         would not be accessible through the package's scope).  In all other
         cases, only tests accessible from introspection of the object will
         be loaded."""))
+
     concurrency_args = parser.add_argument_group("Concurrency Options")
     store_opt(
         concurrency_args.add_argument('-s', '--subprocesses', action='store',
@@ -156,6 +158,7 @@ CONFIG FILES
             "in the system.  1 will disable using subprocesses.  Note that for "
             "trivial tests (tests that take < 1ms), running everything in a "
             "single process may be faster."))
+
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-m', '--html', action='store_true',
         help="HTML5 format.  Overrides terminal color options if specified."))
@@ -164,7 +167,11 @@ CONFIG FILES
     store_opt(
         format_args.add_argument('-T', '--notermcolor', action='store_true',
         help="Force terminal colors off.  Default is to autodetect."))
+
     out_args = parser.add_argument_group("Output Options")
+    store_opt(out_args.add_argument('-a', '--allow-stdout', action='store_true',
+        help=("Instead of capturing the stdout and presenting it in the "
+        "summary of results, let it come through.")))
     store_opt(out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output.")))
@@ -178,14 +185,15 @@ CONFIG FILES
     store_opt(out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more verbosity. "
         "Recommended levels are -v and -vv.")))
+
     other_args = parser.add_argument_group("Other Options")
     store_opt(other_args.add_argument('-f', '--failfast', action='store_true',
-        default=False,
         help=("Stop execution at the first test that fails, errors, or "
         "unexpectedly succeeds.")))
     store_opt(other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green"))
+
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
@@ -195,7 +203,7 @@ CONFIG FILES
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
             "dir)*,*(python system packages)*'")))
-    # These options are used by bash-completion and zsh completion.
+
     integration_args = parser.add_argument_group("Integration Options")
     store_opt(integration_args.add_argument('--completion-file',
         action='store_true', help=("Location of the bash- and zsh-completion "
@@ -208,6 +216,7 @@ CONFIG FILES
         "and zsh-completion.")))
     store_opt(integration_args.add_argument('--options', action='store_true',
         help="Output all options.  Used by bash- and zsh-completion."))
+
     parser.set_defaults(**(dict(default_args._get_kwargs())))
     args = parser.parse_args()
 

@@ -1,4 +1,7 @@
 from __future__ import unicode_literals
+from __future__ import print_function
+
+from collections import OrderedDict
 import time
 import traceback
 from unittest.result import failfast
@@ -61,6 +64,11 @@ class ProtoTest():
             self.method_name = ''
             self.docstr_part = ''
 
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        return hash(self.dotted_name)
 
     @property
     def dotted_name(self, ignored=None):
@@ -162,16 +170,17 @@ class GreenTestResult():
         """stream and verbose are as in
         unittest.runner.TextTestRunner.
         """
-        self.stream       = stream
-        self.showAll      = args.verbose > 1
-        self.dots         = args.verbose == 1
-        self.verbose      = args.verbose
-        self.colors       = Colors(args.termcolor, args.html)
-        self.last_module  = ''
-        self.last_class   = ''
-        self.failfast     = args.failfast
-        self.shouldStop   = False
-        self.testsRun     = 0
+        self.stream        = stream
+        self.showAll       = args.verbose > 1
+        self.dots          = args.verbose == 1
+        self.verbose       = args.verbose
+        self.colors        = Colors(args.termcolor, args.html)
+        self.last_module   = ''
+        self.last_class    = ''
+        self.failfast      = args.failfast
+        self.shouldStop    = False
+        self.testsRun      = 0
+        self.stdout_output = OrderedDict()
         # Individual lists
         self.errors              = []
         self.expectedFailures    = []
@@ -322,6 +331,29 @@ class GreenTestResult():
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
 
+    def displayStdout(self, test):
+        """
+        Displays AND REMOVES the output captured from a specific test.  The
+        removal is done so that this method can be called multiple times
+        without duplicating results output.
+        """
+        test = proto_test(test)
+        if test.dotted_name in self.stdout_output:
+            self.stream.write(
+                "\n{} for {}\n{}".format(
+                    self.colors.blue('Captured stdout'),
+                    self.colors.bold(test.dotted_name),
+                    self.stdout_output[test.dotted_name]))
+            del(self.stdout_output[test.dotted_name])
+
+    def recordStdout(self, test, output):
+        """
+        Called with stdout that the suite decided to capture so we can report
+        the captured output somewhere.
+        """
+        if output:
+            test = proto_test(test)
+            self.stdout_output[test] = output
 
     def addSuccess(self, test):
         "Called when a test passed"
@@ -409,6 +441,13 @@ class GreenTestResult():
                 # Done with this frame, capture it.
                 relevant_frames.append(frame)
             self.stream.write(''.join(relevant_frames))
+
+            # Captured output for failing tests
+            self.displayStdout(test)
+
+        # Captured output for non-failing tests
+        for test in self.stdout_output:
+            self.displayStdout(test)
 
 
     def wasSuccessful(self):

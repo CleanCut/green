@@ -30,6 +30,7 @@ def main(testing=False, coverage_testing=False):
     from green.output import GreenStream, debug
     import green.output
     from green.suite import GreenTestSuite
+    GreenTestSuite.args = args
 
     if args.debug:
         green.output.debug_level = args.debug
@@ -67,7 +68,7 @@ def main(testing=False, coverage_testing=False):
     if not test_suite:
         debug(
             "No test loading attempts succeeded.  Created an empty test suite.")
-        test_suite = GreenTestSuite(args=args)
+        test_suite = GreenTestSuite()
 
     # Actually run the test_suite
     if testing:

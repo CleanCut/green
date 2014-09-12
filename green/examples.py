@@ -7,12 +7,13 @@ class TestStates(unittest.TestCase):
 
 
     def test0Pass(self):
-        "This test will pass"
-        return
+        "This test will print output to stdout, and then pass."
+        print("Sunshine and daisies")
 
 
     def test1Fail(self):
-        "This test will fail an assertion"
+        "This test will print output to stdout, and then fail an assertion"
+        print("Doom and gloom.")
         self.assertTrue(False)
 
 

@@ -1,8 +1,15 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import copy
+import sys
 from unittest.suite import _isnotsuite, TestSuite
+try:
+    from io import StringIO
+except:
+    from cStringIO import StringIO
 
+from green.output import GreenStream
 
 
 class GreenTestSuite(TestSuite):
@@ -12,6 +19,7 @@ class GreenTestSuite(TestSuite):
     1) It brings Python 3.4-like features to Python 2.7
     2) It adds Green-specific features  (see customize())
     """
+    args = None
 
     def __init__(self, tests=(), args=None):
         super(GreenTestSuite, self).__init__(tests)
@@ -24,9 +32,15 @@ class GreenTestSuite(TestSuite):
         the green.config module.  If you don't pass in an args dictionary,
         then this class acts like TestSuite from Python 3.4.
         """
+        # Set a new args on the CLASS
         if args:
-            self.allow_stdout = args.allow_stdout
+            self.args = args
+
+        # Use the class args
+        if self.args:
+            self.allow_stdout = self.args.allow_stdout
         else:
+            # Without args, act like standard TestSuite
             self.allow_stdout = True
 
     def _removeTestAtIndex(self, index):
@@ -70,7 +84,17 @@ class GreenTestSuite(TestSuite):
                     getattr(result, '_moduleSetUpFailed', False)):
                     continue
 
+                if not self.allow_stdout:
+                    captured_stdout = StringIO()
+                    saved_stdout = sys.stdout
+                    sys.stdout = GreenStream(captured_stdout)
+
             test(result)
+
+            if _isnotsuite(test):
+                if not self.allow_stdout:
+                    sys.stdout = saved_stdout
+                    result.recordStdout(test, captured_stdout.getvalue())
 
             self._removeTestAtIndex(index)
 
