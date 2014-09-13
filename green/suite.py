@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import copy
 import sys
 from unittest.suite import _isnotsuite, TestSuite
 try:
     from io import StringIO
-except:
+except: # pragma: no cover
     from cStringIO import StringIO
 
 from green.output import GreenStream
@@ -22,6 +21,8 @@ class GreenTestSuite(TestSuite):
     args = None
 
     def __init__(self, tests=(), args=None):
+        # You should either set GreenTestSuite.args before instantiation, or
+        # pass args into __init__
         super(GreenTestSuite, self).__init__(tests)
         self._removed_tests = 0
         self.customize(args)
@@ -37,11 +38,7 @@ class GreenTestSuite(TestSuite):
             self.args = args
 
         # Use the class args
-        if self.args:
-            self.allow_stdout = self.args.allow_stdout
-        else:
-            # Without args, act like standard TestSuite
-            self.allow_stdout = True
+        self.allow_stdout = self.args.allow_stdout
 
     def _removeTestAtIndex(self, index):
         """

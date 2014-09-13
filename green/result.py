@@ -95,10 +95,13 @@ class ProtoError():
         self.traceback_lines = traceback.format_exception(*err)
 
 
-class BaseTestResult():
+class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
     """
     I am inherited by ProtoTestResult and GreenTestResult.
     """
+
+    def __init__(self):
+        self.stdout_output = OrderedDict()
 
     def recordStdout(self, test, output):
         """
@@ -109,6 +112,21 @@ class BaseTestResult():
             test = proto_test(test)
             self.stdout_output[test] = output
 
+    def displayStdout(self, test):
+        """
+        Displays AND REMOVES the output captured from a specific test.  The
+        removal is done so that this method can be called multiple times
+        without duplicating results output.
+        """
+        test = proto_test(test)
+        if test.dotted_name in self.stdout_output:
+            self.stream.write(
+                "\n{} for {}\n{}".format(
+                    self.colors.blue('Captured stdout'),
+                    self.colors.bold(test.dotted_name),
+                    self.stdout_output[test.dotted_name]))
+            del(self.stdout_output[test.dotted_name])
+
 
 class ProtoTestResult(BaseTestResult):
     """
@@ -117,6 +135,7 @@ class ProtoTestResult(BaseTestResult):
 
 
     def __init__(self):
+        super(ProtoTestResult, self).__init__()
         self.shouldStop = False
         # Individual lists
         self.errors              = []
@@ -180,9 +199,7 @@ class GreenTestResult(BaseTestResult):
 
 
     def __init__(self, args, stream):
-        """stream and verbose are as in
-        unittest.runner.TextTestRunner.
-        """
+        super(GreenTestResult, self).__init__()
         self.stream        = stream
         self.showAll       = args.verbose > 1
         self.dots          = args.verbose == 1
@@ -193,7 +210,6 @@ class GreenTestResult(BaseTestResult):
         self.failfast      = args.failfast
         self.shouldStop    = False
         self.testsRun      = 0
-        self.stdout_output = OrderedDict()
         # Individual lists
         self.errors              = []
         self.expectedFailures    = []
@@ -343,30 +359,6 @@ class GreenTestResult(BaseTestResult):
         elif self.dots:
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
-
-    def displayStdout(self, test):
-        """
-        Displays AND REMOVES the output captured from a specific test.  The
-        removal is done so that this method can be called multiple times
-        without duplicating results output.
-        """
-        test = proto_test(test)
-        if test.dotted_name in self.stdout_output:
-            self.stream.write(
-                "\n{} for {}\n{}".format(
-                    self.colors.blue('Captured stdout'),
-                    self.colors.bold(test.dotted_name),
-                    self.stdout_output[test.dotted_name]))
-            del(self.stdout_output[test.dotted_name])
-
-    def recordStdout(self, test, output):
-        """
-        Called with stdout that the suite decided to capture so we can report
-        the captured output somewhere.
-        """
-        if output:
-            test = proto_test(test)
-            self.stdout_output[test] = output
 
     def addSuccess(self, test):
         "Called when a test passed"
