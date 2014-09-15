@@ -46,6 +46,16 @@ class TestBaseTestResult(unittest.TestCase):
         self.assertEqual(btr.stdout_output[pt], o)
 
 
+    def test_stdoutNoOutput(self):
+        """
+        recordStdout ignores empty output sent to it
+        """
+        btr = BaseTestResult()
+        pt = ProtoTest()
+        btr.recordStdout(pt, '')
+        self.assertEqual(btr.stdout_output, {})
+
+
 
 class TestProtoTestResult(unittest.TestCase):
 
