@@ -6,7 +6,7 @@ import unittest
 from green.config import default_args
 from green.output import GreenStream
 from green.result import GreenTestResult, proto_test, \
-        ProtoTest, proto_error, ProtoTestResult
+        ProtoTest, proto_error, ProtoTestResult, BaseTestResult
 
 try:
     from io import StringIO
@@ -29,6 +29,21 @@ class MyProtoTest(ProtoTest):
         self.class_name  = "MyClass"
         self.method_name = "myMethod"
         self.docstr_part = "My docstring"
+
+
+
+class TestBaseTestResult(unittest.TestCase):
+
+
+    def test_stdoutOutput(self):
+        """
+        recordStdout records output.
+        """
+        btr = BaseTestResult()
+        pt = ProtoTest()
+        o = "some output"
+        btr.recordStdout(pt, o)
+        self.assertEqual(btr.stdout_output[pt], o)
 
 
 
