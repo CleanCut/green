@@ -139,7 +139,9 @@ class A(unittest.TestCase):
 
 
     def test_error(self):
-        "Exception raised running unit test is reported as an error"
+        """
+        Exception raised running unit test is reported as an error
+        """
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
