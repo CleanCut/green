@@ -4,9 +4,9 @@ import sys
 import unittest
 
 from green.config import default_args
-from green.output import GreenStream
+from green.output import Colors, GreenStream
 from green.result import GreenTestResult, proto_test, \
-        ProtoTest, proto_error, ProtoTestResult
+        ProtoTest, proto_error, ProtoTestResult, BaseTestResult
 
 try:
     from io import StringIO
@@ -29,6 +29,45 @@ class MyProtoTest(ProtoTest):
         self.class_name  = "MyClass"
         self.method_name = "myMethod"
         self.docstr_part = "My docstring"
+
+
+
+class TestBaseTestResult(unittest.TestCase):
+
+
+    def test_stdoutOutput(self):
+        """
+        recordStdout records output.
+        """
+        btr = BaseTestResult(None, None)
+        pt = ProtoTest()
+        o = "some output"
+        btr.recordStdout(pt, o)
+        self.assertEqual(btr.stdout_output[pt], o)
+
+
+    def test_stdoutNoOutput(self):
+        """
+        recordStdout ignores empty output sent to it
+        """
+        btr = BaseTestResult(None, None)
+        pt = ProtoTest()
+        btr.recordStdout(pt, '')
+        self.assertEqual(btr.stdout_output, {})
+
+
+    def test_displayStdout(self):
+        """
+        displayStdout displays captured stdout
+        """
+        stream = StringIO()
+        noise = "blah blah blah"
+        btr = BaseTestResult(stream, Colors(False, False))
+        pt = ProtoTest()
+        btr.stdout_output[pt] = noise
+        btr.displayStdout(pt)
+        self.assertIn(noise, stream.getvalue())
+
 
 
 
@@ -324,6 +363,22 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertFalse('&nbsp;' in self.stream.getvalue())
         self.assertFalse('<' in self.stream.getvalue())
         self.assertFalse('>' in self.stream.getvalue())
+
+
+    def test_printErrorsStdout(self):
+        """
+        printErrors() prints out the captured stdout
+        """
+        self.args.verbose = 1
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        output = 'this is what the test spit out to stdout'
+        gtr.recordStdout(pt, output)
+        gtr.addSuccess(pt)
+        gtr.printErrors()
+        self.assertIn(output, self.stream.getvalue())
 
 
     def test_printErrorsDots(self):

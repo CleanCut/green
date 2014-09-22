@@ -12,13 +12,14 @@ import traceback
 
 from green.output import debug
 from green.result import proto_test
+from green.suite import GreenTestSuite
 
 python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
 
 
 def toProtoTestList(suite_part, test_list=None):
     """
-    Take a TestSuite and turn it into a list of ProtoTests.
+    Take a test suite and turn it into a list of ProtoTests.
 
     This function is recursive.  Pass it a suite, and it will re-call itself
     with smaller parts of the suite.
@@ -129,7 +130,7 @@ def loadFromTestCase(test_case_class):
             key=functools.cmp_to_key(lambda x, y: (x > y) - (x < y)))
     if not test_case_names and hasattr(test_case_class, 'runTest'):
         test_case_names = ['runTest']
-    return unittest.TestSuite(map(test_case_class, test_case_names))
+    return GreenTestSuite(map(test_case_class, test_case_names))
 
 
 def loadFromModule(module):
@@ -139,7 +140,7 @@ def loadFromModule(module):
         obj = getattr(module, item)
         if isinstance(obj, type) and issubclass(obj, unittest.case.TestCase):
             test_cases.append(loadFromTestCase(obj))
-    return unittest.suite.TestSuite(test_cases)
+    return GreenTestSuite(test_cases)
 
 
 def loadFromModuleFilename(filename):
@@ -164,7 +165,7 @@ def loadFromModuleFilename(filename):
                 str("ModuleSkipped"),
                 (unittest.case.TestCase,),
                 {filename: testSkipped})
-        return unittest.suite.TestSuite((TestClass(filename),))
+        return GreenTestSuite((TestClass(filename),))
     except:
         # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
         # refactor it and simplify it after we make sure it works.
@@ -177,7 +178,7 @@ def loadFromModuleFilename(filename):
                 str("ModuleImportFailure"),
                 (unittest.case.TestCase,),
                 {filename: testFailure})
-        return unittest.suite.TestSuite((TestClass(filename),))
+        return GreenTestSuite((TestClass(filename),))
     finally:
         # This gets called before return statements in except clauses
         # actually return.  Yay!
@@ -195,13 +196,13 @@ def discover(current_path, file_pattern='test*.py'):
     If path is not a readable directory, I raise an ImportError.
 
     If I don't find anything, I return None.  Otherwise I return a
-    unittest.TestSuite -- but that may change someday.
+    GreenTestSuite
     """
     current_abspath = os.path.abspath(current_path)
     if not os.path.isdir(current_abspath):
         raise ImportError(
                 "'%s' is not a directory".format(str(current_path)))
-    suite = unittest.suite.TestSuite()
+    suite = GreenTestSuite()
     for file_or_dir_name in sorted(os.listdir(current_abspath)):
         path = os.path.join(current_abspath, file_or_dir_name)
         # Recurse into directories
@@ -248,7 +249,7 @@ def loadTargets(targets, file_pattern='test*.py'):
             num_tests, '' if (num_tests == 1) else 's', target))
 
     if suites:
-        return unittest.TestSuite(suites)
+        return GreenTestSuite(suites)
     else:
         return None
 
@@ -259,6 +260,7 @@ def loadTarget(target, file_pattern='test*.py'):
     debug("Attempting to load target '{}' with file_pattern '{}'".format(
         target, file_pattern))
     loader = unittest.TestLoader()
+    loader.suiteClass = GreenTestSuite
 
     # For a test loader, we want to always the current working directory to be
     # the first item in sys.path, just like when a python interpreter is loaded
@@ -305,8 +307,8 @@ def loadTarget(target, file_pattern='test*.py'):
     if target and (target[0] != '.'): # We don't handle relative dot objects
         try:
             tests = loader.loadTestsFromName(target)
-        except:
-            pass
+        except Exception as e:
+            debug("IGNORED exception: {}".format(e))
         if tests and tests.countTestCases():
             debug("Load method: DOTTED OBJECT - {}".format(target))
             return tests
@@ -342,7 +344,7 @@ def loadTarget(target, file_pattern='test*.py'):
                     str("ModuleImportFailure"),
                     (unittest.case.TestCase,),
                     {dotted_path: testFailure})
-            return unittest.suite.TestSuite((TestClass(dotted_path),))
+            return GreenTestSuite((TestClass(dotted_path),))
         if need_cleanup:
             sys.path.remove(cwd)
         if tests and tests.countTestCases():

@@ -141,13 +141,13 @@ class TestMain(unittest.TestCase):
 
 
     def test_noTestsCreatesEmptyTestSuite(self):
-        "If loadTargets doesn't find any tests, an empty test suite is created"
-        save_TestSuite = cmdline.unittest.suite.TestSuite
-        cmdline.unittest.suite.TestSuite = MagicMock()
+        """
+        If loadTargets doesn't find any tests, an empty test suite is created.
+        Coverage test, since loading the module inside the main function (due
+        to coverage handling constraints) prevents injecting a mock.
+        """
         cmdline.sys.argv = ['', '/tmp/non-existent/path']
         cmdline.main(testing=True)
-        cmdline.unittest.suite.TestSuite.assert_called_with()
-        cmdline.unittest.suite.TestSuite = save_TestSuite
 
 
     def test_omit(self):

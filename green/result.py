@@ -1,4 +1,7 @@
 from __future__ import unicode_literals
+from __future__ import print_function
+
+from collections import OrderedDict
 import time
 import traceback
 from unittest.result import failfast
@@ -61,6 +64,11 @@ class ProtoTest():
             self.method_name = ''
             self.docstr_part = ''
 
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        return hash(self.dotted_name)
 
     @property
     def dotted_name(self, ignored=None):
@@ -87,14 +95,49 @@ class ProtoError():
         self.traceback_lines = traceback.format_exception(*err)
 
 
+class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
+    """
+    I am inherited by ProtoTestResult and GreenTestResult.
+    """
 
-class ProtoTestResult():
+    def __init__(self, stream, colors):
+        self.stdout_output = OrderedDict()
+        self.stream = stream
+        self.colors = colors
+
+    def recordStdout(self, test, output):
+        """
+        Called with stdout that the suite decided to capture so we can report
+        the captured output somewhere.
+        """
+        if output:
+            test = proto_test(test)
+            self.stdout_output[test] = output
+
+    def displayStdout(self, test):
+        """
+        Displays AND REMOVES the output captured from a specific test.  The
+        removal is done so that this method can be called multiple times
+        without duplicating results output.
+        """
+        test = proto_test(test)
+        if test.dotted_name in self.stdout_output:
+            self.stream.write(
+                "\n{} for {}\n{}".format(
+                    self.colors.blue('Captured stdout'),
+                    self.colors.bold(test.dotted_name),
+                    self.stdout_output[test]))
+            del(self.stdout_output[test])
+
+
+class ProtoTestResult(BaseTestResult):
     """
     I'm the TestResult object for a single unit test run in a subprocess.
     """
 
 
     def __init__(self):
+        super(ProtoTestResult, self).__init__(None, None)
         self.shouldStop = False
         # Individual lists
         self.errors              = []
@@ -113,7 +156,6 @@ class ProtoTestResult():
                 "passing" + str(self.passing) + ', ' +
                 "skipped" + str(self.skipped) + ', ' +
                 "unexpectedSuccesses" + str(self.unexpectedSuccesses))
-
 
     def startTest(self, test):
         "Called before each test runs"
@@ -154,24 +196,22 @@ class ProtoTestResult():
 
 
 
-class GreenTestResult():
+class GreenTestResult(BaseTestResult):
     "Aggregates test results and outputs them to a stream."
 
 
     def __init__(self, args, stream):
-        """stream and verbose are as in
-        unittest.runner.TextTestRunner.
-        """
-        self.stream       = stream
-        self.showAll      = args.verbose > 1
-        self.dots         = args.verbose == 1
-        self.verbose      = args.verbose
-        self.colors       = Colors(args.termcolor, args.html)
-        self.last_module  = ''
-        self.last_class   = ''
-        self.failfast     = args.failfast
-        self.shouldStop   = False
-        self.testsRun     = 0
+        super(GreenTestResult, self).__init__(
+                stream,
+                Colors(args.termcolor, args.html))
+        self.showAll       = args.verbose > 1
+        self.dots          = args.verbose == 1
+        self.verbose       = args.verbose
+        self.last_module   = ''
+        self.last_class    = ''
+        self.failfast      = args.failfast
+        self.shouldStop    = False
+        self.testsRun      = 0
         # Individual lists
         self.errors              = []
         self.expectedFailures    = []
@@ -322,7 +362,6 @@ class GreenTestResult():
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
 
-
     def addSuccess(self, test):
         "Called when a test passed"
         test = proto_test(test)
@@ -375,11 +414,20 @@ class GreenTestResult():
 
 
     def printErrors(self):
-        "Print a list of all tracebacks from errors and failures"
-        if not self.all_errors:
-            return
+        """
+        Print a list of all tracebacks from errors and failures, as well as
+        captured stdout (even if the test passed).
+        """
         if self.dots:
             self.stream.writeln()
+
+        # Captured output for non-failing tests
+        failing_tests = set([x[0] for x in self.all_errors])
+        for test in self.stdout_output:
+            if test not in failing_tests:
+                self.displayStdout(test)
+
+        # Actual tracebacks and captured output for failing tests
         for (test, color_func, outcome, err) in self.all_errors:
             # Header Line
             self.stream.writeln(
@@ -409,6 +457,9 @@ class GreenTestResult():
                 # Done with this frame, capture it.
                 relevant_frames.append(frame)
             self.stream.write(''.join(relevant_frames))
+
+            # Captured output for failing tests
+            self.displayStdout(test)
 
 
     def wasSuccessful(self):
