@@ -33,6 +33,8 @@ Format Options:
   -T, --notermcolor     Force terminal colors off. Default is to autodetect.
 
 Output Options:
+  -a, --allow-stdout    Instead of capturing the stdout and presenting it in
+                        the summary of results, let it come through.
   -d, --debug           Enable internal debugging statements. Implies
                         --logging. Can be specified up to three times for more
                         debug output.
