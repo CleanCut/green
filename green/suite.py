@@ -8,6 +8,7 @@ try:
 except: # pragma: no cover
     from cStringIO import StringIO
 
+from green.config import default_args
 from green.output import GreenStream
 
 
@@ -25,6 +26,7 @@ class GreenTestSuite(TestSuite):
         # pass args into __init__
         super(GreenTestSuite, self).__init__(tests)
         self._removed_tests = 0
+        self.allow_stdout = default_args.allow_stdout
         self.customize(args)
 
     def customize(self, args):
@@ -38,7 +40,8 @@ class GreenTestSuite(TestSuite):
             self.args = args
 
         # Use the class args
-        self.allow_stdout = self.args.allow_stdout
+        if self.args:
+            self.allow_stdout = self.args.allow_stdout
 
     def _removeTestAtIndex(self, index):
         """

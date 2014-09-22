@@ -307,8 +307,8 @@ def loadTarget(target, file_pattern='test*.py'):
     if target and (target[0] != '.'): # We don't handle relative dot objects
         try:
             tests = loader.loadTestsFromName(target)
-        except:
-            pass
+        except Exception, e:
+            debug("IGNORED exception: {}".format(e))
         if tests and tests.countTestCases():
             debug("Load method: DOTTED OBJECT - {}".format(target))
             return tests
