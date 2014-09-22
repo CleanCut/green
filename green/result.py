@@ -414,11 +414,20 @@ class GreenTestResult(BaseTestResult):
 
 
     def printErrors(self):
-        "Print a list of all tracebacks from errors and failures"
-        if not self.all_errors:
-            return
+        """
+        Print a list of all tracebacks from errors and failures, as well as
+        captured stdout (even if the test passed).
+        """
         if self.dots:
             self.stream.writeln()
+
+        # Captured output for non-failing tests
+        failing_tests = set([x[0] for x in self.all_errors])
+        for test in self.stdout_output:
+            if test not in failing_tests:
+                self.displayStdout(test)
+
+        # Actual tracebacks and captured output for failing tests
         for (test, color_func, outcome, err) in self.all_errors:
             # Header Line
             self.stream.writeln(
@@ -450,10 +459,6 @@ class GreenTestResult(BaseTestResult):
             self.stream.write(''.join(relevant_frames))
 
             # Captured output for failing tests
-            self.displayStdout(test)
-
-        # Captured output for non-failing tests
-        for test in self.stdout_output:
             self.displayStdout(test)
 
 

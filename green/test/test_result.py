@@ -365,6 +365,22 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertFalse('>' in self.stream.getvalue())
 
 
+    def test_printErrorsStdout(self):
+        """
+        printErrors() prints out the captured stdout
+        """
+        self.args.verbose = 1
+        self.args.termcolor = False
+        self.args.html = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        output = 'this is what the test spit out to stdout'
+        gtr.recordStdout(pt, output)
+        gtr.addSuccess(pt)
+        gtr.printErrors()
+        self.assertIn(output, self.stream.getvalue())
+
+
     def test_printErrorsDots(self):
         """
         printErrors() looks correct in verbose=1 (dots) mode
