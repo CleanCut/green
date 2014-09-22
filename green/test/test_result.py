@@ -4,7 +4,7 @@ import sys
 import unittest
 
 from green.config import default_args
-from green.output import GreenStream
+from green.output import Colors, GreenStream
 from green.result import GreenTestResult, proto_test, \
         ProtoTest, proto_error, ProtoTestResult, BaseTestResult
 
@@ -39,7 +39,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStdout records output.
         """
-        btr = BaseTestResult()
+        btr = BaseTestResult(None, None)
         pt = ProtoTest()
         o = "some output"
         btr.recordStdout(pt, o)
@@ -50,10 +50,24 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStdout ignores empty output sent to it
         """
-        btr = BaseTestResult()
+        btr = BaseTestResult(None, None)
         pt = ProtoTest()
         btr.recordStdout(pt, '')
         self.assertEqual(btr.stdout_output, {})
+
+
+    def test_displayStdout(self):
+        """
+        displayStdout displays captured stdout
+        """
+        stream = StringIO()
+        noise = "blah blah blah"
+        btr = BaseTestResult(stream, Colors(False, False))
+        pt = ProtoTest()
+        btr.stdout_output[pt] = noise
+        btr.displayStdout(pt)
+        self.assertIn(noise, stream.getvalue())
+
 
 
 

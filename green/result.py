@@ -100,8 +100,10 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
     I am inherited by ProtoTestResult and GreenTestResult.
     """
 
-    def __init__(self):
+    def __init__(self, stream, colors):
         self.stdout_output = OrderedDict()
+        self.stream = stream
+        self.colors = colors
 
     def recordStdout(self, test, output):
         """
@@ -124,8 +126,8 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
                 "\n{} for {}\n{}".format(
                     self.colors.blue('Captured stdout'),
                     self.colors.bold(test.dotted_name),
-                    self.stdout_output[test.dotted_name]))
-            del(self.stdout_output[test.dotted_name])
+                    self.stdout_output[test]))
+            del(self.stdout_output[test])
 
 
 class ProtoTestResult(BaseTestResult):
@@ -135,7 +137,7 @@ class ProtoTestResult(BaseTestResult):
 
 
     def __init__(self):
-        super(ProtoTestResult, self).__init__()
+        super(ProtoTestResult, self).__init__(None, None)
         self.shouldStop = False
         # Individual lists
         self.errors              = []
@@ -199,12 +201,12 @@ class GreenTestResult(BaseTestResult):
 
 
     def __init__(self, args, stream):
-        super(GreenTestResult, self).__init__()
-        self.stream        = stream
+        super(GreenTestResult, self).__init__(
+                stream,
+                Colors(args.termcolor, args.html))
         self.showAll       = args.verbose > 1
         self.dots          = args.verbose == 1
         self.verbose       = args.verbose
-        self.colors        = Colors(args.termcolor, args.html)
         self.last_module   = ''
         self.last_class    = ''
         self.failfast      = args.failfast
