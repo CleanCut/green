@@ -17,7 +17,7 @@ from green.suite import GreenTestSuite
 python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
 
 
-def toProtoTestList(suite_part, test_list=None):
+def toProtoTestList(suite_part, test_list=None, doing_completions=False):
     """
     Take a test suite and turn it into a list of ProtoTests.
 
@@ -30,6 +30,8 @@ def toProtoTestList(suite_part, test_list=None):
     # makes this crazy special case necessary.  See _make_failed_import_test in
     # the source code for unittest.loader
     if suite_part.__class__.__name__ == 'ModuleImportFailure':
+        if doing_completions:
+            return test_list
         exception_method = str(suite_part).split()[0]
         getattr(suite_part, exception_method)()
     # On to the real stuff

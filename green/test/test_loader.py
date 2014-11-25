@@ -20,11 +20,21 @@ class TestToProtoTestList(unittest.TestCase):
 
 
     def test_moduleImportFailure(self):
+        "toProtoTestList() raises import errors normally"
         suite = MagicMock()
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
         self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
+
+
+    def test_moduleImportFailureIgnored(self):
+        "toProtoTestList() does not raise errors when doing completions"
+        suite = MagicMock()
+        suite.__class__.__name__ = str('ModuleImportFailure')
+        suite.__str__.return_value = "exception_method other_stuff"
+        suite.exception_method.side_effect = AttributeError
+        self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
 
 
 
