@@ -39,7 +39,7 @@ def toProtoTestList(suite_part, test_list=None, doing_completions=False):
         test_list.append(proto_test(suite_part))
     else:
         for i in suite_part:
-            toProtoTestList(i, test_list)
+            toProtoTestList(i, test_list, doing_completions=doing_completions)
         return test_list
 
 
@@ -71,7 +71,7 @@ def getCompletions(target):
 
         dotted_names = set()
         if test_suite:
-            for dotted_name in [x.dotted_name for x in toProtoTestList(test_suite)]:
+            for dotted_name in [x.dotted_name for x in toProtoTestList(test_suite, doing_completions=True)]:
                 if dotted_name.startswith(target):
                     dotted_names.add(dotted_name)
             # We have the fully dotted test names.  Now add the intermediate

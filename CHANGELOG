@@ -1,3 +1,9 @@
+Version 1.7.1 - 25 November 2014
+
+- When run in completions mode (green --completions), import errors in
+potential modules are ignored, so that the completions list is still generated
+instead of producing crash output.
+
 Version 1.7.0 - 21 September 2014
 
 - Output sent to stdout is now captured and then presented along with the list
