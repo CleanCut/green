@@ -62,6 +62,7 @@ class TestCompletions(unittest.TestCase):
         cwd = os.getcwd()
         green_parent = dirname(dirname(dirname(os.path.abspath(__file__))))
         os.chdir(green_parent)
+        self.addCleanup(os.chdir, cwd)
         c = set(loader.getCompletions('gre').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
@@ -69,7 +70,6 @@ class TestCompletions(unittest.TestCase):
         self.assertIn('green.test.test_loader.TestCompletions', c)
         self.assertIn(
             'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
-        os.chdir(cwd)
 
 
     def test_completionPartial(self):
@@ -87,7 +87,9 @@ class TestCompletions(unittest.TestCase):
         "An empty target generates completions for the whole directory"
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
+        self.addCleanup(os.chdir, cwd)
         os.mkdir('the_pkg')
         fh = open(os.path.join('the_pkg', '__init__.py'), 'w')
         fh.write('')
@@ -109,15 +111,15 @@ class A(unittest.TestCase):
         self.assertIn('the_pkg.test_things', c)
         self.assertIn('the_pkg.test_things.A.testOne', c)
         self.assertIn('the_pkg.test_things.A.testTwo', c)
-        os.chdir(cwd)
-        shutil.rmtree(tmpdir)
 
 
     def test_completionDot(self):
         "A '.' target generates completions for the whole directory"
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
+        self.addCleanup(os.chdir, cwd)
         os.mkdir('my_pkg')
         fh = open(os.path.join('my_pkg', '__init__.py'), 'w')
         fh.write('')
@@ -139,22 +141,21 @@ class A(unittest.TestCase):
         self.assertIn('my_pkg.test_things', c)
         self.assertIn('my_pkg.test_things.A.testOne', c)
         self.assertIn('my_pkg.test_things.A.testTwo', c)
-        os.chdir(cwd)
-        shutil.rmtree(tmpdir)
 
 
     def test_completionIgnoresErrors(self):
         "Errors in one module don't block the remaining completions"
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
+        self.addCleanup(os.chdir, cwd)
         os.mkdir('my_pkg2')
         fh = open(os.path.join('my_pkg2', '__init__.py'), 'w')
         fh.write('')
         fh.close()
-        fh = open(os.path.join('my_pkg2', 'test_things.py'), 'w')
-        fh.write(
-"""
+        fh = open(os.path.join('my_pkg2', 'test_crash01.py'), 'w')
+        contents = """
 import unittest
 
 class A(unittest.TestCase):
@@ -162,18 +163,23 @@ class A(unittest.TestCase):
         pass
     def testTwo(self):
         pass
-""")
+"""
+        fh.write(contents)
         fh.close()
-        fh = open(os.path.join('my_pkg2', 'test_crash.py'), 'w')
+        fh = open(os.path.join('my_pkg2', 'test_crash02.py'), 'w')
         fh.write("import moocow")
+        fh.close()
+        fh = open(os.path.join('my_pkg2', 'test_crash03.py'), 'w')
+        fh.write(contents)
         fh.close()
         c = set(loader.getCompletions('.').split('\n'))
         self.assertIn('my_pkg2', c)
-        self.assertIn('my_pkg2.test_things', c)
-        self.assertIn('my_pkg2.test_things.A.testOne', c)
-        self.assertIn('my_pkg2.test_things.A.testTwo', c)
-        os.chdir(cwd)
-        shutil.rmtree(tmpdir)
+        self.assertIn('my_pkg2.test_crash01', c)
+        self.assertIn('my_pkg2.test_crash01.A.testOne', c)
+        self.assertIn('my_pkg2.test_crash01.A.testTwo', c)
+        self.assertIn('my_pkg2.test_crash03', c)
+        self.assertIn('my_pkg2.test_crash03.A.testOne', c)
+        self.assertIn('my_pkg2.test_crash03.A.testTwo', c)
 
 
 
@@ -183,18 +189,18 @@ class TestIsPackage(unittest.TestCase):
     def test_yes(self):
         "A package is identified."
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         fh = open(os.path.join(tmpdir, '__init__.py'), 'w')
         fh.write('pass\n')
         fh.close()
         self.assertTrue(loader.isPackage(tmpdir))
-        shutil.rmtree(tmpdir)
 
 
     def test_no(self):
         "A non-package is identified"
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         self.assertFalse(loader.isPackage(tmpdir))
-        shutil.rmtree(tmpdir)
 
 
 
@@ -290,6 +296,7 @@ class TestDiscover(unittest.TestCase):
     def test_bad_input(self):
         "discover() raises ImportError when passed a non-directory"
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         self.assertRaises(ImportError, loader.discover,
                 os.path.join(tmpdir, 'garbage_in'))
         filename = os.path.join(tmpdir, 'some_file.py')
@@ -297,7 +304,6 @@ class TestDiscover(unittest.TestCase):
         fh.write('pass\n')
         fh.close()
         self.assertRaises(ImportError, loader.discover, filename)
-        shutil.rmtree(tmpdir)
 
 
 
