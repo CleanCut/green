@@ -264,6 +264,17 @@ class TestLoadFromTestCase(unittest.TestCase):
                          set(['test_method1', 'test_method2']))
 
 
+    def test_nose_disabled_attribute(self):
+        "Tests disabled by nose generators dont get loaded"
+        class HasDisabled(unittest.TestCase):
+            def test_method(self):
+                pass
+
+            test_method.__test__ = False
+
+        suite = loader.loadFromTestCase(HasDisabled)
+        self.assertEqual(suite.countTestCases(), 0)
+
 
 class TestLoadFromModuleFilename(unittest.TestCase):
 
