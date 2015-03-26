@@ -264,8 +264,8 @@ class TestLoadFromTestCase(unittest.TestCase):
                          set(['test_method1', 'test_method2']))
 
 
-    def test_nose_disabled_attribute(self):
-        "Tests disabled by nose generators dont get loaded"
+    def test_isTestCaseDisabled(self):
+        "TestCases disabled by nose generators don't get loaded"
         class HasDisabled(unittest.TestCase):
             def test_method(self):
                 pass

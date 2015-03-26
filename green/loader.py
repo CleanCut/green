@@ -121,21 +121,21 @@ def findDottedModuleAndParentDir(file_path):
     return (dotted_module, parent_dir)
 
 
-def isNoseDisabledCase(test_case_class, attrname):
-    test_func = getattr(test_case_class, attrname)
-    nose_enabled = getattr(test_func, "__test__", None)
-
-    if nose_enabled is False:
-        return True
-    else:
-        return False
+def isTestCaseDisabled(test_case_class, method_name):
+    """
+    I check to see if a method on a TestCase has been disabled via nose's
+    convention for disabling a TestCase.  This makes it so that users can mix
+    nose's parameterized tests with green as a runner.
+    """
+    test_method = getattr(test_case_class, method_name)
+    return getattr(test_method, "__test__", 'not nose') == False
 
 def loadFromTestCase(test_case_class):
     debug("Examining test case {}".format(test_case_class.__name__), 3)
     test_case_names = list(filter(
         lambda attrname: (attrname.startswith('test') and
                           callable(getattr(test_case_class, attrname)) and
-                          not isNoseDisabledCase(test_case_class, attrname)),
+                          not isTestCaseDisabled(test_case_class, attrname)),
         dir(test_case_class)))
     debug("Test case names: {}".format(test_case_names))
     test_case_names.sort(
