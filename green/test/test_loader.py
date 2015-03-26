@@ -614,3 +614,45 @@ class A(unittest.TestCase):
         tests = loader.loadTargets('mod_with_import_error.py')
         self.assertEqual(tests.countTestCases(), 1)
 
+    def test_file_pattern(self):
+        "Specifying a file_pattern"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/target1_tests.py
+        fh = open(os.path.join(sub_tmpdir, 'target1_tests.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # pkg/test/target2_tests.py
+        fh = open(os.path.join(sub_tmpdir, 'target2_tests.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # pkg/test/test_target999.py: NOT a match.
+        fh = open(os.path.join(sub_tmpdir, 'test_target999.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        pkg = os.path.basename(sub_tmpdir)
+        targets = [
+            pkg + '.' + 'target1_tests',
+            pkg + '.' + 'target2_tests',
+            pkg + '.' + 'test_target999',
+        ]
+        tests = loader.loadTargets(pkg, file_pattern='*_tests.py')
+        self.assertEqual(tests.countTestCases(), 2)
+
