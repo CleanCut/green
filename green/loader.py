@@ -130,6 +130,7 @@ def isTestCaseDisabled(test_case_class, method_name):
     test_method = getattr(test_case_class, method_name)
     return getattr(test_method, "__test__", 'not nose') == False
 
+
 def loadFromTestCase(test_case_class):
     debug("Examining test case {}".format(test_case_class.__name__), 3)
     test_case_names = list(filter(
