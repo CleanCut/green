@@ -1,1 +1,3 @@
--e .
+colorama
+mock
+python-termstyle

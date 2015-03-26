@@ -11,10 +11,9 @@ with open('README-pypi.rst') as readme_file:
 
 # Calculate dependencies
 dependencies = [
-    'python-termstyle'
+    'colorama',
+    'python-termstyle',
 ]
-if platform.system() == 'Windows':
-    dependencies.append('colorama')
 if sys.version_info[0] == 2:
     dependencies.append('mock')
 
