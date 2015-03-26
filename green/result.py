@@ -423,7 +423,7 @@ class GreenTestResult(BaseTestResult):
 
         # Captured output for non-failing tests
         failing_tests = set([x[0] for x in self.all_errors])
-        for test in self.stdout_output:
+        for test in list(self.stdout_output):
             if test not in failing_tests:
                 self.displayStdout(test)
 
