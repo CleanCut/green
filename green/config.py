@@ -52,6 +52,7 @@ default_args = argparse.Namespace( # pragma: no cover
         verbose         = 1,
         failfast        = False,
         config          = None,  # Not in configs
+        pattern         = 'test*.py',
         run_coverage    = False,
         omit            = None,
         completion_file = False,
@@ -193,6 +194,8 @@ CONFIG FILES
     store_opt(other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green"))
+    store_opt(other_args.add_argument('-p', '--pattern', action='store',
+        metavar='PATTERN', help="Pattern to match test files. Default is test*.py."))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
@@ -333,7 +336,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit', 'warnings']:
+        elif name in ['omit', 'warnings', 'pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
