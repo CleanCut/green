@@ -62,7 +62,7 @@ def main(testing=False, coverage_testing=False):
     if testing:
         test_suite = None
     else:
-        test_suite = loadTargets(args.targets)
+        test_suite = loadTargets(args.targets, file_pattern = args.pattern)
 
     # We didn't even load 0 tests...
     if not test_suite:

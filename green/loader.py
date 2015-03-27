@@ -220,7 +220,7 @@ def discover(current_path, file_pattern='test*.py'):
         path = os.path.join(current_abspath, file_or_dir_name)
         # Recurse into directories
         if os.path.isdir(path):
-            subdir_suite = discover(path, file_pattern)
+            subdir_suite = discover(path, file_pattern=file_pattern)
             if subdir_suite:
                 suite.addTest(subdir_suite)
 
@@ -307,7 +307,7 @@ def loadTarget(target, file_pattern='test*.py'):
     for candidate in [bare_dir, dot_dir, pkg_in_path_dir]:
         if (candidate == None) or (not os.path.isdir(candidate)):
             continue
-        tests = discover(candidate)
+        tests = discover(candidate, file_pattern=file_pattern)
         if tests and tests.countTestCases():
             debug("Load method: DISCOVER - {}".format(candidate))
             return tests
