@@ -180,7 +180,7 @@ Django can use green as the test runner for running tests.
 TEST_RUNNER="green.djangorunner.DjangoRunner"
 ```
 
-### nose-paramaterized
+### nose-parameterized
 
 Green will run generated tests created by
 [nose-parameterized](https://github.com/wolever/nose-parameterized).  They have
