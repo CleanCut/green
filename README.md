@@ -21,7 +21,9 @@ Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
 6. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
 7. [Integration](https://github.com/CleanCut/green#integration)
   - [Bash and Zsh](https://github.com/CleanCut/green#bash-and-zsh)
+  - [coverage](https://github.com/CleanCut/green#coverage)
   - [Django](https://github.com/CleanCut/green#django)
+  - [nose-parameterized](https://github.com/CleanCut/green#nose-parameterized)
 8. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
 9. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
@@ -30,8 +32,8 @@ Features
 --------
 
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
-- **Clean** - Low redundancy in output. Result stats for each test is lined up in a vertical column.
-- **Fast** - Can run tests in independent subprocesses.
+- **Clean** - Low redundancy in output. Result statistics for each test is vertically aligned.
+- **Fast** - Tests can run in independent subprocesses.
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.
@@ -159,6 +161,11 @@ config file of your choice (usually `~/.bashrc` or `~/.zshrc`)
 which green >& /dev/null && source "$( green --completion-file )"
 ```
 
+### Coverage
+
+Green has built-in integration support for the
+[coverage](http://coverage.readthedocs.org/) module.  Just make sure `coverage`
+is installed, and then add `-r` or `--run-coverage` when you run green.
 
 ### Django
 
@@ -172,6 +179,13 @@ Django can use green as the test runner for running tests.
 ```python
 TEST_RUNNER="green.djangorunner.DjangoRunner"
 ```
+
+### nose-paramaterized
+
+Green will run generated tests created by
+[nose-parameterized](https://github.com/wolever/nose-parameterized).  They have
+lots of examples of how to generate tests, so follow the link above if you're
+interested.
 
 
 Unit Test Structure Tutorial

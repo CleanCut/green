@@ -6,7 +6,8 @@ question to get things going.  Contributed by Mikko Ohtamaa.  Pull request
 #43.
 
 - Added -p / --pattern option to specify the file pattern to search for tests
-under instead of the default pattern (test*py).
+under instead of the default pattern (test*py). Contributed by ???.  Issue
+#41.  Pull request #42.
 
 - Green now supports nose-parameterized.  Contributed by Sam Spilsbury.  Issue
 #39.  Pull request #40.
