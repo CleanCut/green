@@ -15,7 +15,9 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 test-local:
-	@sudo make test-installed
+	@sudo -H pip install -r requirements-optional.txt
+	-@sudo -H pip uninstall green
+	@sudo -H make test-installed
 	make test-versions
 	make test-coverage
 	@# test-coverage needs to be last in deps, don't clean after it runs!

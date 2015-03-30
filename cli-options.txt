@@ -53,7 +53,7 @@ Other Options:
                         environment variable GREEN_CONFIG or the default
                         ~/.green
   -p PATTERN, --pattern PATTERN
-                        Pattern to match test files. Default is test*.py.
+                        Pattern to match test files. Default is test*.py
 
 Coverage Options (Coverage 3.7.1):
   -r, --run-coverage    Produce coverage output.
