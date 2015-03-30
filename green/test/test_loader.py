@@ -625,8 +625,9 @@ class A(unittest.TestCase):
         tests = loader.loadTargets('mod_with_import_error.py')
         self.assertEqual(tests.countTestCases(), 1)
 
+
     def test_file_pattern(self):
-        "Specifying a file_pattern"
+        "Specifying a file pattern causes only matching files to be loaded"
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')

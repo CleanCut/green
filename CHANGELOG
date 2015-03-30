@@ -1,19 +1,43 @@
+ Version 1.8.0 - ? March 2015
+
+- The tag to use for questions on StackOverflow was changed to python-green to
+avoid being too generic.  The tag has a nice wiki entry and an initial
+question to get things going.  Contributed by Mikko Ohtamaa.  Pull request
+#43.
+
+- Added -p / --pattern option to specify the file pattern to search for tests
+under instead of the default pattern (test*py).
+
+- Green now supports nose-parameterized.  Contributed by Sam Spilsbury.  Issue
+#39.  Pull request #40.
+
+- Fixed a crash that could occur in PyPy 2.5
+
+- Fixed a crash that could occur during automated build testing with pip 6.x
+
+- Colorama is now a dependency on all platforms (dropping python-termstyle as
+a dependency is planned).
+
+
 Version 1.7.1 - 25 November 2014
 
 - When run in completions mode (green --completions), import errors in
 potential modules are ignored, so that the completions list is still generated
 instead of producing crash output.
 
+
 Version 1.7.0 - 21 September 2014
 
 - Output sent to stdout is now captured and then presented along with the list
 of tracebacks.  This can be disabled with -a/--allow-stdout.  Issue #29.
+
 
 Version 1.6.0 - 10 September 2014
 
 - Added -f/--failfast to stop executing tests after the first error, failure,
 or unexpected successes.
 - Simplified the usage line in the help output.
+
 
 Version 1.5.0 - 31 August 2014
 
@@ -23,6 +47,7 @@ test run.
 - Python 3.3 is no longer supported on Windows.  It might work still--it's
 just not supported.
 - Windows CI with AppVeyor is now passing.
+
 
 Version 1.4.4 - 26 August 2014
 

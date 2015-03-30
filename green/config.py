@@ -195,7 +195,8 @@ CONFIG FILES
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green"))
     store_opt(other_args.add_argument('-p', '--pattern', action='store',
-        metavar='PATTERN', help="Pattern to match test files. Default is test*.py."))
+        metavar='PATTERN',
+        help="Pattern to match test files. Default is test*.py"))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
