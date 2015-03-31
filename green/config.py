@@ -53,6 +53,7 @@ default_args = argparse.Namespace( # pragma: no cover
         failfast        = False,
         config          = None,  # Not in configs
         pattern         = 'test*.py',
+        name_pattern    = None,
         run_coverage    = False,
         omit            = None,
         completion_file = False,
@@ -197,6 +198,8 @@ CONFIG FILES
     store_opt(other_args.add_argument('-p', '--pattern', action='store',
         metavar='PATTERN',
         help="Pattern to match test files. Default is test*.py"))
+    store_opt(other_args.add_argument('-n', '--name-pattern', action='store',
+        metavar='PATTERN', help="Pattern to match test method names."))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
@@ -337,7 +340,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit', 'warnings', 'pattern']:
+        elif name in ['omit', 'warnings', 'pattern', 'name_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
