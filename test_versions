@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS_IN_PATH="$(find -E `echo $PATH | tr : ' '` -regex '.*/python(2.7|3.3|3.4)' 2>/dev/null | sed -e 's/.*python//')"
+PYTHON_VERSIONS_IN_PATH="$(find -d 1 -E `echo $PATH | tr : ' '` -regex '.*/python(2.7|3.3|3.4)' 2>/dev/null | sed -e 's/.*python//')"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 if [ "${TESTS}" == "" ] ; then
