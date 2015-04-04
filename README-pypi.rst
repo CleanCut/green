@@ -35,4 +35,4 @@ Features
 .. _tutorial on how to correctly layout unit tests: https://github.com/CleanCut/green#unit-test-structure-tutorial
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
-.. _changelog: https://github.com/CleanCut/green/blob/master/CHANGELOG
+.. _changelog: https://github.com/CleanCut/green/blob/master/CHANGELOG.md

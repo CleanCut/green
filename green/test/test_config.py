@@ -77,11 +77,15 @@ class ConfigBase(unittest.TestCase):
         self.default_filename = os.path.join(self.tmpd, ".green")
         self.default_logging = False
         self.default_version = False
+        self.default_failfast = True
+        self.default_termcolor = True
         self._write_file(self.default_filename,
                         ["# this is a test config file for green",
                          "logging = {}".format(str(self.default_logging)),
                          "version = {}".format(str(self.default_version)),
                          "omit = {}".format(self.default_filename),
+                         "failfast = {}".format(str(self.default_failfast)),
+                         "termcolor = {}".format(str(self.default_termcolor)),
                          ])
         self.env_filename = os.path.join(self.tmpd, "green.env")
         self.env_logging = True
@@ -290,7 +294,7 @@ class TestMergeConfig(ConfigBase):
             new_args.version      = True
 
             new_args.config = self.cmd_filename
-            computed_args = config.mergeConfig(new_args, config.default_args)
+            computed_args = config.mergeConfig(new_args, testing=True)
 
             self.assertEqual(computed_args.omit,         'omitstuff')
             self.assertEqual(computed_args.run_coverage, new_args.run_coverage)
@@ -302,14 +306,32 @@ class TestMergeConfig(ConfigBase):
 
     def test_no_overwrite(self):
         """
-        Default command-line arguments do not overwrite config values.
+        Default unspecified command-line args do not overwrite config values.
         """
         # This config environment should set logging to True
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=""):
             # The default for logging in arguments is False
-            da = config.default_args
-            computed_args = config.mergeConfig(da, da)
+            da = copy.deepcopy(config.default_args)
+            del(da.logging)
+            computed_args = config.mergeConfig(da, testing=True)
             self.assertEqual(computed_args.logging, True)
+
+
+    def test_specified_command_line(self):
+        """
+        Specified command-line arguments always overwrite config file values
+        """
+        with ModifiedEnvironment(HOME=self.tmpd):
+            new_args = copy.deepcopy(config.default_args)
+            new_args.failfast = True # same as config, for sanity
+            new_args.logging = True # different than config, not default
+            del(new_args.version) # Not in arguments, should get config value
+            new_args.termcolor = False # override config, set back to default
+            computed_args = config.mergeConfig(new_args, testing=True)
+            self.assertEqual(computed_args.failfast, True)
+            self.assertEqual(computed_args.logging, True)
+            self.assertEqual(computed_args.version, False)
+            self.assertEqual(computed_args.termcolor, False)
 
 
     def test_targets(self):
@@ -325,8 +347,11 @@ class TestMergeConfig(ConfigBase):
          """
          mergeConfig raises an exception for unknown cmdline args
          """
+         orig_args = copy.deepcopy(config.default_args)
+         self.addCleanup(setattr, config, 'default_args', orig_args)
+         config.default_args.new_option = True
+
          new_args = copy.deepcopy(config.default_args)
-         new_args.new_option = True
 
          self.assertRaises(NotImplementedError, config.mergeConfig, new_args,
-                 config.default_args)
+                 testing=True)
