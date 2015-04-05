@@ -239,7 +239,7 @@ def discover(current_path, file_pattern='test*.py'):
     return ((suite.countTestCases() and suite) or None)
 
 
-def loadTargets(targets, file_pattern='test*.py', name_pattern=None):
+def loadTargets(targets, file_pattern='test*.py', test_pattern=None):
     # If a string was passed in, put it into a list.
     if type(targets) != list:
         targets = [targets]
@@ -265,10 +265,10 @@ def loadTargets(targets, file_pattern='test*.py', name_pattern=None):
         return None
 
     suite = GreenTestSuite(suites)
-    if name_pattern is None:
+    if test_pattern is None:
         return suite
     else:
-        name_regex = re.compile(name_pattern)
+        name_regex = re.compile(test_pattern)
         return name_filtered(suite, name_regex)
 
 def name_filtered(suite, name_regex):

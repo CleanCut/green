@@ -64,8 +64,8 @@ def main(testing=False, coverage_testing=False):
     else:
         test_suite = loadTargets(
             args.targets,
-            file_pattern = args.pattern,
-            name_pattern = args.name_pattern,
+            file_pattern = args.file_pattern,
+            test_pattern = args.test_pattern,
         )
 
     # We didn't even load 0 tests...
