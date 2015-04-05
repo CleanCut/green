@@ -35,7 +35,7 @@ def main(testing=False, coverage_testing=False):
     if args.debug:
         green.output.debug_level = args.debug
 
-    stream = GreenStream(sys.stdout, html = args.html)
+    stream = GreenStream(sys.stderr, html = args.html)
 
     # Location of shell completion file
     if args.completion_file:
