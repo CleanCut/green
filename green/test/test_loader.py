@@ -625,7 +625,6 @@ class A(unittest.TestCase):
         tests = loader.loadTargets('mod_with_import_error.py')
         self.assertEqual(tests.countTestCases(), 1)
 
-
     def test_file_pattern(self):
         "Specifying a file pattern causes only matching files to be loaded"
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -667,4 +666,61 @@ class A(unittest.TestCase):
         ]
         tests = loader.loadTargets(pkg, file_pattern='*_tests.py')
         self.assertEqual(tests.countTestCases(), 2)
+
+    def test_test_pattern(self):
+        "Specifying a test pattern causes only matching tests to be loaded"
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/target1_tests.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target1.py'), 'w')
+        fh.write("""
+import unittest
+class A(unittest.TestCase):
+    def testFoo(self):
+        pass
+    def testFooBar(self):
+        pass
+    def testBar(self):
+        pass""")
+        fh.close()
+        # pkg/test/target2_tests.py
+        fh = open(os.path.join(sub_tmpdir, 'test_target2.py'), 'w')
+        fh.write("""
+import unittest
+class B(unittest.TestCase):
+    def testFoolish(self):
+        pass
+    def testBarber(self):
+        pass""")
+        fh.close()
+        # pkg/test/test_target999.py: NOT a match.
+        fh = open(os.path.join(sub_tmpdir, 'test_target3.py'), 'w')
+        fh.write("""
+import unittest
+class C(unittest.TestCase):
+    def testPasses(self):
+        pass""")
+        fh.close()
+        # Load tests using various test patterns.
+        os.chdir(self.tmpdir)
+        pkg = os.path.basename(sub_tmpdir)
+        targets = [
+            pkg + '.' + 'test_target1',
+            pkg + '.' + 'test_target2',
+            pkg + '.' + 'test_target3',
+        ]
+        scenarios = {
+            None: 6,
+            'Foo': 3,
+            'FooB': 1,
+            'Bar': 3,
+            'Bar$': 2,
+            'Foolish': 1,
+        }
+        for test_pattern, exp_n_tests in scenarios.items():
+            tests = loader.loadTargets(pkg, test_pattern=test_pattern)
+            self.assertEqual(tests.countTestCases(), exp_n_tests)
 
