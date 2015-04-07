@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS_IN_PATH="$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.3|3.4)' 2>/dev/null | sed -e 's/.*python//')"
-if which pypy &> /dev/null ; then
-    PYTHON_VERSIONS_IN_PATH="$PYTHON_VERSIONS_IN_PATH
-pypy"
-fi
+PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*?/python(2.7|3.3|3.4)|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 
@@ -13,12 +9,12 @@ if [ "${TESTS}" == "" ] ; then
     exit 2
 fi
 
-if [ "${PYTHON_VERSIONS_IN_PATH}" == "" ] ; then
-    PYTHON_VERSIONS_IN_PATH="default"
+if [ "${PYTHON_VERSIONS}" == "" ] ; then
+    PYTHON_VERSIONS="default"
 fi
 
 for TEST in ${TESTS} ; do
-    for PYTHON_VERSION in ${PYTHON_VERSIONS_IN_PATH} ; do
+    for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         if [ "${PYTHON_VERSION}" == "default" ] ; then
             PYTHON_VERSION=""
         fi
@@ -33,4 +29,4 @@ for TEST in ${TESTS} ; do
     done
 done
 
-echo -e "\nCompleted internal test suite for Python(s):\n${PYTHON_VERSIONS_IN_PATH}\n"
+echo -e "\nCompleted internal test suite for Python(s):\n${PYTHON_VERSIONS}\n"
