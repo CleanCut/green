@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+from fnmatch import fnmatch
 import sys
 from unittest.suite import _isnotsuite, TestSuite
 try:
@@ -24,10 +25,26 @@ class GreenTestSuite(TestSuite):
     def __init__(self, tests=(), args=None):
         # You should either set GreenTestSuite.args before instantiation, or
         # pass args into __init__
-        super(GreenTestSuite, self).__init__(tests)
         self._removed_tests = 0
         self.allow_stdout = default_args.allow_stdout
+        self.full_test_pattern = 'test' + default_args.test_pattern
         self.customize(args)
+        super(GreenTestSuite, self).__init__(tests)
+
+    def addTest(self, test):
+        """
+        Override default behavior with some green-specific behavior.
+        """
+        if (self.full_test_pattern
+        # test can actually be suites and things.  Only tests have _testMethodName
+                and getattr(test, '_testMethodName', False)
+        # Fake test cases (generated for module import failures, for example) do
+        # not start with 'test'.  We still want to see those fake cases.
+                and test._testMethodName.startswith('test')
+                ):
+            if not fnmatch(test._testMethodName, self.full_test_pattern):
+                return
+        super(GreenTestSuite, self).addTest(test)
 
     def customize(self, args):
         """
@@ -42,6 +59,7 @@ class GreenTestSuite(TestSuite):
         # Use the class args
         if self.args:
             self.allow_stdout = self.args.allow_stdout
+            self.full_test_pattern = 'test' + self.args.test_pattern
 
     def _removeTestAtIndex(self, index):
         """
