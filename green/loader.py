@@ -239,7 +239,7 @@ def discover(current_path, file_pattern='test*.py'):
     return ((suite.countTestCases() and suite) or None)
 
 
-def loadTargets(targets, file_pattern='test*.py'):
+def loadTargets(targets, file_pattern='test*.py', test_pattern=None):
     # If a string was passed in, put it into a list.
     if type(targets) != list:
         targets = [targets]
@@ -261,11 +261,35 @@ def loadTargets(targets, file_pattern='test*.py'):
         debug("Found {} test{} for target '{}'".format(
             num_tests, '' if (num_tests == 1) else 's', target))
 
-    if suites:
-        return GreenTestSuite(suites)
-    else:
+    if not suites:
         return None
 
+    suite = GreenTestSuite(suites)
+    if test_pattern is None:
+        return suite
+    else:
+        name_regex = re.compile(test_pattern)
+        return name_filtered(suite, name_regex)
+
+def name_filtered(suite, name_regex):
+    """
+    Takes a GreenTestSuite and a compiled regex. Creates a new GreenTestSuite
+    consisting only of test methods having names that satisfy the regex.
+    Returns None if the new suite is empty.
+    """
+    new_suite = GreenTestSuite()
+    for x in suite:
+        if isinstance(x, GreenTestSuite):
+            sub_suite = name_filtered(x, name_regex)
+            if sub_suite and sub_suite.countTestCases():
+                new_suite.addTest(sub_suite)
+        else:
+            if name_regex is None or name_regex.search(x._testMethodName):
+                new_suite.addTest(x)
+    if new_suite.countTestCases():
+        return new_suite
+    else:
+        return None
 
 def loadTarget(target, file_pattern='test*.py'):
     """
