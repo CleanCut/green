@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import copy
 import unittest
 try:
     from unittest.mock import MagicMock
@@ -52,3 +53,21 @@ class TestGreenTestSuite(unittest.TestCase):
         mock_result._moduleSetUpFailed = True
         mock_result.shouldStop = False
         gts.run(mock_result)
+
+
+    def test_addTest_testPattern(self):
+        """
+        Setting test_pattern will cause a test to be filtered.
+        """
+        mock_test = MagicMock()
+        mock_test._testMethodName = 'test_hello'
+        mock_test2 = MagicMock()
+        mock_test2._testMethodName = 'test_goodbye'
+        args = copy.deepcopy(default_args)
+        args.test_pattern = '_good*'
+        gts = GreenTestSuite(args=args)
+        gts.addTest(mock_test)
+        self.assertEqual(gts._tests, [])
+        gts.addTest(mock_test2)
+        self.assertEqual(gts._tests, [mock_test2])
+
