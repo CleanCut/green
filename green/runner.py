@@ -62,7 +62,7 @@ def run(suite, stream, args):
                         coverage_number = None
                     async_responses.append(pool.apply_async(
                         poolRunner,
-                        (test.dotted_name, coverage_number, args.omit)))
+                        (test.dotted_name, coverage_number, args.omit_patterns)))
                 pool.close()
                 for test, async_response in zip(tests, async_responses):
                     # Prints out the white 'processing...' version of the output

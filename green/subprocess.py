@@ -78,7 +78,7 @@ class LoggingDaemonlessPool(Pool):
 
 
 
-def poolRunner(test_name, coverage_number=None, omit=[]):
+def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
     "I am the function that pool worker subprocesses run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
@@ -92,7 +92,7 @@ def poolRunner(test_name, coverage_number=None, omit=[]):
         cov = coverage.coverage(
                 data_file='.coverage.{}_{}'.format(
                     coverage_number, random.randint(0, 10000)),
-                omit=omit)
+                omit=omit_patterns)
         cov.start()
 
     # Create a structure to return the results of this one test

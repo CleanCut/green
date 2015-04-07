@@ -55,7 +55,7 @@ default_args = argparse.Namespace( # pragma: no cover
         file_pattern    = 'test*.py',
         test_pattern    = '*',
         run_coverage    = False,
-        omit            = None,
+        omit_patterns   = None,
         completion_file = False,
         completions     = False,
         options         = False,
@@ -130,9 +130,9 @@ CONFIG FILES
 
   Example:
 
-    verbose = 2
-    logging = True
-    omit    = myproj*,*prototype*
+    verbose       = 2
+    logging       = True
+    omit-patterns = myproj*,*prototype*
 """.rstrip(),
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -217,7 +217,7 @@ CONFIG FILES
         "Coverage Options ({})".format(coverage_version))
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
         help=("Produce coverage output."), default=argparse.SUPPRESS))
-    store_opt(cov_args.add_argument('-o', '--omit', action='store',
+    store_opt(cov_args.add_argument('-o', '--omit-patterns', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  Default "
             "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
@@ -336,10 +336,10 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     argument items that are set to default value.
 
     Returns: I return a new argparse.Namespace, adding members:
-        shouldExit = default False
-        exitCode   = default 0
-        omit       = omit settings converted to list and extended
-        cov        = coverage object default None
+        shouldExit    = default False
+        exitCode      = default 0
+        omit_patterns = omit-patterns settings converted to list and extended
+        cov           = coverage object default None
     """
     config = getConfig(args.config)
     new_args = copy.deepcopy(default_args) # Default by default!
@@ -353,7 +353,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit', 'warnings', 'file_pattern', 'test_pattern']:
+        elif name in ['omit_patterns', 'warnings', 'file_pattern', 'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
@@ -408,11 +408,11 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     # Coverage.  We must enable it here because we cannot cover module-level
     # code after it is imported, and this is the earliest place we can turn on
     # coverage.
-    omit = []
-    if new_args.omit:
-        omit = new_args.omit.split(',')
+    omit_patterns = []
+    if new_args.omit_patterns:
+        omit_patterns = new_args.omit_patterns.split(',')
     else:
-        omit = [
+        omit_patterns = [
             '*/test*',
             '*/termstyle*',
             '*/colorama*',
@@ -424,10 +424,10 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             tempfile.gettempdir() + '*']
         if 'green' not in new_args.targets and (
                 False in [t.startswith('green.') for t in new_args.targets]):
-            omit.extend([
+            omit_patterns.extend([
             '*Python.framework*',
             '*site-packages*'])
-    new_args.omit = omit
+    new_args.omit_patterns = omit_patterns
 
     if new_args.run_coverage:
         if not coverage:
@@ -438,7 +438,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             args.exitCode = 3
             return args
         if (not testing) or coverage_testing:
-            cov = coverage.coverage(data_file='.coverage', omit=omit)
+            cov = coverage.coverage(data_file='.coverage', omit=omit_patterns)
             cov.start()
         new_args.cov = cov
 

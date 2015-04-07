@@ -83,7 +83,7 @@ def main(testing=False, coverage_testing=False):
         args.cov.save()
         args.cov.combine()
         args.cov.save()
-        args.cov.report(file=stream, omit=args.omit)
+        args.cov.report(file=stream, omit=args.omit_patterns)
     return(int(not result.wasSuccessful()))
 
 
