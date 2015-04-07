@@ -52,7 +52,7 @@ default_args = argparse.Namespace( # pragma: no cover
         verbose         = 1,
         failfast        = False,
         config          = None,  # Not in configs
-        pattern         = 'test*.py',
+        file_pattern    = 'test*.py',
         test_pattern    = '*',
         run_coverage    = False,
         omit            = None,
@@ -205,7 +205,7 @@ CONFIG FILES
         metavar='FILE', help="Use this config file instead of the one pointed "
         "to by environment variable GREEN_CONFIG or the default ~/.green",
         default=argparse.SUPPRESS))
-    store_opt(other_args.add_argument('-p', '--pattern', action='store',
+    store_opt(other_args.add_argument('-p', '--file-pattern', action='store',
         metavar='PATTERN',
         help="Pattern to match test files. Default is test*.py",
         default=argparse.SUPPRESS))
@@ -353,7 +353,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             config_getter = config.getboolean
         elif name in ['subprocesses', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit', 'warnings', 'pattern', 'test_pattern']:
+        elif name in ['omit', 'warnings', 'file_pattern', 'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
