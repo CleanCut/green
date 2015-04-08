@@ -1,4 +1,5 @@
-# Version 1.9.0 - 8 April 2015
+# Version 1.9.0
+#### 8 April 2015
 
 - BREAKING CHANGE: `--omit` was renamed to `--omit-patterns` for consistency
   with how other pattern-related options are named.
