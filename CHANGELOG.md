@@ -14,7 +14,8 @@
 - Tweaked Travis CI builds
 
 
-# Version 1.8.1 - 1 April 2015 (Not a joke!)
+# Version 1.8.1
+##### 1 April 2015 (Not a joke!)
 
 - Fixed issue where command-line arguments could not override config
 arguments to set options back to default values.  Reported by Monty Hindman.
@@ -23,7 +24,8 @@ Issue #47.
 - Converted this changelog file to markdown format.
 
 
-# Version 1.8.0 - 30 March 2015
+# Version 1.8.0
+##### 30 March 2015
 
 - The tag to use for questions on StackOverflow was changed to python-green to
   avoid being too generic.  The tag has a nice wiki entry and an initial
@@ -44,20 +46,23 @@ Issue #47.
   dependency is planned).
 
 
-# Version 1.7.1 - 25 November 2014
+# Version 1.7.1
+##### 25 November 2014
 
 - When run in completions mode (`green --completions`), import errors in
   potential modules are ignored, so that the completions list is still
   generated instead of producing crash output.
 
 
-# Version 1.7.0 - 21 September 2014
+# Version 1.7.0
+##### 21 September 2014
 
 - Output sent to stdout is now captured and then presented along with the list
   of tracebacks.  This can be disabled with `-a/--allow-stdout`.  Issue #29.
 
 
-# Version 1.6.0 - 10 September 2014
+# Version 1.6.0
+##### 10 September 2014
 
 - Added `-f/--failfast` to stop executing tests after the first error, failure,
   or unexpected successes.
@@ -65,7 +70,8 @@ Issue #47.
 - Simplified the usage line in the help output.
 
 
-# Version 1.5.0 - 31 August 2014
+# Version 1.5.0
+##### 31 August 2014
 
 - You can press Ctrl-C once while tests are running to cleanly terminate the
   test run.
@@ -78,20 +84,23 @@ Issue #47.
 - Windows CI with AppVeyor is now passing.
 
 
-# Version 1.4.4 - 26 August 2014
+# Version 1.4.4
+##### 26 August 2014
 
 - File handles are now explicitly closed in setup.py.  Contributed by Simeon
   Visser.
 
 
-# Version 1.4.3 - 26 August 2014
+# Version 1.4.3
+##### 26 August 2014
 
 - Trying to import a module by name that raises an exception during import now
   manufactures a test that reports an ImportError instead of just silently
   ignoring the file.  Issue #31.
 
 
-# Version 1.4.2 - 14 August 2014
+# Version 1.4.2
+##### 14 August 2014
 
 - Automated generation of the CLI documentation.
 - Improved the suggest command for Bash-/Zsh-completion integration.
@@ -105,7 +114,8 @@ Issue #47.
   for the tip!  Issue #11.
 
 
-# Version 1.4.1 - 30 July 2014
+# Version 1.4.1
+##### 30 July 2014
 
 - We now use the fully-dotted test name at the start of each traceback in the
   error listing.  Issue #28.
@@ -113,7 +123,8 @@ Issue #47.
 - More cleanup on internal tests.
 
 
-# Version 1.4.0 - 30 July 2014
+# Version 1.4.0
+##### 30 July 2014
 
 ### User Stuff
 
@@ -151,27 +162,31 @@ Issue #47.
 - Internal refactoring of argument parsing and configuration handling.
 
 
-# Version 1.3.1 - 23 July 2014
+# Version 1.3.1
+##### 23 July 2014
 
 - Fixed the new tests that failed if you ran them in-place on an installed
   version of green.  Forgot to check the build status before I did the last
   release!
 
 
-# Version 1.3.0 - 23 July 2014
+# Version 1.3.0
+##### 23 July 2014
 
 - Bash-completion and ZSH-completion support for options and test targets.
   Issue #7.
 
 
-# Version 1.2.1 - 20 July 2014
+# Version 1.2.1
+##### 20 July 2014
 
 - Multiline docstrings (with -vv or -vvv) on test methods are now handled
   correctly.  Initial whitespace is first stripped.  Then lines are combined
   into one space-separated string until the first blank line.  Issue #26.
 
 
-# Version 1.2.0 - 20 July 2014
+# Version 1.2.0
+##### 20 July 2014
 
 - Implemented custom test discovery code instead of relying on built-in
   unittest.discover(). So far, the new implementation  mimics the built-in
@@ -194,13 +209,15 @@ Issue #47.
 - Many new internal tests.
 
 
-# Version 1.1.0 - 17 July 2014
+# Version 1.1.0
+##### 17 July 2014
 
 - Configuration file support, originally contributed by Tom Barron - Issues
   #20, #23, #24
 
 
-# Version 1.0.2 - 6 July 2014
+# Version 1.0.2
+##### 6 July 2014
 
 - Color works on Windows - Issues #18, #19
 
@@ -217,12 +234,14 @@ Issue #47.
 - Improved the README.md file a lot based on feedback from reddit.
 
 
-# Version 1.0.1 - 23 June 2014
+# Version 1.0.1
+##### 23 June 2014
 
 - Fixed MANIFEST so that installation didn't crash
 
 
-# Version 1.0 - 22 June 2014
+# Version 1.0
+##### 22 June 2014
 
 ### Features
 
