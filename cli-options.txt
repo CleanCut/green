@@ -53,12 +53,15 @@ Other Options:
                         Use this config file instead of the one pointed to by
                         environment variable GREEN_CONFIG or the default
                         ~/.green
-  -p PATTERN, --pattern PATTERN
+  -p PATTERN, --file-pattern PATTERN
                         Pattern to match test files. Default is test*.py
+  -n PATTERN, --test-pattern PATTERN
+                        Pattern to match test method names after 'test'.
+                        Default is '*', meaning match methods named 'test*'.
 
 Coverage Options (Coverage 3.7.1):
   -r, --run-coverage    Produce coverage output.
-  -o PATTERN, --omit PATTERN
+  -o PATTERN, --omit-patterns PATTERN
                         Comma-separated file-patterns to omit from coverage.
                         Default is something like
                         '*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python
@@ -97,6 +100,6 @@ CONFIG FILES
 
   Example:
 
-    verbose = 2
-    logging = True
-    omit    = myproj*,*prototype*
+    verbose       = 2
+    logging       = True
+    omit-patterns = myproj*,*prototype*

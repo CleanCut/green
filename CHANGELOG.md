@@ -1,3 +1,17 @@
+# Version 1.9.0 - 8 April 2015
+
+- BREAKING CHANGE: --omit was renamed to --omit-patterns for consistency with
+  how other pattern-related options are named.
+
+- BREAKING CHANGE: --pattern was renamed to --file-pattern for consistency with
+  how other pattern-related options are named.
+
+- Added -n / --test-pattern option to further refine which tests are actually
+  run.  Thanks to Monty Hindman for a pull request that got this feature going.
+
+- Tweaked Travis CI builds
+
+
 # Version 1.8.1 - 1 April 2015 (Not a joke!)
 
 - Fixed issue where command-line arguments could not override config
