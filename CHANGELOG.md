@@ -33,7 +33,7 @@ Issue #47.
   Hindman.  Issue #41.  Pull request #42.
 
 - Green now supports nose-parameterized.  Contributed by Sam Spilsbury.  Issue
-  #39.  Pull request #40.
+  green#39.  Pull request #40.
 
 - Fixed a crash that could occur in PyPy 2.5
 
