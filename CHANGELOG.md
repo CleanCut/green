@@ -1,13 +1,14 @@
 # Version 1.9.0 - 8 April 2015
 
-- BREAKING CHANGE: --omit was renamed to --omit-patterns for consistency with
-  how other pattern-related options are named.
+- BREAKING CHANGE: `--omit` was renamed to `--omit-patterns` for consistency
+  with how other pattern-related options are named.
 
-- BREAKING CHANGE: --pattern was renamed to --file-pattern for consistency with
-  how other pattern-related options are named.
+- BREAKING CHANGE: `--pattern` was renamed to `--file-pattern` for consistency
+  with how other pattern-related options are named.
 
-- Added -n / --test-pattern option to further refine which tests are actually
-  run.  Thanks to Monty Hindman for a pull request that got this feature going.
+- Added `-n` / `--test-pattern` option to further refine which tests are
+  actually run.  Thanks to Monty Hindman for a pull request that got this
+  feature going.
 
 - Tweaked Travis CI builds
 
@@ -27,9 +28,9 @@ Issue #47.
   avoid being too generic.  The tag has a nice wiki entry and an initial
   question to get things going.  Contributed by Mikko Ohtamaa.  Pull request #43.
 
-- Added -p / --pattern option to specify the file pattern to search for tests
-  under instead of the default pattern `test*py`. Contributed by Monty Hindman.
-  Issue #41.  Pull request #42.
+- Added `-p/--pattern` option to specify the file pattern to search for
+  tests under instead of the default pattern `test*py`. Contributed by Monty
+  Hindman.  Issue #41.  Pull request #42.
 
 - Green now supports nose-parameterized.  Contributed by Sam Spilsbury.  Issue
   #39.  Pull request #40.
@@ -44,7 +45,7 @@ Issue #47.
 
 # Version 1.7.1 - 25 November 2014
 
-- When run in completions mode (green --completions), import errors in
+- When run in completions mode (`green --completions`), import errors in
   potential modules are ignored, so that the completions list is still
   generated instead of producing crash output.
 
@@ -52,12 +53,12 @@ Issue #47.
 # Version 1.7.0 - 21 September 2014
 
 - Output sent to stdout is now captured and then presented along with the list
-  of tracebacks.  This can be disabled with -a/--allow-stdout.  Issue #29.
+  of tracebacks.  This can be disabled with `-a/--allow-stdout`.  Issue #29.
 
 
 # Version 1.6.0 - 10 September 2014
 
-- Added -f/--failfast to stop executing tests after the first error, failure,
+- Added `-f/--failfast` to stop executing tests after the first error, failure,
   or unexpected successes.
 
 - Simplified the usage line in the help output.
