@@ -314,7 +314,7 @@ class GreenTestResult(BaseTestResult):
                 self.stream.writeln(self.colors.className(
                     self.stream.formatText(current_class, indent=1)))
             # Test name or description
-            if not self.colors.html:
+            if not self.colors.html and self.stream.isatty():
                 # In the terminal, we will write a placeholder, and then
                 # rewrite it in color after the test has run.
                 self.stream.write(
@@ -340,7 +340,7 @@ class GreenTestResult(BaseTestResult):
         test = proto_test(test)
         if self.showAll:
             # Move the cursor back to the start of the line in terminal mode
-            if not self.colors.html:
+            if not self.colors.html and self.stream.isatty():
                 self.stream.write('\r')
             # Escape the HTML that may be in the docstring
             test_description = test.getDescription(self.verbose)

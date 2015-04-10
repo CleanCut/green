@@ -297,10 +297,8 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertEqual(gtr.shouldStop, True)
 
 
-    def test_startTestVerbose(self):
-        """
-        startTest() contains output we expect in verbose mode
-        """
+    def _outputFromVerboseTest(self):
+        """Start a test with verbose = 2 and get its output."""
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -309,7 +307,14 @@ class TestGreenTestResult(unittest.TestCase):
         tc = FakeCase()
         gtr.startTest(tc)
         output = self.stream.getvalue()
-        output_lines = output.split('\n')
+        return output.split('\n')
+
+    def test_startTestVerboseTerminal(self):
+        """
+        startTest() contains output we expect in verbose mode on a terminal
+        """
+        self.stream.isatty = lambda: True
+        output_lines = self._outputFromVerboseTest()
         # Output should look like (I'm not putting the termcolor formatting here)
         # green.test.test_runner
         #   FakeCase
@@ -318,6 +323,23 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertNotIn(' ', output_lines[0])
         self.assertIn('  ', output_lines[1])
         self.assertIn('    ', output_lines[2])
+
+
+    def test_startTestVerbosePipe(self):
+        """
+        startTest() contains output we expect in verbose mode on a pipe
+        """
+        self.stream.isatty = lambda: False
+        output_lines = self._outputFromVerboseTest()
+        # Output should look like (I'm not putting the termcolor formatting here)
+        # green.test.test_runner
+        #   FakeCase
+        #     test_it
+        self.assertEqual(len(output_lines), 3)
+        self.assertNotIn(' ', output_lines[0])
+        self.assertIn('  ', output_lines[1])
+        # No carriage return or extra lines printed
+        self.assertIn('', output_lines[2])
 
 
     def test_reportOutcome(self):
