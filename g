@@ -15,4 +15,4 @@ elif [[ -e `which python$1` ]] ; then
 fi
 
 # Run the command-line version of green
-PYTHONPATH="." $PYTHON -m green.cmdline $@
+PYTHONPATH="." $PYTHON -m green.cmdline "$@"
