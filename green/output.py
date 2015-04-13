@@ -200,3 +200,6 @@ class GreenStream(object):
             space_char = '&nbsp;'
         return (outcome_char + space_char * actual_spaces + line)
 
+    def isatty(self):
+        """Wrap internal self.stream.isatty."""
+        return self.stream.isatty()
