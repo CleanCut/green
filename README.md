@@ -6,9 +6,7 @@ Green
 [![Windows Build Status](http://img.shields.io/appveyor/ci/CleanCut/green.svg?style=flat)](https://ci.appveyor.com/project/CleanCut/green)
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
-Green is a **clean, colorful test runner** for Python unit tests.  Compare it to
-[trial](http://twistedmatrix.com/trac/wiki/TwistedTrial) or
-[nose](https://nose.readthedocs.org/en/latest/).
+Green is a **clean, colorful test runner** for Python unit tests.
 
 #### Table of Contents
 
