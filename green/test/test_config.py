@@ -27,6 +27,20 @@ class ParseArguments(unittest.TestCase):
         self.assertEqual(args.targets, ['target1', 'target2'])
 
 
+    def test_absent(self):
+        """
+        Arguments not specified on the command-line are not present in the args
+        object.
+        """
+        config.sys.argv = ['', '--debug']
+        args = config.parseArguments()
+        self.assertEqual(getattr(args, 'debug', 'not there'), True)
+        self.assertEqual(getattr(args, 'verbose', 'not there'), 'not there')
+        self.assertEqual(getattr(args, 'targets', 'not there'), 'not there')
+        self.assertEqual(getattr(args, 'html', 'not there'), 'not there')
+        self.assertEqual(getattr(args, 'file_pattern', 'not there'), 'not there')
+
+
 
 class ModifiedEnvironment(object):
     """

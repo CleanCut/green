@@ -57,7 +57,7 @@ class GreenTestSuite(TestSuite):
             self.args = args
 
         # Use the class args
-        if self.args:
+        if self.args and getattr(self.args, 'test_pattern', None):
             self.allow_stdout = self.args.allow_stdout
             self.full_test_pattern = 'test' + self.args.test_pattern
 

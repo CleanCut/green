@@ -237,7 +237,6 @@ CONFIG FILES
         help="Output all options.  Used by bash- and zsh-completion.",
         default=argparse.SUPPRESS))
 
-    parser.set_defaults(**(dict(default_args._get_kwargs())))
     args = parser.parse_args()
 
     # Add additional members
@@ -341,7 +340,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         omit_patterns = omit-patterns settings converted to list and extended
         cov           = coverage object default None
     """
-    config = getConfig(args.config)
+    config = getConfig(getattr(args, 'config', default_args.config))
     new_args = copy.deepcopy(default_args) # Default by default!
 
     for name, default_value in dict(default_args._get_kwargs()).items():
