@@ -1,3 +1,32 @@
+# Version 1.9.1
+##### 13 April 2015
+
+- Don't do the interactive print/reprint a test line behavior when we're not
+  connected to a terminal.  Contributed by Sam Spilsbury.  Issue #52.  Pull
+  request #53.
+
+- Fixed a rather largeish bug that caused all configuration files to be
+  ignored.  Issue #56.  Thanks for Monty Hindman for finding and reporting the
+  bug.
+
+- The `g` script has been improved so that wildcards are passed through without
+  local expansion.  `g` is is used by developers to try out changes to green
+  itself in-place without installing it.  Contributed by Monty Hindman.  Pull
+  request #57.
+
+- Switch to Travis CI's docker builders for faster builds.  Contributed by Sam
+  Spilsbury.  Issue #54.  Pull request #55.
+
+- Cleaned up the formatting of dates on this changelog file.
+
+- Removed Python 3.3 builders on Linux, now that they're failing.  Official
+  support for Python 3.3 was dropped on 31 August 2014.  It may still work in
+  various use cases, but no guarantees.
+
+- Fixed `test_versions` again.  The regex for non-Travis CI builds had broken,
+  so that only the default python was being tested on development setups.
+
+
 # Version 1.9.0
 ##### 8 April 2015
 
