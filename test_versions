@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*?/python(2.7|3.3|3.4)|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
+PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.3|3.4)|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 
