@@ -357,7 +357,11 @@ class TestGreenTestResult(unittest.TestCase):
         _reportOutcome contains output we expect in verbose mode
         """
         self.args.verbose = 2
-        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        def isatty():
+            return True
+        gs = GreenStream(self.stream)
+        gs.isatty = isatty
+        gtr = GreenTestResult(self.args, gs)
         r = 'a fake reason'
         t = MagicMock()
         t.__str__.return_value = 'junk'
