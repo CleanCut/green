@@ -71,3 +71,15 @@ class TestGreenTestSuite(unittest.TestCase):
         gts.addTest(mock_test2)
         self.assertEqual(gts._tests, [mock_test2])
 
+
+    def test_allow_stdout(self):
+        """
+        The allow_stdout setting should not get ignored.
+        """
+        class Object(object):
+            pass
+        args = Object()
+        args.allow_stdout = True
+        gts = GreenTestSuite(args=args)
+        self.assertEqual(gts.allow_stdout, True)
+

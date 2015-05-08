@@ -57,8 +57,9 @@ class GreenTestSuite(TestSuite):
             self.args = args
 
         # Use the class args
-        if self.args and getattr(self.args, 'test_pattern', None):
+        if self.args and getattr(self.args, 'allow_stdout', None):
             self.allow_stdout = self.args.allow_stdout
+        if self.args and getattr(self.args, 'test_pattern', None):
             self.full_test_pattern = 'test' + self.args.test_pattern
 
     def _removeTestAtIndex(self, index):
