@@ -1,3 +1,8 @@
+# Version 1.9.2
+##### 8 May 2015
+
+- Fixed a regression that caused the `-a/--allow-stdout` cli option and corresponding config option to be ignored.  Fixes issue #58.
+
 # Version 1.9.1
 ##### 13 April 2015
 
