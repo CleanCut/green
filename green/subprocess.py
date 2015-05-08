@@ -66,7 +66,7 @@ class DaemonlessProcess(multiprocessing.Process):
 
 
 class LoggingDaemonlessPool(Pool):
-    "I use SubprocessLogger and DoemonlessProcess to make a pool of workers."
+    "I use SubprocessLogger and DaemonlessProcess to make a pool of workers."
 
 
     Process = DaemonlessProcess
@@ -76,7 +76,130 @@ class LoggingDaemonlessPool(Pool):
         return Pool.apply_async(
                 self, SubprocessLogger(func), args, kwds, callback)
 
+#-------------------------------------------------------------------------------
+# START of Worker Finalization Monkey Patching
+#
+# I started with code from cpython/Lib/multiprocessing/pool.py from version
+# 3.5.0a4+ of the main python mercurial repository.  Then altered it to run on
+# 2.7+ and added the finalizer/finalargs parameter handling.
+    _wrap_exception = True
 
+    def __init__(self, processes=None, initializer=None, initargs=(),
+                 maxtasksperchild=None, context=None, finalizer=None,
+                 finalargs=()):
+        self._finalizer = finalizer
+        self._finalargs = finalargs
+        # Python 2 and 3 have different method signatures
+        if platform.python_version_tuple()[0] == '2':
+            super(LoggingDaemonlessPool, self).__init__(processes, initializer,
+                    initargs, maxtasksperchild)
+        else:
+            super(LoggingDaemonlessPool, self).__init__(processes, initializer,
+                    initargs, maxtasksperchild, context)
+
+
+    def _repopulate_pool(self):
+        """Bring the number of pool processes up to the specified number,
+        for use after reaping workers which have exited.
+        """
+        for i in range(self._processes - len(self._pool)):
+            w = self.Process(target=worker,
+                             args=(self._inqueue, self._outqueue,
+                                   self._initializer,
+                                   self._initargs, self._maxtasksperchild,
+                                   self._wrap_exception,
+                                   self._finalizer,
+                                   self._finalargs)
+                            )
+            self._pool.append(w)
+            w.name = w.name.replace('Process', 'PoolWorker')
+            w.daemon = True
+            w.start()
+            util.debug('added worker')
+
+
+import platform
+import multiprocessing.pool
+from multiprocessing import util
+from multiprocessing.pool import MaybeEncodingError
+
+# Python 2 and 3 raise a different error when they exit
+if platform.python_version_tuple()[0] == '2':
+    PortableOSError = IOError
+else:
+    PortableOSError = OSError
+
+
+def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
+           wrap_exception=False, finalizer=None, finalargs=()):
+    assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
+    put = outqueue.put
+    get = inqueue.get
+    if hasattr(inqueue, '_writer'):
+        inqueue._writer.close()
+        outqueue._reader.close()
+
+    if initializer is not None:
+        initializer(*initargs)
+
+    completed = 0
+    while maxtasks is None or (maxtasks and completed < maxtasks):
+        try:
+            task = get()
+        except (EOFError, PortableOSError):
+            util.debug('worker got EOFError or OSError -- exiting')
+            break
+
+        if task is None:
+            util.debug('worker got sentinel -- exiting')
+            break
+
+        job, i, func, args, kwds = task
+        try:
+            result = (True, func(*args, **kwds))
+        except Exception as e:
+            if wrap_exception:
+                e = ExceptionWithTraceback(e, e.__traceback__)
+            result = (False, e)
+        try:
+            put((job, i, result))
+        except Exception as e:
+            wrapped = MaybeEncodingError(e, result[1])
+            util.debug("Possible encoding error while sending result: %s" % (
+                wrapped))
+            put((job, i, (False, wrapped)))
+        completed += 1
+
+    if finalizer:
+        finalizer(*finalargs)
+
+    util.debug('worker exiting after %d tasks' % completed)
+
+# Unmodified (see above)
+class RemoteTraceback(Exception):
+    def __init__(self, tb):
+        self.tb = tb
+    def __str__(self):
+        return self.tb
+
+# Unmodified (see above)
+class ExceptionWithTraceback:
+    def __init__(self, exc, tb):
+        tb = traceback.format_exception(type(exc), exc, tb)
+        tb = ''.join(tb)
+        self.exc = exc
+        self.tb = '\n"""\n%s"""' % tb
+    def __reduce__(self):
+        return rebuild_exc, (self.exc, self.tb)
+
+# Unmodified (see above)
+def rebuild_exc(exc, tb):
+    exc.__cause__ = RemoteTraceback(tb)
+    return exc
+
+multiprocessing.pool.worker = worker
+# END of Worker Finalization Monkey Patching
+#-------------------------------------------------------------------------------
 
 def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
     "I am the function that pool worker subprocesses run.  I run one unit test."
