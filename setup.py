@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import platform
 import os
 import sys
 
@@ -41,7 +40,19 @@ setup(
     download_url = 'https://github.com/CleanCut/green/tarball/' + version,
     keywords = ['nose', 'nose2', 'trial', 'pytest', 'py.test', 'tox', 'green',
         'tdd', 'test', 'tests', 'functional', 'system', 'unit', 'unittest',
-        'color', 'tabular', 'clean', 'red', 'rednose', 'regression', 'runner'],
+        'color', 'tabular', 'clean', 'red', 'rednose', 'regression', 'runner',
+        'integration','smoke', 'white', 'black', 'box', 'incremental', 'end',
+        'end-to-end', 'sanity', 'acceptance', 'load', 'stress', 'performance',
+        'usability', 'install', 'uninstall', 'recovery', 'security',
+        'comparison', 'alpha', 'beta', 'non-functional', 'destructive',
+        'accessibility', 'internationalization', 'i18n', 'localization', 'l10n',
+        'development', 'a/b', 'concurrent', 'conformance', 'verification',
+        'validation', 'quality', 'assurance', 'ad-hoc', 'agile', 'api',
+        'automated', 'all', 'pairs', 'pairwise', 'boundary', 'value', 'branch',
+        'browser', 'condition', 'coverage', 'dynamic', 'exploratory',
+        'equivalence', 'partitioning', 'fuzz', 'gui', 'glass', 'gorilla',
+        'interface', 'keyword', 'penetration', 'retesting', 'risk', 'based',
+        'scalability', 'soak', 'volume', 'vulnerability'],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
