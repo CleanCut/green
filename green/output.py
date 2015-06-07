@@ -75,7 +75,11 @@ class Colors:
         if self.html:
             return '<span style="color: rgb(0,128,255)">{}</span>'.format(text)
         else:
-            return termstyle.blue(text)
+            if platform.system() == 'Windows':
+                # Default blue in windows is unreadable (such awful defaults...)
+                return termstyle.cyan(text)
+            else:
+                return termstyle.blue(text)
 
 
     def green(self, text):
