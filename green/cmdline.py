@@ -16,6 +16,15 @@ import green.config as config
 def main(testing=False, coverage_testing=False):
     args = config.parseArguments()
     args = config.mergeConfig(args, testing, coverage_testing)
+    if getattr(args, 'html', False):
+        print("""
+The --html flag is scheduled to be removed in version 2.0 due to it being a pain
+to maintain and no one using it.  If you actually use it, please open an issue
+stating so!  https://github.com/CleanCut/green/issues/new  Unless some people
+request it, it will be removed in 2.0
+""")
+        import time
+        time.sleep(2)
     if args.shouldExit:
         return args.exitCode
 
