@@ -1,3 +1,18 @@
+# Version 1.9.4
+##### 15 June 2015
+
+- Added a deprecation warning for the `-m/--html` option.  Unless I get some
+  credible requests to leave the functionality, then I am going to proceed with
+  removing it under the assumption that no one uses it (and I don't want to
+  maintain complex, unused code).
+- Investigated an issue with `SystemExit` and `KeyboardInterrupt` halting the
+  python process when your test subclasses `testtools.TestCase`.  Turns out
+  that that is a design decision made by the testtools devs that they want those
+  exceptions to stop everything.  So we won't interfere with their desires.  If
+  you don't like the behavior, either stop subclassing `testtools.TestCase` or
+  simply catch those two exceptions in your own tests.
+
+
 # Version 1.9.3
 ##### 7 June 2015
 
@@ -6,11 +21,13 @@
   each subprocess to obtain whatever resources might be needed by a single
   process (like its own database, for example).
 
+
 # Version 1.9.2
 ##### 8 May 2015
 
 - Fixed a regression that caused the `-a/--allow-stdout` cli option and
   corresponding config option to be ignored.  Fixes issue #58.
+
 
 # Version 1.9.1
 ##### 13 April 2015
