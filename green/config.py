@@ -1,4 +1,5 @@
 from __future__ import unicode_literals # pragma: no cover
+from __future__ import print_function   # pragma: no cover
 """
 Configuration settings are read in this order:
 
@@ -244,12 +245,12 @@ CONFIG FILES
     args.store_opt = store_opt
 
     if getattr(args, 'html', False):
-        print """
+        print("""
 The --html flag is scheduled to be removed in version 2.0 due to it being a pain
 to maintain and no one using it.  If you actually use it, please open an issue
 stating so!  https://github.com/CleanCut/green/issues/new  Unless some people
 request it, it will be removed in 2.0
-"""
+""")
         import time
         time.sleep(2)
 
