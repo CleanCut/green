@@ -148,6 +148,29 @@ class SIGINTCase(unittest.TestCase):
         self.assertEqual(result.testsRun, 1)
 
 
+    def test_systemExit(self):
+        """
+        Raising a SystemExit gets caught and reported.
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_systemexit.py'), 'w')
+        fh.write("""
+import unittest
+class SystemExitCase(unittest.TestCase):
+    def test00(self):
+        raise SystemExit(1)
+    def test01(self):
+        pass
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_systemexit')
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(result.testsRun, 2)
+
+
+
 class TestSubprocesses(unittest.TestCase):
 
     # Setup
