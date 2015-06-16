@@ -171,7 +171,7 @@ class SystemExitCase(unittest.TestCase):
 
 
 
-class TestSubprocesses(unittest.TestCase):
+class TestProcesses(unittest.TestCase):
 
     # Setup
     @classmethod
@@ -194,14 +194,14 @@ class TestSubprocesses(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.startdir)
-        # On windows, the subprocesses block access to the files while
+        # On windows, the processes block access to the files while
         # they take a bit to clean themselves up.
         shutil.rmtree(self.tmpdir)
         del(self.stream)
 
-    def test_catchSubprocessSIGINT(self):
+    def test_catchProcessSIGINT(self):
         """
-        run() can catch SIGINT while running a subprocess.
+        run() can catch SIGINT while running a process.
         """
         if platform.system() == 'Windows':
             self.skipTest('This test is for posix-specific behavior.')
@@ -223,10 +223,10 @@ class SIGINTCase(unittest.TestCase):
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_sigint')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         run(tests, self.stream, self.args)
         unittest.signals._results = saved__results
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
 
     def test_collisionProtection(self):
         """
@@ -276,18 +276,18 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.termcolor = False
         try:
             run(tests, self.stream, self.args)
         except KeyboardInterrupt:
             os.kill(os.getpid(), signal.SIGINT)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
-    def test_detectNumSubprocesses(self):
+    def test_detectNumProcesses(self):
         """
-        args.subprocesses = 0 causes auto-detection of number of subprocesses.
+        args.processes = 0 causes auto-detection of number of processes.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
@@ -295,7 +295,7 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         # pkg/test/test_target_module.py
-        fh = open(os.path.join(sub_tmpdir, 'test_autosubprocesses.py'), 'w')
+        fh = open(os.path.join(sub_tmpdir, 'test_autoprocesses.py'), 'w')
         fh.write("""
 import unittest
 class A(unittest.TestCase):
@@ -305,14 +305,14 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 0
+        self.args.processes = 0
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
     def test_runCoverage(self):
         """
-        Running coverage in subprocess mode doesn't crash
+        Running coverage in process mode doesn't crash
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
@@ -330,10 +330,10 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.run_coverage = True
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
     def test_badTest(self):
@@ -352,15 +352,15 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
 
     def test_empty(self):
         """
-        run() does not crash with empty suite and subprocesses
+        run() does not crash with empty suite and processes
         """
         suite = GreenTestSuite()
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.termcolor = False
         run(suite, self.stream, self.args)

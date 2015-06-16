@@ -18,7 +18,7 @@ Features
 
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
 - **Clean** - Low redundancy in output. Result stats for each test is lined up in a vertical column.
-- **Fast** - Can run tests in independent subprocesses.
+- **Fast** - Can run tests in independent processes.
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal ``unittest`` classes and methods for your unit tests.
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.

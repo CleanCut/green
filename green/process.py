@@ -16,9 +16,10 @@ from green.result import ProtoTest, ProtoTestResult
 from green.loader import loadTargets
 
 
-class SubprocessLogger(object):
+
+class ProcessLogger(object):
     """I am used by LoggingDaemonlessPool to get crash output out to the
-    logger, instead of having subprocess crashes be silent"""
+    logger, instead of having process crashes be silent"""
 
 
     def __init__(self, callable):
@@ -47,7 +48,7 @@ class SubprocessLogger(object):
 
 class DaemonlessProcess(multiprocessing.Process):
     """I am used by LoggingDaemonlessPool to make pool workers NOT run in
-    daemon mode (daemon mode subprocess can't launch their own subprocesses)"""
+    daemon mode (daemon mode process can't launch their own subprocesses)"""
 
 
     def _get_daemon(self):
@@ -63,10 +64,8 @@ class DaemonlessProcess(multiprocessing.Process):
 
 
 
-
-
 class LoggingDaemonlessPool(Pool):
-    "I use SubprocessLogger and DaemonlessProcess to make a pool of workers."
+    "I use ProcessLogger and DaemonlessProcess to make a pool of workers."
 
 
     Process = DaemonlessProcess
@@ -74,7 +73,7 @@ class LoggingDaemonlessPool(Pool):
 
     def apply_async(self, func, args=(), kwds={}, callback=None):
         return Pool.apply_async(
-                self, SubprocessLogger(func), args, kwds, callback)
+                self, ProcessLogger(func), args, kwds, callback)
 
 #-------------------------------------------------------------------------------
 # START of Worker Finalization Monkey Patching
@@ -90,10 +89,10 @@ class LoggingDaemonlessPool(Pool):
         self._finalizer = finalizer
         self._finalargs = finalargs
         # Python 2 and 3 have different method signatures
-        if platform.python_version_tuple()[0] == '2':
+        if platform.python_version_tuple()[0] == '2': # pragma: no cover
             super(LoggingDaemonlessPool, self).__init__(processes, initializer,
                     initargs, maxtasksperchild)
-        else:
+        else: # pragma: no cover
             super(LoggingDaemonlessPool, self).__init__(processes, initializer,
                     initargs, maxtasksperchild, context)
 
@@ -124,9 +123,9 @@ from multiprocessing import util
 from multiprocessing.pool import MaybeEncodingError
 
 # Python 2 and 3 raise a different error when they exit
-if platform.python_version_tuple()[0] == '2':
+if platform.python_version_tuple()[0] == '2': # pragma: no cover
     PortableOSError = IOError
-else:
+else: # pragma: no cover
     PortableOSError = OSError
 
 
@@ -140,7 +139,12 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         outqueue._reader.close()
 
     if initializer is not None:
-        initializer(*initargs)
+        try:
+            initializer(*initargs)
+        except Exception as e:
+            print("Warning, initializer command '{}' failed with:\n{}"
+                    .format(initializer.command,
+                        ''.join(traceback.format_tb(sys.exc_info()[2]))))
 
     completed = 0
     while maxtasks is None or (maxtasks and completed < maxtasks):
@@ -175,12 +179,15 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
 
     util.debug('worker exiting after %d tasks' % completed)
 
+
+
 # Unmodified (see above)
 class RemoteTraceback(Exception):
     def __init__(self, tb):
         self.tb = tb
     def __str__(self):
         return self.tb
+
 
 # Unmodified (see above)
 class ExceptionWithTraceback:
@@ -192,6 +199,7 @@ class ExceptionWithTraceback:
     def __reduce__(self):
         return rebuild_exc, (self.exc, self.tb)
 
+
 # Unmodified (see above)
 def rebuild_exc(exc, tb):
     exc.__cause__ = RemoteTraceback(tb)
@@ -202,7 +210,7 @@ multiprocessing.pool.worker = worker
 #-------------------------------------------------------------------------------
 
 def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
-    "I am the function that pool worker subprocesses run.  I run one unit test."
+    "I am the function that pool worker processes run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp

@@ -18,7 +18,7 @@
 
 - Switched to cyan instead of blue on Windows only.
 - Stubbed in the beginnings of support for designating initialization to run in
-  each subprocess to obtain whatever resources might be needed by a single
+  each process to obtain whatever resources might be needed by a single
   process (like its own database, for example).
 
 
@@ -168,7 +168,7 @@ Issue #47.
 - Fixed a crash that could occur if an exception was raised during a test
   case's setUpClass() or tearDownClass()
 - We now explicitly terminate the thread pool and join() it.  This makes self
-  unit tests much easier to clean up on Windows, where the subprocesses would
+  unit tests much easier to clean up on Windows, where the processes would
   block deletion of temporary directories.
 - Set up continuous integration for Windows using AppVeyor.  Thanks to ionelmc
   for the tip!  Issue #11.
@@ -215,7 +215,7 @@ Issue #47.
   auto-detect all versions of python (in the form of pythonX.Y) in $PATH and
   run many permutations of self tests on each version.
 - Fixed a crash that could occur if discovery did not find any tests and
-  subprocesses was set higher than one.
+  processes was set higher than one.
 
 - Fixed lots of tests so that they would succeed in all environments.
 
@@ -311,7 +311,7 @@ Issue #47.
 - Clean - Low redundancy in output. Result stats for each test is lined up in a
   vertical column.
 
-- Fast - Can run tests in independent subprocesses.
+- Fast - Can run tests in independent processes.
 
 - Powerful - Multi-target + auto-discovery.
 

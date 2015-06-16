@@ -41,7 +41,9 @@ files_loaded = [] # pragma: no cover
 # Set the defaults in a re-usable way
 default_args = argparse.Namespace( # pragma: no cover
         targets         = ['.'], # Not in configs
-        subprocesses    = 1,
+        processes       = 1,
+        initializer     = '',
+        finalizer       = '',
         html            = False,
         termcolor       = None,
         notermcolor     = None,
@@ -153,18 +155,33 @@ CONFIG FILES
 
     concurrency_args = parser.add_argument_group("Concurrency Options")
     store_opt(
-        concurrency_args.add_argument('-s', '--subprocesses', action='store',
+        concurrency_args.add_argument('-s', '--processes', action='store',
             type=int, metavar='NUM',
-            help="Number of subprocesses to use to run tests.  Note that your "
+            help="Number of processes to use to run tests.  Note that your "
             "tests need to be written to avoid using the same resources (temp "
             "files, sockets, ports, etc.) for the multi-process mode to work "
-            "well. Default is 1, meaning disable using subprocesses. 0 means "
-            "try to autodetect the number of CPUs in the system. Note that for "
-            "a small number of trivial tests, running everything in a single "
-            "process may be faster than the overhead of initializing all the "
-            "subprocesses.",
+            "well (--initializer and --finalizer can help provision "
+            "per-process resources). Default is 1, meaning just use a single "
+            "process (maximizes compatibility with standard unittest and other "
+            "test runners). 0 means try to autodetect the number of CPUs in "
+            "the system. Note that for a small number of trivial tests, "
+            "running everything in a single process may be faster than the "
+            "overhead of initializing all the processes.",
         default=argparse.SUPPRESS))
-
+    store_opt(
+        concurrency_args.add_argument('-i', '--initializer', action='store',
+            metavar='EXECUTABLE_FILE', default='',
+            help="Executable to run inside of a single worker process before "
+            "it starts running tests.  This is the way to provision external "
+            "resources that each concurrent worker process needs to have "
+            "exclusive access to.  Can be a relative or absolute path."))
+    store_opt(
+        concurrency_args.add_argument('-z', '--finalizer', action='store',
+            metavar='EXECUTABLE_FILE', default='',
+            help="Executable to run inside of a single worker process after "
+            "it completes running tests and the process is about to be "
+            "destroyed.  This is the way to reclaim resources provisioned with "
+            "--initializer.  Can be a relative or absolute path."))
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-m', '--html', action='store_true',
         help="HTML5 format.  Overrides terminal color options if specified.",
@@ -351,9 +368,10 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
                 'logging', 'version', 'failfast', 'run_coverage', 'options',
                 'completions', 'completion_file']:
             config_getter = config.getboolean
-        elif name in ['subprocesses', 'debug', 'verbose']:
+        elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
-        elif name in ['omit_patterns', 'warnings', 'file_pattern', 'test_pattern']:
+        elif name in ['file_pattern', 'finalizer', 'initializer',
+                'omit_patterns', 'warnings', 'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
@@ -441,5 +459,14 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns)
             cov.start()
         new_args.cov = cov
+
+    # Initializer and finalizer need to be real, executable files
+    new_args.initializer = new_args.initializer and os.path.realpath(new_args.initializer)
+    new_args.finalizer = new_args.finalizer and os.path.realpath(new_args.finalizer)
+    for cmd in [new_args.initializer, new_args.finalizer]:
+        if cmd and (not os.access(cmd, os.X_OK)):
+            print("'{}' is not an executable file.".format(cmd))
+            new_args.shouldExit = True
+            new_args.exitCode = 4
 
     return new_args

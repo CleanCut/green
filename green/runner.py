@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+from subprocess import check_output
+import sys
 from unittest.signals import (
         registerResult, installHandler, removeResult)
 import warnings
@@ -13,7 +15,30 @@ except: # pragma: no cover
 from green.loader import toProtoTestList
 from green.output import GreenStream
 from green.result import GreenTestResult
-from green.subprocess import LoggingDaemonlessPool, poolRunner
+from green.process import LoggingDaemonlessPool, poolRunner
+
+
+class InitializerOrFinalizer:
+    """
+    I represent a command that will be run as either the initializer or the
+    finalizer for a worker process.  The only reason I'm a class instead of a
+    function is so that I can be instantiated at the creation time of the Pool
+    (with the user's customized command to run), but actually run at the
+    appropriate time.
+    """
+    def __init__(self, command):
+        self.command = command
+
+
+    def __call__(self, *args):
+        if not self.command:
+            return
+        print(str(args), self.command)
+        try:
+            check_output(self.command)
+        except:
+            raise(Exception('aoeuaoeuaoeu'))
+
 
 
 
@@ -48,11 +73,13 @@ def run(suite, stream, args):
 
         result.startTestRun()
 
-        if args.subprocesses == 1:
+        if args.processes == 1:
             suite.run(result)
         else:
             tests = toProtoTestList(suite)
-            pool = LoggingDaemonlessPool(processes=args.subprocesses or None)
+            pool = LoggingDaemonlessPool(processes=args.processes or None,
+                    initializer=InitializerOrFinalizer(args.initializer),
+                    finalizer=InitializerOrFinalizer(args.finalizer))
             if tests:
                 async_responses = []
                 for index, test in enumerate(tests):

@@ -38,7 +38,7 @@ def proto_error(err):
 
 class ProtoTest():
     """I take a full-fledged TestCase and preserve just the information we need
-    and can pass between subprocesses.
+    and can pass between processes.
     """
 
 
@@ -87,7 +87,7 @@ class ProtoTest():
 
 class ProtoError():
     """I take a full-fledged test error and preserve just the information we
-    need and can bass between subprocesses.
+    need and can bass between processes.
     """
 
 
@@ -132,7 +132,7 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
 
 class ProtoTestResult(BaseTestResult):
     """
-    I'm the TestResult object for a single unit test run in a subprocess.
+    I'm the TestResult object for a single unit test run in a process.
     """
 
 
