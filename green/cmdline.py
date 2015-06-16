@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import sys
+import traceback
 
 try: # pragma: no cover
     import coverage
@@ -80,11 +81,17 @@ request it, it will be removed in 2.0
         test_suite = GreenTestSuite()
 
     # Actually run the test_suite
-    if testing:
-        result = lambda: None
-        result.wasSuccessful = lambda: 0
-    else:
-        result = run(test_suite, stream, args) # pragma: no cover
+    #   result defaults to a failure
+    result = lambda: None
+    result.wasSuccessful = lambda: 0
+    if not testing:
+        try:
+            result = run(test_suite, stream, args)
+        except:
+            sys.__stderr__.write(
+                'Unhandled exception in the testing framework:\n')
+            tb_limit = None
+            traceback.print_exc(tb_limit, sys.__stderr__)
 
     if args.run_coverage and ((not testing) or coverage_testing):
         stream.writeln()
