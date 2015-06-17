@@ -218,8 +218,8 @@ def discover(current_path, file_pattern='test*.py'):
     suite = GreenTestSuite()
     for file_or_dir_name in sorted(os.listdir(current_abspath)):
         path = os.path.join(current_abspath, file_or_dir_name)
-        # Recurse into directories
-        if os.path.isdir(path):
+        # Recurse into directories, attempting to skip virtual environments
+        if os.path.isdir(path) and not os.path.isfile(os.path.join(path, 'bin', 'activate')):
             subdir_suite = discover(path, file_pattern=file_pattern)
             if subdir_suite:
                 suite.addTest(subdir_suite)
