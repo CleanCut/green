@@ -9,9 +9,8 @@ python:
   - "pypy"
 install:
   - "pip install ."
-  - "pip install -r requirements.txt"
+  - "pip install virtualenv"
   - "pip install coveralls"
-  - "pip install django"
 script:
   - "make test"
 after_success: "coveralls"
