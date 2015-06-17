@@ -413,15 +413,24 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         omit_patterns = new_args.omit_patterns.split(',')
     else:
         omit_patterns = [
-            '*/test*',
-            '*/termstyle*',
+            '*/argparse*',
             '*/colorama*',
-            '*/mock*',
             '*/django/*',
-            '*/pytz*',          # pulled in by django
+            '*/extras*',        # pulled in by testtools
+            '*/linecache2*',    # pulled in by testtools
+            '*/mimeparse*',     # pulled in by testtools
+            '*/mock*',
+            '*/pbr*',           # pulled in by testtools
             '*/pkg_resources*', # pulled in by django
             '*/pypy*',
-            tempfile.gettempdir() + '*']
+            '*/pytz*',          # pulled in by django
+            '*/six*',           # pulled in by testtools
+            '*/termstyle*',
+            '*/test*',
+            '*/traceback2*',    # pulled in by testtools
+            '*/unittest2*',     # pulled in by testtools
+            tempfile.gettempdir() + '*',
+        ]
         if 'green' not in new_args.targets and (
                 False in [t.startswith('green.') for t in new_args.targets]):
             omit_patterns.extend([
