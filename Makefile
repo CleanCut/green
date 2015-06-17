@@ -34,6 +34,7 @@ test-coverage:
 test-installed:
 	# Install under the default python and run self-tests
 	@make clean-silent
+	pip install -r requirements-optional.txt
 	python setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
 	bash -c "cd green-$(VERSION) && python setup.py install"
