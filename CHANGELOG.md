@@ -17,6 +17,10 @@
   Green catches and interprets as a desire to terminate testing, and stops the
   test run.
 
+- Changed the `-m/--html` help text to be a deprecation warning.  If you would
+  like this feature to stay, please create an issue stating so at
+  https://github.com/CleanCut/green/issues/new
+
 
 # Version 1.9.4
 ##### 15 June 2015

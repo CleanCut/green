@@ -167,7 +167,9 @@ CONFIG FILES
 
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-m', '--html', action='store_true',
-        help="HTML5 format.  Overrides terminal color options if specified.",
+        help="THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR IT TO "
+        "STAY BY CREATING AN ISSUE AT "
+        "https://github.com/CleanCut/green/issues/new",
         default=argparse.SUPPRESS))
     store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
         help="Force terminal colors on.  Default is to autodetect.",

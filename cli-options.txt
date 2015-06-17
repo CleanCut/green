@@ -28,8 +28,9 @@ Concurrency Options:
                         initializing all the subprocesses.
 
 Format Options:
-  -m, --html            HTML5 format. Overrides terminal color options if
-                        specified.
+  -m, --html            THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR
+                        IT TO STAY BY CREATING AN ISSUE AT
+                        https://github.com/CleanCut/green/issues/new
   -t, --termcolor       Force terminal colors on. Default is to autodetect.
   -T, --notermcolor     Force terminal colors off. Default is to autodetect.
 
