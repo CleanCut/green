@@ -1,3 +1,23 @@
+# Version 1.10.0
+##### 17 June 2015
+
+- Virtualenv directories are now skipped during test discovery, so you can now
+  use discovery on projects that contain one or more virtualenv directories
+  inside of them.
+
+- Green *always* runs tests in a separate process now, though by default it
+  still (currently) defaults to only *one* separate process, to maximize
+  compatibility with large suites that already assume tests are run sequentially.
+
+- Green will now catch exceptions that the test framework doesn't handle and
+  report them as test failures.  Specifically, if your test case subclasses
+  `testtools.TestCase` from the popular `testtools` project, then `SystemExit`
+  exceptions will escape the TestCase.  Green will catch these exceptions and
+  report them as failures.  The one special-case is KeyboardInterrupt, which
+  Green catches and interprets as a desire to terminate testing, and stops the
+  test run.
+
+
 # Version 1.9.4
 ##### 15 June 2015
 
@@ -5,6 +25,7 @@
   credible requests to leave the functionality, then I am going to proceed with
   removing it under the assumption that no one uses it (and I don't want to
   maintain complex, unused code).
+
 - Investigated an issue with `SystemExit` and `KeyboardInterrupt` halting the
   python process when your test subclasses `testtools.TestCase`.  Turns out
   that that is a design decision made by the testtools devs that they want those
@@ -17,6 +38,7 @@
 ##### 7 June 2015
 
 - Switched to cyan instead of blue on Windows only.
+
 - Stubbed in the beginnings of support for designating initialization to run in
   each subprocess to obtain whatever resources might be needed by a single
   process (like its own database, for example).
