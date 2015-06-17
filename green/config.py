@@ -416,6 +416,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             '*/argparse*',
             '*/colorama*',
             '*/django/*',
+            '*/distutils*',     # Gets pulled in on Travis-CI CPython
             '*/extras*',        # pulled in by testtools
             '*/linecache2*',    # pulled in by testtools
             '*/mimeparse*',     # pulled in by testtools
