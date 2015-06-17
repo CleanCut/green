@@ -37,3 +37,6 @@ docs/_build/
 
 # Editor files
 tags
+
+# virtualenvs
+venv*

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.3|3.4)|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
+PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 
@@ -13,20 +13,68 @@ if [ "${PYTHON_VERSIONS}" == "" ] ; then
     PYTHON_VERSIONS="default"
 fi
 
+echo "Identified python versions: `echo ${PYTHON_VERSIONS} | tr '\n' ' '`"
+
+# Make sure each of the pythons has the necessary requirements installed
+for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
+    if [ "${PYTHON_VERSION}" == "default" ] ; then
+        PYTHON_VERSION=""
+    fi
+    if [ "${PYTHON_VERSION}" == "pypy" ] ; then
+        PYTHON=pypy
+        shift
+    elif [[ -e `which python${PYTHON_VERSION}` ]] ; then
+        PYTHON=python${PYTHON_VERSION}
+        shift
+    else
+        echo "Failed to determine python binary for python version '${PYTHON_VERSION}'"
+        exit 4
+    fi
+
+    if ! ${PYTHON} -m pip > /dev/null ; then
+        echo "Please install pip under ${PYTHON}"
+        exit 5
+    fi
+
+    if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
+        echo "Please install virtualenv under ${PYTHON}"
+        exit 6
+    fi
+
+    VENV_DIR="venv${PYTHON_VERSION}"
+    if [ ! -d ${VENV_DIR} ] ; then
+        ${PYTHON} -m virtualenv ${VENV_DIR}
+    fi
+
+    echo "Ensuring dependencies are installed for ${VENV_DIR}"
+
+    if ! source ${VENV_DIR}/bin/activate ; then
+        echo "Failed to enter virtualenv"
+        exit 7
+    fi
+    hash -r
+    ${VENV_DIR}/bin/pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
+    deactivate
+done
+
+# Finally, run all the tests
 for TEST in ${TESTS} ; do
     for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         if [ "${PYTHON_VERSION}" == "default" ] ; then
-            PYTHON_VERSION=""
+            PYTHON="python"
+        else
+            VENV_DIR="venv${PYTHON_VERSION}"
+            PYTHON=${VENV_DIR}/bin/python
         fi
-        for PROCESS_NUM in 1 8 ; do
-            echo ""
-            set -x
-            if ! ./g ${PYTHON_VERSION} -s ${PROCESS_NUM} ${TEST} ; then
-                exit 3
-            fi
-            { set +x; } 2>/dev/null
-        done
+
+        echo ""
+        set -x
+        # Actually run it!
+        if ! PYTHONPATH="." ${PYTHON} -m green.cmdline -s 8 ${TEST} ; then
+            exit 3
+        fi
+        { set +x; } 2>/dev/null
     done
 done
 
-echo -e "\nCompleted internal test suite for Python(s):\n${PYTHON_VERSIONS}\n"
+echo -e "\nCompleted internal test suite for Python versions:\n${PYTHON_VERSIONS}\n"

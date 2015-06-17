@@ -1,2 +1,4 @@
 django
 coverage
+testtools
+-r requirements.txt

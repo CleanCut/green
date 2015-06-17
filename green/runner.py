@@ -48,35 +48,32 @@ def run(suite, stream, args):
 
         result.startTestRun()
 
-        if args.subprocesses == 1:
-            suite.run(result)
-        else:
-            tests = toProtoTestList(suite)
-            pool = LoggingDaemonlessPool(processes=args.subprocesses or None)
-            if tests:
-                async_responses = []
-                for index, test in enumerate(tests):
-                    if args.run_coverage:
-                        coverage_number = index + 1
-                    else:
-                        coverage_number = None
-                    async_responses.append(pool.apply_async(
-                        poolRunner,
-                        (test.dotted_name, coverage_number, args.omit_patterns)))
-                pool.close()
-                for test, async_response in zip(tests, async_responses):
-                    # Prints out the white 'processing...' version of the output
-                    result.startTest(test)
-                    # This blocks until the worker who is processing this
-                    # particular test actually finishes
-                    try:
-                        result.addProtoTestResult(async_response.get())
-                    except KeyboardInterrupt: # pragma: no cover
-                        result.shouldStop = True
-                    if result.shouldStop:
-                        break
-            pool.terminate()
-            pool.join()
+        tests = toProtoTestList(suite)
+        pool = LoggingDaemonlessPool(processes=args.subprocesses or None)
+        if tests:
+            async_responses = []
+            for index, test in enumerate(tests):
+                if args.run_coverage:
+                    coverage_number = index + 1
+                else:
+                    coverage_number = None
+                async_responses.append(pool.apply_async(
+                    poolRunner,
+                    (test.dotted_name, coverage_number, args.omit_patterns)))
+            pool.close()
+            for test, async_response in zip(tests, async_responses):
+                # Prints out the white 'processing...' version of the output
+                result.startTest(test)
+                # This blocks until the worker who is processing this
+                # particular test actually finishes
+                try:
+                    result.addProtoTestResult(async_response.get())
+                except KeyboardInterrupt: # pragma: no cover
+                    result.shouldStop = True
+                if result.shouldStop:
+                    break
+        pool.terminate()
+        pool.join()
 
         result.stopTestRun()
 
