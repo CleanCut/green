@@ -17,6 +17,7 @@ from green.result import GreenTestResult
 from green.process import LoggingDaemonlessPool, poolRunner
 
 
+
 class InitializerOrFinalizer:
     """
     I represent a command that will be run as either the initializer or the
@@ -32,12 +33,10 @@ class InitializerOrFinalizer:
     def __call__(self, *args):
         if not self.command:
             return
-        print(str(args), self.command)
         try:
             check_output(self.command)
         except:
             raise(Exception('aoeuaoeuaoeu'))
-
 
 
 

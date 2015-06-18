@@ -12,7 +12,7 @@ import weakref
 from green.config import default_args
 from green.loader import loadTargets
 from green.output import GreenStream
-from green.runner import run
+from green.runner import InitializerOrFinalizer, run
 from green.suite import GreenTestSuite
 
 try:
@@ -21,9 +21,29 @@ except:
     from StringIO import StringIO
 
 
-class FakeCase(unittest.TestCase):
-    def runTest(self):
-        pass
+class TestInitializerOrFinalizer(unittest.TestCase):
+
+    def test_blank(self):
+        """
+        Given a blank command, calling the initializer/finalizer does nothing.
+        """
+        initializer = InitializerOrFinalizer('')
+        initializer()
+
+    def test_ls(self):
+        """
+        An ls command works.
+        """
+        initializer = InitializerOrFinalizer('/bin/ls')
+        initializer()
+
+    def test_crash(self):
+        """
+        A bad command crashes.
+        """
+        initializer = InitializerOrFinalizer('crash')
+        initializer()
+
 
 
 class TestRun(unittest.TestCase):
@@ -87,6 +107,9 @@ class TestRun(unittest.TestCase):
         """
         html=True causes html output
         """
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
         self.args.html = True
         run(FakeCase(), self.stream, self.args)
         self.assertIn('<', self.stream.getvalue())
@@ -421,9 +444,9 @@ class Uncaught(testtools.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('FAILED', self.stream.getvalue())
 
 
