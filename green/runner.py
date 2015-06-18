@@ -56,7 +56,7 @@ def run(suite, stream, args):
     registerResult(result)
 
     with warnings.catch_warnings():
-        if args.warnings:
+        if args.warnings: # pragma: no cover
             # if args.warnings is set, use it to filter all the warnings
             warnings.simplefilter(args.warnings)
             # if the filter is 'default' or 'always', special-case the
@@ -95,7 +95,7 @@ def run(suite, stream, args):
                     result.addProtoTestResult(async_response.get())
                 except KeyboardInterrupt: # pragma: no cover
                     result.shouldStop = True
-                if result.shouldStop:
+                if result.shouldStop: # pragma: no cover
                     break
         pool.terminate()
         pool.join()

@@ -125,7 +125,7 @@ else: # pragma: no cover
 
 
 def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
-           wrap_exception=False, finalizer=None, finalargs=()):
+        wrap_exception=False, finalizer=None, finalargs=()): # pragma: no cover
     assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
@@ -177,7 +177,7 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
 
 
 # Unmodified (see above)
-class RemoteTraceback(Exception):
+class RemoteTraceback(Exception): # pragma: no cover
     def __init__(self, tb):
         self.tb = tb
     def __str__(self):
@@ -185,7 +185,7 @@ class RemoteTraceback(Exception):
 
 
 # Unmodified (see above)
-class ExceptionWithTraceback:
+class ExceptionWithTraceback: # pragma: no cover
     def __init__(self, exc, tb):
         tb = traceback.format_exception(type(exc), exc, tb)
         tb = ''.join(tb)
@@ -196,7 +196,7 @@ class ExceptionWithTraceback:
 
 
 # Unmodified (see above)
-def rebuild_exc(exc, tb):
+def rebuild_exc(exc, tb): # pragma: no cover
     exc.__cause__ = RemoteTraceback(tb)
     return exc
 
@@ -204,7 +204,7 @@ multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
 #-------------------------------------------------------------------------------
 
-def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
+def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no cover
     "I am the function that pool worker processes run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
