@@ -16,7 +16,7 @@ import green.config as config
 def main(testing=False, coverage_testing=False):
     args = config.parseArguments()
     args = config.mergeConfig(args, testing, coverage_testing)
-    if getattr(args, 'html', False):
+    if getattr(args, 'html', False): # pragma: no cover
         print("""
 The --html flag is scheduled to be removed in version 2.0 due to it being a pain
 to maintain and no one using it.  If you actually use it, please open an issue

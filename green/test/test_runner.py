@@ -96,7 +96,20 @@ class TestRun(unittest.TestCase):
         verbose=3 causes version output, and an empty test case passes.
         """
         self.args.verbose = 3
-        run(FakeCase(), self.stream, self.args)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_verbose3.py'), 'w')
+        fh.write("""
+import unittest
+class Verbose3(unittest.TestCase):
+    def test01(self):
+        pass
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_verbose3')
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(result.testsRun, 1)
         self.assertIn('Green', self.stream.getvalue())
         self.assertIn('OK', self.stream.getvalue())
 
@@ -105,7 +118,20 @@ class TestRun(unittest.TestCase):
         setting warnings='always' doesn't crash
         """
         self.args.warnings = 'always'
-        run(FakeCase(), self.stream, self.args)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_warnings.py'), 'w')
+        fh.write("""
+import unittest
+class Warnings(unittest.TestCase):
+    def test01(self):
+        pass
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_warnings')
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(result.testsRun, 1)
         self.assertIn('OK', self.stream.getvalue())
 
     def test_noTestsFound(self):
@@ -119,10 +145,20 @@ class TestRun(unittest.TestCase):
         """
         A failing test case causes the whole run to report 'FAILED'
         """
-        class FailCase(unittest.TestCase):
-            def runTest(self):
-                self.assertTrue(False)
-        run(FailCase(), self.stream, self.args)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_failed.py'), 'w')
+        fh.write("""
+import unittest
+class Failed(unittest.TestCase):
+    def test01(self):
+        self.assertTrue(False)
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_failed')
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(result.testsRun, 1)
         self.assertIn('FAILED', self.stream.getvalue())
 
     def test_failfast(self):
@@ -355,6 +391,42 @@ class A(unittest.TestCase):
         self.args.processes = 2
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
+
+    def test_uncaughtException(self):
+        """
+        Exceptions that escape the test framework get caught by poolRunner and
+        reported as a failure.  For example, the testtools implementation of
+        TestCase unwisely (but deliberately) lets SystemExit exceptions through.
+        """
+        try:
+            import testtools
+        except:
+            self.skipTest('testtools must be installed to run this test.')
+        testtools # Make the linter happy
+
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        # pkg/__init__.py
+        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        # pkg/test/test_target_module.py
+        fh = open(os.path.join(sub_tmpdir, 'test_uncaught.py'), 'w')
+        fh.write("""
+import testtools
+class Uncaught(testtools.TestCase):
+    def test_uncaught(self):
+        raise SystemExit(0)
+        """)
+        fh.close()
+        # Load the tests
+        os.chdir(self.tmpdir)
+        tests = loadTargets('.')
+        self.args.subprocesses = 2
+        run(tests, self.stream, self.args)
+        os.chdir(TestSubprocesses.startdir)
+        self.assertIn('FAILED', self.stream.getvalue())
+
+
 
     def test_empty(self):
         """

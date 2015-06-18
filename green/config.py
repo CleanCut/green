@@ -184,7 +184,9 @@ CONFIG FILES
             "--initializer.  Can be a relative or absolute path."))
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-m', '--html', action='store_true',
-        help="HTML5 format.  Overrides terminal color options if specified.",
+        help="THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR IT TO "
+        "STAY BY CREATING AN ISSUE AT "
+        "https://github.com/CleanCut/green/issues/new",
         default=argparse.SUPPRESS))
     store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
         help="Force terminal colors on.  Default is to autodetect.",
@@ -431,15 +433,25 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         omit_patterns = new_args.omit_patterns.split(',')
     else:
         omit_patterns = [
-            '*/test*',
-            '*/termstyle*',
+            '*/argparse*',
             '*/colorama*',
-            '*/mock*',
             '*/django/*',
-            '*/pytz*',          # pulled in by django
+            '*/distutils*',     # Gets pulled in on Travis-CI CPython
+            '*/extras*',        # pulled in by testtools
+            '*/linecache2*',    # pulled in by testtools
+            '*/mimeparse*',     # pulled in by testtools
+            '*/mock*',
+            '*/pbr*',           # pulled in by testtools
             '*/pkg_resources*', # pulled in by django
             '*/pypy*',
-            tempfile.gettempdir() + '*']
+            '*/pytz*',          # pulled in by django
+            '*/six*',           # pulled in by testtools
+            '*/termstyle*',
+            '*/test*',
+            '*/traceback2*',    # pulled in by testtools
+            '*/unittest2*',     # pulled in by testtools
+            tempfile.gettempdir() + '*',
+        ]
         if 'green' not in new_args.targets and (
                 False in [t.startswith('green.') for t in new_args.targets]):
             omit_patterns.extend([
