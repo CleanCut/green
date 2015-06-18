@@ -89,8 +89,11 @@ class LoggingDaemonlessPool(Pool):
                  finalargs=()):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        # Python 2 and 3 have different method signatures
-        if platform.python_version_tuple()[0] == '2':
+        # Python 2 and 3 have different method signatures, but PyPy3 does
+        # not ship a compliant multiprocessing version, so use the
+        # Python 2 signature on PyPy3
+        if (platform.python_version_tuple()[0] == '2' or
+                platform.python_implementation == 'PyPy'):
             super(LoggingDaemonlessPool, self).__init__(processes, initializer,
                     initargs, maxtasksperchild)
         else:
