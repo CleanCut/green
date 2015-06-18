@@ -89,13 +89,8 @@ class LoggingDaemonlessPool(Pool):
                  finalargs=()):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        # Python 2 and 3 have different method signatures
-        if platform.python_version_tuple()[0] == '2':
-            super(LoggingDaemonlessPool, self).__init__(processes, initializer,
-                    initargs, maxtasksperchild)
-        else:
-            super(LoggingDaemonlessPool, self).__init__(processes, initializer,
-                    initargs, maxtasksperchild, context)
+        super(LoggingDaemonlessPool, self).__init__(processes, initializer,
+                initargs, maxtasksperchild)
 
 
     def _repopulate_pool(self):

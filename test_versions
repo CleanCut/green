@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
+PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 
@@ -22,6 +22,9 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     fi
     if [ "${PYTHON_VERSION}" == "pypy" ] ; then
         PYTHON=pypy
+        shift
+    elif [ "${PYTHON_VERSION}" == "pypy3" ] ; then
+        PYTHON=pypy3
         shift
     elif [[ -e `which python${PYTHON_VERSION}` ]] ; then
         PYTHON=python${PYTHON_VERSION}
