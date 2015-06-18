@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from subprocess import check_output
+from os import devnull, getpid
+from subprocess import CalledProcessError, check_call
 from unittest.signals import (
         registerResult, installHandler, removeResult)
 import warnings
@@ -11,10 +12,11 @@ try: # pragma: no cover
 except: # pragma: no cover
     coverage = None
 
+from green.exceptions import InitializerOrFinalizerError
 from green.loader import toProtoTestList
 from green.output import GreenStream
-from green.result import GreenTestResult
 from green.process import LoggingDaemonlessPool, poolRunner
+from green.result import GreenTestResult
 
 
 
@@ -34,9 +36,12 @@ class InitializerOrFinalizer:
         if not self.command:
             return
         try:
-            check_output(self.command)
-        except:
-            raise(Exception('aoeuaoeuaoeu'))
+            with open(devnull, 'w') as DEVNULL:
+                check_call(self.command, stdout=DEVNULL, stderr=DEVNULL)
+        except CalledProcessError as e:
+            raise(InitializerOrFinalizerError(
+                "Worker process {} reports that command '{}' failed with "
+                "return code {}. ".format(getpid(), self.command, e.returncode)))
 
 
 

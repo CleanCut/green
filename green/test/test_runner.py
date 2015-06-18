@@ -10,6 +10,7 @@ import unittest
 import weakref
 
 from green.config import default_args
+from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
 from green.output import GreenStream
 from green.runner import InitializerOrFinalizer, run
@@ -37,12 +38,19 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         initializer = InitializerOrFinalizer('/bin/ls')
         initializer()
 
-    def test_crash(self):
+    def test_crash_no_output(self):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer('crash')
-        initializer()
+        initializer = InitializerOrFinalizer('/usr/bin/grep')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
+
+    def test_crash_output(self):
+        """
+        A bad command crashes.
+        """
+        initializer = InitializerOrFinalizer('/usr/bin/grep')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
 
 
 

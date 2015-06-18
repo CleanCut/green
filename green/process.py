@@ -12,8 +12,9 @@ try: # pragma: no cover
 except: # pragma: no cover
     coverage = None
 
-from green.result import ProtoTest, ProtoTestResult
+from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
+from green.result import ProtoTest, ProtoTestResult
 
 
 
@@ -136,10 +137,8 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
     if initializer is not None:
         try:
             initializer(*initargs)
-        except Exception as e:
-            print("Warning, initializer command '{}' failed with:\n{}"
-                    .format(initializer.command,
-                        ''.join(traceback.format_tb(sys.exc_info()[2]))))
+        except InitializerOrFinalizerError as e:
+            print(e.message)
 
     completed = 0
     while maxtasks is None or (maxtasks and completed < maxtasks):
