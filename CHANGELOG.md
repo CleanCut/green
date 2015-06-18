@@ -1,3 +1,12 @@
+# Version 1.11.0
+##### 18 June 2015
+
+- Added support for pypy3.  Fiixes issue #63.
+
+- Disabled the virtual-env aspect of test_versions when run in Travis-CI, which
+  is already in a virtualenv.
+
+
 # Version 1.10.0
 ##### 17 June 2015
 
