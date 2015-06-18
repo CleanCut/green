@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
+PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
 TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
 
 
@@ -23,6 +23,9 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     if [ "${PYTHON_VERSION}" == "pypy" ] ; then
         PYTHON=pypy
         shift
+    elif [ "${PYTHON_VERSION}" == "pypy3" ] ; then
+        PYTHON=pypy3
+        shift
     elif [[ -e `which python${PYTHON_VERSION}` ]] ; then
         PYTHON=python${PYTHON_VERSION}
         shift
@@ -34,6 +37,11 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     if ! ${PYTHON} -m pip > /dev/null ; then
         echo "Please install pip under ${PYTHON}"
         exit 5
+    fi
+
+    if [ "${TRAVIS}" == "true" ] ; then
+        pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
+        continue
     fi
 
     if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
@@ -61,6 +69,8 @@ done
 for TEST in ${TESTS} ; do
     for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         if [ "${PYTHON_VERSION}" == "default" ] ; then
+            PYTHON="python"
+        elif [ "${TRAVIS}" == "true" ] ; then
             PYTHON="python"
         else
             VENV_DIR="venv${PYTHON_VERSION}"
