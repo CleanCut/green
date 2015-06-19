@@ -33,6 +33,11 @@ except:
 
 class TestInitializerOrFinalizer(unittest.TestCase):
 
+    def setUp(self):
+        self.cmd = '/bin/ls'
+        if platform.system() == 'Windows':
+            self.cmd = 'C:\\WINDOWS\\system32\\find.exe'
+
     def test_blank(self):
         """
         Given a blank command, calling the initializer/finalizer does nothing.
@@ -44,21 +49,21 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         """
         An ls command works.
         """
-        initializer = InitializerOrFinalizer('/bin/ls')
+        initializer = InitializerOrFinalizer(self.cmd)
         initializer()
 
     def test_crash_no_output(self):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer('/bin/mv')
+        initializer = InitializerOrFinalizer(self.cmd)
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
     def test_crash_output(self):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer('/bin/mv')
+        initializer = InitializerOrFinalizer(self.cmd)
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
 
