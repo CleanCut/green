@@ -138,7 +138,7 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         try:
             initializer(*initargs)
         except InitializerOrFinalizerError as e:
-            print(e.message)
+            print(str(e))
 
     completed = 0
     while maxtasks is None or (maxtasks and completed < maxtasks):
@@ -169,7 +169,10 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         completed += 1
 
     if finalizer:
-        finalizer(*finalargs)
+        try:
+            finalizer(*finalargs)
+        except InitializerOrFinalizerError as e:
+            print(str(e))
 
     util.debug('worker exiting after %d tasks' % completed)
 
