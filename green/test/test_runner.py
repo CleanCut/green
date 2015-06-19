@@ -33,32 +33,27 @@ except:
 
 class TestInitializerOrFinalizer(unittest.TestCase):
 
-    def setUp(self):
-        self.good_cmd = '/bin/ls'
-        self.bad_cmd = '/bin/mv'
-        if platform.system() == 'Windows':
-            self.good_cmd = 'C:\\WINDOWS\\system32\\hostname.exe'
-            self.bad_cmd = 'C:\\WINDOWS\\system32\\find.exe'
-
     def test_blank(self):
         """
-        Given a blank command, calling the initializer/finalizer does nothing.
+        Given a blank dotted function, calling the initializer/finalizer does
+        nothing.
         """
         initializer = InitializerOrFinalizer('')
         initializer()
 
-    def test_ls(self):
+    def test_unimportable(self):
         """
-        An ls command works.
+        Given an unimportable module, an InitializerOrFinalizerError is raised.
         """
-        initializer = InitializerOrFinalizer(self.good_cmd)
-        initializer()
+        initializer = InitializerOrFinalizer('garbagejunk12345')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
 
     def test_crash(self):
         """
-        A bad command crashes.
+        An importable, but not-callable-object also raises an
+        InitializerOrFinalizerError.
         """
-        initializer = InitializerOrFinalizer(self.bad_cmd)
+        initializer = InitializerOrFinalizer('sys')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
 

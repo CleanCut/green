@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from os import devnull, getpid
-from subprocess import CalledProcessError, check_call
+from sys import modules
 from unittest.signals import (
         registerResult, installHandler, removeResult)
 import warnings
@@ -28,20 +27,24 @@ class InitializerOrFinalizer:
     (with the user's customized command to run), but actually run at the
     appropriate time.
     """
-    def __init__(self, command):
-        self.command = command
+    def __init__(self, dotted_function):
+        self.dotted_function = dotted_function
 
 
     def __call__(self, *args):
-        if not self.command:
+        if not self.dotted_function:
             return
         try:
-            with open(devnull, 'w') as DEVNULL:
-                check_call(self.command, stdout=DEVNULL, stderr=DEVNULL)
-        except CalledProcessError as e:
-            raise(InitializerOrFinalizerError(
-                "Worker process {} reports that command '{}' failed with "
-                "return code {}. ".format(getpid(), self.command, e.returncode)))
+            __import__(self.dotted_function)
+            loaded_function = modules[self.dotted_function]
+        except Exception as e:
+            raise InitializerOrFinalizerError("Couldn't load '{}' - got: {}"
+                    .format(self.dotted_function, str(e)))
+        try:
+            loaded_function()
+        except Exception as e:
+            raise InitializerOrFinalizerError("Error running '{}' - got: {}"
+                    .format(self.dotted_function, str(e)))
 
 
 

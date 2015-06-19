@@ -170,18 +170,19 @@ CONFIG FILES
         default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-i', '--initializer', action='store',
-            metavar='EXECUTABLE_FILE', default='',
-            help="Executable to run inside of a single worker process before "
-            "it starts running tests.  This is the way to provision external "
-            "resources that each concurrent worker process needs to have "
-            "exclusive access to.  Can be a relative or absolute path."))
+            metavar='DOTTED_FUNCTION', default='',
+            help="Python function to run inside of a single worker process "
+            "before it starts running tests.  This is the way to provision "
+            "external resources that each concurrent worker process needs to "
+            "have exclusive access to. Specify the function in dotted notation "
+            "in a way that will be importable from the location you are "
+            "running green from."))
     store_opt(
         concurrency_args.add_argument('-z', '--finalizer', action='store',
-            metavar='EXECUTABLE_FILE', default='',
-            help="Executable to run inside of a single worker process after "
-            "it completes running tests and the process is about to be "
-            "destroyed.  This is the way to reclaim resources provisioned with "
-            "--initializer.  Can be a relative or absolute path."))
+            metavar='DOTTED_FUNCTION', default='',
+            help="Same as --initializer, only run at the end of a worker "
+            "process's lifetime.  Used to unprovision resources provisioned by "
+            "the initializer."))
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-m', '--html', action='store_true',
         help="THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR IT TO "
@@ -471,14 +472,5 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns)
             cov.start()
         new_args.cov = cov
-
-    # Initializer and finalizer need to be real, executable files
-    new_args.initializer = new_args.initializer and os.path.realpath(new_args.initializer)
-    new_args.finalizer = new_args.finalizer and os.path.realpath(new_args.finalizer)
-    for cmd in [new_args.initializer, new_args.finalizer]:
-        if cmd and (not os.access(cmd, os.X_OK)):
-            print("'{}' is not an executable file.".format(cmd))
-            new_args.shouldExit = True
-            new_args.exitCode = 4
 
     return new_args
