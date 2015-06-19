@@ -51,21 +51,14 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         """
         An ls command works.
         """
-        initializer = InitializerOrFinalizer(self.cmd)
+        initializer = InitializerOrFinalizer(self.good_cmd)
         initializer()
 
-    def test_crash_no_output(self):
+    def test_crash(self):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer(self.cmd)
-        self.assertRaises(InitializerOrFinalizerError, initializer)
-
-    def test_crash_output(self):
-        """
-        A bad command crashes.
-        """
-        initializer = InitializerOrFinalizer(self.cmd)
+        initializer = InitializerOrFinalizer(self.bad_cmd)
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
 
