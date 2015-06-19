@@ -392,6 +392,15 @@ class GreenTestResult(BaseTestResult):
         print(test.method_name)
         print(test.module)
         print(err.traceback_lines)
+
+        # Special case: Catch Twisted's skips that come thtrough as failures and
+        # treat them as skips instead
+        if len(err.traceback_lines) == 1:
+            if err.traceback_lines[0].startswith('UnsupportedTrialFeature'):
+                reason = eval(err.traceback_lines[0][25:])[1]
+                self.addSkip(test, reason)
+                return
+
         test = proto_test(test)
         err = proto_error(err)
         self.failures.append((test, err))
