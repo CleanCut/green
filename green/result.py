@@ -382,17 +382,6 @@ class GreenTestResult(BaseTestResult):
     @failfast
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
-        print(test, err)
-        print(dir(test))
-        print(dir(err))
-        print(test.class_name)
-        print(test.docstr_part)
-        print(test.dotted_name)
-        print(test.getDescription(2))
-        print(test.method_name)
-        print(test.module)
-        print(err.traceback_lines)
-
         # Special case: Catch Twisted's skips that come thtrough as failures and
         # treat them as skips instead
         if len(err.traceback_lines) == 1:
