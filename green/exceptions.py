@@ -1,0 +1,2 @@
+class InitializerOrFinalizerError(Exception):
+    pass
