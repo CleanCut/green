@@ -42,14 +42,14 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer('/usr/bin/grep')
+        initializer = InitializerOrFinalizer('/bin/mv')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
     def test_crash_output(self):
         """
         A bad command crashes.
         """
-        initializer = InitializerOrFinalizer('/usr/bin/grep')
+        initializer = InitializerOrFinalizer('/bin/mv')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
 
