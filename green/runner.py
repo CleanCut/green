@@ -28,23 +28,28 @@ class InitializerOrFinalizer:
     appropriate time.
     """
     def __init__(self, dotted_function):
-        self.dotted_function = dotted_function
+        self.module_part = '.'.join(dotted_function.split('.')[:-1])
+        self.function_part = '.'.join(dotted_function.split('.')[-1:])
 
 
     def __call__(self, *args):
-        if not self.dotted_function:
+        if not self.module_part:
             return
         try:
-            __import__(self.dotted_function)
-            loaded_function = modules[self.dotted_function]
+            __import__(self.module_part)
+            loaded_function = getattr(modules[self.module_part], self.function_part, None)
         except Exception as e:
             raise InitializerOrFinalizerError("Couldn't load '{}' - got: {}"
-                    .format(self.dotted_function, str(e)))
+                    .format(self.function_part, str(e)))
+        if not loaded_function:
+            raise InitializerOrFinalizerError(
+                    "Loaded module '{}', but couldn't find function '{}'"
+                    .format(self.module_part, self.function_part))
         try:
             loaded_function()
         except Exception as e:
             raise InitializerOrFinalizerError("Error running '{}' - got: {}"
-                    .format(self.dotted_function, str(e)))
+                    .format(self.function_part, str(e)))
 
 
 
