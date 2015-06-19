@@ -382,6 +382,9 @@ class GreenTestResult(BaseTestResult):
     @failfast
     def addFailure(self, test, err):
         "Called when a test fails a unittest assertion"
+        print(test, err)
+        print(dir(test))
+        print(dir(err))
         test = proto_test(test)
         err = proto_error(err)
         self.failures.append((test, err))
