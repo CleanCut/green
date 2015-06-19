@@ -388,7 +388,7 @@ class GreenTestResult(BaseTestResult):
         print(test.class_name)
         print(test.docstr_part)
         print(test.dotted_name)
-        print(test.getDescription())
+        print(test.getDescription(2))
         print(test.method_name)
         print(test.module)
         print(err.traceback_lines)
