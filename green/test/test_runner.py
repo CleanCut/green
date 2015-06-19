@@ -22,6 +22,15 @@ except:
     from StringIO import StringIO
 
 
+global skip_testtools
+skip_testtools = False
+try:
+    import testtools; testtools
+except:
+    skip_testtools = True
+
+
+
 class TestInitializerOrFinalizer(unittest.TestCase):
 
     def test_blank(self):
@@ -429,11 +438,9 @@ class A(unittest.TestCase):
         reported as a failure.  For example, the testtools implementation of
         TestCase unwisely (but deliberately) lets SystemExit exceptions through.
         """
-        try:
-            import testtools
-        except:
+        global skip_testtools
+        if skip_testtools:
             self.skipTest('testtools must be installed to run this test.')
-        testtools # Make the linter happy
 
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
