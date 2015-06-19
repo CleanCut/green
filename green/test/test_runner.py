@@ -34,9 +34,11 @@ except:
 class TestInitializerOrFinalizer(unittest.TestCase):
 
     def setUp(self):
-        self.cmd = '/bin/ls'
+        self.good_cmd = '/bin/ls'
+        self.bad_cmd = '/bin/mv'
         if platform.system() == 'Windows':
-            self.cmd = 'C:\\WINDOWS\\system32\\find.exe'
+            self.good_cmd = 'C:\\WINDOWS\\system32\\hostname.exe'
+            self.bad_cmd = 'C:\\WINDOWS\\system32\\find.exe'
 
     def test_blank(self):
         """
