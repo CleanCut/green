@@ -237,21 +237,32 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
         t.method_name = 'poolRunner'
         result.addError(t, err)
 
-    try:
-        test.run(result)
-    except:
-        # Some frameworks like testtools record the error AND THEN let it
-        # through to crash things.  So we only need to manufacture another error
-        # if the underlying framework didn't, but either way we don't want to
-        # crash.
-        if not result.errors:
-            err = sys.exc_info()
-            t             = ProtoTest()
-            t.module      = 'green.runner'
-            t.class_name  = 'N/A'
-            t.description = 'Green encountered an exception not caught by the underlying test framework.'
-            t.method_name = 'poolRunner'
-            result.addError(t, err)
+    if getattr(test, 'run', False):
+        # Loading was successful, lets do this
+        try:
+            test.run(result)
+        except:
+            # Some frameworks like testtools record the error AND THEN let it
+            # through to crash things.  So we only need to manufacture another error
+            # if the underlying framework didn't, but either way we don't want to
+            # crash.
+            if not result.errors:
+                err = sys.exc_info()
+                t             = ProtoTest()
+                t.module      = 'green.runner'
+                t.class_name  = 'N/A'
+                t.description = 'Green encountered an exception not caught by the underlying test framework.'
+                t.method_name = 'poolRunner'
+                result.addError(t, err)
+    else:
+        # loadTargets() returned an object without a run() method, probably None
+        err = sys.exc_info()
+        t             = ProtoTest()
+        t.module      = 'green.loader'
+        t.class_name  = "type is {}, str is {}, dir is {}".format(type(test), str(test), str(dir(test)))
+        t.description = 'Loading the test resulted in an un-runnable object'
+        t.method_name = 'poolRunner'
+        result.addError(t, err)
 
     # Finish coverage
     if coverage_number and coverage:

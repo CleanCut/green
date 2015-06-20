@@ -40,8 +40,6 @@ class ProtoTest():
     """I take a full-fledged TestCase and preserve just the information we need
     and can pass between processes.
     """
-
-
     def __init__(self, test=None):
         if test:
             self.module      = test.__module__
@@ -64,11 +62,14 @@ class ProtoTest():
             self.method_name = ''
             self.docstr_part = ''
 
+
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
 
+
     def __hash__(self):
         return hash(self.dotted_name)
+
 
     @property
     def dotted_name(self, ignored=None):
@@ -89,17 +90,15 @@ class ProtoError():
     """I take a full-fledged test error and preserve just the information we
     need and can bass between processes.
     """
-
-
     def __init__(self, err=None):
         self.traceback_lines = traceback.format_exception(*err)
+
 
 
 class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
     """
     I am inherited by ProtoTestResult and GreenTestResult.
     """
-
     def __init__(self, stream, colors):
         self.stdout_output = OrderedDict()
         self.stream = stream
@@ -134,8 +133,6 @@ class ProtoTestResult(BaseTestResult):
     """
     I'm the TestResult object for a single unit test run in a process.
     """
-
-
     def __init__(self):
         super(ProtoTestResult, self).__init__(None, None)
         self.shouldStop = False
@@ -197,9 +194,9 @@ class ProtoTestResult(BaseTestResult):
 
 
 class GreenTestResult(BaseTestResult):
-    "Aggregates test results and outputs them to a stream."
-
-
+    """
+    Aggregates test results and outputs them to a stream.
+    """
     def __init__(self, args, stream):
         super(GreenTestResult, self).__init__(
                 stream,
