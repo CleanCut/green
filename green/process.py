@@ -261,8 +261,8 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
         t.module      = 'green.loader'
         t.class_name  = "type is {}, str is {}, dir is {}".format(type(test), str(test), str(dir(test)))
         t.description = 'Loading the test resulted in an un-runnable object'
-        t.method_name = 'poolRunner'
-        result.addError(test, err)
+        t.method_name = test_name
+        result.addError(t, err)
 
     # Finish coverage
     if coverage_number and coverage:
