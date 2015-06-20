@@ -256,11 +256,13 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
                 result.addError(t, err)
     else:
         # loadTargets() returned an object without a run() method, probably None
-        err = (TypeError, TypeError('Test loader returned an un-runnable object'), None)
+        description = 'Test loader returned an un-runnable object: {} of type {} with dir {}'.format(
+                str(test), type(test), dir(test))
+        err = (TypeError, TypeError(description), None)
         t             = ProtoTest()
         t.module      = '.'.join(test_name.split('.')[:-2])
         t.class_name  = test_name.split('.')[-2]
-        t.description = 'Loading the test resulted in an un-runnable object'
+        t.description = description
         t.method_name = test_name.split('.')[-1]
         result.addError(t, err)
 
