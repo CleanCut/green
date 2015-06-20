@@ -256,7 +256,7 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
                 result.addError(t, err)
     else:
         # loadTargets() returned an object without a run() method, probably None
-        err = (1,2,3)
+        err = (1,'',[])
         t             = ProtoTest()
         t.module      = '.'.join(test_name.split('.')[:-2])
         t.class_name  = test_name.split('.')[-2]
