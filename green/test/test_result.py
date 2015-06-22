@@ -625,6 +625,26 @@ class TestGreenTestResultAdds(unittest.TestCase):
                 test, 'F', self.gtr.colors.failing, err)
 
 
+    def test_addFailureTwistedSkip(self):
+        """
+        Twisted's practice of calling addFailure() with their skips is detected
+        and redirected to addSkip()
+        """
+        err = None
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        reason = "Twisted is odd"
+        err = proto_error(err)
+        err.traceback_lines = ["UnsupportedTrialFeature: ('skip', '{}')"
+                .format(reason)]
+        self.gtr.addFailure(test, err)
+        self.gtr._reportOutcome.assert_called_with(
+                test, 's', self.gtr.colors.skipped, reason=reason)
+
+
     def test_addSkip(self):
         """
         addSkip() makes the correct calls to other functions.

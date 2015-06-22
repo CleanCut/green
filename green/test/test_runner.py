@@ -31,6 +31,29 @@ except:
 
 
 
+#--- Helper stuff ---
+
+global importable_function_worked
+importable_function_worked = False
+def _importableFunction():
+    """
+    Used by TestInitializerOrFinalizer.test_importable()
+    """
+    global importable_function_worked
+    importable_function_worked = True
+
+non_callable = None # Used by TestInitializerOrFinalizer.test_not_callable()
+
+def _crashy():
+    """
+    Used by TestInitializerOrFinalizer.test_crash()
+    """
+    raise Exception('Oops!  I crashed.')
+
+#--- End of helper stuff
+
+
+
 class TestInitializerOrFinalizer(unittest.TestCase):
 
     def test_blank(self):
@@ -45,15 +68,34 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         """
         Given an unimportable module, an InitializerOrFinalizerError is raised.
         """
-        initializer = InitializerOrFinalizer('garbagejunk12345')
+        initializer = InitializerOrFinalizer('garbagejunk.nonexistant')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
-    def test_crash(self):
+
+    def test_importable(self):
+        """
+        Given an actual importable module and function, the function is run.
+        """
+        global importable_function_worked
+        importable_function_worked = False
+        InitializerOrFinalizer('green.test.test_runner._importableFunction')()
+        self.assertTrue(importable_function_worked)
+
+
+    def test_not_callable(self):
         """
         An importable, but not-callable-object also raises an
         InitializerOrFinalizerError.
         """
-        initializer = InitializerOrFinalizer('sys')
+        initializer = InitializerOrFinalizer('green.test.test_runner.non_callable')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
+
+
+    def test_crash(self):
+        """
+        An importable, callable object...crashes.
+        """
+        initializer = InitializerOrFinalizer('green.test.test_runner._crashy')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
 
