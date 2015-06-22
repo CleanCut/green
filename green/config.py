@@ -199,8 +199,9 @@ CONFIG FILES
 
     out_args = parser.add_argument_group("Output Options")
     store_opt(out_args.add_argument('-a', '--allow-stdout', action='store_true',
-        help=("Instead of capturing the stdout and presenting it in the "
-        "summary of results, let it come through."), default=argparse.SUPPRESS))
+        help=("Instead of capturing the stdout and stderr and presenting it in "
+        "the summary of results, let it come through."),
+        default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."),

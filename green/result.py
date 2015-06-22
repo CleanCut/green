@@ -101,6 +101,7 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
     """
     def __init__(self, stream, colors):
         self.stdout_output = OrderedDict()
+        self.stderr_errput = OrderedDict()
         self.stream = stream
         self.colors = colors
 
@@ -112,6 +113,16 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
         if output:
             test = proto_test(test)
             self.stdout_output[test] = output
+
+    def recordStderr(self, test, errput):
+        """
+        Called with stderr that the suite decided to capture so we can report
+        the captured "errput" somewhere.
+        """
+        if errput:
+            test = proto_test(test)
+            self.stderr_errput[test] = errput
+
 
     def displayStdout(self, test):
         """
@@ -127,6 +138,23 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
                     self.colors.bold(test.dotted_name),
                     self.stdout_output[test]))
             del(self.stdout_output[test])
+
+
+    def displayStderr(self, test):
+        """
+        Displays AND REMOVES the errput captured from a specific test.  The
+        removal is done so that this method can be called multiple times
+        without duplicating results errput.
+        """
+        test = proto_test(test)
+        if test.dotted_name in self.stderr_errput:
+            self.stream.write(
+                "\n{} {} for {}\n{}".format(
+                    self.colors.blue('Captured'),
+                    self.colors.yellow('stderr'),
+                    self.colors.bold(test.dotted_name),
+                    self.stderr_errput[test]))
+            del(self.stderr_errput[test])
 
 
 class ProtoTestResult(BaseTestResult):
@@ -224,19 +252,32 @@ class GreenTestResult(BaseTestResult):
         self.shouldStop = True
 
 
-    def addProtoTestResult(self, protoTestResult):
-        for test, err in protoTestResult.errors:
+    def tryRecordingStdoutStderr(self, ptr, test):
+        if ptr.stdout_output.get(test, False):
+            self.recordStdout(test, ptr.stdout_output[test])
+        if ptr.stderr_errput.get(test, False):
+            self.recordStderr(test, ptr.stderr_errput[test])
+
+
+    def addProtoTestResult(self, proto_test_result):
+        for test, err in proto_test_result.errors:
             self.addError(test, err)
-        for test, err in protoTestResult.expectedFailures:
+            self.tryRecordingStdoutStderr(proto_test_result, test)
+        for test, err in proto_test_result.expectedFailures:
             self.addExpectedFailure(test, err)
-        for test, err in protoTestResult.failures:
+            self.tryRecordingStdoutStderr(proto_test_result, test)
+        for test, err in proto_test_result.failures:
             self.addFailure(test, err)
-        for test in protoTestResult.passing:
+            self.tryRecordingStdoutStderr(proto_test_result, test)
+        for test in proto_test_result.passing:
             self.addSuccess(test)
-        for test, reason in protoTestResult.skipped:
+            self.tryRecordingStdoutStderr(proto_test_result, test)
+        for test, reason in proto_test_result.skipped:
             self.addSkip(test, reason)
-        for test in protoTestResult.unexpectedSuccesses:
+            self.tryRecordingStdoutStderr(proto_test_result, test)
+        for test in proto_test_result.unexpectedSuccesses:
             self.addUnexpectedSuccess(test)
+            self.tryRecordingStdoutStderr(proto_test_result, test)
 
 
     def startTestRun(self):
@@ -431,6 +472,7 @@ class GreenTestResult(BaseTestResult):
         for test in list(self.stdout_output):
             if test not in failing_tests:
                 self.displayStdout(test)
+                self.displayStderr(test)
 
         # Actual tracebacks and captured output for failing tests
         for (test, color_func, outcome, err) in self.all_errors:
@@ -465,6 +507,7 @@ class GreenTestResult(BaseTestResult):
 
             # Captured output for failing tests
             self.displayStdout(test)
+            self.displayStderr(test)
 
 
     def wasSuccessful(self):

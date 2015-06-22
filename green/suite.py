@@ -105,15 +105,20 @@ class GreenTestSuite(TestSuite):
 
                 if not self.allow_stdout:
                     captured_stdout = StringIO()
+                    captured_stderr = StringIO()
                     saved_stdout = sys.stdout
+                    saved_stderr = sys.stderr
                     sys.stdout = GreenStream(captured_stdout)
+                    sys.stderr = GreenStream(captured_stderr)
 
             test(result)
 
             if _isnotsuite(test):
                 if not self.allow_stdout:
                     sys.stdout = saved_stdout
+                    sys.stderr = saved_stderr
                     result.recordStdout(test, captured_stdout.getvalue())
+                    result.recordStderr(test, captured_stderr.getvalue())
 
             self._removeTestAtIndex(index)
 
