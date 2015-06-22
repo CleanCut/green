@@ -1,6 +1,8 @@
 Green
 =====
 
+[![Join the chat at https://gitter.im/CleanCut/green](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CleanCut/green?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 [![Posix Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
 [![Windows Build Status](http://img.shields.io/appveyor/ci/CleanCut/green.svg?style=flat)](https://ci.appveyor.com/project/CleanCut/green)
