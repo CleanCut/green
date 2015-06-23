@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+import os
 import platform
 import sys
 import termstyle
@@ -156,7 +157,10 @@ class GreenStream(object):
 
     def __init__(self, stream, html=False):
         self.stream = stream
-        if platform.system() == 'Windows': # pragma: no cover
+        # Ironically, AppVeyor doesn't support windows win32 system calls for
+        # colors, but it WILL interpret posix ansi escape codes!
+        if ((platform.system() == 'Windows')
+            and (not os.environ.get('APPVEYOR', False))): # pragma: no cover
             from colorama.initialise import wrap_stream
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.html = html
