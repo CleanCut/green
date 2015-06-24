@@ -469,7 +469,9 @@ class GreenTestResult(BaseTestResult):
         # Skipped Test Report
         for test, reason in self.skipped:
             print("\n{} {} - {}".format(
-                self.colors.blue('Skipped'), test.dotted_name, reason))
+                self.colors.blue('Skipped'),
+                self.colors.bold(test.dotted_name),
+                reason))
 
         # Captured output for non-failing tests
         failing_tests = set([x[0] for x in self.all_errors])
