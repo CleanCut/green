@@ -110,6 +110,7 @@ def run(suite, stream, args):
                     result.shouldStop = True
                 if result.shouldStop: # pragma: no cover
                     break
+        pool.close()
         pool.join()
 
         result.stopTestRun()
