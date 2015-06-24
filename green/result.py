@@ -134,7 +134,7 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
         if test.dotted_name in self.stdout_output:
             self.stream.write(
                 "\n{} for {}\n{}".format(
-                    self.colors.blue('Captured stdout'),
+                    self.colors.yellow('Captured stdout'),
                     self.colors.bold(test.dotted_name),
                     self.stdout_output[test]))
             del(self.stdout_output[test])
@@ -149,9 +149,8 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
         test = proto_test(test)
         if test.dotted_name in self.stderr_errput:
             self.stream.write(
-                "\n{} {} for {}\n{}".format(
-                    self.colors.blue('Captured'),
-                    self.colors.yellow('stderr'),
+                "\n{} for {}\n{}".format(
+                    self.colors.yellow('Captured stderr'),
                     self.colors.bold(test.dotted_name),
                     self.stderr_errput[test]))
             del(self.stderr_errput[test])
@@ -466,6 +465,11 @@ class GreenTestResult(BaseTestResult):
         """
         if self.dots:
             self.stream.writeln()
+
+        # Skipped Test Report
+        for test, reason in self.skipped:
+            print("\n{} {} - {}".format(
+                self.colors.blue('Skipped'), test.dotted_name, reason))
 
         # Captured output for non-failing tests
         failing_tests = set([x[0] for x in self.all_errors])
