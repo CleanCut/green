@@ -69,6 +69,40 @@ class TestBaseTestResult(unittest.TestCase):
         self.assertIn(noise, stream.getvalue())
 
 
+    def test_stderrErrput(self):
+        """
+        recordStderr records errput.
+        """
+        btr = BaseTestResult(None, None)
+        pt = ProtoTest()
+        o = "some errput"
+        btr.recordStderr(pt, o)
+        self.assertEqual(btr.stderr_errput[pt], o)
+
+
+    def test_stderrNoErrput(self):
+        """
+        recordStderr ignores empty errput sent to it
+        """
+        btr = BaseTestResult(None, None)
+        pt = ProtoTest()
+        btr.recordStderr(pt, '')
+        self.assertEqual(btr.stderr_errput, {})
+
+
+    def test_displayStderr(self):
+        """
+        displayStderr displays captured stderr
+        """
+        stream = StringIO()
+        noise = "blah blah blah"
+        btr = BaseTestResult(stream, Colors(False, False))
+        pt = ProtoTest()
+        btr.stderr_errput[pt] = noise
+        btr.displayStderr(pt)
+        self.assertIn(noise, stream.getvalue())
+
+
 
 
 class TestProtoTestResult(unittest.TestCase):
@@ -253,6 +287,33 @@ class TestGreenTestResult(unittest.TestCase):
         del(self.args)
 
 
+    def test_tryRecordingStdoutStderr(self):
+        """
+        Recording stdout and stderr works correctly.
+        """
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.recordStdout = MagicMock()
+        gtr.recordStderr = MagicMock()
+
+        output = 'apple'
+        test1 = MagicMock()
+        ptr1 = MagicMock()
+        ptr1.stdout_output = {test1:output}
+        ptr1.stderr_errput = {}
+
+        errput = 'banana'
+        test2 = MagicMock()
+        ptr2 = MagicMock()
+        ptr2.stdout_output = {}
+        ptr2.stderr_errput = {test2:errput}
+
+
+        gtr.tryRecordingStdoutStderr(test1, ptr1)
+        gtr.recordStdout.assert_called_with(test1, output)
+        gtr.tryRecordingStdoutStderr(test2, ptr2)
+        gtr.recordStderr.assert_called_with(test2, errput)
+
+
     def test_failfastAddError(self):
         """
         addError triggers failfast when it is set
@@ -389,6 +450,20 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertFalse('&nbsp;' in self.stream.getvalue())
         self.assertFalse('<' in self.stream.getvalue())
         self.assertFalse('>' in self.stream.getvalue())
+
+
+    def test_printErrorsSkipreport(self):
+        """
+        printErrors() prints the skip report
+        """
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        reason = "dog ate homework"
+        gtr.addSkip(pt, reason)
+        gtr.printErrors()
+        self.assertIn(reason, self.stream.getvalue())
+
 
 
     def test_printErrorsStdout(self):

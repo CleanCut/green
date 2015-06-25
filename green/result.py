@@ -228,6 +228,7 @@ class GreenTestResult(BaseTestResult):
         super(GreenTestResult, self).__init__(
                 stream,
                 Colors(args.termcolor, args.html))
+        self.args = args
         self.showAll       = args.verbose > 1
         self.dots          = args.verbose == 1
         self.verbose       = args.verbose
@@ -251,32 +252,32 @@ class GreenTestResult(BaseTestResult):
         self.shouldStop = True
 
 
-    def tryRecordingStdoutStderr(self, ptr, test):
-        if ptr.stdout_output.get(test, False):
-            self.recordStdout(test, ptr.stdout_output[test])
-        if ptr.stderr_errput.get(test, False):
-            self.recordStderr(test, ptr.stderr_errput[test])
+    def tryRecordingStdoutStderr(self, test, proto_test_result):
+        if proto_test_result.stdout_output.get(test, False):
+            self.recordStdout(test, proto_test_result.stdout_output[test])
+        if proto_test_result.stderr_errput.get(test, False):
+            self.recordStderr(test, proto_test_result.stderr_errput[test])
 
 
     def addProtoTestResult(self, proto_test_result):
         for test, err in proto_test_result.errors:
             self.addError(test, err)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, err in proto_test_result.expectedFailures:
             self.addExpectedFailure(test, err)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, err in proto_test_result.failures:
             self.addFailure(test, err)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
         for test in proto_test_result.passing:
             self.addSuccess(test)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, reason in proto_test_result.skipped:
             self.addSkip(test, reason)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
         for test in proto_test_result.unexpectedSuccesses:
             self.addUnexpectedSuccess(test)
-            self.tryRecordingStdoutStderr(proto_test_result, test)
+            self.tryRecordingStdoutStderr(test, proto_test_result)
 
 
     def startTestRun(self):
@@ -467,11 +468,12 @@ class GreenTestResult(BaseTestResult):
             self.stream.writeln()
 
         # Skipped Test Report
-        for test, reason in self.skipped:
-            print("\n{} {} - {}".format(
-                self.colors.blue('Skipped'),
-                self.colors.bold(test.dotted_name),
-                reason))
+        if not self.args.no_skip_report:
+            for test, reason in self.skipped:
+                self.stream.writeln("\n{} {} - {}".format(
+                    self.colors.blue('Skipped'),
+                    self.colors.bold(test.dotted_name),
+                    reason))
 
         # Captured output for non-failing tests
         failing_tests = set([x[0] for x in self.all_errors])

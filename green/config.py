@@ -48,16 +48,18 @@ default_args = argparse.Namespace( # pragma: no cover
         termcolor       = None,
         notermcolor     = None,
         allow_stdout    = False,
-        debug           = 0,
+        no_skip_report  = False,
         help            = False, # Not in configs
-        logging         = False,
         version         = False,
+        logging         = False,
+        debug           = 0,
         verbose         = 1,
         failfast        = False,
         config          = None,  # Not in configs
         file_pattern    = 'test*.py',
         test_pattern    = '*',
         run_coverage    = False,
+        clear_omit      = False,
         omit_patterns   = None,
         completion_file = False,
         completions     = False,
@@ -202,18 +204,23 @@ CONFIG FILES
         help=("Instead of capturing the stdout and stderr and presenting it in "
         "the summary of results, let it come through."),
         default=argparse.SUPPRESS))
-    store_opt(out_args.add_argument('-d', '--debug', action='count',
-        help=("Enable internal debugging statements.  Implies --logging.  Can "
-        "be specified up to three times for more debug output."),
+    store_opt(out_args.add_argument('-k', '--no-skip-report',
+        action='store_true', help=("Don't print the report of skipped tests "
+        "after testing is done.  Skips will still show up in the progress "
+        "report and summary count."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-h', '--help', action='store_true',
         help="Show this help message and exit.",
         default=argparse.SUPPRESS))
+    store_opt(out_args.add_argument('-V', '--version', action='store_true',
+        help="Print the version of Green and Python and exit.",
+        default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-l', '--logging', action='store_true',
         help="Don't configure the root logger to redirect to /dev/null, "
         "enabling internal debugging output", default=argparse.SUPPRESS))
-    store_opt(out_args.add_argument('-V', '--version', action='store_true',
-        help="Print the version of Green and Python and exit.",
+    store_opt(out_args.add_argument('-d', '--debug', action='count',
+        help=("Enable internal debugging statements.  Implies --logging.  Can "
+        "be specified up to three times for more debug output."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more verbosity. "
@@ -239,11 +246,20 @@ CONFIG FILES
         "Coverage Options ({})".format(coverage_version))
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
         help=("Produce coverage output."), default=argparse.SUPPRESS))
+    store_opt(cov_args.add_argument('-O', '--clear-omit', action='store_true',
+        help=("Green tries really hard to set up a good list of patterns of "
+            "files to omit from coverage reports.  If the default list catches "
+            "files that you DO want to cover you can specify this flag to "
+            "leave the default list empty to start with.  You can then add "
+            "patterns back in with --omit-add. The default list is something"
+            "like'*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python system "
+            "packages)*' -- only longer."),
+        default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-o', '--omit-patterns', action='store',
         metavar='PATTERN',
-        help=("Comma-separated file-patterns to omit from coverage.  Default "
-            "is something like '*/test*,*/termstyle*,*/mock*,*(temp "
-            "dir)*,*(python system packages)*'"),
+        help=("Comma-separated file-patterns to omit from coverage.  For "
+            "example, if coverage reported a file mypackage/foo/bar you could"
+            "omit it from coverage with 'mypackage*', '*/foo/*', or '*bar'"),
         default=argparse.SUPPRESS))
 
     integration_args = parser.add_argument_group("Integration Options")
@@ -359,7 +375,8 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     Returns: I return a new argparse.Namespace, adding members:
         shouldExit    = default False
         exitCode      = default 0
-        omit_patterns = omit-patterns settings converted to list and extended
+        omit_patterns = omit-patterns settings converted to list and extended,
+                        taking clear-omit into account.
         cov           = coverage object default None
     """
     config = getConfig(getattr(args, 'config', default_args.config))
@@ -370,7 +387,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         config_getter = None
         if name in ['html', 'termcolor', 'notermcolor', 'allow_stdout', 'help',
                 'logging', 'version', 'failfast', 'run_coverage', 'options',
-                'completions', 'completion_file']:
+                'completions', 'completion_file', 'clear_omit', 'no_skip_report']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
@@ -430,35 +447,35 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     # Coverage.  We must enable it here because we cannot cover module-level
     # code after it is imported, and this is the earliest place we can turn on
     # coverage.
-    omit_patterns = []
+    omit_patterns = [
+        '*/argparse*',
+        '*/colorama*',
+        '*/django/*',
+        '*/distutils*',     # Gets pulled in on Travis-CI CPython
+        '*/extras*',        # pulled in by testtools
+        '*/linecache2*',    # pulled in by testtools
+        '*/mimeparse*',     # pulled in by testtools
+        '*/mock*',
+        '*/pbr*',           # pulled in by testtools
+        '*/pkg_resources*', # pulled in by django
+        '*/pypy*',
+        '*/pytz*',          # pulled in by django
+        '*/six*',           # pulled in by testtools
+        '*/termstyle*',
+        '*/test*',
+        '*/traceback2*',    # pulled in by testtools
+        '*/unittest2*',     # pulled in by testtools
+        tempfile.gettempdir() + '*',
+    ]
+    if 'green' not in new_args.targets and (
+            False in [t.startswith('green.') for t in new_args.targets]):
+        omit_patterns.extend([
+        '*Python.framework*',
+        '*site-packages*'])
+    if new_args.clear_omit:
+        omit_patterns = []
     if new_args.omit_patterns:
-        omit_patterns = new_args.omit_patterns.split(',')
-    else:
-        omit_patterns = [
-            '*/argparse*',
-            '*/colorama*',
-            '*/django/*',
-            '*/distutils*',     # Gets pulled in on Travis-CI CPython
-            '*/extras*',        # pulled in by testtools
-            '*/linecache2*',    # pulled in by testtools
-            '*/mimeparse*',     # pulled in by testtools
-            '*/mock*',
-            '*/pbr*',           # pulled in by testtools
-            '*/pkg_resources*', # pulled in by django
-            '*/pypy*',
-            '*/pytz*',          # pulled in by django
-            '*/six*',           # pulled in by testtools
-            '*/termstyle*',
-            '*/test*',
-            '*/traceback2*',    # pulled in by testtools
-            '*/unittest2*',     # pulled in by testtools
-            tempfile.gettempdir() + '*',
-        ]
-        if 'green' not in new_args.targets and (
-                False in [t.startswith('green.') for t in new_args.targets]):
-            omit_patterns.extend([
-            '*Python.framework*',
-            '*site-packages*'])
+        omit_patterns.extend(new_args.omit_patterns.split(','))
     new_args.omit_patterns = omit_patterns
 
     if new_args.run_coverage:

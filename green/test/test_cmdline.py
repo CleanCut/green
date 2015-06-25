@@ -133,7 +133,7 @@ class TestMain(unittest.TestCase):
         "If coverage and --run-coverage, then coverage is started"
         save_coverage = config.coverage
         config.coverage = MagicMock()
-        config.sys.argv = ['', '--run-coverage', '--omit-patterns=abc']
+        config.sys.argv = ['', '--run-coverage', '--omit-patterns=abc', '--clear-omit']
         cmdline.main(testing=True, coverage_testing=True)
         config.coverage.coverage.assert_called_with(
                 data_file=u'.coverage', omit=['abc'])
@@ -150,6 +150,18 @@ class TestMain(unittest.TestCase):
         cmdline.main(testing=True)
 
 
+    def test_omit_patterns_clear(self):
+        "Omit pattern gets parsed"
+        save_coverage = config.coverage
+        config.coverage = MagicMock()
+        cov = MagicMock()
+        config.coverage.coverage.return_value = cov
+        config.sys.argv = [
+                '', '--run-coverage', '--clear-omit', '--omit-patterns', 'a,b']
+        cmdline.main(testing=True, coverage_testing=True)
+        self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
+        config.coverage = save_coverage
+
     def test_omit_patterns(self):
         "Omit pattern gets parsed"
         save_coverage = config.coverage
@@ -158,7 +170,9 @@ class TestMain(unittest.TestCase):
         config.coverage.coverage.return_value = cov
         config.sys.argv = ['', '--run-coverage', '--omit-patterns', 'a,b']
         cmdline.main(testing=True, coverage_testing=True)
-        self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
+        self.assertIn('a', cov.report.mock_calls[0][2]['omit'])
+        self.assertIn('b', cov.report.mock_calls[0][2]['omit'])
+        self.assertIn('*/colorama*', cov.report.mock_calls[0][2]['omit'])
         config.coverage = save_coverage
 
 
