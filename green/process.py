@@ -221,6 +221,7 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
                 data_file='.coverage.{}_{}'.format(
                     coverage_number, random.randint(0, 10000)),
                 omit=omit_patterns)
+        cov._warn_no_data = False
         cov.start()
 
     # Create a structure to return the results of this one test
