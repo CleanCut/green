@@ -37,6 +37,62 @@ class TestToProtoTestList(unittest.TestCase):
         self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
 
 
+class TestToParallelTestTargets(unittest.TestCase):
+
+    def setUp(self):
+        super(TestToParallelTestTargets, self).setUp()
+
+        class FakeModule(object):
+            pass
+
+        self._fake_module_name = "my_test_module"
+        sys.modules[self._fake_module_name] = FakeModule
+
+    def tearDown(self):
+        del sys.modules[self._fake_module_name]
+        super(TestToParallelTestTargets, self).tearDown()
+
+    def test_methods_with_no_constraints(self):
+        "toParallelTestTargets() returns normal target names."
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+
+        targets = loader.toParallelTestTargets(NormalTestCase(), [])
+        self.assertEqual(targets,
+                         set(["my_test_module.NormalTestCase.runTest"]))
+
+    def test_methods_with_set_up_class(self):
+        "toParallelTestTargets() returns class name with setUpClass."
+        class WithSetUpClassTestCase(unittest.TestCase):
+            @classmethod
+            def setUpClass(cls):
+                pass
+
+            def runTest(self):
+                pass
+
+        WithSetUpClassTestCase.__module__ = self._fake_module_name
+
+        targets = loader.toParallelTestTargets(WithSetUpClassTestCase(), [])
+        self.assertEqual(targets,
+                         set(["my_test_module.WithSetUpClassTestCase"]))
+
+    def test_methods_with_set_up_module_on_module(self):
+        "toParallelTestTargets() returns module name with setUpModule."
+        class WithSetUpModuleTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        WithSetUpModuleTestCase.__module__ = self._fake_module_name
+
+        sys.modules[self._fake_module_name].setUpModule = lambda c: None
+        targets = loader.toParallelTestTargets(WithSetUpModuleTestCase(), [])
+        self.assertEqual(targets,
+                         set(["my_test_module"]))
+        del sys.modules[self._fake_module_name].setUpModule
 
 class TestCompletions(unittest.TestCase):
 

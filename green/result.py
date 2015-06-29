@@ -194,6 +194,10 @@ class ProtoTestResult(BaseTestResult):
         "Called when a test passed, but we expected a failure"
         self.unexpectedSuccesses.append(proto_test(test))
 
+    @property
+    def any_errors(self, ignored=None):
+        "True if anything failed due to an error"
+        return self.errors > 0
 
 
 class GreenTestResult(BaseTestResult):

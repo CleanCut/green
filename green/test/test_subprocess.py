@@ -11,6 +11,11 @@ except:
 from green.subprocess import SubprocessLogger, DaemonlessProcess, poolRunner
 from green import subprocess
 
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
+
 
 class TestSubprocessLogger(unittest.TestCase):
 
@@ -112,9 +117,11 @@ class A(unittest.TestCase):
 """)
         fh.close()
         module_name = basename + '.test_pool_runner_dotted.A.testPass'
-        result = poolRunner(module_name, 1)
+        result = Queue()
+        poolRunner(module_name, result, 1)
         subprocess.coverage = saved_coverage
-        self.assertEqual(len(result.passing), 1)
+        result.get()
+        self.assertEqual(len(result.get().passing), 1)
 
 
     def test_SyntaxErrorInUnitTest(self):
@@ -133,9 +140,11 @@ class A(unittest.TestCase):
         fh.write("aoeu")
         fh.close()
         module_name = basename + '.test_pool_syntax_error'
-        result = poolRunner(module_name, 1)
+        result = Queue()
+        poolRunner(module_name, result, 1)
         subprocess.coverage = saved_coverage
-        self.assertEqual(len(result.errors), 1)
+        result.get()
+        self.assertEqual(len(result.get().errors), 1)
 
 
     def test_error(self):
@@ -159,7 +168,9 @@ class A(unittest.TestCase):
 """)
         fh.close()
         module_name = basename + '.test_pool_runner_dotted_fail.A.testError'
-        result = poolRunner(module_name)
-        self.assertEqual(len(result.errors), 1)
+        result = Queue()
+        poolRunner(module_name, result)
+        result.get()
+        self.assertEqual(len(result.get().errors), 1)
 
 
