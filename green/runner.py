@@ -10,11 +10,17 @@ try: # pragma: no cover
 except: # pragma: no cover
     coverage = None
 
-from green.loader import toProtoTestList
+from green.loader import toProtoTestList, toParallelTestTargets
 from green.output import GreenStream
 from green.result import GreenTestResult
 from green.subprocess import LoggingDaemonlessPool, poolRunner
 
+from collections import defaultdict, namedtuple
+
+import multiprocessing
+
+
+_AsyncChunk = namedtuple("_AsyncChunk", "suite_name queue")
 
 
 def run(suite, stream, args):
@@ -48,30 +54,45 @@ def run(suite, stream, args):
 
         result.startTestRun()
 
-        tests = toProtoTestList(suite)
+        tests = [_AsyncChunk(t, multiprocessing.Manager().Queue()) for t in toParallelTestTargets(suite, args.targets)]
         pool = LoggingDaemonlessPool(processes=args.subprocesses or None)
         if tests:
             async_responses = []
-            for index, test in enumerate(tests):
+            for index, test_chunk in enumerate(tests):
                 if args.run_coverage:
                     coverage_number = index + 1
                 else:
                     coverage_number = None
-                async_responses.append(pool.apply_async(
+                pool.apply_async(
                     poolRunner,
-                    (test.dotted_name, coverage_number, args.omit_patterns)))
+                    (test_chunk.suite_name, test_chunk.queue, coverage_number, args.omit_patterns))
             pool.close()
-            for test, async_response in zip(tests, async_responses):
-                # Prints out the white 'processing...' version of the output
-                result.startTest(test)
-                # This blocks until the worker who is processing this
-                # particular test actually finishes
-                try:
-                    result.addProtoTestResult(async_response.get())
-                except KeyboardInterrupt: # pragma: no cover
-                    result.shouldStop = True
+            for test_chunk in tests:
+                while True:
+                    msg = test_chunk.queue.get()
+
+                    # Sentinel value, we're done
+                    if not msg:
+                        break
+                    else:
+                        # Result guarunteed after this message
+                        result.startTest(msg)
+                        result.addProtoTestResult(test_chunk.queue.get())
+
                 if result.shouldStop:
                     break
+
+                # Prints out the white 'processing...' version of the output
+                # result.startTest(test)
+                # This blocks until the worker who is processing this
+                # particular test actually finishes
+                # try:
+                #     for response in async_response.get():
+                #         result.addProtoTestResult(response)
+                # except KeyboardInterrupt: # pragma: no cover
+                #     result.shouldStop = True
+                # if result.shouldStop:
+                #     break
         pool.terminate()
         pool.join()
 

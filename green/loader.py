@@ -43,6 +43,86 @@ def toProtoTestList(suite_part, test_list=None, doing_completions=False):
         return test_list
 
 
+def _isDefinedOnParentOtherThan(cls, method_name, parent_to_ignore):
+    """
+    Take a class and determine if a method is overridden in its hierarchy.
+
+    This searches every parent class in the classes MRO to determine
+    if method_name was defined on any of them, except for the
+    class specified by parent_to_ignore. You can use this function
+    to check if a method has been overridden on a class.
+    """
+    for subclass in cls.__mro__:
+        if subclass == parent_to_ignore:
+            continue
+
+        if method_name in subclass.__dict__.keys():
+            return True
+
+    return False
+
+def toParallelTestTargets(suite_part, user_targets, test_set=None):
+    """
+    Take a test suite and turn it into a list of target names.
+
+    This is effectively just the name of the target to load in each case.
+    In most cases, this will be right down to the level of the individual
+    test, however in certain cases, such as where test case or test module
+    set up and tear down functions have been registered, it will need to
+    stop at a level before that.
+    """
+    if test_set == None:
+        test_set = set()
+
+    # Python's lousy handling of module import failures during loader discovery
+    # makes this crazy special case necessary.  See _make_failed_import_test in
+    # the source code for unittest.loader
+    if suite_part.__class__.__name__ == 'ModuleImportFailure':
+        exception_method = str(suite_part).split()[0]
+        getattr(suite_part, exception_method)()
+
+    # Base case: check if we're a TestCase.
+    #
+    # If so, we then have a further check -
+    # 1. If the module defines setUpModule or tearDownModule then the entire
+    #    module must be run in serial, so we add only the module name.
+    # 2. If the class defines setUpClass or tearDownClass then the entire
+    #    class must be run in serial, so we add only the class name.
+    #
+    # However, if the user has specifically asked for a certain target
+    # then we should return that target only, instead of the whole
+    # class.
+    if issubclass(type(suite_part), unittest.TestCase):
+        full_test_case_name = ".".join((suite_part.__module__,
+                                        suite_part.__class__.__name__))
+        full_unit_test_name = ".".join((suite_part.__module__,
+                                        suite_part.__class__.__name__,
+                                        str(suite_part).split()[0]))
+
+        if not (full_test_case_name in user_targets or
+                full_unit_test_name in user_targets):
+            for attr in ("setUpModule", "tearDownModule"):
+                module = sys.modules[suite_part.__module__]
+                if getattr(module, attr, None):
+                    test_set.add(suite_part.__module__)
+                    return test_set
+
+        if not full_unit_test_name in user_targets:
+            for attr in ("setUpClass", "tearDownClass"):
+                if _isDefinedOnParentOtherThan(suite_part.__class__,
+                                               attr,
+                                               unittest.TestCase):
+                    test_set.add(full_test_case_name)
+                    return test_set
+
+        test_set.add(full_unit_test_name)
+    else:
+        for test in suite_part:
+            toParallelTestTargets(test, user_targets, test_set)
+
+    return test_set
+
+
 def getCompletions(target):
         # This option expects 0 or 1 targets
         if type(target) == list:
