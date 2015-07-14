@@ -37,6 +37,44 @@ class TestToProtoTestList(unittest.TestCase):
         self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
 
 
+class TestToParallelTestTargets(unittest.TestCase):
+
+    def setUp(self):
+        super(TestToParallelTestTargets, self).setUp()
+
+        class FakeModule(object):
+            pass
+
+        self._fake_module_name = "my_test_module"
+        sys.modules[self._fake_module_name] = FakeModule
+
+    def tearDown(self):
+        del sys.modules[self._fake_module_name]
+        super(TestToParallelTestTargets, self).tearDown()
+
+    def test_methods_with_no_constraints(self):
+        "toParallelTestTargets() returns only module names."
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+
+        targets = loader.toParallelTestTargets(NormalTestCase(), [])
+        self.assertEqual(targets,
+                         set(["my_test_module"]))
+
+    def test_methods_with_constraints(self):
+        "toParallelTestTargets() returns test names when constrained."
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+        full_name = "my_test_module.NormalTestCase.runTest"
+
+        targets = loader.toParallelTestTargets(NormalTestCase(), [full_name])
+        self.assertEqual(targets, set([full_name]))
 
 class TestCompletions(unittest.TestCase):
 

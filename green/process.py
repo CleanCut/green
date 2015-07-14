@@ -14,7 +14,7 @@ except: # pragma: no cover
 
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
-from green.result import ProtoTest, ProtoTestResult
+from green.result import proto_test, proto_error, ProtoTest, ProtoTestResult, BaseTestResult
 
 
 
@@ -206,7 +206,73 @@ multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
 #-------------------------------------------------------------------------------
 
-def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no cover
+class SubprocessTestResult(BaseTestResult):
+    """
+    I'm the TestResult object for a single unit test run in a subprocess.
+    """
+
+
+    def __init__(self, reporting_queue):
+        super(SubprocessTestResult, self).__init__(None, None)
+        self.reportingQueue = reporting_queue
+        self.currentResult = None
+        self.shouldStop = False
+
+    def startTest(self, test):
+        "Called before each test runs"
+        self.reportingQueue.put(proto_test(test))
+        self.currentResult = ProtoTestResult()
+
+
+    def stopTest(self, test):
+        "Called after each test runs"
+        self.reportingQueue.put(self.currentResult)
+        self.currentResult = None
+
+
+    def addSuccess(self, test):
+        "Called when a test passed"
+        self.currentResult.addSuccess(test)
+
+
+    def addError(self, test, err):
+        "Called when a test raises an exception"
+        if not self.currentResult:
+            self.startTest(test)
+            self.addError(test, err)
+            self.stopTest(test)
+        else:
+            self.currentResult.addError(test, err)
+
+
+    def addFailure(self, test, err):
+        "Called when a test fails a unittest assertion"
+        self.currentResult.addFailure(test, err)
+
+
+    def addSkip(self, test, reason):
+        "Called when a test is skipped"
+        self.currentResult.addSkip(test, reason)
+
+
+    def addExpectedFailure(self, test, err):
+        "Called when a test fails, and we expeced the failure"
+        self.currentResult.addExpectedFailure(test, err)
+
+
+    def addUnexpectedSuccess(self, test):
+        "Called when a test passed, but we expected a failure"
+        self.currentResult.addUnexpectedSuccess(test)
+
+    @property
+    def any_errors(self, ignored=None):
+        "True if anything failed and test execution hasn't stopped"
+        if not self.currentResult:
+            return False
+        else:
+            return self.currentResult.any_errors
+
+def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
     "I am the function that pool worker processes run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
@@ -225,10 +291,10 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
         cov.start()
 
     # Create a structure to return the results of this one test
-    result = ProtoTestResult()
+    result = SubprocessTestResult(queue)
     test = None
     try:
-        test = loadTargets(test_name)
+        test = loadTargets(target)
     except:
         err = sys.exc_info()
         t             = ProtoTest()
@@ -236,7 +302,9 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
         t.class_name  = 'N/A'
         t.description = 'Green encountered an error loading the unit test.'
         t.method_name = 'poolRunner'
+        result.startTest(t)
         result.addError(t, err)
+        result.stopTest(t)
 
     if getattr(test, 'run', False):
         # Loading was successful, lets do this
@@ -247,24 +315,26 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
             # through to crash things.  So we only need to manufacture another error
             # if the underlying framework didn't, but either way we don't want to
             # crash.
-            if not result.errors:
+            if not result.any_errors:
                 err = sys.exc_info()
                 t             = ProtoTest()
                 t.module      = 'green.runner'
                 t.class_name  = 'N/A'
                 t.description = 'Green encountered an exception not caught by the underlying test framework.'
                 t.method_name = 'poolRunner'
+                result.startTest(t)
                 result.addError(t, err)
+                result.stopTest(t)
     else:
         # loadTargets() returned an object without a run() method, probably None
         description = 'Test loader returned an un-runnable object: {} of type {} with dir {}'.format(
                 str(test), type(test), dir(test))
         err = (TypeError, TypeError(description), None)
         t             = ProtoTest()
-        t.module      = '.'.join(test_name.split('.')[:-2])
-        t.class_name  = test_name.split('.')[-2]
+        t.module      = '.'.join(target.split('.')[:-2])
+        t.class_name  = target.split('.')[-2]
         t.description = description
-        t.method_name = test_name.split('.')[-1]
+        t.method_name = target.split('.')[-1]
         result.addError(t, err)
 
     # Finish coverage
@@ -275,4 +345,5 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]): # pragma: no 
     # Restore the state of the temp directory
     shutil.rmtree(tempfile.tempdir)
     tempfile.tempdir = saved_tempdir
-    return result
+    queue.put(None)
+    return None
