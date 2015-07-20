@@ -265,12 +265,11 @@ class SubprocessTestResult(BaseTestResult):
         self.currentResult.addUnexpectedSuccess(test)
 
     @property
-    def any_errors(self, ignored=None):
-        "True if anything failed and test execution hasn't stopped"
+    def errors(self):
         if not self.currentResult:
-            return False
-        else:
-            return self.currentResult.any_errors
+            return 0
+        return self.currentResult.errors
+
 
 def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
     "I am the function that pool worker processes run.  I run one unit test."
@@ -315,7 +314,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
             # through to crash things.  So we only need to manufacture another error
             # if the underlying framework didn't, but either way we don't want to
             # crash.
-            if not result.any_errors:
+            if not result.errors:
                 err = sys.exc_info()
                 t             = ProtoTest()
                 t.module      = 'green.runner'
