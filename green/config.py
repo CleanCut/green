@@ -34,6 +34,7 @@ import logging    # pragma: no cover
 import os         # pragma: no cover
 import sys        # pragma: no cover
 import tempfile   # pragma: no cover
+import multiprocessing # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.
 files_loaded = [] # pragma: no cover
@@ -41,7 +42,7 @@ files_loaded = [] # pragma: no cover
 # Set the defaults in a re-usable way
 default_args = argparse.Namespace( # pragma: no cover
         targets         = ['.'], # Not in configs
-        processes       = 1,
+        processes       = multiprocessing.cpu_count(),
         initializer     = '',
         finalizer       = '',
         html            = False,

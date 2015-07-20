@@ -132,11 +132,19 @@ class TestRun(unittest.TestCase):
         # told to stop when we send SIGINT
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
-        class KBICase(unittest.TestCase):
-            def runTest(self):
-                os.kill(os.getpid(), signal.SIGINT)
-        kc = KBICase()
-        run(kc, self.stream, self.args)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
+        fh.write("""
+import unittest
+class KBICase(unittest.TestCase):
+    def runTest(self):
+        os.kill(os.getpid(), signal.SIGINT)
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_catch_sigint')
+        run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
         unittest.signals._results = saved__results
 
     def test_stdout(self):
@@ -161,11 +169,19 @@ class TestRun(unittest.TestCase):
         """
         html=True causes html output
         """
-        class FakeCase(unittest.TestCase):
-            def runTest(self):
-                pass
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_html.py'), 'w')
+        fh.write("""
+import unittest
+class FakeCase(unittest.TestCase):
+    def runTest(self):
+        os.kill(os.getpid(), signal.SIGINT)
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_html')
         self.args.html = True
-        run(FakeCase(), self.stream, self.args)
+        run(tests, self.stream, self.args)
         self.assertIn('<', self.stream.getvalue())
 
     def test_verbose3(self):
