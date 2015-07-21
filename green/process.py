@@ -334,7 +334,9 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         t.class_name  = target.split('.')[-2]
         t.description = description
         t.method_name = target.split('.')[-1]
+        result.startTest(t)
         result.addError(t, err)
+        result.stopTest(t)
 
     # Finish coverage
     if coverage_number and coverage:
