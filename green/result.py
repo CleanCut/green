@@ -160,10 +160,16 @@ class ProtoTestResult(BaseTestResult):
     """
     I'm the TestResult object for a single unit test run in a process.
     """
-    def __init__(self):
+    def __init__(self, start_callback=None, stop_callback=None):
         super(ProtoTestResult, self).__init__(None, None)
+        self.start_callback      = start_callback
+        self.stop_callback       = stop_callback
+        self.reinitialize()
+
+
+    def reinitialize(self):
+        self.current_test = None
         self.shouldStop = False
-        # Individual lists
         self.errors              = []
         self.expectedFailures    = []
         self.failures            = []
@@ -181,13 +187,39 @@ class ProtoTestResult(BaseTestResult):
                 "skipped" + str(self.skipped) + ', ' +
                 "unexpectedSuccesses" + str(self.unexpectedSuccesses))
 
+
+    def __getstate__(self):
+        "Prevent the callback functions from getting pickled"
+        clean_dict = self.__dict__.copy()
+        del clean_dict['start_callback']
+        del clean_dict['stop_callback']
+        return clean_dict
+
+
+    def __setstate__(self, dict):
+        "Since the callback functions weren't pickled, we need to init them"
+        self.__dict__.update(dict)
+        self.start_callback = None
+        self.stop_callback = None
+
+
     def startTest(self, test):
         "Called before each test runs"
+        # I can't quite figure out the exact reason tests get double-started in
+        # test_uncaughtException, but this fixes it
+        if test == self.current_test:
+            # Don't double-start a test
+            return
+        self.reinitialize()
+        self.current_test = test
+        if self.start_callback:
+            self.start_callback(test)
 
 
     def stopTest(self, test):
         "Called after each test runs"
-
+        if self.stop_callback:
+            self.stop_callback(self)
 
     def addSuccess(self, test):
         "Called when a test passed"

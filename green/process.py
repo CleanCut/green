@@ -14,7 +14,7 @@ except: # pragma: no cover
 
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
-from green.result import proto_test, proto_error, ProtoTest, ProtoTestResult, BaseTestResult
+from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
 
@@ -206,70 +206,6 @@ multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
 #-------------------------------------------------------------------------------
 
-class SubprocessTestResult(BaseTestResult):
-    """
-    I'm the TestResult object for a single unit test run in a subprocess.
-    """
-
-
-    def __init__(self, reporting_queue):
-        super(SubprocessTestResult, self).__init__(None, None)
-        self.reportingQueue = reporting_queue
-        self.currentResult = None
-        self.shouldStop = False
-
-    def startTest(self, test):
-        "Called before each test runs"
-        self.reportingQueue.put(proto_test(test))
-        self.currentResult = ProtoTestResult()
-
-
-    def stopTest(self, test):
-        "Called after each test runs"
-        self.reportingQueue.put(self.currentResult)
-        self.currentResult = None
-
-
-    def addSuccess(self, test):
-        "Called when a test passed"
-        self.currentResult.addSuccess(test)
-
-
-    def addError(self, test, err):
-        "Called when a test raises an exception"
-        if not self.currentResult:
-            self.startTest(test)
-            self.addError(test, err)
-            self.stopTest(test)
-        else:
-            self.currentResult.addError(test, err)
-
-
-    def addFailure(self, test, err):
-        "Called when a test fails a unittest assertion"
-        self.currentResult.addFailure(test, err)
-
-
-    def addSkip(self, test, reason):
-        "Called when a test is skipped"
-        self.currentResult.addSkip(test, reason)
-
-
-    def addExpectedFailure(self, test, err):
-        "Called when a test fails, and we expeced the failure"
-        self.currentResult.addExpectedFailure(test, err)
-
-
-    def addUnexpectedSuccess(self, test):
-        "Called when a test passed, but we expected a failure"
-        self.currentResult.addUnexpectedSuccess(test)
-
-    @property
-    def errors(self):
-        if not self.currentResult:
-            return 0
-        return self.currentResult.errors
-
 
 def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
     "I am the function that pool worker processes run.  I run one unit test."
@@ -289,8 +225,17 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         cov._warn_no_data = False
         cov.start()
 
+    # What to do each time an individual test is started
+    def start_callback(test):
+        # Let the main process know what test we are starting
+        queue.put(proto_test(test))
+
+    def stop_callback(test_result):
+        # Let the main process know what happened with the test run
+        queue.put(test_result)
+
     # Create a structure to return the results of this one test
-    result = SubprocessTestResult(queue)
+    result = ProtoTestResult(start_callback, stop_callback)
     test = None
     try:
         test = loadTargets(target)

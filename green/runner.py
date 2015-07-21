@@ -12,16 +12,14 @@ except: # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
-from green.loader import toProtoTestList, toParallelTestTargets
+from green.loader import toParallelTestTargets
 from green.output import GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
 
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 
 import multiprocessing
-
-import sys
 
 
 _AsyncChunk = namedtuple("_AsyncChunk", "suite_name queue")
@@ -119,7 +117,8 @@ def run(suite, stream, args):
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output
                         result.startTest(msg)
-                        result.addProtoTestResult(test_chunk.queue.get())
+                        proto_test_result = test_chunk.queue.get()
+                        result.addProtoTestResult(proto_test_result)
 
                     if result.shouldStop:
                         abort_tests = True
