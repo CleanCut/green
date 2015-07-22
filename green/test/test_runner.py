@@ -425,7 +425,6 @@ class A(unittest.TestCase):
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test_autoprocesses.py'), 'w')
         fh.write("""
 import unittest
@@ -450,7 +449,6 @@ class A(unittest.TestCase):
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test_coverage.py'), 'w')
         fh.write("""
 import unittest
@@ -484,8 +482,8 @@ class A(unittest.TestCase):
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
         self.args.processes = 2
-        self.assertRaises(ImportError, run, tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
+        self.assertRaises(ImportError, run, tests, self.stream, self.args)
 
     def test_uncaughtException(self):
         """
@@ -502,7 +500,6 @@ class A(unittest.TestCase):
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test_uncaught.py'), 'w')
         fh.write("""
 import testtools
