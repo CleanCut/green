@@ -88,7 +88,7 @@ class ProtoTest():
 
 class ProtoError():
     """I take a full-fledged test error and preserve just the information we
-    need and can bass between processes.
+    need and can pass between processes.
     """
     def __init__(self, err=None):
         self.traceback_lines = traceback.format_exception(*err)
@@ -207,6 +207,7 @@ class ProtoTestResult(BaseTestResult):
         "Called before each test runs"
         # I can't quite figure out the exact reason tests get double-started in
         # test_uncaughtException, but this fixes it
+        test = proto_test(test)
         if test == self.current_test:
             # Don't double-start a test
             return

@@ -92,7 +92,8 @@ def run(suite, stream, args):
         pool = LoggingDaemonlessPool(processes=args.processes or None,
                 initializer=InitializerOrFinalizer(args.initializer),
                 finalizer=InitializerOrFinalizer(args.finalizer))
-        tests = [_AsyncChunk(t, multiprocessing.Manager().Queue()) for t in toParallelTestTargets(suite, args.targets)]
+        manager = multiprocessing.Manager()
+        tests = [_AsyncChunk(t, manager.Queue()) for t in toParallelTestTargets(suite, args.targets)]
         if tests:
             for index, test_chunk in enumerate(tests):
                 if args.run_coverage:
@@ -127,7 +128,7 @@ def run(suite, stream, args):
                 if abort_tests:
                     break
 
-        pool.terminate()
+        pool.close()
         pool.join()
 
         result.stopTestRun()

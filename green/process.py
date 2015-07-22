@@ -234,7 +234,6 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         # Let the main process know what happened with the test run
         queue.put(test_result)
 
-    # Create a structure to return the results of this one test
     result = ProtoTestResult(start_callback, stop_callback)
     test = None
     try:
