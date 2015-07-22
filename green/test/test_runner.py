@@ -135,11 +135,13 @@ class TestRun(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
         fh.write("""
+import os
+import signal
 import unittest
 class KBICase(unittest.TestCase):
     def runTest(self):
         os.kill(os.getpid(), signal.SIGINT)
-""".format(os.getpid()))
+""")
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_catch_sigint')
@@ -174,8 +176,8 @@ class KBICase(unittest.TestCase):
         fh.write("""
 import unittest
 class FakeCase(unittest.TestCase):
-    def runTest(self):
-        os.kill(os.getpid(), signal.SIGINT)
+    def test_html_stuff(self):
+        pass
 """.format(os.getpid()))
         fh.close()
         os.chdir(sub_tmpdir)
