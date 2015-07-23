@@ -164,6 +164,18 @@ class ProtoTestResult(BaseTestResult):
         super(ProtoTestResult, self).__init__(None, None)
         self.start_callback      = start_callback
         self.stop_callback       = stop_callback
+        self.pickle_attrs = [
+                'errors',
+                'expectedFailures',
+                'failures',
+                'passing',
+                'pickle_attrs',
+                'shouldStop',
+                'skipped',
+                'stderr_errput',
+                'stdout_output',
+                'unexpectedSuccesses',
+                ]
         self.reinitialize()
 
 
@@ -190,10 +202,10 @@ class ProtoTestResult(BaseTestResult):
 
     def __getstate__(self):
         "Prevent the callback functions from getting pickled"
-        clean_dict = self.__dict__.copy()
-        del clean_dict['start_callback']
-        del clean_dict['stop_callback']
-        return clean_dict
+        result_dict = {}
+        for pickle_attr in self.pickle_attrs:
+            result_dict[pickle_attr] = self.__dict__[pickle_attr]
+        return result_dict
 
 
     def __setstate__(self, dict):

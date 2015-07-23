@@ -18,6 +18,22 @@ from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
 
+# Super-useful debug function for finding problems in the subprocesses, and it
+# even works on windows
+def ddebug(msg, err=None): # pragma: no cover
+    """
+    err can be an instance of sys.exc_info() -- which is the latest traceback
+    info
+    """
+    if err:
+        err = ''.join(traceback.format_exception(*err))
+    else:
+        err = ''
+    sys.__stdout__.write("({}) {} {}".format(os.getpid(), msg, err)+'\n')
+    sys.__stdout__.flush()
+
+
+
 class ProcessLogger(object):
     """I am used by LoggingDaemonlessPool to get crash output out to the
     logger, instead of having process crashes be silent"""
