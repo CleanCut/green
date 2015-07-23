@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import logging
 import os
 import shutil
+import sys
 import tempfile
 import unittest
 
@@ -45,9 +46,11 @@ class TestMain(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         cwd = os.getcwd()
         os.chdir(tmpdir)
+        sys.path.insert(0, cwd)
         config.sys.argv = ['', tmpdir]
         cmdline.main()
         os.chdir(cwd)
+        del(sys.path[0])
         shutil.rmtree(tmpdir)
 
 
