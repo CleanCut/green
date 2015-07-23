@@ -17,12 +17,9 @@ from green.output import GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
 
-from collections import namedtuple
-
 import multiprocessing
 
 
-_AsyncChunk = namedtuple("_AsyncChunk", "suite_name queue")
 
 class InitializerOrFinalizer:
     """
@@ -93,22 +90,22 @@ def run(suite, stream, args):
                 initializer=InitializerOrFinalizer(args.initializer),
                 finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
-        tests = [_AsyncChunk(t, manager.Queue()) for t in toParallelTestTargets(suite, args.targets)]
+        tests = [(target, manager.Queue()) for target in toParallelTestTargets(suite, args.targets)]
         if tests:
-            for index, test_chunk in enumerate(tests):
+            for index, (target, queue) in enumerate(tests):
                 if args.run_coverage:
                     coverage_number = index + 1
                 else:
                     coverage_number = None
                 pool.apply_async(
                     poolRunner,
-                    (test_chunk.suite_name, test_chunk.queue, coverage_number, args.omit_patterns))
+                    (target, queue, coverage_number, args.omit_patterns))
             pool.close()
-            for test_chunk in tests:
+            for target, queue in tests:
                 abort_tests = False
 
                 while True:
-                    msg = test_chunk.queue.get()
+                    msg = queue.get()
 
                     # Sentinel value, we're done
                     if not msg:
@@ -118,7 +115,7 @@ def run(suite, stream, args):
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output
                         result.startTest(msg)
-                        proto_test_result = test_chunk.queue.get()
+                        proto_test_result = queue.get()
                         result.addProtoTestResult(proto_test_result)
 
                     if result.shouldStop:
