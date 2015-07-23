@@ -220,9 +220,6 @@ class ProtoTestResult(BaseTestResult):
         # I can't quite figure out the exact reason tests get double-started in
         # test_uncaughtException, but this fixes it
         test = proto_test(test)
-        if test == self.current_test:
-            # Don't double-start a test
-            return
         self.reinitialize()
         self.current_test = test
         if self.start_callback:
