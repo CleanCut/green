@@ -44,7 +44,7 @@ class TestProcessLogger(unittest.TestCase):
             raise AttributeError
         l = ProcessLogger(func)
         self.assertRaises(AttributeError, l)
-        mock_get_logger.assert_called()
+        mock_get_logger.assert_any_call()
         process.multiprocessing.get_logger = saved_get_logger
 
 
