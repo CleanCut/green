@@ -19,6 +19,42 @@
   things that an individual worker process will need exclusive access to apart
   from the other worker processes.
 
+- We're back at 100% self-test coverage again.  Yay!!!
+
+- Twisted's skip functionality is caught and recorded as skips instead of
+  failures, if your `TestCase` subclasses `twisted.trial.unittest.TestCase` and
+  sets the class attribute `.skip` to `True`, or a test raises
+  `twisted.trial.unittest.SkipTest`.
+
+- Better handling of outside-of-test exceptions that occur inside worker
+  processes.
+
+- We now capture stderr that is emitted during tests and present it after tests
+  have run, just like we do with stdout.
+
+- Capturing stdout in worker processes more consistently works (no known bugs
+  left).
+
+- The headers for stdout and stderr are now yellow, for better color scheme
+  consistency (and so they don't get confused with skip headers).
+
+- Skip report headers now display the dotted test name in bold, just like other
+  headers do.  We are so consistent!
+
+- Fixed the skip report so it goes to the stream instead of stdout.
+
+- Disabled the annoying "Coverage.py warning: No data was collected." message
+  that started happening a lot, even though coverage was working just fine.
+
+- Colors now work on AppVeyor builds, all hail the pretty colors!  (Ironically,
+  they don't support Windows ansi colors, they wrote their own interpreters for
+  posix-style color escape codes.)
+
+- We now "close" the process pool instead of "terminating" it, which results in
+  much better behavior in pypy and Windows, especially for things like tearDown
+  stuff.
+
+
 # Version 1.11.0
 ##### 18 June 2015
 
