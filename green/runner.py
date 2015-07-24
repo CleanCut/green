@@ -12,7 +12,7 @@ except: # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
-from green.loader import toParallelTestTargets
+from green.loader import toParallelTargets
 from green.output import GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
@@ -90,9 +90,9 @@ def run(suite, stream, args):
                 initializer=InitializerOrFinalizer(args.initializer),
                 finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
-        tests = [(target, manager.Queue()) for target in toParallelTestTargets(suite, args.targets)]
-        if tests:
-            for index, (target, queue) in enumerate(tests):
+        targets = [(target, manager.Queue()) for target in toParallelTargets(suite, args.targets)]
+        if targets:
+            for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:
                     coverage_number = index + 1
                 else:
@@ -101,8 +101,8 @@ def run(suite, stream, args):
                     poolRunner,
                     (target, queue, coverage_number, args.omit_patterns))
             pool.close()
-            for target, queue in tests:
-                abort_tests = False
+            for target, queue in targets:
+                abort = False
 
                 while True:
                     msg = queue.get()
@@ -119,10 +119,10 @@ def run(suite, stream, args):
                         result.addProtoTestResult(proto_test_result)
 
                     if result.shouldStop:
-                        abort_tests = True
+                        abort = True
                         break
 
-                if abort_tests:
+                if abort:
                     break
 
         pool.close()
