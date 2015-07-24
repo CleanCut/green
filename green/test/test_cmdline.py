@@ -28,17 +28,14 @@ class TestMain(unittest.TestCase):
     def setUp(self):
         self.s = StringIO()
         self.gs = GreenStream(self.s)
-        self.saved_stdout = config.sys.stdout
-        self.saved_argv = config.sys.argv
+        saved_stdout = config.sys.stdout
         config.sys.stdout = self.gs
+        self.addCleanup(setattr, config.sys, 'stdout', saved_stdout)
 
 
     def tearDown(self):
-        config.sys.stdout = self.saved_stdout
-        config.sys.argv = self.saved_argv
         del(self.gs)
         del(self.s)
-        del(self.saved_stdout)
 
 
     def test_notTesting(self):
@@ -119,13 +116,13 @@ class TestMain(unittest.TestCase):
         """
         config.sys.argv = ['', '--debug']
         saved_basicConfig = config.logging.basicConfig
+        self.addCleanup(setattr, config.logging, 'basicConfig', saved_basicConfig)
         config.logging.basicConfig = MagicMock()
         cmdline.main(testing=True)
         config.logging.basicConfig.assert_called_with(
             level=logging.DEBUG,
             format="%(asctime)s %(levelname)9s %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S")
-        config.logging.basicConfig = saved_basicConfig
 
 
     def test_disableTermcolor(self):

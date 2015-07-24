@@ -133,6 +133,7 @@ class TestRun(unittest.TestCase):
         # told to stop when we send SIGINT
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
+        self.addCleanup(setattr, unittest.signals, '_results', saved__results)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
         fh.write(dedent(
@@ -149,7 +150,6 @@ class TestRun(unittest.TestCase):
         tests = loadTargets('test_catch_sigint')
         run(tests, self.stream, self.args)
         os.chdir(self.startdir)
-        unittest.signals._results = saved__results
 
     def test_stdout(self):
         """
@@ -157,8 +157,8 @@ class TestRun(unittest.TestCase):
         """
         saved_stdout = sys.stdout
         sys.stdout = self.stream
+        self.addCleanup(setattr, sys, 'stdout', saved_stdout)
         run(GreenTestSuite(), sys.stdout, args=self.args)
-        sys.stdout = saved_stdout
         self.assertIn('No Tests Found', self.stream.getvalue())
 
     def test_GreenStream(self):
@@ -330,6 +330,7 @@ class TestProcesses(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
+        self.addCleanup(setattr, unittest.signals, '_results', saved__results)
         fh = open(os.path.join(sub_tmpdir, 'test_sigint.py'), 'w')
         fh.write(dedent(
             """
@@ -345,7 +346,6 @@ class TestProcesses(unittest.TestCase):
         tests = loadTargets('test_sigint')
         self.args.processes = 2
         run(tests, self.stream, self.args)
-        unittest.signals._results = saved__results
         os.chdir(TestProcesses.startdir)
 
     def test_collisionProtection(self):

@@ -45,12 +45,12 @@ class TestProcessLogger(unittest.TestCase):
         mock_get_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
         process.multiprocessing.get_logger = mock_get_logger
+        self.addCleanup(setattr, process.multiprocessing, 'get_logger', saved_get_logger)
         def func():
             raise AttributeError
         l = ProcessLogger(func)
         self.assertRaises(AttributeError, l)
         mock_get_logger.assert_any_call()
-        process.multiprocessing.get_logger = saved_get_logger
 
 
 
@@ -109,6 +109,7 @@ class TestPoolRunner(unittest.TestCase):
         """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
+        self.addCleanup(setattr, process, 'coverage', saved_coverage)
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -130,7 +131,6 @@ class TestPoolRunner(unittest.TestCase):
         result = Queue()
         poolRunner(module_name, result, 1)
         result.get()
-        process.coverage = saved_coverage
         self.assertEqual(len(result.get().passing), 1)
 
 
@@ -140,6 +140,7 @@ class TestPoolRunner(unittest.TestCase):
         """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
+        self.addCleanup(setattr, process, 'coverage', saved_coverage)
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -155,7 +156,6 @@ class TestPoolRunner(unittest.TestCase):
         result = Queue()
         poolRunner(module_name, result, 1)
         result.get()
-        process.coverage = saved_coverage
         self.assertEqual(len(result.get().errors), 1)
 
 

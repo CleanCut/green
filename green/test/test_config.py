@@ -299,6 +299,7 @@ class TestMergeConfig(ConfigBase):
         gs = GreenStream(s)
         saved_stdout = config.sys.stdout
         config.sys.stdout = gs
+        self.addCleanup(setattr, config.sys, 'stdout', saved_stdout)
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             new_args = copy.deepcopy(config.default_args)
 
@@ -316,7 +317,6 @@ class TestMergeConfig(ConfigBase):
             self.assertEqual(computed_args.logging,        new_args.logging)
             self.assertEqual(computed_args.no_skip_report, new_args.no_skip_report)
             self.assertEqual(computed_args.version,        new_args.version)
-        config.sys.stdout = saved_stdout
 
 
     def test_no_overwrite(self):

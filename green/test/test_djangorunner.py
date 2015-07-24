@@ -30,13 +30,10 @@ class TestDjangoRunner(unittest.TestCase):
             djangorunner.DjangoRunner()
         except ImportError:
             raise unittest.SkipTest("Django is not installed")
-        self.saved_stdout = sys.stdout
+        saved_stdout = sys.stdout
         self.stream = StringIO()
         sys.stdout = self.stream
-
-
-    def tearDown(self):
-        sys.stdout = self.saved_stdout
+        self.addCleanup(setattr, sys, 'stdout', saved_stdout)
 
 
     def test_run_testsWithLabel(self):
@@ -63,10 +60,10 @@ class TestDjangoRunner(unittest.TestCase):
 
         saved_loadTargets = djangorunner.loadTargets
         djangorunner.loadTargets = MagicMock()
+        self.addCleanup(setattr, djangorunner, 'loadTargets', saved_loadTargets)
 
         dr.run_tests(())
         djangorunner.loadTargets.assert_called_with(['.'])
-        djangorunner.loadTargets = saved_loadTargets
         self.assertIn('No Tests Found', self.stream.getvalue())
 
 
