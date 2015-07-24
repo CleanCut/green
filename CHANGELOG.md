@@ -10,7 +10,14 @@
   or methods specified individually on the command-line will still be run in
   their own worker process.  A ton of credit for this feature needs to go to Sam
   Spilsbury, who put in considerable time and effort to actually code up the
-  initial pull request.
+  initial pull request.  Fixes issues #68, #70.
+
+- Added a gitter chatroom link to the readme.
+
+- Support for acquiring and releasing arbitrary resources via the
+  `-i/--initializer` and `-z/--finalizer` options.  Use it to setup/teardown
+  things that an individual worker process will need exclusive access to apart
+  from the other worker processes.
 
 # Version 1.11.0
 ##### 18 June 2015

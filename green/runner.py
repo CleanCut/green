@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import multiprocessing
 from sys import modules
 from unittest.signals import (
         registerResult, installHandler, removeResult)
@@ -16,8 +17,6 @@ from green.loader import toParallelTargets
 from green.output import GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
-
-import multiprocessing
 
 
 

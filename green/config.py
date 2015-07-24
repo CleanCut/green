@@ -17,23 +17,23 @@ We have to use this entire file before we can turn coverage on, so we exclude
 it from coverage.  We still have tests, though!
 """
 
-import argparse   # pragma: no cover
-try:              # pragma: no cover
+import argparse        # pragma: no cover
+try:                   # pragma: no cover
     import configparser
-except:           # pragma: no cover
+except:                # pragma: no cover
     import ConfigParser as configparser
-try: # pragma: no cover
+try:                   # pragma: no cover
     import coverage
     coverage_version = "Coverage {}".format(coverage.__version__)
-except: # pragma: no cover
+except:                # pragma: no cover
     coverage = None
     coverage_version = "Coverage Not Installed"
 
-import copy       # pragma: no cover
-import logging    # pragma: no cover
-import os         # pragma: no cover
-import sys        # pragma: no cover
-import tempfile   # pragma: no cover
+import copy            # pragma: no cover
+import logging         # pragma: no cover
+import os              # pragma: no cover
+import sys             # pragma: no cover
+import tempfile        # pragma: no cover
 import multiprocessing # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.

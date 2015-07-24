@@ -162,8 +162,8 @@ class ProtoTestResult(BaseTestResult):
     """
     def __init__(self, start_callback=None, stop_callback=None):
         super(ProtoTestResult, self).__init__(None, None)
-        self.start_callback      = start_callback
-        self.stop_callback       = stop_callback
+        self.start_callback = start_callback
+        self.stop_callback  = stop_callback
         self.pickle_attrs = [
                 'errors',
                 'expectedFailures',
@@ -180,7 +180,6 @@ class ProtoTestResult(BaseTestResult):
 
 
     def reinitialize(self):
-        self.current_test = None
         self.shouldStop = False
         self.errors              = []
         self.expectedFailures    = []
@@ -217,11 +216,8 @@ class ProtoTestResult(BaseTestResult):
 
     def startTest(self, test):
         "Called before each test runs"
-        # I can't quite figure out the exact reason tests get double-started in
-        # test_uncaughtException, but this fixes it
         test = proto_test(test)
         self.reinitialize()
-        self.current_test = test
         if self.start_callback:
             self.start_callback(test)
 
@@ -230,6 +226,7 @@ class ProtoTestResult(BaseTestResult):
         "Called after each test runs"
         if self.stop_callback:
             self.stop_callback(self)
+
 
     def addSuccess(self, test):
         "Called when a test passed"
@@ -259,6 +256,7 @@ class ProtoTestResult(BaseTestResult):
     def addUnexpectedSuccess(self, test):
         "Called when a test passed, but we expected a failure"
         self.unexpectedSuccesses.append(proto_test(test))
+
 
 
 class GreenTestResult(BaseTestResult):

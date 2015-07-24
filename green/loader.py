@@ -317,7 +317,6 @@ def loadTarget(target, file_pattern='test*.py'):
         target, file_pattern))
     loader = unittest.TestLoader()
     loader.suiteClass = GreenTestSuite
-    loader.loadTestsFromTestCase = lambda tcc: loadFromTestCase(tcc)
 
     # For a test loader, we want to always the current working directory to be
     # the first item in sys.path, just like when a python interpreter is loaded
