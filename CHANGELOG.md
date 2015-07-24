@@ -1,19 +1,27 @@
 # Version 2.0.0
 ##### ? July 2015
 
-- Major overhaul of the multiprocessing system.  Tests always run in a separate
-  worker process, even when only one process is specified.  The default number
-  of processes is now the number of logical processors detected instead of 1.
-  Entire modules are now run in the same worker process by default to avoid both
-  the overhead of multiple processes loading the same module and the overhead of
-  running module and class setUp/tearDown multiple times redundantly.  Classes
-  or methods specified individually on the command-line will still be run in
-  their own worker process.  A ton of credit for this feature needs to go to Sam
-  Spilsbury, who put in considerable time and effort to actually code up the
-  initial pull request.  Fixes issues #68, #70.
+- BREAKING CHANGE: Major overhaul of the multiprocessing system.  Tests always
+  run in a separate worker process, even when only one process is specified.
+  The default number of processes is now the number of logical processors
+  detected instead of 1.  Entire modules are now run in the same worker process
+  by default to avoid both the overhead of multiple processes loading the same
+  module and the overhead of running module and class setUp/tearDown multiple
+  times redundantly.  Classes or methods specified individually on the
+  command-line will still be run in their own worker process.  A ton of credit
+  for this feature needs to go to Sam Spilsbury, who put in considerable time
+  and effort to actually code up the initial pull request.  Fixes 
+  issues #68, #70.
 
-- Due the fact that no one uses it that I can tell and I don't want to maintain
-  it, the `-m/--html` option has been removed.
+- BREAKING CHANGE: Due the fact that no one uses it that I can tell and I don't
+  want to maintain it, the `-m/--html` option has been removed.
+
+- BREAKING CHANGE: `-o/--omit-patterns` now adds patterns to the default
+  coverage omit list instead of replacing the default list.
+
+- `-O/--clear-omit` was added to clear the default coverage omit list.
+
+- `-k/--no-skip-report` was added to suppress the skip report if desired.
 
 - Added a gitter chatroom link to the readme.
 

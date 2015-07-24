@@ -29,36 +29,37 @@ Concurrency Options:
                         number of trivial tests, running everything in a
                         single process may be faster than the overhead of
                         initializing all the processes.
-  -i EXECUTABLE_FILE, --initializer EXECUTABLE_FILE
-                        Executable to run inside of a single worker process
-                        before it starts running tests. This is the way to
-                        provision external resources that each concurrent
-                        worker process needs to have exclusive access to. Can
-                        be a relative or absolute path.
-  -z EXECUTABLE_FILE, --finalizer EXECUTABLE_FILE
-                        Executable to run inside of a single worker process
-                        after it completes running tests and the process is
-                        about to be destroyed. This is the way to reclaim
-                        resources provisioned with --initializer. Can be a
-                        relative or absolute path.
+  -i DOTTED_FUNCTION, --initializer DOTTED_FUNCTION
+                        Python function to run inside of a single worker
+                        process before it starts running tests. This is the
+                        way to provision external resources that each
+                        concurrent worker process needs to have exclusive
+                        access to. Specify the function in dotted notation in
+                        a way that will be importable from the location you
+                        are running green from.
+  -z DOTTED_FUNCTION, --finalizer DOTTED_FUNCTION
+                        Same as --initializer, only run at the end of a worker
+                        process's lifetime. Used to unprovision resources
+                        provisioned by the initializer.
 
 Format Options:
-  -m, --html            THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR
-                        IT TO STAY BY CREATING AN ISSUE AT
-                        https://github.com/CleanCut/green/issues/new
   -t, --termcolor       Force terminal colors on. Default is to autodetect.
   -T, --notermcolor     Force terminal colors off. Default is to autodetect.
 
 Output Options:
-  -a, --allow-stdout    Instead of capturing the stdout and presenting it in
-                        the summary of results, let it come through.
+  -a, --allow-stdout    Instead of capturing the stdout and stderr and
+                        presenting it in the summary of results, let it come
+                        through.
+  -k, --no-skip-report  Don't print the report of skipped tests after testing
+                        is done. Skips will still show up in the progress
+                        report and summary count.
+  -h, --help            Show this help message and exit.
+  -V, --version         Print the version of Green and Python and exit.
+  -l, --logging         Don't configure the root logger to redirect to
+                        /dev/null, enabling internal debugging output
   -d, --debug           Enable internal debugging statements. Implies
                         --logging. Can be specified up to three times for more
                         debug output.
-  -h, --help            Show this help message and exit.
-  -l, --logging         Don't configure the root logger to redirect to
-                        /dev/null, enabling internal debugging output
-  -V, --version         Print the version of Green and Python and exit.
   -v, --verbose         Verbose. Can be specified up to three times for more
                         verbosity. Recommended levels are -v and -vv.
 
@@ -77,11 +78,19 @@ Other Options:
 
 Coverage Options (Coverage 3.7.1):
   -r, --run-coverage    Produce coverage output.
+  -O, --clear-omit      Green tries really hard to set up a good list of
+                        patterns of files to omit from coverage reports. If
+                        the default list catches files that you DO want to
+                        cover you can specify this flag to leave the default
+                        list empty to start with. You can then add patterns
+                        back in with --omit-add. The default list is
+                        somethinglike'*/test*,*/termstyle*,*/mock*,*(temp
+                        dir)*,*(python system packages)*' -- only longer.
   -o PATTERN, --omit-patterns PATTERN
                         Comma-separated file-patterns to omit from coverage.
-                        Default is something like
-                        '*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python
-                        system packages)*'
+                        For example, if coverage reported a file
+                        mypackage/foo/bar you couldomit it from coverage with
+                        'mypackage*', '*/foo/*', or '*bar'
 
 Integration Options:
   --completion-file     Location of the bash- and zsh-completion file. To
