@@ -3,12 +3,19 @@ VERSION=$(shell cat green/VERSION)
 clean: clean-message clean-silent
 
 clean-message:
-	@echo "Cleaning generated files and directories."
+	@echo "Cleaning generated files and directories.  Do 'make super-clean' to remove virtualenvs as well."
 
 clean-silent:
 	@find . -name '*.pyc' -exec rm \{\} \;
 	@find . -name '.coverage*' -exec rm \{\} \;
 	@rm -rf _trial_temp build dist green.egg-info green-*
+
+super-clean-message:
+	@echo "Cleaning generated files and directories and the virtual-environments."
+
+super-clean: super-clean-message clean-silent
+	@rm -rf venv*
+
 
 test: test-versions test-installed test-coverage
 	# test-coverage needs to be last in deps, don't clean after it runs!
