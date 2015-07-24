@@ -17,24 +17,25 @@ We have to use this entire file before we can turn coverage on, so we exclude
 it from coverage.  We still have tests, though!
 """
 
-import argparse        # pragma: no cover
-try:                   # pragma: no cover
+import argparse             # pragma: no cover
+try:                        # pragma: no cover
     import configparser
-except:                # pragma: no cover
+except:                     # pragma: no cover
     import ConfigParser as configparser
-try:                   # pragma: no cover
+try:                        # pragma: no cover
     import coverage
     coverage_version = "Coverage {}".format(coverage.__version__)
-except:                # pragma: no cover
+except:                     # pragma: no cover
     coverage = None
     coverage_version = "Coverage Not Installed"
 
-import copy            # pragma: no cover
-import logging         # pragma: no cover
-import os              # pragma: no cover
-import sys             # pragma: no cover
-import tempfile        # pragma: no cover
-import multiprocessing # pragma: no cover
+import copy                 # pragma: no cover
+import logging              # pragma: no cover
+import os                   # pragma: no cover
+import sys                  # pragma: no cover
+import tempfile             # pragma: no cover
+from textwrap import dedent # pragma: no cover
+import multiprocessing      # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.
 files_loaded = [] # pragma: no cover
@@ -104,41 +105,41 @@ def parseArguments(): # pragma: no cover
             prog='green',
             usage='%(prog)s [options] [target [target2 ...]]',
             add_help=False,
-            description=
-"""
-Green is a clean, colorful test runner for Python unit tests.
-""".rstrip(),
-            epilog=
-"""
-ENABLING SHELL COMPLETION
+            description=dedent(
+                """
+                Green is a clean, colorful test runner for Python unit tests.
+                """.rstrip()),
+            epilog=dedent(
+                """
+                ENABLING SHELL COMPLETION
 
-  To enable bash- or zsh-completion, add the line below to the end of your
-  .bashrc or .zshrc file (or equivalent config file):
+                  To enable bash- or zsh-completion, add the line below to the end of your
+                  .bashrc or .zshrc file (or equivalent config file):
 
-    which green >& /dev/null && source "$( green --completion-file )"
+                    which green >& /dev/null && source "$( green --completion-file )"
 
-  Warning!  Generating a completion list actually discovers and loads tests
-  -- this can be very slow if you run it in huge directories!
+                  Warning!  Generating a completion list actually discovers and loads tests
+                  -- this can be very slow if you run it in huge directories!
 
-CONFIG FILES
+                CONFIG FILES
 
-  Green will look for and process three config files if found:
-  1) $HOME/.green
-  2) $GREEN_CONFIG
-  3) A file specified with "--config FILE"
+                  Green will look for and process three config files if found:
+                  1) $HOME/.green
+                  2) $GREEN_CONFIG
+                  3) A file specified with "--config FILE"
 
-  Config file format is simply "option = value" on separate lines.  "option" is
-  the same as the long options above, just without the "--".
+                  Config file format is simply "option = value" on separate lines.  "option" is
+                  the same as the long options above, just without the "--".
 
-  Most values should be "True" or "False".  Accumulated values (verbose, debug)
-  should be specified as integers ("-vv" would be "verbose = 2").
+                  Most values should be "True" or "False".  Accumulated values (verbose, debug)
+                  should be specified as integers ("-vv" would be "verbose = 2").
 
-  Example:
+                  Example:
 
-    verbose       = 2
-    logging       = True
-    omit-patterns = myproj*,*prototype*
-""".rstrip(),
+                    verbose       = 2
+                    logging       = True
+                    omit-patterns = myproj*,*prototype*
+                """.rstrip()),
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
     target_args = parser.add_argument_group("Target Specification")

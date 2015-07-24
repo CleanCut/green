@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from textwrap import dedent
 import unittest
 
 try:
@@ -109,12 +110,13 @@ class TestPoolRunner(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(basename, 'test_pool_runner_dotted.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         module_name = basename + '.test_pool_runner_dotted.A.testPass'
         result = Queue()
@@ -160,12 +162,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(basename, 'test_pool_runner_dotted_fail.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testError(self):
-        raise AttributeError
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testError(self):
+                    raise AttributeError
+            """))
         fh.close()
         module_name = basename + '.test_pool_runner_dotted_fail.A.testError'
         result = Queue()

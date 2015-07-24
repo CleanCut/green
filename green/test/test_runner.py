@@ -6,6 +6,7 @@ import shutil
 import signal
 import sys
 import tempfile
+from textwrap import dedent
 import unittest
 import weakref
 
@@ -134,14 +135,15 @@ class TestRun(unittest.TestCase):
         unittest.signals._results = weakref.WeakKeyDictionary()
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
-        fh.write("""
-import os
-import signal
-import unittest
-class KBICase(unittest.TestCase):
-    def runTest(self):
-        os.kill(os.getpid(), signal.SIGINT)
-""")
+        fh.write(dedent(
+            """
+            import os
+            import signal
+            import unittest
+            class KBICase(unittest.TestCase):
+                def runTest(self):
+                    os.kill(os.getpid(), signal.SIGINT)
+            """))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_catch_sigint')
@@ -174,12 +176,13 @@ class KBICase(unittest.TestCase):
         self.args.verbose = 3
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_verbose3.py'), 'w')
-        fh.write("""
-import unittest
-class Verbose3(unittest.TestCase):
-    def test01(self):
-        pass
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import unittest
+            class Verbose3(unittest.TestCase):
+                def test01(self):
+                    pass
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_verbose3')
@@ -196,12 +199,13 @@ class Verbose3(unittest.TestCase):
         self.args.warnings = 'always'
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_warnings.py'), 'w')
-        fh.write("""
-import unittest
-class Warnings(unittest.TestCase):
-    def test01(self):
-        pass
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import unittest
+            class Warnings(unittest.TestCase):
+                def test01(self):
+                    pass
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_warnings')
@@ -223,12 +227,13 @@ class Warnings(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_failed.py'), 'w')
-        fh.write("""
-import unittest
-class Failed(unittest.TestCase):
-    def test01(self):
-        self.assertTrue(False)
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import unittest
+            class Failed(unittest.TestCase):
+                def test01(self):
+                    self.assertTrue(False)
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_failed')
@@ -243,14 +248,15 @@ class Failed(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_failfast.py'), 'w')
-        fh.write("""
-import unittest
-class SIGINTCase(unittest.TestCase):
-    def test00(self):
-        raise Exception
-    def test01(self):
-        pass
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import unittest
+            class SIGINTCase(unittest.TestCase):
+                def test00(self):
+                    raise Exception
+                def test01(self):
+                    pass
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_failfast')
@@ -266,14 +272,15 @@ class SIGINTCase(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, 'test_systemexit.py'), 'w')
-        fh.write("""
-import unittest
-class SystemExitCase(unittest.TestCase):
-    def test00(self):
-        raise SystemExit(1)
-    def test01(self):
-        pass
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import unittest
+            class SystemExitCase(unittest.TestCase):
+                def test00(self):
+                    raise SystemExit(1)
+                def test01(self):
+                    pass
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_systemexit')
@@ -324,14 +331,15 @@ class TestProcesses(unittest.TestCase):
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
         fh = open(os.path.join(sub_tmpdir, 'test_sigint.py'), 'w')
-        fh.write("""
-import os
-import signal
-import unittest
-class SIGINTCase(unittest.TestCase):
-    def test00(self):
-        os.kill({}, signal.SIGINT)
-""".format(os.getpid()))
+        fh.write(dedent(
+            """
+            import os
+            import signal
+            import unittest
+            class SIGINTCase(unittest.TestCase):
+                def test00(self):
+                    os.kill({}, signal.SIGINT)
+            """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_sigint')
@@ -362,28 +370,29 @@ class SIGINTCase(unittest.TestCase):
         fh.close()
         # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test', 'test_some_module.py'), 'w')
-        fh.write("""\
-import os
-import tempfile
-import unittest
-import {}.some_module
-class A(unittest.TestCase):
-    def setUp(self):
-        self.tmpdir = tempfile.gettempdir()
-        self.filename = os.path.join(tempfile.gettempdir(), 'file.txt')
-    def testOne(self):
-        for msg in [str(x) for x in range(100)]:
-            fh = open(self.filename, 'w')
-            fh.write(msg)
-            fh.close()
-            self.assertEqual(msg, open(self.filename).read())
-    def testTwo(self):
-        for msg in [str(x) for x in range(100,200)]:
-            fh = open(self.filename, 'w')
-            fh.write(msg)
-            fh.close()
-            self.assertEqual(msg, open(self.filename).read())
-""".format(os.path.basename(sub_tmpdir)))
+        fh.write(dedent(
+            """
+            import os
+            import tempfile
+            import unittest
+            import {}.some_module
+            class A(unittest.TestCase):
+                def setUp(self):
+                    self.tmpdir = tempfile.gettempdir()
+                    self.filename = os.path.join(tempfile.gettempdir(), 'file.txt')
+                def testOne(self):
+                    for msg in [str(x) for x in range(100)]:
+                        fh = open(self.filename, 'w')
+                        fh.write(msg)
+                        fh.close()
+                        self.assertEqual(msg, open(self.filename).read())
+                def testTwo(self):
+                    for msg in [str(x) for x in range(100,200)]:
+                        fh = open(self.filename, 'w')
+                        fh.write(msg)
+                        fh.close()
+                        self.assertEqual(msg, open(self.filename).read())
+            """.format(os.path.basename(sub_tmpdir))))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -407,11 +416,12 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(sub_tmpdir, 'test_autoprocesses.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass"""))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -431,11 +441,12 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(sub_tmpdir, 'test_coverage.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass"""))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -482,12 +493,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(sub_tmpdir, 'test_uncaught.py'), 'w')
-        fh.write("""
-import testtools
-class Uncaught(testtools.TestCase):
-    def test_uncaught(self):
-        raise SystemExit(0)
-        """)
+        fh.write(dedent(
+            """
+            import testtools
+            class Uncaught(testtools.TestCase):
+                def test_uncaught(self):
+                    raise SystemExit(0)
+                    """))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)

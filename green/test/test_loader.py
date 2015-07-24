@@ -4,6 +4,7 @@ from os.path import dirname
 import shutil
 import sys
 import tempfile
+from textwrap import dedent
 import unittest
 try:
     from unittest.mock import MagicMock
@@ -139,16 +140,16 @@ class TestCompletions(unittest.TestCase):
         fh.write('')
         fh.close()
         fh = open(os.path.join('the_pkg', 'test_things.py'), 'w')
-        fh.write(
-"""
-import unittest
+        fh.write(dedent(
+            """
+            import unittest
 
-class A(unittest.TestCase):
-    def testOne(self):
-        pass
-    def testTwo(self):
-        pass
-""")
+            class A(unittest.TestCase):
+                def testOne(self):
+                    pass
+                def testTwo(self):
+                    pass
+            """))
         fh.close()
         c = set(loader.getCompletions('').split('\n'))
         self.assertIn('the_pkg', c)
@@ -169,16 +170,16 @@ class A(unittest.TestCase):
         fh.write('')
         fh.close()
         fh = open(os.path.join('my_pkg', 'test_things.py'), 'w')
-        fh.write(
-"""
-import unittest
+        fh.write(dedent(
+            """
+            import unittest
 
-class A(unittest.TestCase):
-    def testOne(self):
-        pass
-    def testTwo(self):
-        pass
-""")
+            class A(unittest.TestCase):
+                def testOne(self):
+                    pass
+                def testTwo(self):
+                    pass
+            """))
         fh.close()
         c = set(loader.getCompletions('.').split('\n'))
         self.assertIn('my_pkg', c)
@@ -199,15 +200,16 @@ class A(unittest.TestCase):
         fh.write('')
         fh.close()
         fh = open(os.path.join('my_pkg2', 'test_crash01.py'), 'w')
-        contents = """
-import unittest
+        contents = dedent(
+            """
+            import unittest
 
-class A(unittest.TestCase):
-    def testOne(self):
-        pass
-    def testTwo(self):
-        pass
-"""
+            class A(unittest.TestCase):
+                def testOne(self):
+                    pass
+                def testTwo(self):
+                    pass
+            """)
         fh.write(contents)
         fh.close()
         fh = open(os.path.join('my_pkg2', 'test_crash02.py'), 'w')
@@ -328,15 +330,16 @@ class TestLoadFromModuleFilename(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         filename = os.path.join(tmpdir, 'skipped_module.py')
         fh = open(filename, 'w')
-        fh.write("""
-import unittest
-raise unittest.case.SkipTest
-class NotReached(unittest.TestCase):
-    def test_one(self):
-        pass
-    def test_two(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            raise unittest.case.SkipTest
+            class NotReached(unittest.TestCase):
+                def test_one(self):
+                    pass
+                def test_two(self):
+                    pass
+            """))
         fh.close()
         suite = loader.loadFromModuleFilename(filename)
         self.assertEqual(suite.countTestCases(), 1)
@@ -440,13 +443,14 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
         # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test', 'test_target_module.py'), 'w')
-        fh.write("""\
-import unittest
-import {}.target_module
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""".format(pkg_name))
+        fh.write(dedent(
+            """
+            import unittest
+            import {}.target_module
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """.format(pkg_name)))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -469,12 +473,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(self.tmpdir, 'test_module_with_init.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         module_name = os.path.basename(self.tmpdir)
@@ -493,12 +498,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(basename, 'test_module_dotted_name.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         module_name = basename + ".test_module_dotted_name"
@@ -515,12 +521,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(tmp_subdir, 'test_module.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         # Go somewhere else, but setup the path
         os.chdir(self.startdir)
@@ -541,12 +548,13 @@ class A(unittest.TestCase):
         named_module = os.path.join(os.path.basename(tmp_subdir),
                                     'named_module.py')
         fh = open(named_module, 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         tests = loader.loadTargets(named_module)
@@ -589,12 +597,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(basename, 'existing_module.py'), 'w')
-        fh.write("""\
-import unittest
-class A(unittest.TestCase):
-    def testPass(self):
-        pass
-""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         module_name = basename + ".existing_module.nonexistant_object"
@@ -611,19 +620,23 @@ class A(unittest.TestCase):
         fh.close()
         # pkg/test/test_target1.py
         fh = open(os.path.join(sub_tmpdir, 'test_target1.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
         # pkg/test/test_target2.py
         fh = open(os.path.join(sub_tmpdir, 'test_target2.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -640,11 +653,13 @@ class A(unittest.TestCase):
         fh.write('\n')
         fh.close()
         fh = open(os.path.join(sub_tmpdir, 'test_dupe_target.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
 
         os.chdir(self.tmpdir)
@@ -679,27 +694,33 @@ class A(unittest.TestCase):
         fh.close()
         # pkg/test/target1_tests.py
         fh = open(os.path.join(sub_tmpdir, 'target1_tests.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
         # pkg/test/target2_tests.py
         fh = open(os.path.join(sub_tmpdir, 'target2_tests.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
         # pkg/test/test_target999.py: NOT a match.
         fh = open(os.path.join(sub_tmpdir, 'test_target999.py'), 'w')
-        fh.write("""
-import unittest
-class A(unittest.TestCase):
-    def testPasses(self):
-        pass""")
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPasses(self):
+                    pass
+            """))
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)

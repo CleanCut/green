@@ -1,3 +1,9 @@
+# Version 2.0.1
+##### ???
+
+- Improved some of our own unit tests to follow more best practices.  Fixes
+  issue #62.
+
 # Version 2.0.0
 ##### 24 July 2015
 
