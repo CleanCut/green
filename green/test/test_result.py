@@ -359,7 +359,9 @@ class TestGreenTestResult(unittest.TestCase):
 
 
     def _outputFromVerboseTest(self):
-        """Start a test with verbose = 2 and get its output."""
+        """
+        Start a test with verbose = 2 and get its output.
+        """
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -707,7 +709,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 
     def test_wasSuccessful(self):
-        "wasSuccessful returns what we expect"
+        """
+        wasSuccessful returns what we expect
+        """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.assertEqual(gtr.wasSuccessful(), True)

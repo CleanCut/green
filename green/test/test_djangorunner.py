@@ -52,7 +52,9 @@ class TestDjangoRunner(unittest.TestCase):
 
 
     def test_run_testsWithoutLabel(self):
-        "Not passing in a label causes the targets to be ['.']"
+        """
+        Not passing in a label causes the targets to be ['.']
+        """
         dr = djangorunner.DjangoRunner()
         dr.setup_test_environment    = MagicMock()
         dr.setup_databases           = MagicMock()
@@ -69,7 +71,9 @@ class TestDjangoRunner(unittest.TestCase):
 
 
     def test_run_testsWithBadInput(self):
-        "Bad input causes a ValueError to be raised"
+        """
+        Bad input causes a ValueError to be raised
+        """
         dr = djangorunner.DjangoRunner()
         dr.setup_test_environment    = MagicMock()
         dr.setup_databases           = MagicMock()

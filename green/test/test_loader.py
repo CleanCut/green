@@ -21,7 +21,9 @@ class TestToProtoTestList(unittest.TestCase):
 
 
     def test_moduleImportFailure(self):
-        "toProtoTestList() raises import errors normally"
+        """
+        toProtoTestList() raises import errors normally
+        """
         suite = MagicMock()
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
@@ -30,7 +32,9 @@ class TestToProtoTestList(unittest.TestCase):
 
 
     def test_moduleImportFailureIgnored(self):
-        "toProtoTestList() does not raise errors when doing completions"
+        """
+        toProtoTestList() does not raise errors when doing completions
+        """
         suite = MagicMock()
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
@@ -58,7 +62,9 @@ class TestToParallelTargets(unittest.TestCase):
 
 
     def test_methods_with_no_constraints(self):
-        "toParallelTargets() returns only module names."
+        """
+        toParallelTargets() returns only module names.
+        """
         class NormalTestCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -70,7 +76,9 @@ class TestToParallelTargets(unittest.TestCase):
 
 
     def test_methods_with_constraints(self):
-        "toParallelTargets() returns test names when constrained."
+        """
+        toParallelTargets() returns test names when constrained.
+        """
         class NormalTestCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -87,12 +95,16 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionBad(self):
-        "Bad match generates no completions"
+        """
+        Bad match generates no completions
+        """
         self.assertEqual('', loader.getCompletions('garbage.in'))
 
 
     def test_completionExact(self):
-        "Correct completions are generated for an exact match."
+        """
+        Correct completions are generated for an exact match.
+        """
         c = set(loader.getCompletions('green').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
@@ -103,7 +115,9 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionPartialShort(self):
-        "Correct completions generated for short partial match."
+        """
+        Correct completions generated for short partial match.
+        """
         cwd = os.getcwd()
         green_parent = dirname(dirname(dirname(os.path.abspath(__file__))))
         os.chdir(green_parent)
@@ -118,7 +132,9 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionPartial(self):
-        "Correct completions generated for partial match.  2nd target ignored."
+        """
+        Correct completions generated for partial match.  2nd target ignored.
+        """
         c = set(loader.getCompletions(['green.te', 'green']).split('\n'))
         self.assertIn('green.test', c)
         self.assertIn('green.test.test_loader', c)
@@ -129,7 +145,9 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionEmpty(self):
-        "An empty target generates completions for the whole directory"
+        """
+        An empty target generates completions for the whole directory
+        """
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
@@ -159,7 +177,9 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionDot(self):
-        "A '.' target generates completions for the whole directory"
+        """
+        A '.' target generates completions for the whole directory
+        """
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
@@ -189,7 +209,9 @@ class TestCompletions(unittest.TestCase):
 
 
     def test_completionIgnoresErrors(self):
-        "Errors in one module don't block the remaining completions"
+        """
+        Errors in one module don't block the remaining completions
+        """
         cwd = os.getcwd()
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
@@ -233,7 +255,9 @@ class TestIsPackage(unittest.TestCase):
 
 
     def test_yes(self):
-        "A package is identified."
+        """
+        A package is identified.
+        """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
         fh = open(os.path.join(tmpdir, '__init__.py'), 'w')
@@ -243,7 +267,9 @@ class TestIsPackage(unittest.TestCase):
 
 
     def test_no(self):
-        "A non-package is identified"
+        """
+        A non-package is identified
+        """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
         self.assertFalse(loader.isPackage(tmpdir))
@@ -254,14 +280,18 @@ class TestDottedModule(unittest.TestCase):
 
 
     def test_bad_path(self):
-        "A bad path causes an exception"
+        """
+        A bad path causes an exception
+        """
         self.assertRaises(
                 ValueError,
                 loader.findDottedModuleAndParentDir, tempfile.tempdir)
 
 
     def test_good_path(self):
-        "A good path gets (dotted_module, parent) properly returned"
+        """
+        A good path gets (dotted_module, parent) properly returned
+        """
         tmpdir = tempfile.mkdtemp()
         os.makedirs(os.path.join(tmpdir, 'a', 'b', 'c', 'd'))
         package_init = os.path.join(tmpdir, 'a', 'b', 'c', '__init__.py')
@@ -298,7 +328,9 @@ class TestLoadFromTestCase(unittest.TestCase):
 
 
     def test_normal(self):
-        "Normal test methods get loaded"
+        """
+        Normal test methods get loaded
+        """
         class Normal(unittest.TestCase):
             def test_method1(self):
                 pass
@@ -311,7 +343,9 @@ class TestLoadFromTestCase(unittest.TestCase):
 
 
     def test_isTestCaseDisabled(self):
-        "TestCases disabled by nose generators don't get loaded"
+        """
+        TestCases disabled by nose generators don't get loaded
+        """
         class HasDisabled(unittest.TestCase):
             def test_method(self):
                 pass
@@ -326,7 +360,9 @@ class TestLoadFromModuleFilename(unittest.TestCase):
 
 
     def test_skipped_module(self):
-        "A module that wants to be skipped gets skipped"
+        """
+        A module that wants to be skipped gets skipped
+        """
         tmpdir = tempfile.mkdtemp()
         filename = os.path.join(tmpdir, 'skipped_module.py')
         fh = open(filename, 'w')
@@ -352,7 +388,9 @@ class TestDiscover(unittest.TestCase):
 
 
     def test_bad_input(self):
-        "discover() raises ImportError when passed a non-directory"
+        """
+        discover() raises ImportError when passed a non-directory
+        """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
         self.assertRaises(ImportError, loader.discover,
@@ -394,13 +432,17 @@ class TestLoadTargets(unittest.TestCase):
 
     # Tests
     def test_emptyDirAbsolute(self):
-        "Absolute path to empty directory returns None"
+        """
+        Absolute path to empty directory returns None
+        """
         tests = loader.loadTargets(self.tmpdir)
         self.assertTrue(tests == None)
 
 
     def test_emptyDirRelative(self):
-        "Relative path to empty directory returns None"
+        """
+        Relative path to empty directory returns None
+        """
         os.chdir(self.tmpdir)
         os.chdir('..')
         tests = loader.loadTargets(os.path.dirname(self.tmpdir))
@@ -408,14 +450,18 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_emptyDirDot(self):
-        "'.' while in an empty directory returns None"
+        """
+        '.' while in an empty directory returns None
+        """
         os.chdir(self.tmpdir)
         tests = loader.loadTargets('.')
         self.assertTrue(tests == None)
 
 
     def test_relativeDotDir(self):
-        "Dotted relative path to empty directory returns None"
+        """
+        Dotted relative path to empty directory returns None
+        """
         os.chdir(self.tmpdir)
         os.chdir('..')
         target = os.path.join('.', os.path.basename(self.tmpdir))
@@ -424,7 +470,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_BigDirWithAbsoluteImports(self):
-        "Big dir discovers tests and doesn't crash on absolute import"
+        """
+        Big dir discovers tests and doesn't crash on absolute import
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         pkg_name = os.path.basename(sub_tmpdir)
         # Child setup
@@ -463,7 +511,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_DirWithInit(self):
-        "Dir empty other than blank __init__.py returns None"
+        """
+        Dir empty other than blank __init__.py returns None
+        """
         # Parent directory setup
         os.chdir(self.tmpdir)
         os.chdir('..')
@@ -488,7 +538,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_DottedName(self):
-        "Importing a module via dotted name loads the tests."
+        """
+        Importing a module via dotted name loads the tests.
+        """
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -513,7 +565,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_DottedNamePackageFromPath(self):
-        "Importing a package from path loads the tests."
+        """
+        Importing a package from path loads the tests.
+        """
         # Child setup
 
         tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -539,7 +593,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_ModuleByName(self):
-        "A module in a package can be loaded by filename."
+        """
+        A module in a package can be loaded by filename.
+        """
         os.chdir(self.tmpdir)
         tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
@@ -587,7 +643,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_partiallyGoodName(self):
-        "Don't crash loading module.object with existing module but not object"
+        """
+        Don't crash loading module.object with existing module but not object
+        """
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -612,7 +670,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_multiple_targets(self):
-        "Specifying multiple targets causes them all to be tested"
+        """
+        Specifying multiple targets causes them all to be tested
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
@@ -647,7 +707,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_duplicate_targets(self):
-        "Specifying duplicate targets does not cause duplicate loading."
+        """
+        Specifying duplicate targets does not cause duplicate loading.
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
@@ -686,7 +748,9 @@ class TestLoadTargets(unittest.TestCase):
 
 
     def test_file_pattern(self):
-        "Specifying a file pattern causes only matching files to be loaded"
+        """
+        Specifying a file pattern causes only matching files to be loaded
+        """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')

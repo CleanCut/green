@@ -1,6 +1,7 @@
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool
+import os
 import random
 import shutil
 import sys
@@ -35,8 +36,10 @@ def ddebug(msg, err=None): # pragma: no cover
 
 
 class ProcessLogger(object):
-    """I am used by LoggingDaemonlessPool to get crash output out to the
-    logger, instead of having process crashes be silent"""
+    """
+    I am used by LoggingDaemonlessPool to get crash output out to the logger,
+    instead of having process crashes be silent
+    """
 
 
     def __init__(self, callable):
@@ -64,8 +67,10 @@ class ProcessLogger(object):
 
 
 class DaemonlessProcess(multiprocessing.Process):
-    """I am used by LoggingDaemonlessPool to make pool workers NOT run in
-    daemon mode (daemon mode process can't launch their own subprocesses)"""
+    """
+    I am used by LoggingDaemonlessPool to make pool workers NOT run in
+    daemon mode (daemon mode process can't launch their own subprocesses)
+    """
 
 
     def _get_daemon(self):
@@ -82,8 +87,9 @@ class DaemonlessProcess(multiprocessing.Process):
 
 
 class LoggingDaemonlessPool(Pool):
-    "I use ProcessLogger and DaemonlessProcess to make a pool of workers."
-
+    """
+    I use ProcessLogger and DaemonlessProcess to make a pool of workers.
+    """
 
     Process = DaemonlessProcess
 
@@ -110,8 +116,9 @@ class LoggingDaemonlessPool(Pool):
 
 
     def _repopulate_pool(self):
-        """Bring the number of pool processes up to the specified number,
-        for use after reaping workers which have exited.
+        """
+        Bring the number of pool processes up to the specified number, for use
+        after reaping workers which have exited.
         """
         for i in range(self._processes - len(self._pool)):
             w = self.Process(target=worker,
@@ -224,7 +231,9 @@ multiprocessing.pool.worker = worker
 
 
 def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
-    "I am the function that pool worker processes run.  I run one unit test."
+    """
+    I am the function that pool worker processes run.  I run one unit test.
+    """
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp

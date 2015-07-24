@@ -16,7 +16,9 @@ else: # pragma: no cover
 
 
 def debug(message, level=1):
-    """So we can tune how much debug output we get when we turn it on."""
+    """
+    So we can tune how much debug output we get when we turn it on.
+    """
     if level <= debug_level:
         logging.debug(' ' * (level - 1) * 2 + message)
 
@@ -43,7 +45,8 @@ class Colors:
 
 
     def _restoreColor(self):
-        """Unfortunately other programs (that we test) can mess with termstyle's
+        """
+        Unfortunately other programs (that we test) can mess with termstyle's
         global settings, so we need to reset termstyle to the correct mode after
         each test (which I think is faster than just checking whether it matches
         the current mode...)
@@ -119,7 +122,8 @@ class Colors:
 
 
 class GreenStream(object):
-    """Wraps a stream-like object with the following additonal features:
+    """
+    Wraps a stream-like object with the following additonal features:
 
     1) A handy writeln() method (which calls write() under-the-hood)
     2) Handy formatLine() and formatText() methods, which support indent levels,
@@ -171,11 +175,15 @@ class GreenStream(object):
 
 
     def formatLine(self, line, indent=0, outcome_char=''):
-        """Takes a single line, optionally adds an indent and/or outcome
-        character to the beginning of the line."""
+        """
+        Takes a single line, optionally adds an indent and/or outcome
+        character to the beginning of the line.
+        """
         actual_spaces = (indent * self.indent_spaces) - len(outcome_char)
         return (outcome_char + ' ' * actual_spaces + line)
 
     def isatty(self):
-        """Wrap internal self.stream.isatty."""
+        """
+        Wrap internal self.stream.isatty.
+        """
         return self.stream.isatty()

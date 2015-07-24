@@ -22,7 +22,9 @@ class TestProcessLogger(unittest.TestCase):
 
 
     def test_callThrough(self):
-        "Calls are passed through to the wrapped callable"
+        """
+        Calls are passed through to the wrapped callable
+        """
         message = "some message"
         def func():
             return message
@@ -31,7 +33,9 @@ class TestProcessLogger(unittest.TestCase):
 
 
     def test_exception(self):
-        "A raised exception gets re-raised"
+        """
+        A raised exception gets re-raised
+        """
         saved_get_logger = process.multiprocessing.get_logger
         mock_logger = MagicMock()
         def addHandler(ignore):
@@ -54,7 +58,9 @@ class TestDaemonlessProcess(unittest.TestCase):
 
 
     def test_daemonIsFalse(self):
-        "No matter what daemon is set to, it returns False"
+        """
+        No matter what daemon is set to, it returns False
+        """
         dp = DaemonlessProcess()
         self.assertEqual(dp.daemon, False)
         dp.daemon = True
@@ -98,7 +104,9 @@ class TestPoolRunner(unittest.TestCase):
 
     # Tests
     def test_normalRun(self):
-        "Runs normally"
+        """
+        Runs normally
+        """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
         # Parent directory setup
@@ -127,7 +135,9 @@ class TestPoolRunner(unittest.TestCase):
 
 
     def test_SyntaxErrorInUnitTest(self):
-        "SyntaxError gets reported as an error loading the unit test"
+        """
+        SyntaxError gets reported as an error loading the unit test
+        """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
         # Parent directory setup

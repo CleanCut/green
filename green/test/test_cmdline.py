@@ -42,7 +42,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_notTesting(self):
-        "We actually attempt running loadTargets (coverage test)"
+        """
+        We actually attempt running loadTargets (coverage test)
+        """
         tmpdir = tempfile.mkdtemp()
         cwd = os.getcwd()
         os.chdir(tmpdir)
@@ -55,7 +57,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_configFileDebug(self):
-        "A debug message is output if a config file is loaded (coverage test)"
+        """
+        A debug message is output if a config file is loaded (coverage test)
+        """
         tmpdir = tempfile.mkdtemp()
         filename = os.path.join(tmpdir, 'config')
         fh = open(filename, 'w')
@@ -67,7 +71,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_completionFile(self):
-        "--completion-file causes a version string to be output"
+        """
+        --completion-file causes a version string to be output
+        """
         config.sys.argv = ['', '--completion-file']
         cmdline.main(testing=True)
         self.assertIn('shell_completion.sh', self.s.getvalue())
@@ -75,7 +81,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_completions(self):
-        "--completions returns completions (the loader module tests deeper)"
+        """
+        --completions returns completions (the loader module tests deeper)
+        """
         cwd = os.getcwd()
         path = os.path.abspath(__file__)
         os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(path))))
@@ -86,7 +94,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_options(self):
-        "--options causes options to be output"
+        """
+        --options causes options to be output
+        """
         cmdline.sys.argv = ['', '--options']
         cmdline.main(testing=True)
         self.assertIn('--options', self.s.getvalue())
@@ -94,7 +104,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_version(self):
-        "--version causes a version string to be output"
+        """
+        --version causes a version string to be output
+        """
         cmdline.sys.argv = ['', '--version']
         cmdline.main(testing=True)
         self.assertIn('Green', self.s.getvalue())
@@ -102,7 +114,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_debug(self):
-        "--debug causes the log-level to be set to debug"
+        """
+        --debug causes the log-level to be set to debug
+        """
         config.sys.argv = ['', '--debug']
         saved_basicConfig = config.logging.basicConfig
         config.logging.basicConfig = MagicMock()
@@ -115,13 +129,17 @@ class TestMain(unittest.TestCase):
 
 
     def test_disableTermcolor(self):
-        "--notermcolor causes coverage of the line disabling termcolor"
+        """
+        --notermcolor causes coverage of the line disabling termcolor
+        """
         cmdline.sys.argv = ['', '--notermcolor']
         cmdline.main(testing=True)
 
 
     def test_noCoverage(self):
-        "The absence of coverage prompts a return code of 3"
+        """
+        The absence of coverage prompts a return code of 3
+        """
         save_stdout = config.sys.stdout
         config.sys.stdout = MagicMock()
         save_coverage = config.coverage
@@ -133,7 +151,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_coverage(self):
-        "If coverage and --run-coverage, then coverage is started"
+        """
+        If coverage and --run-coverage, then coverage is started
+        """
         save_coverage = config.coverage
         config.coverage = MagicMock()
         config.sys.argv = ['', '--run-coverage', '--omit-patterns=abc', '--clear-omit']
@@ -154,7 +174,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_omit_patterns_clear(self):
-        "Omit pattern gets parsed"
+        """
+        Omit pattern gets parsed
+        """
         save_coverage = config.coverage
         config.coverage = MagicMock()
         cov = MagicMock()
@@ -166,7 +188,9 @@ class TestMain(unittest.TestCase):
         config.coverage = save_coverage
 
     def test_omit_patterns(self):
-        "Omit pattern gets parsed"
+        """
+        Omit pattern gets parsed
+        """
         save_coverage = config.coverage
         config.coverage = MagicMock()
         cov = MagicMock()
@@ -180,7 +204,9 @@ class TestMain(unittest.TestCase):
 
 
     def test_import_cmdline_module(self):
-        "The cmdline module can be imported"
+        """
+        The cmdline module can be imported
+        """
         global reload
         try: # In Python 3.4+ reload is in importlib
             import importlib

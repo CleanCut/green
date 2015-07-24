@@ -21,7 +21,9 @@ class ParseArguments(unittest.TestCase):
 
 
     def test_target(self):
-        "The specified target gets parsed"
+        """
+        The specified target gets parsed
+        """
         config.sys.argv = ['', 'target1', 'target2']
         args = config.parseArguments()
         self.assertEqual(args.targets, ['target1', 'target2'])
@@ -348,8 +350,10 @@ class TestMergeConfig(ConfigBase):
 
 
     def test_targets(self):
-        "The targets passed in make it through mergeConfig"
-        "The specified target gets parsed"
+        """
+        The targets passed in make it through mergeConfig, and the specified
+        target gets parsed
+        """
         config.sys.argv = ['', 'target1', 'target2']
         args = config.parseArguments()
         args = config.mergeConfig(args)

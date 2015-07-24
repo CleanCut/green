@@ -11,8 +11,10 @@ from green.version import pretty_version
 
 
 def proto_test(test):
-    """If test is a ProtoTest, I just return it.  Otherwise I create a
-    ProtoTest out of test and return it."""
+    """
+    If test is a ProtoTest, I just return it.  Otherwise I create a ProtoTest
+    out of test and return it.
+    """
     if isinstance(test, ProtoTest):
         return test
     else:
@@ -20,8 +22,10 @@ def proto_test(test):
 
 
 def proto_error(err):
-    """If err is a ProtoError, I just return it.  Otherwise I create a
-    ProtoError out of err and return it."""
+    """
+    If err is a ProtoError, I just return it.  Otherwise I create a ProtoError
+    out of err and return it.
+    """
     if isinstance(err, ProtoError):
         return err
     else:
@@ -30,8 +34,9 @@ def proto_error(err):
 
 
 class ProtoTest():
-    """I take a full-fledged TestCase and preserve just the information we need
-    and can pass between processes.
+    """
+    I take a full-fledged TestCase and preserve just the information we need and
+    can pass between processes.
     """
     def __init__(self, test=None):
         if test:
@@ -80,8 +85,9 @@ class ProtoTest():
 
 
 class ProtoError():
-    """I take a full-fledged test error and preserve just the information we
-    need and can pass between processes.
+    """
+    I take a full-fledged test error and preserve just the information we need
+    and can pass between processes.
     """
     def __init__(self, err=None):
         self.traceback_lines = traceback.format_exception(*err)
@@ -184,16 +190,18 @@ class ProtoTestResult(BaseTestResult):
 
     def __repr__(self): # pragma: no cover
         return (
-                "errors" + str(self.errors) + ', ' +
-                "expectedFailures" + str(self.expectedFailures) + ', ' +
-                "failures" + str(self.failures) + ', ' +
-                "passing" + str(self.passing) + ', ' +
-                "skipped" + str(self.skipped) + ', ' +
-                "unexpectedSuccesses" + str(self.unexpectedSuccesses))
+            "errors" + str(self.errors) + ', ' +
+            "expectedFailures" + str(self.expectedFailures) + ', ' +
+            "failures" + str(self.failures) + ', ' +
+            "passing" + str(self.passing) + ', ' +
+            "skipped" + str(self.skipped) + ', ' +
+            "unexpectedSuccesses" + str(self.unexpectedSuccesses))
 
 
     def __getstate__(self):
-        "Prevent the callback functions from getting pickled"
+        """
+        Prevent the callback functions from getting pickled
+        """
         result_dict = {}
         for pickle_attr in self.pickle_attrs:
             result_dict[pickle_attr] = self.__dict__[pickle_attr]
@@ -201,14 +209,18 @@ class ProtoTestResult(BaseTestResult):
 
 
     def __setstate__(self, dict):
-        "Since the callback functions weren't pickled, we need to init them"
+        """
+        Since the callback functions weren't pickled, we need to init them
+        """
         self.__dict__.update(dict)
         self.start_callback = None
         self.stop_callback = None
 
 
     def startTest(self, test):
-        "Called before each test runs"
+        """
+        Called before each test runs
+        """
         test = proto_test(test)
         self.reinitialize()
         if self.start_callback:
@@ -216,38 +228,52 @@ class ProtoTestResult(BaseTestResult):
 
 
     def stopTest(self, test):
-        "Called after each test runs"
+        """
+        Called after each test runs
+        """
         if self.stop_callback:
             self.stop_callback(self)
 
 
     def addSuccess(self, test):
-        "Called when a test passed"
+        """
+        Called when a test passed
+        """
         self.passing.append(proto_test(test))
 
 
     def addError(self, test, err):
-        "Called when a test raises an exception"
+        """
+        Called when a test raises an exception
+        """
         self.errors.append((proto_test(test), proto_error(err)))
 
 
     def addFailure(self, test, err):
-        "Called when a test fails a unittest assertion"
+        """
+        Called when a test fails a unittest assertion
+        """
         self.failures.append((proto_test(test), proto_error(err)))
 
 
     def addSkip(self, test, reason):
-        "Called when a test is skipped"
+        """
+        Called when a test is skipped
+        """
         self.skipped.append((proto_test(test), reason))
 
 
     def addExpectedFailure(self, test, err):
-        "Called when a test fails, and we expeced the failure"
+        """
+        Called when a test fails, and we expeced the failure
+        """
         self.expectedFailures.append((proto_test(test), proto_error(err)))
 
 
     def addUnexpectedSuccess(self, test):
-        "Called when a test passed, but we expected a failure"
+        """
+        Called when a test passed, but we expected a failure
+        """
         self.unexpectedSuccesses.append(proto_test(test))
 
 
@@ -311,7 +337,9 @@ class GreenTestResult(BaseTestResult):
 
 
     def startTestRun(self):
-        "Called once before any tests run"
+        """
+        Called once before any tests run
+        """
         self.startTime = time.time()
         # Really verbose information
         if self.verbose > 2:
@@ -319,7 +347,9 @@ class GreenTestResult(BaseTestResult):
 
 
     def stopTestRun(self):
-        "Called once after all tests have run"
+        """
+        Called once after all tests have run
+        """
         self.stopTime = time.time()
         self.timeTaken = self.stopTime - self.startTime
         self.printErrors()
@@ -359,7 +389,9 @@ class GreenTestResult(BaseTestResult):
 
 
     def startTest(self, test):
-        "Called before the start of each test"
+        """
+        Called before the start of each test
+        """
         self.testsRun += 1
 
         # Get our bearings
@@ -395,7 +427,9 @@ class GreenTestResult(BaseTestResult):
 
 
     def stopTest(self, test):
-        "Called after the end of each test"
+        """
+        Called after the end of each test
+        """
 
 
     def _reportOutcome(self, test, outcome_char, color_func, err=None,
@@ -422,7 +456,9 @@ class GreenTestResult(BaseTestResult):
             self.stream.flush()
 
     def addSuccess(self, test):
-        "Called when a test passed"
+        """
+        Called when a test passed
+        """
         test = proto_test(test)
         self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
@@ -430,7 +466,9 @@ class GreenTestResult(BaseTestResult):
 
     @failfast
     def addError(self, test, err):
-        "Called when a test raises an exception"
+        """
+        Called when a test raises an exception
+        """
         test = proto_test(test)
         err = proto_error(err)
         self.errors.append((test, err))
@@ -440,7 +478,9 @@ class GreenTestResult(BaseTestResult):
 
     @failfast
     def addFailure(self, test, err):
-        "Called when a test fails a unittest assertion"
+        """
+        Called when a test fails a unittest assertion
+        """
         # Special case: Catch Twisted's skips that come thtrough as failures and
         # treat them as skips instead
         if len(err.traceback_lines) == 1:
@@ -457,15 +497,19 @@ class GreenTestResult(BaseTestResult):
 
 
     def addSkip(self, test, reason):
+        """
+        Called when a test is skipped
+        """
         test = proto_test(test)
-        "Called when a test is skipped"
         self.skipped.append((test, reason))
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
 
 
     def addExpectedFailure(self, test, err):
-        "Called when a test fails, and we expeced the failure"
+        """
+        Called when a test fails, and we expeced the failure
+        """
         test = proto_test(test)
         err = proto_error(err)
         self.expectedFailures.append((test, err))
@@ -474,7 +518,9 @@ class GreenTestResult(BaseTestResult):
 
     @failfast
     def addUnexpectedSuccess(self, test):
-        "Called when a test passed, but we expected a failure"
+        """
+        Called when a test passed, but we expected a failure
+        """
         test = proto_test(test)
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
@@ -529,5 +575,7 @@ class GreenTestResult(BaseTestResult):
 
 
     def wasSuccessful(self):
-        "Tells whether or not the overall run was successful"
+        """
+        Tells whether or not the overall run was successful
+        """
         return len(self.all_errors) == 0
