@@ -38,6 +38,50 @@ class TestToProtoTestList(unittest.TestCase):
 
 
 
+class TestToParallelTargets(unittest.TestCase):
+
+
+    def setUp(self):
+        super(TestToParallelTargets, self).setUp()
+
+        class FakeModule(object):
+            pass
+
+        self._fake_module_name = "my_test_module"
+        sys.modules[self._fake_module_name] = FakeModule
+
+
+    def tearDown(self):
+        del sys.modules[self._fake_module_name]
+        super(TestToParallelTargets, self).tearDown()
+
+
+    def test_methods_with_no_constraints(self):
+        "toParallelTargets() returns only module names."
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+
+        targets = loader.toParallelTargets(NormalTestCase(), [])
+        self.assertEqual(targets, ["my_test_module"])
+
+
+    def test_methods_with_constraints(self):
+        "toParallelTargets() returns test names when constrained."
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+        full_name = "my_test_module.NormalTestCase.runTest"
+
+        targets = loader.toParallelTargets(NormalTestCase(), [full_name])
+        self.assertEqual(targets, [full_name])
+
+
+
 class TestCompletions(unittest.TestCase):
 
 
@@ -660,11 +704,6 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        targets = [
-            pkg + '.' + 'target1_tests',
-            pkg + '.' + 'target2_tests',
-            pkg + '.' + 'test_target999',
-        ]
         tests = loader.loadTargets(pkg, file_pattern='*_tests.py')
         self.assertEqual(tests.countTestCases(), 2)
 

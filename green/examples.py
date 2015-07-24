@@ -52,6 +52,6 @@ class TestStates(unittest.TestCase):
 #
 #
 #    def test8AnotherDelay(self):
-#        "This test will also take 2 seconds to pass, but not if you use 3 or more subprocesses!"
+#        "This test will also take 2 seconds to pass.
 #        import time
 #        time.sleep(2)

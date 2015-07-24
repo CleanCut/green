@@ -1,4 +1,4 @@
-Green
+Green: A clean, colorful, fast, multi-process test runner.
 =====
 
 [![Join the chat at https://gitter.im/CleanCut/green](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CleanCut/green?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -7,8 +7,6 @@ Green
 [![Posix Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
 [![Windows Build Status](http://img.shields.io/appveyor/ci/CleanCut/green.svg?style=flat)](https://ci.appveyor.com/project/CleanCut/green)
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
-
-Green is a **clean, colorful test runner** for Python unit tests.
 
 #### Table of Contents
 
@@ -31,17 +29,17 @@ Green is a **clean, colorful test runner** for Python unit tests.
 Features
 --------
 
-- **Colorful** - Terminal output makes good use of color when the terminal supports it.
 - **Clean** - Low redundancy in output. Result statistics for each test is vertically aligned.
-- **Fast** - Tests can run in independent subprocesses.
+- **Colorful** - Terminal output makes good use of color when the terminal supports it.
+- **Fast** - Tests run in independent processes.  (Only 1 by default for compatibility, try `-s 0` for best results)
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
-- **Modern** - Supports Python 2.7, 3.4+, and [PyPy](http://pypy.org).
-- **Portable** - Completely supports OS X, Linux, and BSDs (and maybe Windows).
+- **Modern** - Supports Python 2.7, 3.4+, [PyPy](http://pypy.org), and [PyPy3](http://pypy.org).
+- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows most of the time).
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
 

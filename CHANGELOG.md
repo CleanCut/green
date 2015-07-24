@@ -1,3 +1,60 @@
+# Version 2.0.0
+##### ? July 2015
+
+- Major overhaul of the multiprocessing system.  Tests always run in a separate
+  worker process, even when only one process is specified.  The default number
+  of processes is now the number of logical processors detected instead of 1.
+  Entire modules are now run in the same worker process by default to avoid both
+  the overhead of multiple processes loading the same module and the overhead of
+  running module and class setUp/tearDown multiple times redundantly.  Classes
+  or methods specified individually on the command-line will still be run in
+  their own worker process.  A ton of credit for this feature needs to go to Sam
+  Spilsbury, who put in considerable time and effort to actually code up the
+  initial pull request.  Fixes issues #68, #70.
+
+- Added a gitter chatroom link to the readme.
+
+- Support for acquiring and releasing arbitrary resources via the
+  `-i/--initializer` and `-z/--finalizer` options.  Use it to setup/teardown
+  things that an individual worker process will need exclusive access to apart
+  from the other worker processes.
+
+- We're back at 100% self-test coverage again.  Yay!!!
+
+- Twisted's skip functionality is caught and recorded as skips instead of
+  failures, if your `TestCase` subclasses `twisted.trial.unittest.TestCase` and
+  sets the class attribute `.skip` to `True`, or a test raises
+  `twisted.trial.unittest.SkipTest`.
+
+- Better handling of outside-of-test exceptions that occur inside worker
+  processes.
+
+- We now capture stderr that is emitted during tests and present it after tests
+  have run, just like we do with stdout.
+
+- Capturing stdout in worker processes more consistently works (no known bugs
+  left).
+
+- The headers for stdout and stderr are now yellow, for better color scheme
+  consistency (and so they don't get confused with skip headers).
+
+- Skip report headers now display the dotted test name in bold, just like other
+  headers do.  We are so consistent!
+
+- Fixed the skip report so it goes to the stream instead of stdout.
+
+- Disabled the annoying "Coverage.py warning: No data was collected." message
+  that started happening a lot, even though coverage was working just fine.
+
+- Colors now work on AppVeyor builds, all hail the pretty colors!  (Ironically,
+  they don't support Windows ansi colors, they wrote their own interpreters for
+  posix-style color escape codes.)
+
+- We now "close" the process pool instead of "terminating" it, which results in
+  much better behavior in pypy and Windows, especially for things like tearDown
+  stuff.
+
+
 # Version 1.11.0
 ##### 18 June 2015
 
@@ -53,7 +110,7 @@
 - Switched to cyan instead of blue on Windows only.
 
 - Stubbed in the beginnings of support for designating initialization to run in
-  each subprocess to obtain whatever resources might be needed by a single
+  each process to obtain whatever resources might be needed by a single
   process (like its own database, for example).
 
 
@@ -203,7 +260,7 @@ Issue #47.
 - Fixed a crash that could occur if an exception was raised during a test
   case's setUpClass() or tearDownClass()
 - We now explicitly terminate the thread pool and join() it.  This makes self
-  unit tests much easier to clean up on Windows, where the subprocesses would
+  unit tests much easier to clean up on Windows, where the processes would
   block deletion of temporary directories.
 - Set up continuous integration for Windows using AppVeyor.  Thanks to ionelmc
   for the tip!  Issue #11.
@@ -250,7 +307,7 @@ Issue #47.
   auto-detect all versions of python (in the form of pythonX.Y) in $PATH and
   run many permutations of self tests on each version.
 - Fixed a crash that could occur if discovery did not find any tests and
-  subprocesses was set higher than one.
+  processes was set higher than one.
 
 - Fixed lots of tests so that they would succeed in all environments.
 
@@ -346,7 +403,7 @@ Issue #47.
 - Clean - Low redundancy in output. Result stats for each test is lined up in a
   vertical column.
 
-- Fast - Can run tests in independent subprocesses.
+- Fast - Can run tests in independent processes.
 
 - Powerful - Multi-target + auto-discovery.
 

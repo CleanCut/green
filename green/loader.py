@@ -17,7 +17,7 @@ from green.suite import GreenTestSuite
 python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
 
 
-def toProtoTestList(suite_part, test_list=None, doing_completions=False):
+def toProtoTestList(suite, test_list=None, doing_completions=False):
     """
     Take a test suite and turn it into a list of ProtoTests.
 
@@ -29,18 +29,61 @@ def toProtoTestList(suite_part, test_list=None, doing_completions=False):
     # Python's lousy handling of module import failures during loader discovery
     # makes this crazy special case necessary.  See _make_failed_import_test in
     # the source code for unittest.loader
-    if suite_part.__class__.__name__ == 'ModuleImportFailure':
+    if suite.__class__.__name__ == 'ModuleImportFailure':
         if doing_completions:
             return test_list
-        exception_method = str(suite_part).split()[0]
-        getattr(suite_part, exception_method)()
+        exception_method = str(suite).split()[0]
+        getattr(suite, exception_method)()
     # On to the real stuff
-    if issubclass(type(suite_part), unittest.TestCase):
-        test_list.append(proto_test(suite_part))
+    if issubclass(type(suite), unittest.TestCase):
+        test_list.append(proto_test(suite))
     else:
-        for i in suite_part:
-            toProtoTestList(i, test_list, doing_completions=doing_completions)
-        return test_list
+        for i in suite:
+            toProtoTestList(i, test_list, doing_completions)
+    return test_list
+
+
+def toParallelTargets(suite, targets):
+    """
+    Produce a list of targets which should be tested in parallel.
+
+    For the most part this will be a list of test modules.  The exception is
+    when a dotted name representing something more granular than a module was
+    input (like an individal test case or test method)
+    """
+    # First, convert the suite to a proto test list - proto tests nicely parse
+    # things like the fully dotted name of the test and the finest-grained
+    # module it belongs to, which simplifies our job.
+    proto_test_list = toProtoTestList(suite)
+    # Extract a list of the modules that all of the discovered tests are in
+    modules = set([x.module for x in proto_test_list])
+    # Get the list of user-specified targets that are NOT modules
+    non_module_targets = []
+    for target in targets:
+        if not list(filter(None, [target in x for x in modules])):
+            non_module_targets.append(target)
+    # Main loop -- iterating through all loaded test methods
+    parallel_targets = []
+    for test in proto_test_list:
+        found = False
+        for target in non_module_targets:
+            # target is a dotted name of either a test case or test method here
+            # test.dotted name is always a dotted name of a method
+            if (target in test.dotted_name):
+                if target not in parallel_targets:
+                    # Explicitly specified targets get their own entry to run
+                    # parallel to everything else
+                    parallel_targets.append(target)
+                found = True
+                break
+        if found:
+            continue
+        # This test does not appear to be part of a specified target, so its
+        # entire module must have been discovered, so just add the whole module
+        # to the list if we haven't already.
+        if test.module not in parallel_targets:
+            parallel_targets.append(test.module)
+    return parallel_targets
 
 
 def getCompletions(target):
@@ -75,7 +118,7 @@ def getCompletions(target):
                 if dotted_name.startswith(target):
                     dotted_names.add(dotted_name)
             # We have the fully dotted test names.  Now add the intermediate
-            # completions.  bash and zsh will filter out the intermediats that
+            # completions.  bash and zsh will filter out the intermediates that
             # don't match.
             for dotted_name in list(dotted_names):
                 while True:

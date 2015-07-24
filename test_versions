@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION:-$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )}"
-TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
+# This fancy line makes it so we test each module individually, and then all of green.
+#TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
+TESTS="green"
 
 
 if [ "${TESTS}" == "" ] ; then

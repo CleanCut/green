@@ -10,9 +10,10 @@ import unittest
 import weakref
 
 from green.config import default_args
+from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
 from green.output import GreenStream
-from green.runner import run
+from green.runner import InitializerOrFinalizer, run
 from green.suite import GreenTestSuite
 
 try:
@@ -21,9 +22,82 @@ except:
     from StringIO import StringIO
 
 
-class FakeCase(unittest.TestCase):
-    def runTest(self):
-        pass
+global skip_testtools
+skip_testtools = False
+try:
+    import testtools; testtools
+except:
+    skip_testtools = True
+
+
+
+#--- Helper stuff ---
+
+global importable_function_worked
+importable_function_worked = False
+def _importableFunction():
+    """
+    Used by TestInitializerOrFinalizer.test_importable()
+    """
+    global importable_function_worked
+    importable_function_worked = True
+
+non_callable = None # Used by TestInitializerOrFinalizer.test_not_callable()
+
+def _crashy():
+    """
+    Used by TestInitializerOrFinalizer.test_crash()
+    """
+    raise Exception('Oops!  I crashed.')
+
+#--- End of helper stuff
+
+
+
+class TestInitializerOrFinalizer(unittest.TestCase):
+
+    def test_blank(self):
+        """
+        Given a blank dotted function, calling the initializer/finalizer does
+        nothing.
+        """
+        initializer = InitializerOrFinalizer('')
+        initializer()
+
+    def test_unimportable(self):
+        """
+        Given an unimportable module, an InitializerOrFinalizerError is raised.
+        """
+        initializer = InitializerOrFinalizer('garbagejunk.nonexistant')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
+
+
+    def test_importable(self):
+        """
+        Given an actual importable module and function, the function is run.
+        """
+        global importable_function_worked
+        importable_function_worked = False
+        InitializerOrFinalizer('green.test.test_runner._importableFunction')()
+        self.assertTrue(importable_function_worked)
+
+
+    def test_not_callable(self):
+        """
+        An importable, but not-callable-object also raises an
+        InitializerOrFinalizerError.
+        """
+        initializer = InitializerOrFinalizer('green.test.test_runner.non_callable')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
+
+
+    def test_crash(self):
+        """
+        An importable, callable object...crashes.
+        """
+        initializer = InitializerOrFinalizer('green.test.test_runner._crashy')
+        self.assertRaises(InitializerOrFinalizerError, initializer)
+
 
 
 class TestRun(unittest.TestCase):
@@ -58,11 +132,21 @@ class TestRun(unittest.TestCase):
         # told to stop when we send SIGINT
         saved__results = unittest.signals._results
         unittest.signals._results = weakref.WeakKeyDictionary()
-        class KBICase(unittest.TestCase):
-            def runTest(self):
-                os.kill(os.getpid(), signal.SIGINT)
-        kc = KBICase()
-        run(kc, self.stream, self.args)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
+        fh.write("""
+import os
+import signal
+import unittest
+class KBICase(unittest.TestCase):
+    def runTest(self):
+        os.kill(os.getpid(), signal.SIGINT)
+""")
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_catch_sigint')
+        run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
         unittest.signals._results = saved__results
 
     def test_stdout(self):
@@ -87,8 +171,19 @@ class TestRun(unittest.TestCase):
         """
         html=True causes html output
         """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_html.py'), 'w')
+        fh.write("""
+import unittest
+class FakeCase(unittest.TestCase):
+    def test_html_stuff(self):
+        pass
+""".format(os.getpid()))
+        fh.close()
+        os.chdir(sub_tmpdir)
+        tests = loadTargets('test_html')
         self.args.html = True
-        run(FakeCase(), self.stream, self.args)
+        run(tests, self.stream, self.args)
         self.assertIn('<', self.stream.getvalue())
 
     def test_verbose3(self):
@@ -207,7 +302,7 @@ class SystemExitCase(unittest.TestCase):
 
 
 
-class TestSubprocesses(unittest.TestCase):
+class TestProcesses(unittest.TestCase):
 
     # Setup
     @classmethod
@@ -230,14 +325,14 @@ class TestSubprocesses(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.startdir)
-        # On windows, the subprocesses block access to the files while
+        # On windows, the processes block access to the files while
         # they take a bit to clean themselves up.
         shutil.rmtree(self.tmpdir)
         del(self.stream)
 
-    def test_catchSubprocessSIGINT(self):
+    def test_catchProcessSIGINT(self):
         """
-        run() can catch SIGINT while running a subprocess.
+        run() can catch SIGINT while running a process.
         """
         if platform.system() == 'Windows':
             self.skipTest('This test is for posix-specific behavior.')
@@ -259,10 +354,10 @@ class SIGINTCase(unittest.TestCase):
         fh.close()
         os.chdir(sub_tmpdir)
         tests = loadTargets('test_sigint')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         run(tests, self.stream, self.args)
         unittest.signals._results = saved__results
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
 
     def test_collisionProtection(self):
         """
@@ -312,26 +407,25 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.termcolor = False
         try:
             run(tests, self.stream, self.args)
         except KeyboardInterrupt:
             os.kill(os.getpid(), signal.SIGINT)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
-    def test_detectNumSubprocesses(self):
+    def test_detectNumProcesses(self):
         """
-        args.subprocesses = 0 causes auto-detection of number of subprocesses.
+        args.processes = 0 causes auto-detection of number of processes.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
-        fh = open(os.path.join(sub_tmpdir, 'test_autosubprocesses.py'), 'w')
+        fh = open(os.path.join(sub_tmpdir, 'test_autoprocesses.py'), 'w')
         fh.write("""
 import unittest
 class A(unittest.TestCase):
@@ -341,21 +435,20 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 0
+        self.args.processes = 0
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
     def test_runCoverage(self):
         """
-        Running coverage in subprocess mode doesn't crash
+        Running coverage in process mode doesn't crash
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test_coverage.py'), 'w')
         fh.write("""
 import unittest
@@ -366,10 +459,10 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.run_coverage = True
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 
     def test_badTest(self):
@@ -388,9 +481,9 @@ class A(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
+        os.chdir(TestProcesses.startdir)
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
 
     def test_uncaughtException(self):
         """
@@ -398,18 +491,15 @@ class A(unittest.TestCase):
         reported as a failure.  For example, the testtools implementation of
         TestCase unwisely (but deliberately) lets SystemExit exceptions through.
         """
-        try:
-            import testtools
-        except:
+        global skip_testtools
+        if skip_testtools:
             self.skipTest('testtools must be installed to run this test.')
-        testtools # Make the linter happy
 
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
         fh.write('\n')
         fh.close()
-        # pkg/test/test_target_module.py
         fh = open(os.path.join(sub_tmpdir, 'test_uncaught.py'), 'w')
         fh.write("""
 import testtools
@@ -421,18 +511,18 @@ class Uncaught(testtools.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
-        self.args.subprocesses = 2
+        self.args.processes = 2
         run(tests, self.stream, self.args)
-        os.chdir(TestSubprocesses.startdir)
+        os.chdir(TestProcesses.startdir)
         self.assertIn('FAILED', self.stream.getvalue())
 
 
 
     def test_empty(self):
         """
-        run() does not crash with empty suite and subprocesses
+        run() does not crash with empty suite and processes
         """
         suite = GreenTestSuite()
-        self.args.subprocesses = 2
+        self.args.processes = 2
         self.args.termcolor = False
         run(suite, self.stream, self.args)

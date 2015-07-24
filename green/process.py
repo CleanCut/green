@@ -12,13 +12,31 @@ try: # pragma: no cover
 except: # pragma: no cover
     coverage = None
 
-from green.result import ProtoTest, ProtoTestResult
+from green.exceptions import InitializerOrFinalizerError
 from green.loader import loadTargets
+from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
-class SubprocessLogger(object):
+
+# Super-useful debug function for finding problems in the subprocesses, and it
+# even works on windows
+def ddebug(msg, err=None): # pragma: no cover
+    """
+    err can be an instance of sys.exc_info() -- which is the latest traceback
+    info
+    """
+    if err:
+        err = ''.join(traceback.format_exception(*err))
+    else:
+        err = ''
+    sys.__stdout__.write("({}) {} {}".format(os.getpid(), msg, err)+'\n')
+    sys.__stdout__.flush()
+
+
+
+class ProcessLogger(object):
     """I am used by LoggingDaemonlessPool to get crash output out to the
-    logger, instead of having subprocess crashes be silent"""
+    logger, instead of having process crashes be silent"""
 
 
     def __init__(self, callable):
@@ -47,7 +65,7 @@ class SubprocessLogger(object):
 
 class DaemonlessProcess(multiprocessing.Process):
     """I am used by LoggingDaemonlessPool to make pool workers NOT run in
-    daemon mode (daemon mode subprocess can't launch their own subprocesses)"""
+    daemon mode (daemon mode process can't launch their own subprocesses)"""
 
 
     def _get_daemon(self):
@@ -63,10 +81,8 @@ class DaemonlessProcess(multiprocessing.Process):
 
 
 
-
-
 class LoggingDaemonlessPool(Pool):
-    "I use SubprocessLogger and DaemonlessProcess to make a pool of workers."
+    "I use ProcessLogger and DaemonlessProcess to make a pool of workers."
 
 
     Process = DaemonlessProcess
@@ -74,7 +90,7 @@ class LoggingDaemonlessPool(Pool):
 
     def apply_async(self, func, args=(), kwds={}, callback=None):
         return Pool.apply_async(
-                self, SubprocessLogger(func), args, kwds, callback)
+                self, ProcessLogger(func), args, kwds, callback)
 
 #-------------------------------------------------------------------------------
 # START of Worker Finalization Monkey Patching
@@ -119,14 +135,14 @@ from multiprocessing import util
 from multiprocessing.pool import MaybeEncodingError
 
 # Python 2 and 3 raise a different error when they exit
-if platform.python_version_tuple()[0] == '2':
+if platform.python_version_tuple()[0] == '2': # pragma: no cover
     PortableOSError = IOError
-else:
+else: # pragma: no cover
     PortableOSError = OSError
 
 
 def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
-           wrap_exception=False, finalizer=None, finalargs=()):
+        wrap_exception=False, finalizer=None, finalargs=()): # pragma: no cover
     assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
@@ -135,7 +151,10 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         outqueue._reader.close()
 
     if initializer is not None:
-        initializer(*initargs)
+        try:
+            initializer(*initargs)
+        except InitializerOrFinalizerError as e:
+            print(str(e))
 
     completed = 0
     while maxtasks is None or (maxtasks and completed < maxtasks):
@@ -166,19 +185,25 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         completed += 1
 
     if finalizer:
-        finalizer(*finalargs)
+        try:
+            finalizer(*finalargs)
+        except InitializerOrFinalizerError as e:
+            print(str(e))
 
     util.debug('worker exiting after %d tasks' % completed)
 
+
+
 # Unmodified (see above)
-class RemoteTraceback(Exception):
+class RemoteTraceback(Exception): # pragma: no cover
     def __init__(self, tb):
         self.tb = tb
     def __str__(self):
         return self.tb
 
+
 # Unmodified (see above)
-class ExceptionWithTraceback:
+class ExceptionWithTraceback: # pragma: no cover
     def __init__(self, exc, tb):
         tb = traceback.format_exception(type(exc), exc, tb)
         tb = ''.join(tb)
@@ -187,8 +212,9 @@ class ExceptionWithTraceback:
     def __reduce__(self):
         return rebuild_exc, (self.exc, self.tb)
 
+
 # Unmodified (see above)
-def rebuild_exc(exc, tb):
+def rebuild_exc(exc, tb): # pragma: no cover
     exc.__cause__ = RemoteTraceback(tb)
     return exc
 
@@ -196,8 +222,9 @@ multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
 #-------------------------------------------------------------------------------
 
-def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
-    "I am the function that pool worker subprocesses run.  I run one unit test."
+
+def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
+    "I am the function that pool worker processes run.  I run one unit test."
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
     # with eachother.  So long as the test doesn't use a hard-coded temp
@@ -211,13 +238,22 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
                 data_file='.coverage.{}_{}'.format(
                     coverage_number, random.randint(0, 10000)),
                 omit=omit_patterns)
+        cov._warn_no_data = False
         cov.start()
 
-    # Create a structure to return the results of this one test
-    result = ProtoTestResult()
+    # What to do each time an individual test is started
+    def start_callback(test):
+        # Let the main process know what test we are starting
+        queue.put(proto_test(test))
+
+    def stop_callback(test_result):
+        # Let the main process know what happened with the test run
+        queue.put(test_result)
+
+    result = ProtoTestResult(start_callback, stop_callback)
     test = None
     try:
-        test = loadTargets(test_name)
+        test = loadTargets(target)
     except:
         err = sys.exc_info()
         t             = ProtoTest()
@@ -225,23 +261,42 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
         t.class_name  = 'N/A'
         t.description = 'Green encountered an error loading the unit test.'
         t.method_name = 'poolRunner'
+        result.startTest(t)
         result.addError(t, err)
+        result.stopTest(t)
 
-    try:
-        test.run(result)
-    except:
-        # Some frameworks like testtools record the error AND THEN let it
-        # through to crash things.  So we only need to manufacture another error
-        # if the underlying framework didn't, but either way we don't want to
-        # crash.
-        if not result.errors:
-            err = sys.exc_info()
-            t             = ProtoTest()
-            t.module      = 'green.runner'
-            t.class_name  = 'N/A'
-            t.description = 'Green encountered an exception not caught by the underlying test framework.'
-            t.method_name = 'poolRunner'
-            result.addError(t, err)
+    if getattr(test, 'run', False):
+        # Loading was successful, lets do this
+        try:
+            test.run(result)
+        except:
+            # Some frameworks like testtools record the error AND THEN let it
+            # through to crash things.  So we only need to manufacture another error
+            # if the underlying framework didn't, but either way we don't want to
+            # crash.
+            if not result.errors:
+                err = sys.exc_info()
+                t             = ProtoTest()
+                t.module      = 'green.runner'
+                t.class_name  = 'N/A'
+                t.description = 'Green encountered an exception not caught by the underlying test framework.'
+                t.method_name = 'poolRunner'
+                result.startTest(t)
+                result.addError(t, err)
+                result.stopTest(t)
+    else:
+        # loadTargets() returned an object without a run() method, probably None
+        description = 'Test loader returned an un-runnable object: {} of type {} with dir {}'.format(
+                str(test), type(test), dir(test))
+        err = (TypeError, TypeError(description), None)
+        t             = ProtoTest()
+        t.module      = '.'.join(target.split('.')[:-2])
+        t.class_name  = target.split('.')[-2]
+        t.description = description
+        t.method_name = target.split('.')[-1]
+        result.startTest(t)
+        result.addError(t, err)
+        result.stopTest(t)
 
     # Finish coverage
     if coverage_number and coverage:
@@ -251,4 +306,5 @@ def poolRunner(test_name, coverage_number=None, omit_patterns=[]):
     # Restore the state of the temp directory
     shutil.rmtree(tempfile.tempdir)
     tempfile.tempdir = saved_tempdir
-    return result
+    queue.put(None)
+    return None

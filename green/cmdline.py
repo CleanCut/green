@@ -70,7 +70,7 @@ request it, it will be removed in 2.0
     # Discover/Load the test suite
     if testing:
         test_suite = None
-    else:
+    else: # pragma: no cover
         test_suite = loadTargets(args.targets, file_pattern = args.file_pattern)
 
     # We didn't even load 0 tests...

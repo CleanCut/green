@@ -8,11 +8,16 @@ try:
 except:
     from mock import MagicMock
 
-from green.subprocess import SubprocessLogger, DaemonlessProcess, poolRunner
-from green import subprocess
+from green.process import ProcessLogger, DaemonlessProcess, poolRunner
+from green import process
+
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
 
 
-class TestSubprocessLogger(unittest.TestCase):
+class TestProcessLogger(unittest.TestCase):
 
 
     def test_callThrough(self):
@@ -20,13 +25,13 @@ class TestSubprocessLogger(unittest.TestCase):
         message = "some message"
         def func():
             return message
-        l = SubprocessLogger(func)
+        l = ProcessLogger(func)
         self.assertEqual(l(), message)
 
 
     def test_exception(self):
         "A raised exception gets re-raised"
-        saved_get_logger = subprocess.multiprocessing.get_logger
+        saved_get_logger = process.multiprocessing.get_logger
         mock_logger = MagicMock()
         def addHandler(ignore):
             mock_logger.handlers = [MagicMock()]
@@ -34,13 +39,13 @@ class TestSubprocessLogger(unittest.TestCase):
         mock_logger.handlers = False
         mock_get_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
-        subprocess.multiprocessing.get_logger = mock_get_logger
+        process.multiprocessing.get_logger = mock_get_logger
         def func():
             raise AttributeError
-        l = SubprocessLogger(func)
+        l = ProcessLogger(func)
         self.assertRaises(AttributeError, l)
-        mock_get_logger.assert_called()
-        subprocess.multiprocessing.get_logger = saved_get_logger
+        mock_get_logger.assert_any_call()
+        process.multiprocessing.get_logger = saved_get_logger
 
 
 
@@ -93,8 +98,8 @@ class TestPoolRunner(unittest.TestCase):
     # Tests
     def test_normalRun(self):
         "Runs normally"
-        saved_coverage = subprocess.coverage
-        subprocess.coverage = MagicMock()
+        saved_coverage = process.coverage
+        process.coverage = MagicMock()
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -112,15 +117,17 @@ class A(unittest.TestCase):
 """)
         fh.close()
         module_name = basename + '.test_pool_runner_dotted.A.testPass'
-        result = poolRunner(module_name, 1)
-        subprocess.coverage = saved_coverage
-        self.assertEqual(len(result.passing), 1)
+        result = Queue()
+        poolRunner(module_name, result, 1)
+        result.get()
+        process.coverage = saved_coverage
+        self.assertEqual(len(result.get().passing), 1)
 
 
     def test_SyntaxErrorInUnitTest(self):
         "SyntaxError gets reported as an error loading the unit test"
-        saved_coverage = subprocess.coverage
-        subprocess.coverage = MagicMock()
+        saved_coverage = process.coverage
+        process.coverage = MagicMock()
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
@@ -133,9 +140,11 @@ class A(unittest.TestCase):
         fh.write("aoeu")
         fh.close()
         module_name = basename + '.test_pool_syntax_error'
-        result = poolRunner(module_name, 1)
-        subprocess.coverage = saved_coverage
-        self.assertEqual(len(result.errors), 1)
+        result = Queue()
+        poolRunner(module_name, result, 1)
+        result.get()
+        process.coverage = saved_coverage
+        self.assertEqual(len(result.get().errors), 1)
 
 
     def test_error(self):
@@ -159,7 +168,9 @@ class A(unittest.TestCase):
 """)
         fh.close()
         module_name = basename + '.test_pool_runner_dotted_fail.A.testError'
-        result = poolRunner(module_name)
-        self.assertEqual(len(result.errors), 1)
+        result = Queue()
+        poolRunner(module_name, result)
+        result.get()
+        self.assertEqual(len(result.get().errors), 1)
 
 
