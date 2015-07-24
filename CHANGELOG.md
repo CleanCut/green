@@ -1,5 +1,5 @@
 # Version 2.0.0
-##### ? July 2015
+##### 24 July 2015
 
 - BREAKING CHANGE: Major overhaul of the multiprocessing system.  Tests always
   run in a separate worker process, even when only one process is specified.
