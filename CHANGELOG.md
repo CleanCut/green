@@ -12,6 +12,9 @@
   Spilsbury, who put in considerable time and effort to actually code up the
   initial pull request.  Fixes issues #68, #70.
 
+- Due the fact that no one uses it that I can tell and I don't want to maintain
+  it, the `-m/--html` option has been removed.
+
 - Added a gitter chatroom link to the readme.
 
 - Support for acquiring and releasing arbitrary resources via the

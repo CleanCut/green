@@ -45,7 +45,6 @@ default_args = argparse.Namespace( # pragma: no cover
         processes       = multiprocessing.cpu_count(),
         initializer     = '',
         finalizer       = '',
-        html            = False,
         termcolor       = None,
         notermcolor     = None,
         allow_stdout    = False,
@@ -187,11 +186,6 @@ CONFIG FILES
             "process's lifetime.  Used to unprovision resources provisioned by "
             "the initializer."))
     format_args = parser.add_argument_group("Format Options")
-    store_opt(format_args.add_argument('-m', '--html', action='store_true',
-        help="THIS OPTION WILL BE REMOVED SOON UNLESS PEOPLE ASK FOR IT TO "
-        "STAY BY CREATING AN ISSUE AT "
-        "https://github.com/CleanCut/green/issues/new",
-        default=argparse.SUPPRESS))
     store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
         help="Force terminal colors on.  Default is to autodetect.",
         default=argparse.SUPPRESS))
@@ -386,9 +380,10 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     for name, default_value in dict(default_args._get_kwargs()).items():
         # Config options overwrite default options
         config_getter = None
-        if name in ['html', 'termcolor', 'notermcolor', 'allow_stdout', 'help',
+        if name in ['termcolor', 'notermcolor', 'allow_stdout', 'help',
                 'logging', 'version', 'failfast', 'run_coverage', 'options',
-                'completions', 'completion_file', 'clear_omit', 'no_skip_report']:
+                'completions', 'completion_file', 'clear_omit',
+                'no_skip_report']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
@@ -441,8 +436,8 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
     elif not new_args.logging:
         logging.basicConfig(filename=os.devnull)
 
-    # These options both disable termcolor
-    if new_args.html or new_args.notermcolor:
+    # Disable termcolor?
+    if new_args.notermcolor:
         new_args.termcolor = False
 
     # Coverage.  We must enable it here because we cannot cover module-level

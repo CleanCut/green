@@ -37,7 +37,6 @@ class ParseArguments(unittest.TestCase):
         self.assertEqual(getattr(args, 'debug', 'not there'), True)
         self.assertEqual(getattr(args, 'verbose', 'not there'), 'not there')
         self.assertEqual(getattr(args, 'targets', 'not there'), 'not there')
-        self.assertEqual(getattr(args, 'html', 'not there'), 'not there')
         self.assertEqual(getattr(args, 'file_pattern', 'not there'), 'not there')
 
 
@@ -103,12 +102,12 @@ class ConfigBase(unittest.TestCase):
                          ])
         self.env_filename = os.path.join(self.tmpd, "green.env")
         self.env_logging = True
-        self.env_html = False
+        self.env_no_skip_report = False
         self._write_file(self.env_filename,
                         ["# this is a test config file for green",
                          "logging = {}".format(str(self.env_logging)),
                          "omit-patterns = {}".format(self.env_filename),
-                         "html = {}".format(self.env_html),
+                         "no-skip-report = {}".format(self.env_no_skip_report),
                          ])
         self.cmd_filename = os.path.join(self.tmpd, "green.cmd")
         self.cmd_logging = False
@@ -140,12 +139,12 @@ class TestConfig(ConfigBase):
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             cfg = config.getConfig(self.cmd_filename)
             ae = self.assertEqual
-            ae(["green"],             cfg.sections())
-            ae(self.cmd_filename,     cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging,      cfg.getboolean("green", "logging"))
-            ae(self.env_html,         cfg.getboolean("green", "html"))
-            ae(self.default_version,  cfg.getboolean("green", "version"))
+            ae(["green"],               cfg.sections())
+            ae(self.cmd_filename,       cfg.get("green", "omit-patterns"))
+            ae(self.cmd_run_coverage,   cfg.getboolean("green", "run-coverage"))
+            ae(self.cmd_logging,        cfg.getboolean("green", "logging"))
+            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
+            ae(self.default_version,    cfg.getboolean("green", "version"))
 
 
     def test_cmd_env_nodef(self):
@@ -163,7 +162,7 @@ class TestConfig(ConfigBase):
             ae(self.cmd_filename,          cfg.get("green", "omit-patterns"))
             ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
             ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
-            ae(self.env_html,              cfg.getboolean("green", "html"))
+            ae(self.env_no_skip_report,    cfg.getboolean("green", "no-skip-report"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
@@ -181,7 +180,7 @@ class TestConfig(ConfigBase):
             ae(self.cmd_filename,          cfg.get("green", "omit-patterns"))
             ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
             ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
             ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
@@ -200,7 +199,7 @@ class TestConfig(ConfigBase):
             ae(self.cmd_filename,          cfg.get("green", "omit-patterns"))
             ae(self.cmd_run_coverage,      cfg.getboolean("green", "run-coverage"))
             ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
@@ -218,7 +217,7 @@ class TestConfig(ConfigBase):
             ae(self.env_filename,          cfg.get("green", "omit-patterns"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
             ae(self.env_logging,           cfg.getboolean("green", "logging"))
-            ae(self.env_html,              cfg.getboolean("green", "html"))
+            ae(self.env_no_skip_report,    cfg.getboolean("green", "no-skip-report"))
             ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
@@ -238,7 +237,7 @@ class TestConfig(ConfigBase):
             ae(self.env_filename,          cfg.get("green", "omit-patterns"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
             ae(self.env_logging,           cfg.getboolean("green", "logging"))
-            ae(self.env_html,              cfg.getboolean("green", "html"))
+            ae(self.env_no_skip_report,    cfg.getboolean("green", "no-skip-report"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
 
 
@@ -257,7 +256,7 @@ class TestConfig(ConfigBase):
             ae(self.default_filename,      cfg.get("green", "omit-patterns"))
             ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
             ae(self.default_logging,       cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "html")
+            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
             ae(self.default_version,       cfg.getboolean("green", "version"))
 
 
@@ -277,7 +276,7 @@ class TestConfig(ConfigBase):
             ar(configparser.NoSectionError, cfg.get, "green", "omit-patterns")
             ar(configparser.NoSectionError, cfg.get, "green", "run-coverage")
             ar(configparser.NoSectionError, cfg.get, "green", "logging")
-            ar(configparser.NoSectionError, cfg.get, "green", "html")
+            ar(configparser.NoSectionError, cfg.get, "green", "no-skip-report")
             ar(configparser.NoSectionError, cfg.get, "green", "version")
 
 
@@ -301,20 +300,20 @@ class TestMergeConfig(ConfigBase):
         with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
             new_args = copy.deepcopy(config.default_args)
 
-            new_args.omit_patterns = 'omitstuff'
-            new_args.run_coverage  = True
-            new_args.logging       = True
-            new_args.html          = True
-            new_args.version       = True
+            new_args.omit_patterns  = 'omitstuff'
+            new_args.run_coverage   = True
+            new_args.logging        = True
+            new_args.no_skip_report = True
+            new_args.version        = True
 
             new_args.config = self.cmd_filename
             computed_args = config.mergeConfig(new_args, testing=True)
 
-            self.assertEqual(computed_args.omit_patterns, 'omitstuff')
-            self.assertEqual(computed_args.run_coverage,  new_args.run_coverage)
-            self.assertEqual(computed_args.logging,       new_args.logging)
-            self.assertEqual(computed_args.html,          new_args.html)
-            self.assertEqual(computed_args.version,       new_args.version)
+            self.assertEqual(computed_args.omit_patterns,  'omitstuff')
+            self.assertEqual(computed_args.run_coverage,   new_args.run_coverage)
+            self.assertEqual(computed_args.logging,        new_args.logging)
+            self.assertEqual(computed_args.no_skip_report, new_args.no_skip_report)
+            self.assertEqual(computed_args.version,        new_args.version)
         config.sys.stdout = saved_stdout
 
 

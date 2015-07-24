@@ -167,25 +167,6 @@ class KBICase(unittest.TestCase):
         run(GreenTestSuite(), gs, args=self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
 
-    def test_HTML(self):
-        """
-        html=True causes html output
-        """
-        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, 'test_html.py'), 'w')
-        fh.write("""
-import unittest
-class FakeCase(unittest.TestCase):
-    def test_html_stuff(self):
-        pass
-""".format(os.getpid()))
-        fh.close()
-        os.chdir(sub_tmpdir)
-        tests = loadTargets('test_html')
-        self.args.html = True
-        run(tests, self.stream, self.args)
-        self.assertIn('<', self.stream.getvalue())
-
     def test_verbose3(self):
         """
         verbose=3 causes version output, and an empty test case passes.

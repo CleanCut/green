@@ -16,15 +16,7 @@ import green.config as config
 def main(testing=False, coverage_testing=False):
     args = config.parseArguments()
     args = config.mergeConfig(args, testing, coverage_testing)
-    if getattr(args, 'html', False): # pragma: no cover
-        print("""
-The --html flag is scheduled to be removed in version 2.0 due to it being a pain
-to maintain and no one using it.  If you actually use it, please open an issue
-stating so!  https://github.com/CleanCut/green/issues/new  Unless some people
-request it, it will be removed in 2.0
-""")
-        import time
-        time.sleep(2)
+
     if args.shouldExit:
         return args.exitCode
 
@@ -44,7 +36,7 @@ request it, it will be removed in 2.0
     if args.debug:
         green.output.debug_level = args.debug
 
-    stream = GreenStream(sys.stdout, html = args.html)
+    stream = GreenStream(sys.stdout)
 
     # Location of shell completion file
     if args.completion_file:

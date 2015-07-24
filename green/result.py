@@ -9,13 +9,6 @@ from unittest.result import failfast
 from green.output import Colors, debug
 from green.version import pretty_version
 
-try: # pragma nocover
-    import html
-    escape = html.escape
-except: # pragma nocover
-    import cgi
-    escape = cgi.escape
-
 
 def proto_test(test):
     """If test is a ProtoTest, I just return it.  Otherwise I create a
@@ -264,9 +257,7 @@ class GreenTestResult(BaseTestResult):
     Aggregates test results and outputs them to a stream.
     """
     def __init__(self, args, stream):
-        super(GreenTestResult, self).__init__(
-                stream,
-                Colors(args.termcolor, args.html))
+        super(GreenTestResult, self).__init__(stream, Colors(args.termcolor))
         self.args = args
         self.showAll       = args.verbose > 1
         self.dots          = args.verbose == 1
@@ -323,9 +314,6 @@ class GreenTestResult(BaseTestResult):
         "Called once before any tests run"
         self.startTime = time.time()
         # Really verbose information
-        if self.colors.html:
-            self.stream.write(
-                    '<div style="font-family: Monaco, \'Courier New\', monospace; color: rgb(170,170,170); background: rgb(0,0,0); padding: 14px;">')
         if self.verbose > 2:
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
 
@@ -368,8 +356,6 @@ class GreenTestResult(BaseTestResult):
             if self.errors or self.failures:
                 grade = self.colors.failing('FAILED')
             self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
-        if self.colors.html:
-            self.stream.writeln('</div>')
 
 
     def startTest(self, test):
@@ -391,7 +377,7 @@ class GreenTestResult(BaseTestResult):
                 self.stream.writeln(self.colors.className(
                     self.stream.formatText(current_class, indent=1)))
             # Test name or description
-            if not self.colors.html and self.stream.isatty():
+            if self.stream.isatty():
                 # In the terminal, we will write a placeholder, and then
                 # rewrite it in color after the test has run.
                 self.stream.write(
@@ -417,16 +403,12 @@ class GreenTestResult(BaseTestResult):
         test = proto_test(test)
         if self.showAll:
             # Move the cursor back to the start of the line in terminal mode
-            if not self.colors.html and self.stream.isatty():
+            if self.stream.isatty():
                 self.stream.write('\r')
-            # Escape the HTML that may be in the docstring
-            test_description = test.getDescription(self.verbose)
-            if self.colors.html:
-                test_description = escape(test_description)
             self.stream.write(
                 color_func(
                     self.stream.formatLine(
-                        test_description,
+                        test.getDescription(self.verbose),
                         indent=2,
                         outcome_char=outcome_char)
                 )
@@ -537,17 +519,6 @@ class GreenTestResult(BaseTestResult):
                 if self.verbose < 4:
                     if frame.strip() == "Traceback (most recent call last):":
                         continue
-                reindented_lines = []
-                # If we're in html, space-based indenting needs to be converted.
-                if self.colors.html:
-                    for line in frame.split('\n'):
-                        frame_indent = 0
-                        while line[:2] == '  ':
-                            line = line[2:]
-                            frame_indent += 1
-                        line = self.stream.formatLine(line, indent=frame_indent)
-                        reindented_lines.append(line)
-                    frame = "\n".join(reindented_lines)
                 # Done with this frame, capture it.
                 relevant_frames.append(frame)
             self.stream.write(''.join(relevant_frames))

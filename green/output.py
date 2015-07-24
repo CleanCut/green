@@ -23,30 +23,22 @@ def debug(message, level=1):
 
 
 class Colors:
-    """A class to centralize wrapping strings in colors.  Supports terminal
-    colors or HTML5 colors.  (Not at the same time)
+    """
+    A class to centralize wrapping strings in terminal colors.
     """
 
 
-    def __init__(self, termcolor=None, html=False):
+    def __init__(self, termcolor=None):
         """
         termcolor - If None, attempt to autodetect whether we are in a terminal
             and turn on terminal colors if we think we are.  If True, force
-            terminal colors on.  If False, force terminal colors off.  This
-            value is ignored if html is True.
-
-        html - If true, enables HTML output and causes termcolor to be ignored.
+            terminal colors on.  If False, force terminal colors off.
         """
-        self.html = html
-        if html:
-            termcolor = False
-
         if termcolor == None:
             termstyle.auto()
             self.termcolor = bool(termstyle.bold(""))
         else:
             self.termcolor = termcolor
-
         self._restoreColor()
 
 
@@ -65,46 +57,31 @@ class Colors:
     # Real colors and styles
     def bold(self, text):
         self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(255,255,255);">{}</span>'.format(text)
-        else:
-            return termstyle.bold(text)
+        return termstyle.bold(text)
 
 
     def blue(self, text):
         self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(0,128,255)">{}</span>'.format(text)
+        if platform.system() == 'Windows': # pragma: no cover
+            # Default blue in windows is unreadable (such awful defaults...)
+            return termstyle.cyan(text)
         else:
-            if platform.system() == 'Windows': # pragma: no cover
-                # Default blue in windows is unreadable (such awful defaults...)
-                return termstyle.cyan(text)
-            else:
-                return termstyle.blue(text)
+            return termstyle.blue(text)
 
 
     def green(self, text):
         self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(0,194,0)">{}</span>'.format(text)
-        else:
-            return termstyle.green(text)
+        return termstyle.green(text)
 
 
     def red(self, text):
         self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(237,73,62)">{}</span>'.format(text)
-        else:
-            return termstyle.red(text)
+        return termstyle.red(text)
 
 
     def yellow(self, text):
         self._restoreColor()
-        if self.html:
-            return '<span style="color: rgb(225,140,0)">{}</span>'.format(text)
-        else:
-            return termstyle.yellow(text)
+        return termstyle.yellow(text)
 
 
     # Abstracted colors and styles
@@ -145,17 +122,13 @@ class GreenStream(object):
     """Wraps a stream-like object with the following additonal features:
 
     1) A handy writeln() method (which calls write() under-the-hood)
-    2) Augment the write() method to support HTML5 output (converting
-       indentation and line breaks to HTML5)
-    3) Handy formatLine() and formatText() methods, which support HTML5, indent
-       levels, and outcome codes.
+    2) Handy formatLine() and formatText() methods, which support indent levels,
+       and outcome codes.
     """
 
-    pixels_per_space = 10
     indent_spaces = 2
-    margin_template = '<span style="margin-left: {}px;">{}</span>'
 
-    def __init__(self, stream, html=False, override_appveyor=False):
+    def __init__(self, stream, override_appveyor=False):
         self.stream = stream
         # Ironically, AppVeyor doesn't support windows win32 system calls for
         # colors, but it WILL interpret posix ansi escape codes!
@@ -164,7 +137,6 @@ class GreenStream(object):
                 and (not os.environ.get('APPVEYOR', False))): # pragma: no cover
             from colorama.initialise import wrap_stream
             self.stream = wrap_stream(self.stream, None, None, None, True)
-        self.html = html
         self.closed = False
 
 
@@ -177,8 +149,6 @@ class GreenStream(object):
 
 
     def write(self, text):
-        if self.html:
-            text = text.replace('\n', '<br>\n')
         if type(text) == bytes:
             text = text.decode('utf-8')
         self.stream.write(text)
@@ -204,10 +174,7 @@ class GreenStream(object):
         """Takes a single line, optionally adds an indent and/or outcome
         character to the beginning of the line."""
         actual_spaces = (indent * self.indent_spaces) - len(outcome_char)
-        space_char = ' '
-        if self.html:
-            space_char = '&nbsp;'
-        return (outcome_char + space_char * actual_spaces + line)
+        return (outcome_char + ' ' * actual_spaces + line)
 
     def isatty(self):
         """Wrap internal self.stream.isatty."""

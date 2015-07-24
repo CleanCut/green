@@ -100,7 +100,7 @@ try:
 
             args = mergeConfig(default_args, default_args)
             args.targets = test_labels
-            stream = GreenStream(sys.stdout, html = args.html)
+            stream = GreenStream(sys.stdout)
             suite = loadTargets(args.targets)
             result = run(suite, stream, args)
 

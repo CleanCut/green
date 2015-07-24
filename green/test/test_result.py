@@ -62,7 +62,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         stream = StringIO()
         noise = "blah blah blah"
-        btr = BaseTestResult(stream, Colors(False, False))
+        btr = BaseTestResult(stream, Colors(False))
         pt = ProtoTest()
         btr.stdout_output[pt] = noise
         btr.displayStdout(pt)
@@ -96,7 +96,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         stream = StringIO()
         noise = "blah blah blah"
-        btr = BaseTestResult(stream, Colors(False, False))
+        btr = BaseTestResult(stream, Colors(False))
         pt = ProtoTest()
         btr.stderr_errput[pt] = noise
         btr.displayStderr(pt)
@@ -430,28 +430,6 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn(r, self.stream.getvalue())
 
 
-    def test_reportOutcomeVerboseHTML(self):
-        """
-        html=True causes _reportOutcome() to escape HTML in docstrings
-        """
-        self.args.verbose = 3
-        gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.colors.html = True
-        r = 'a fake reason'
-        class Injection(unittest.TestCase):
-            def test_method(self):
-                'a fake test output line &nbsp; <>'
-        t = proto_test(Injection('test_method'))
-        gtr._reportOutcome(t, '.', lambda x: x, None, r)
-        self.assertTrue(r in self.stream.getvalue())
-        self.assertTrue('&amp;' in self.stream.getvalue())
-        self.assertTrue('&lt;' in self.stream.getvalue())
-        self.assertTrue('&gt;' in self.stream.getvalue())
-        self.assertFalse('&nbsp;' in self.stream.getvalue())
-        self.assertFalse('<' in self.stream.getvalue())
-        self.assertFalse('>' in self.stream.getvalue())
-
-
     def test_printErrorsSkipreport(self):
         """
         printErrors() prints the skip report
@@ -472,7 +450,6 @@ class TestGreenTestResult(unittest.TestCase):
         """
         self.args.verbose = 1
         self.args.termcolor = False
-        self.args.html = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         pt = MyProtoTest()
         output = 'this is what the test spit out to stdout'
@@ -492,7 +469,6 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         self.args.verbose = 1
         self.args.termcolor = False
-        self.args.html = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
@@ -513,7 +489,6 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         self.args.verbose = 2
         self.args.termcolor = False
-        self.args.html = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
@@ -534,7 +509,6 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         self.args.verbose = 3
         self.args.termcolor = False
-        self.args.html = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
@@ -555,7 +529,6 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         self.args.verbose = 4
         self.args.termcolor = False
-        self.args.html = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), err)
         gtr.printErrors()
@@ -565,29 +538,6 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('test_printErrorsVerbose4', self.stream.getvalue())
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
-
-
-    def test_printErrorsZHTML(self):
-        """
-        printErrors() looks correct in html mode
-        """
-        try:
-            raise Exception
-        except:
-            err = sys.exc_info()
-        self.args.verbose = 4
-        gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.colors.html = True
-        test = MagicMock()
-        gtr.addError(test, proto_error(err))
-        gtr.printErrors()
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('(most recent call last)', self.stream.getvalue())
-        self.assertIn('test_printErrorsZHTML', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
-        self.assertIn('<span', self.stream.getvalue())
-        self.assertIn('color: rgb(', self.stream.getvalue())
 
 
     def test_addProtoTestResult(self):
