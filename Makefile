@@ -39,7 +39,6 @@ test-installed:
 	tar zxvf dist/green-$(VERSION).tar.gz
 	bash -c "cd green-$(VERSION) && python setup.py install"
 	bash -c "cd && green -vvv green"
-	bash -c "cd && green -s 0 -vvv green"
 	pip uninstall -y green
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
