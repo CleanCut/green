@@ -1,3 +1,17 @@
+# Version 2.0.0
+##### ? July 2015
+
+- Major overhaul of the multiprocessing system.  Tests always run in a separate
+  worker process, even when only one process is specified.  The default number
+  of processes is now the number of logical processors detected instead of 1.
+  Entire modules are now run in the same worker process by default to avoid both
+  the overhead of multiple processes loading the same module and the overhead of
+  running module and class setUp/tearDown multiple times redundantly.  Classes
+  or methods specified individually on the command-line will still be run in
+  their own worker process.  A ton of credit for this feature needs to go to Sam
+  Spilsbury, who put in considerable time and effort to actually code up the
+  initial pull request.
+
 # Version 1.11.0
 ##### 18 June 2015
 
