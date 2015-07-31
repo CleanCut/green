@@ -325,7 +325,7 @@ class TestProcesses(unittest.TestCase):
         os.chdir(self.startdir)
         # On windows, the processes block access to the files while
         # they take a bit to clean themselves up.
-        shutil.rmtree(self.tmpdir)
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
         del(self.stream)
 
     def test_catchProcessSIGINT(self):
@@ -482,8 +482,8 @@ class A(unittest.TestCase):
         os.chdir(self.tmpdir)
         tests = loadTargets('.')
         self.args.processes = 2
-        self.assertRaises(ImportError, run, tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
+        self.assertRaises(ImportError, run, tests, self.stream, self.args)
 
     def test_uncaughtException(self):
         """

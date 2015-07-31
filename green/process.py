@@ -343,7 +343,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         cov.save()
 
     # Restore the state of the temp directory
-    shutil.rmtree(tempfile.tempdir)
+    shutil.rmtree(tempfile.tempdir, ignore_errors=True)
     tempfile.tempdir = saved_tempdir
     queue.put(None)
     return None
