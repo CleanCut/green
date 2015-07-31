@@ -448,27 +448,24 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
         '*/argparse*',
         '*/colorama*',
         '*/django/*',
-        '*/distutils*',     # Gets pulled in on Travis-CI CPython
-        '*/extras*',        # pulled in by testtools
-        '*/linecache2*',    # pulled in by testtools
-        '*/mimeparse*',     # pulled in by testtools
+        '*/distutils*',       # Gets pulled in on Travis-CI CPython
+        '*/extras*',          # pulled in by testtools
+        '*/linecache2*',      # pulled in by testtools
+        '*/mimeparse*',       # pulled in by testtools
         '*/mock*',
-        '*/pbr*',           # pulled in by testtools
-        '*/pkg_resources*', # pulled in by django
+        '*/pbr*',             # pulled in by testtools
+        '*/pkg_resources*',   # pulled in by django
         '*/pypy*',
-        '*/pytz*',          # pulled in by django
-        '*/six*',           # pulled in by testtools
+        '*/pytz*',            # pulled in by django
+        '*/six*',             # pulled in by testtools
         '*/termstyle*',
         '*/test*',
-        '*/traceback2*',    # pulled in by testtools
-        '*/unittest2*',     # pulled in by testtools
+        '*/traceback2*',      # pulled in by testtools
+        '*/unittest2*',       # pulled in by testtools
+        '*Python.framework*', # OS X system python
+        '*site-packages*',    # System python for other OS's
         tempfile.gettempdir() + '*',
     ]
-    if 'green' not in new_args.targets and (
-            False in [t.startswith('green.') for t in new_args.targets]):
-        omit_patterns.extend([
-        '*Python.framework*',
-        '*site-packages*'])
     if new_args.clear_omit:
         omit_patterns = []
     if new_args.omit_patterns:
