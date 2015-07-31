@@ -1,8 +1,15 @@
 # Version 2.0.1
-##### ???
+##### 30 July 2015
+
+- Handled the case where a module could be discovered by directory searching by
+  the main process but not by module name by the subprocess.  Instead of
+  crashing the subprocess and hanging, we now handle it and report it as an
+  importing problem.  One cause of this problem is forgetting your __init__.py
+  Fixes issue #74.
 
 - Improved some of our own unit tests to follow more best practices.  Fixes
   issue #62.
+
 
 # Version 2.0.0
 ##### 24 July 2015
