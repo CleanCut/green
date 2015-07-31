@@ -26,6 +26,7 @@ def ddebug(msg, err=None): # pragma: no cover
     err can be an instance of sys.exc_info() -- which is the latest traceback
     info
     """
+    import os
     if err:
         err = ''.join(traceback.format_exception(*err))
     else:
@@ -295,14 +296,15 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
                 result.stopTest(t)
     else:
         # loadTargets() returned an object without a run() method, probably None
-        description = 'Test loader returned an un-runnable object: {} of type {} with dir {}'.format(
-                str(test), type(test), dir(test))
+        description = 'Test loader returned an un-runnable object.  Is "{}" importable from your current location?  Maybe you forgot an __init__.py in your directory?  Unrunnable object looks like: {} of type {} with dir {}'.format(
+                target, str(test), type(test), dir(test))
         err = (TypeError, TypeError(description), None)
         t             = ProtoTest()
-        t.module      = '.'.join(target.split('.')[:-2])
-        t.class_name  = target.split('.')[-2]
+        target_list = target.split('.')
+        t.module      = '.'.join(target_list[:-2]) if len(target_list) > 1 else target
+        t.class_name  = target.split('.')[-2] if len(target_list) > 1 else 'UnknownClass'
         t.description = description
-        t.method_name = target.split('.')[-1]
+        t.method_name = target.split('.')[-1] if len(target_list) > 1 else 'unknown_method'
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)
