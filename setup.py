@@ -31,7 +31,7 @@ setup(
             ],
     },
     test_suite='green.test',
-    description = 'Green is a clean, colorful test runner for Python unit tests.',
+    description = 'Green is a clean, colorful, fast python test runner.',
     long_description = long_description,
     author = 'Nathan Stocks',
     author_email = 'nathan.stocks@gmail.com',

@@ -1,5 +1,5 @@
-Green: A clean, colorful, fast, multi-process test runner.
-=====
+# Green
+## A clean, colorful, fast python test runner.
 
 [![Join the chat at https://gitter.im/CleanCut/green](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CleanCut/green?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

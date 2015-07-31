@@ -1,7 +1,7 @@
 Green
 =====
 
-Green is a clean, colorful, fast, multi-process test runner for Python.
+Green is a clean, colorful, fast python test runner.
 
 Documentation
 -------------
