@@ -29,7 +29,7 @@
 Screenshots
 -----------
 
-#### Compare normal output to Green's colorful, exciting and easy to read output!
+#### Top: Without Green.  Bottom: With Green!
 
 ![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
 
