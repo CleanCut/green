@@ -9,20 +9,29 @@
 
 #### Table of Contents
 
-1. [Features](https://github.com/CleanCut/green#features)
-2. [Getting Help](https://github.com/CleanCut/green#getting-help)
-2. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
-3. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
-4. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
-5. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
-6. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
-7. [Integration](https://github.com/CleanCut/green#integration)
+1. [Screenshots](https://github.com/CleanCut/green#screenshots)
+2. [Features](https://github.com/CleanCut/green#features)
+3. [Getting Help](https://github.com/CleanCut/green#getting-help)
+4. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
+5. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
+6. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
+7. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
+8. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
+9. [Integration](https://github.com/CleanCut/green#integration)
   - [Bash and Zsh](https://github.com/CleanCut/green#bash-and-zsh)
   - [coverage](https://github.com/CleanCut/green#coverage)
   - [Django](https://github.com/CleanCut/green#django)
   - [nose-parameterized](https://github.com/CleanCut/green#nose-parameterized)
-8. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
-9. [Origin Story](https://github.com/CleanCut/green#origin-story)
+10. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
+11. [Origin Story](https://github.com/CleanCut/green#origin-story)
+
+
+Screenshots
+-----------
+
+#### Compare normal output to Green's colorful, exciting and easy to read output!
+
+![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
 
 
 Features
