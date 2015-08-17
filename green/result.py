@@ -69,6 +69,10 @@ class ProtoTest():
         return hash(self.dotted_name)
 
 
+    def __str__(self):
+        return self.dotted_name
+
+
     @property
     def dotted_name(self, ignored=None):
         return self.module + '.' + self.class_name + '.' + self.method_name
