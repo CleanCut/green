@@ -431,6 +431,31 @@ class TestLoadTargets(unittest.TestCase):
 
 
     # Tests
+    def test_returnIsLoadable(self):
+        """
+        Results returned by toParallelTargets should be loadable by
+        loadTargets(), even if they aren't directly loadable through a package
+        relative to the current working directory.
+        """
+        tests_dir = tempfile.mkdtemp(dir=self.tmpdir)
+        # No __init__.py in the directory!
+        fh = open(os.path.join(tests_dir, 'test_not_in_pkg.py'), 'w')
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """
+            ))
+        fh.close()
+        # Discover stuff
+        suite = loader.loadTargets('.')
+        # This should resolve it to the module that's not importable from here
+        test = loader.toParallelTargets(suite, [])[0]
+        reloaded = loader.loadTargets(test)
+
+
     def test_emptyDirAbsolute(self):
         """
         Absolute path to empty directory returns None
