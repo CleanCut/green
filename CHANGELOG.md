@@ -1,3 +1,24 @@
+# Version 2.0.2
+##### 20 August 2015
+
+- Captured stdout and stderr is reported properly once again.  Regression in
+  2.0.0.  Resolves issue #76.
+
+- Better capturing and reporting of exceptions that escape the testing
+  framework.
+
+- Added screenshots to the readme file.  Resolves issue #78.
+
+- Put the gitter badge inline with the other badges on the readme.
+
+- Ignore build failures on the alpha OS X builders TravisCI suddenly (and
+  finally) turned on for us.  They don't even have python installed yet...
+
+- Use a consistent tagline for the project everywhere ("Green is a clean,
+  colorful, fast python test runner.")
+
+
+
 # Version 2.0.1
 ##### 30 July 2015
 
@@ -8,7 +29,7 @@
   Fixes issue #74.
 
 - Improved some of our own unit tests to follow more best practices.  Fixes
-  issue #62.
+  issue #62.;
 
 
 # Version 2.0.0
