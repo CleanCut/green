@@ -219,7 +219,7 @@ class TestProtoTest(unittest.TestCase):
         Running a ProtoTest through str() is the same as getting .dotted_name
         """
         pt = ProtoTest()
-        pt.dotted_name = 'aosenuth'
+        pt.module = 'aoeusnth'
         self.assertEqual(str(pt), pt.dotted_name)
 
 
