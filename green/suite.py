@@ -119,6 +119,15 @@ class GreenTestSuite(TestSuite):
                     sys.stderr = saved_stderr
                     result.recordStdout(test, captured_stdout.getvalue())
                     result.recordStderr(test, captured_stderr.getvalue())
+                # Since we're intercepting the stdout/stderr out here at the suite
+                # level, we need to poke the test result and let it know when we're
+                # ready to transmit results back up to the parent process.  I would
+                # rather just do it automatically at test stop time, but we don't
+                # have the captured stuff at that point.  Messy...but the only other
+                # alternative I can think of is monkey-patching loaded TestCases --
+                # which could be from unittest or twisted or some other custom
+                # subclass.
+                result.finalize()
 
             self._removeTestAtIndex(index)
 

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import sys
 import unittest
 
 
@@ -15,9 +16,9 @@ class TestStates(unittest.TestCase):
 
     def test1Fail(self):
         """
-        This test will print output to stdout, and then fail an assertion
+        This test will print output to stderr, and then fail an assertion
         """
-        print("Doom and gloom.")
+        sys.stderr.write("Doom and gloom.\n")
         self.assertTrue(False)
 
 

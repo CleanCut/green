@@ -152,9 +152,8 @@ class TestPoolRunner(unittest.TestCase):
         fh = open(os.path.join(basename, 'test_pool_syntax_error.py'), 'w')
         fh.write("aoeu")
         fh.close()
-        module_name = basename + '.test_pool_syntax_error'
         result = Queue()
-        poolRunner(module_name, result, 1)
+        poolRunner(basename, result, 1)
         result.get()
         self.assertEqual(len(result.get().errors), 1)
 

@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool
-import os
 import random
 import shutil
 import sys
@@ -242,6 +241,16 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
     saved_tempdir = tempfile.tempdir
     tempfile.tempdir = tempfile.mkdtemp()
 
+    def cleanup():
+        # Restore the state of the temp directory
+        shutil.rmtree(tempfile.tempdir, ignore_errors=True)
+        tempfile.tempdir = saved_tempdir
+        queue.put(None)
+        # Finish coverage
+        if coverage_number and coverage:
+            cov.stop()
+            cov.save()
+
     # Each pool starts its own coverage, later combined by the main process.
     if coverage_number and coverage:
         cov = coverage.coverage(
@@ -252,15 +261,19 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         cov.start()
 
     # What to do each time an individual test is started
+    already_sent = set()
     def start_callback(test):
         # Let the main process know what test we are starting
-        queue.put(proto_test(test))
+        test = proto_test(test)
+        if test not in already_sent:
+            queue.put(test)
+            already_sent.add(test)
 
-    def stop_callback(test_result):
+    def finalize_callback(test_result):
         # Let the main process know what happened with the test run
         queue.put(test_result)
 
-    result = ProtoTestResult(start_callback, stop_callback)
+    result = ProtoTestResult(start_callback, finalize_callback)
     test = None
     try:
         test = loadTargets(target)
@@ -274,6 +287,10 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)
+        queue.put(t)
+        queue.put(result)
+        cleanup()
+        return
 
     if getattr(test, 'run', False):
         # Loading was successful, lets do this
@@ -284,16 +301,14 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
             # through to crash things.  So we only need to manufacture another error
             # if the underlying framework didn't, but either way we don't want to
             # crash.
-            if not result.errors:
+            if result.errors:
+                queue.put(result)
+            else:
                 err = sys.exc_info()
-                t             = ProtoTest()
-                t.module      = 'green.runner'
-                t.class_name  = 'N/A'
-                t.description = 'Green encountered an exception not caught by the underlying test framework.'
-                t.method_name = 'poolRunner'
-                result.startTest(t)
-                result.addError(t, err)
-                result.stopTest(t)
+                result.startTest(test)
+                result.addError(test, err)
+                result.stopTest(test)
+                queue.put(result)
     else:
         # loadTargets() returned an object without a run() method, probably None
         description = 'Test loader returned an un-runnable object.  Is "{}" importable from your current location?  Maybe you forgot an __init__.py in your directory?  Unrunnable object looks like: {} of type {} with dir {}'.format(
@@ -309,13 +324,4 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         result.addError(t, err)
         result.stopTest(t)
 
-    # Finish coverage
-    if coverage_number and coverage:
-        cov.stop()
-        cov.save()
-
-    # Restore the state of the temp directory
-    shutil.rmtree(tempfile.tempdir, ignore_errors=True)
-    tempfile.tempdir = saved_tempdir
-    queue.put(None)
-    return None
+    cleanup()

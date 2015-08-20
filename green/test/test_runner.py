@@ -122,35 +122,6 @@ class TestRun(unittest.TestCase):
         del(self.tmpdir)
         del(self.stream)
 
-    def test_catchSIGINT(self):
-        """
-        run() can catch SIGINT with just one process.
-        """
-        if platform.system() == 'Windows':
-            self.skipTest('This test is for posix-specific behavior.')
-        # Mock the list of TestResult instances that should be stopped,
-        # otherwise the actual TestResult that is running this test will be
-        # told to stop when we send SIGINT
-        saved__results = unittest.signals._results
-        unittest.signals._results = weakref.WeakKeyDictionary()
-        self.addCleanup(setattr, unittest.signals, '_results', saved__results)
-        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, 'test_catch_sigint.py'), 'w')
-        fh.write(dedent(
-            """
-            import os
-            import signal
-            import unittest
-            class KBICase(unittest.TestCase):
-                def runTest(self):
-                    os.kill(os.getpid(), signal.SIGINT)
-            """))
-        fh.close()
-        os.chdir(sub_tmpdir)
-        tests = loadTargets('test_catch_sigint')
-        run(tests, self.stream, self.args)
-        os.chdir(self.startdir)
-
     def test_stdout(self):
         """
         run() can use sys.stdout as the stream.
@@ -508,8 +479,6 @@ class TestProcesses(unittest.TestCase):
         run(tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
         self.assertIn('FAILED', self.stream.getvalue())
-
-
 
     def test_empty(self):
         """

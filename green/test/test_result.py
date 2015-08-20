@@ -185,6 +185,22 @@ class TestProtoTestResult(unittest.TestCase):
         self.assertEqual(test, ptr.unexpectedSuccesses[0])
 
 
+class TestProtoError(unittest.TestCase):
+
+
+    def test_str(self):
+        """
+        Running a ProtoError through str() should result in a traceback string
+        """
+        test_str = 'noetuaoe'
+        try:
+            raise Exception(test_str)
+        except:
+            err = sys.exc_info()
+        pe = proto_error(err)
+        self.assertIn(test_str, str(pe))
+
+
 
 class TestProtoTest(unittest.TestCase):
 
@@ -196,6 +212,15 @@ class TestProtoTest(unittest.TestCase):
         pt = ProtoTest()
         for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual('', getattr(pt, i, None))
+
+
+    def test_str(self):
+        """
+        Running a ProtoTest through str() is the same as getting .dotted_name
+        """
+        pt = ProtoTest()
+        pt.dotted_name = 'aosenuth'
+        self.assertEqual(str(pt), pt.dotted_name)
 
 
     def test_ProtoTestFromTest(self):

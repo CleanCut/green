@@ -97,6 +97,10 @@ class ProtoError():
         self.traceback_lines = traceback.format_exception(*err)
 
 
+    def __str__(self):
+        return '\n'.join(self.traceback_lines)
+
+
 
 class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
     """
@@ -163,10 +167,10 @@ class ProtoTestResult(BaseTestResult):
     """
     I'm the TestResult object for a single unit test run in a process.
     """
-    def __init__(self, start_callback=None, stop_callback=None):
+    def __init__(self, start_callback=None, finalize_callback=None):
         super(ProtoTestResult, self).__init__(None, None)
         self.start_callback = start_callback
-        self.stop_callback  = stop_callback
+        self.finalize_callback = finalize_callback
         self.pickle_attrs = [
                 'errors',
                 'expectedFailures',
@@ -218,7 +222,7 @@ class ProtoTestResult(BaseTestResult):
         """
         self.__dict__.update(dict)
         self.start_callback = None
-        self.stop_callback = None
+        self.finalize_callback = None
 
 
     def startTest(self, test):
@@ -235,8 +239,18 @@ class ProtoTestResult(BaseTestResult):
         """
         Called after each test runs
         """
-        if self.stop_callback:
-            self.stop_callback(self)
+        pass
+
+
+    def finalize(self):
+        """
+        I am here so that after the GreenTestSuite has had a chance to inject
+        the captured stdout/stderr back into me, I can relay that through to the
+        worker process's poolRunner who will send me back up to the parent
+        process.
+        """
+        if self.finalize_callback:
+            self.finalize_callback(self)
 
 
     def addSuccess(self, test):
