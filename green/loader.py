@@ -392,8 +392,16 @@ def loadTarget(target, file_pattern='test*.py'):
             # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
             # refactor it and simplify it after we make sure it works.
             # This is a cause of the traceback mangling I observed.
-            message = ('Failed to import {}:\n{}').format(
-                           dotted_path, traceback.format_exc())
+            try:
+                message = ('Failed to import "{}":\n{}').format(
+                               dotted_path, traceback.format_exc())
+            # If the line that caused the exception has unicode literals in it
+            # anywhere, then python 2.7 will crash on traceback.format_exc().
+            # Python 3 is ok.
+            except UnicodeDecodeError:
+                message = ('Failed to import "{}", and the import traceback '
+                    'has a unicode decode error, so I can\'t display it.'
+                    .format(dotted_path))
             def testFailure(self):
                 raise ImportError(message)
             TestClass = type(
