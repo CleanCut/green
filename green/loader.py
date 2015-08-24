@@ -398,7 +398,7 @@ def loadTarget(target, file_pattern='test*.py'):
             # If the line that caused the exception has unicode literals in it
             # anywhere, then python 2.7 will crash on traceback.format_exc().
             # Python 3 is ok.
-            except UnicodeDecodeError:
+            except UnicodeDecodeError: # pragma: no cover
                 message = ('Failed to import "{}", and the import traceback '
                     'has a unicode decode error, so I can\'t display it.'
                     .format(dotted_path))
