@@ -1,3 +1,13 @@
+# Version 2.0.3
+##### 23 August 2015
+
+- When you use Python 2.7 and your failing test has a traceback that refers to
+  a line that has unicode literals in it, green will now catch the resulting
+  UnicodeDecodeError raised while trying to format the traceback and tell you the
+  module it was trying to import and that it couldn't display the correct
+  traceback due to the presence of a unicode literal. Resolves #77.
+
+
 # Version 2.0.2
 ##### 20 August 2015
 
