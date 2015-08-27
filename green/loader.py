@@ -36,7 +36,9 @@ def toProtoTestList(suite, test_list=None, doing_completions=False):
         getattr(suite, exception_method)()
     # On to the real stuff
     if issubclass(type(suite), unittest.TestCase):
-        test_list.append(proto_test(suite))
+        # Skip actual blank TestCase objects that twisted inserts
+        if str(type(suite)) != "<class 'twisted.trial.unittest.TestCase'>":
+            test_list.append(proto_test(suite))
     else:
         for i in suite:
             toProtoTestList(i, test_list, doing_completions)

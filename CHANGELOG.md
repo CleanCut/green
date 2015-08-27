@@ -1,3 +1,10 @@
+# Version 2.0.4
+##### 27 August 2015
+
+- Fixed a bug that was causing crashes when subclassing Twisted's version of
+  TestCase.
+
+
 # Version 2.0.3
 ##### 23 August 2015
 
