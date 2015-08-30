@@ -9,8 +9,8 @@
 
 #### Table of Contents
 
-1. [Screenshots](https://github.com/CleanCut/green#screenshots)
-2. [Features](https://github.com/CleanCut/green#features)
+1. [Features](https://github.com/CleanCut/green#features)
+2. [Screenshots](https://github.com/CleanCut/green#screenshots)
 3. [Getting Help](https://github.com/CleanCut/green#getting-help)
 4. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
 5. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
@@ -24,14 +24,6 @@
   - [nose-parameterized](https://github.com/CleanCut/green#nose-parameterized)
 10. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
 11. [Origin Story](https://github.com/CleanCut/green#origin-story)
-
-
-Screenshots
------------
-
-#### Top: Without Green.  Bottom: With Green!
-
-![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
 
 
 Features
@@ -50,6 +42,14 @@ Features
 - **Portable** - Completely supports OS X, Linux, and BSDs (and Windows most of the time).
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
+
+
+Screenshots
+-----------
+
+#### Top: Without Green.  Bottom: With Green!
+
+![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
 
 
 Getting Help
