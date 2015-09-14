@@ -16,9 +16,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 except:
-    from mock import MagicMock
+    from mock import MagicMock, patch
 
 
 
@@ -147,19 +147,6 @@ class TestMain(unittest.TestCase):
         config.sys.stdout = save_stdout
 
 
-    def test_coverage(self):
-        """
-        If coverage and --run-coverage, then coverage is started
-        """
-        save_coverage = config.coverage
-        config.coverage = MagicMock()
-        config.sys.argv = ['', '--run-coverage', '--omit-patterns=abc', '--clear-omit']
-        cmdline.main(testing=True, coverage_testing=True)
-        config.coverage.coverage.assert_called_with(
-                data_file=u'.coverage', omit=['abc'])
-        config.coverage = save_coverage
-
-
     def test_noTestsCreatesEmptyTestSuite(self):
         """
         If loadTargets doesn't find any tests, an empty test suite is created.
@@ -168,36 +155,6 @@ class TestMain(unittest.TestCase):
         """
         cmdline.sys.argv = ['', '/tmp/non-existent/path']
         cmdline.main(testing=True)
-
-
-    def test_omit_patterns_clear(self):
-        """
-        Omit pattern gets parsed
-        """
-        save_coverage = config.coverage
-        config.coverage = MagicMock()
-        cov = MagicMock()
-        config.coverage.coverage.return_value = cov
-        config.sys.argv = [
-                '', '--run-coverage', '--clear-omit', '--omit-patterns', 'a,b']
-        cmdline.main(testing=True, coverage_testing=True)
-        self.assertEqual(cov.report.mock_calls[0][2]['omit'], ['a', 'b'])
-        config.coverage = save_coverage
-
-    def test_omit_patterns(self):
-        """
-        Omit pattern gets parsed
-        """
-        save_coverage = config.coverage
-        config.coverage = MagicMock()
-        cov = MagicMock()
-        config.coverage.coverage.return_value = cov
-        config.sys.argv = ['', '--run-coverage', '--omit-patterns', 'a,b']
-        cmdline.main(testing=True, coverage_testing=True)
-        self.assertIn('a', cov.report.mock_calls[0][2]['omit'])
-        self.assertIn('b', cov.report.mock_calls[0][2]['omit'])
-        self.assertIn('*/colorama*', cov.report.mock_calls[0][2]['omit'])
-        config.coverage = save_coverage
 
 
     def test_import_cmdline_module(self):

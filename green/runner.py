@@ -54,7 +54,7 @@ class InitializerOrFinalizer:
 
 
 
-def run(suite, stream, args):
+def run(suite, stream, args, testing=False):
     """
     Run the given test case or test suite with the specified arguments.
 
@@ -127,7 +127,7 @@ def run(suite, stream, args):
         pool.close()
         pool.join()
 
-        result.stopTestRun()
+        result.stopTestRun(testing)
 
     removeResult(result)
 

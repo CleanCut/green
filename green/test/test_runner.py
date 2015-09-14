@@ -18,6 +18,11 @@ from green.runner import InitializerOrFinalizer, run
 from green.suite import GreenTestSuite
 
 try:
+    from unittest.mock import MagicMock
+except:
+    from mock import MagicMock
+
+try:
     from io import StringIO
 except:
     from StringIO import StringIO
@@ -424,7 +429,8 @@ class TestProcesses(unittest.TestCase):
         tests = loadTargets('.')
         self.args.processes = 2
         self.args.run_coverage = True
-        run(tests, self.stream, self.args)
+        self.args.cov = MagicMock()
+        run(tests, self.stream, self.args, testing=True)
         os.chdir(TestProcesses.startdir)
         self.assertIn('OK', self.stream.getvalue())
 

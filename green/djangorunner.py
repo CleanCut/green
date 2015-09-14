@@ -100,7 +100,7 @@ try:
             if not test_labels:
                 test_labels = ['.']
 
-            args = mergeConfig(Namespace(), default_args)
+            args = mergeConfig(Namespace())
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
             suite = loadTargets(args.targets)

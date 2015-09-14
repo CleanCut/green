@@ -13,9 +13,9 @@ except: # pragma: no cover
 import green.config as config
 
 
-def main(testing=False, coverage_testing=False):
+def main(testing=False):
     args = config.parseArguments()
-    args = config.mergeConfig(args, testing, coverage_testing)
+    args = config.mergeConfig(args, testing)
 
     if args.shouldExit:
         return args.exitCode
@@ -72,19 +72,8 @@ def main(testing=False, coverage_testing=False):
         test_suite = GreenTestSuite()
 
     # Actually run the test_suite
-    if testing:
-        result = lambda: None
-        result.wasSuccessful = lambda: 0
-    else:
-        result = run(test_suite, stream, args) # pragma: no cover
+    result = run(test_suite, stream, args, testing)
 
-    if args.run_coverage and ((not testing) or coverage_testing):
-        stream.writeln()
-        args.cov.stop()
-        args.cov.save()
-        args.cov.combine()
-        args.cov.save()
-        args.cov.report(file=stream, omit=args.omit_patterns)
     return(int(not result.wasSuccessful()))
 
 

@@ -365,7 +365,7 @@ def getConfig(filepath=None): # pragma: no cover
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
-def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
+def mergeConfig(args, testing=False): # pragma: no cover
     """
     I take in a namespace created by the ArgumentParser in cmdline.main() and
     merge in options from configuration files.  The config items only replace
@@ -483,7 +483,7 @@ def mergeConfig(args, testing=False, coverage_testing=False): # pragma: no cover
             args.shouldExit = True
             args.exitCode = 3
             return args
-        if (not testing) or coverage_testing:
+        if not testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns)
             cov.start()
         new_args.cov = cov
