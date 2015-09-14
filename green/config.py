@@ -173,19 +173,21 @@ def parseArguments(): # pragma: no cover
         default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-i', '--initializer', action='store',
-            metavar='DOTTED_FUNCTION', default='',
+            metavar='DOTTED_FUNCTION',
             help="Python function to run inside of a single worker process "
             "before it starts running tests.  This is the way to provision "
             "external resources that each concurrent worker process needs to "
             "have exclusive access to. Specify the function in dotted notation "
             "in a way that will be importable from the location you are "
-            "running green from."))
+            "running green from.",
+            default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-z', '--finalizer', action='store',
-            metavar='DOTTED_FUNCTION', default='',
+            metavar='DOTTED_FUNCTION',
             help="Same as --initializer, only run at the end of a worker "
             "process's lifetime.  Used to unprovision resources provisioned by "
-            "the initializer."))
+            "the initializer.",
+            default=argparse.SUPPRESS))
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
         help="Force terminal colors on.  Default is to autodetect.",
@@ -236,7 +238,8 @@ def parseArguments(): # pragma: no cover
         default=argparse.SUPPRESS))
     store_opt(other_args.add_argument('-n', '--test-pattern', action='store',
         metavar='PATTERN', help="Pattern to match test method names after "
-        "'test'.  Default is '*', meaning match methods named 'test*'."))
+        "'test'.  Default is '*', meaning match methods named 'test*'.",
+        default=argparse.SUPPRESS))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
