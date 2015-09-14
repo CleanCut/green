@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 from os.path import dirname
+import platform
 import shutil
 import sys
 import tempfile
@@ -432,6 +433,37 @@ class TestDiscover(unittest.TestCase):
         self.assertEqual(loader.discover(tmpdir), None)
 
 
+    def test_symlink(self):
+        """
+        If the directory is a symlink, it should be skipped.
+        """
+        if platform.system() == 'Windows': # pragma: no cover
+            self.skipTest('This test is for posix-specific behavior')
+        tmpdir  = tempfile.mkdtemp()
+        tmpdir2 = tempfile.mkdtemp()
+        os.symlink(tmpdir, os.path.join(tmpdir2, 'link'))
+        self.addCleanup(shutil.rmtree, tmpdir)
+        startdir = os.getcwd()
+        os.chdir(tmpdir)
+        self.addCleanup(os.chdir, startdir)
+        pkg_name = 'realpkg'
+        os.mkdir(pkg_name)
+        tmp_subdir = os.path.join(tmpdir, pkg_name)
+        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        named_module = os.path.join(os.path.basename(tmp_subdir),
+                                    'test_module.py')
+        fh = open(named_module, 'w')
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
+        fh.close()
+        self.assertEqual(loader.discover(tmpdir2), None)
 
 
 

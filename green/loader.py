@@ -266,6 +266,10 @@ def discover(current_path, file_pattern='test*.py'):
         path = os.path.join(current_abspath, file_or_dir_name)
         # Recurse into directories, attempting to skip virtual environments
         if os.path.isdir(path) and not os.path.isfile(os.path.join(path, 'bin', 'activate')):
+            # Don't follow symlinks
+            if os.path.islink(path):
+                continue
+            # Don't recurse into directories that couldn't be a package name
             if not python_dir_pattern.match(file_or_dir_name):
                 continue
             subdir_suite = discover(path, file_pattern=file_pattern)

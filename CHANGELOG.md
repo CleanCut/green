@@ -1,3 +1,10 @@
+# Version 2.0.6
+##### 14 September 2015
+
+- Green no longer follows symlinks during discovery, to avoid infinite
+  discovering.
+
+
 # Version 2.0.5
 ##### 14 September 2015
 
