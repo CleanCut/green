@@ -9,6 +9,7 @@ To make the change permanent for your project, in settings.py add:
     TEST_RUNNER=green.djangorunner.DjangoRunner
 """
 
+from argparse import Namespace
 import os
 import sys
 
@@ -99,7 +100,7 @@ try:
             if not test_labels:
                 test_labels = ['.']
 
-            args = mergeConfig(default_args, default_args)
+            args = mergeConfig(Namespace(), default_args)
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
             suite = loadTargets(args.targets)
