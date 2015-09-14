@@ -1,6 +1,14 @@
 # Version 2.0.5
 ##### 14 September 2015
 
+- Green no longer ignores config files when run as through django.  Fixes #79
+  and #82.
+
+- Green no longer crashes when run through django when no tests are present.
+
+- Coverage output now appears before the summary, so that long coverage lists
+  don't make it difficult to tell whether tests passed or not.
+
 - Fixed a bug that would cause a crash if a python package with an invalid (and
   thus un-importable) name existed within the discovery scope.
 
