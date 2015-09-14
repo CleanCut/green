@@ -364,6 +364,7 @@ class TestLoadFromModuleFilename(unittest.TestCase):
         A module that wants to be skipped gets skipped
         """
         tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
         filename = os.path.join(tmpdir, 'skipped_module.py')
         fh = open(filename, 'w')
         fh.write(dedent(
@@ -400,6 +401,37 @@ class TestDiscover(unittest.TestCase):
         fh.write('pass\n')
         fh.close()
         self.assertRaises(ImportError, loader.discover, filename)
+
+
+    def test_bad_pkg_name(self):
+        """
+        If the directory is an invalid package name, don't bother looking in it.
+        """
+        tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
+        startdir = os.getcwd()
+        os.chdir(tmpdir)
+        self.addCleanup(os.chdir, startdir)
+        bad_pkg_name = '1badname'
+        os.mkdir(bad_pkg_name)
+        tmp_subdir = os.path.join(tmpdir, bad_pkg_name)
+        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        named_module = os.path.join(os.path.basename(tmp_subdir),
+                                    'named_module.py')
+        fh = open(named_module, 'w')
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testPass(self):
+                    pass
+            """))
+        fh.close()
+        self.assertEqual(loader.discover(tmpdir), None)
+
+
 
 
 
@@ -453,7 +485,7 @@ class TestLoadTargets(unittest.TestCase):
         suite = loader.loadTargets('.')
         # This should resolve it to the module that's not importable from here
         test = loader.toParallelTargets(suite, [])[0]
-        reloaded = loader.loadTargets(test)
+        loader.loadTargets(test)
 
 
     def test_emptyDirAbsolute(self):
