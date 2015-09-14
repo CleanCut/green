@@ -14,7 +14,8 @@ from green.output import debug
 from green.result import proto_test
 from green.suite import GreenTestSuite
 
-python_file_pattern = re.compile(r'[_a-z]\w*\.py?$', re.IGNORECASE)
+python_file_pattern = re.compile(r'^[_a-z]\w*?\.py$', re.IGNORECASE)
+python_dir_pattern  = re.compile(r'^[_a-z]\w*?$', re.IGNORECASE)
 
 
 def toProtoTestList(suite, test_list=None, doing_completions=False):
@@ -265,6 +266,8 @@ def discover(current_path, file_pattern='test*.py'):
         path = os.path.join(current_abspath, file_or_dir_name)
         # Recurse into directories, attempting to skip virtual environments
         if os.path.isdir(path) and not os.path.isfile(os.path.join(path, 'bin', 'activate')):
+            if not python_dir_pattern.match(file_or_dir_name):
+                continue
             subdir_suite = discover(path, file_pattern=file_pattern)
             if subdir_suite:
                 suite.addTest(subdir_suite)
