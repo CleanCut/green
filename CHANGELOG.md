@@ -1,3 +1,13 @@
+# Version 2.0.5
+##### 14 September 2015
+
+- Fixed a bug that would cause a crash if a python package with an invalid (and
+  thus un-importable) name existed within the discovery scope.
+
+- Updated the readme: swapped the features and screenshots section, swapped the
+  positioning of the two screenshots.
+
+
 # Version 2.0.4
 ##### 27 August 2015
 
