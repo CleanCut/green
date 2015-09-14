@@ -16,6 +16,7 @@ from green.config import default_args, mergeConfig
 from green.loader import loadTargets
 from green.output import GreenStream
 from green.runner import run
+from green.suite import GreenTestSuite
 
 # If we're not being run from an actual django project, set up django config
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'green.djangorunner')
@@ -102,6 +103,8 @@ try:
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
             suite = loadTargets(args.targets)
+            if not suite:
+                suite = GreenTestSuite()
             result = run(suite, stream, args)
 
             # Django teardown

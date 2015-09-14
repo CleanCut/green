@@ -6,9 +6,9 @@ except:
 import sys
 import unittest
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 except:
-    from mock import MagicMock
+    from mock import MagicMock, patch
 
 from green import djangorunner
 
@@ -76,3 +76,24 @@ class TestDjangoRunner(unittest.TestCase):
         dr.setup_databases           = MagicMock()
 
         self.assertRaises(ValueError, dr.run_tests, None)
+
+
+    @patch('green.djangorunner.GreenTestSuite')
+    @patch('green.djangorunner.run')
+    @patch('green.djangorunner.loadTargets')
+    def test_run_noTests(self, mock_loadTargets, mock_run, mock_GreenTestSuite):
+        """
+        If no tests are found, we create an empty test suite and run it.
+        """
+        dr = djangorunner.DjangoRunner()
+
+        dr.setup_test_environment        = MagicMock()
+        dr.setup_databases               = MagicMock()
+        dr.teardown_databases            = MagicMock()
+        dr.teardown_test_environment     = MagicMock()
+        mock_loadTargets.return_value    = None
+        mock_GreenTestSuite.return_value = 123
+
+        dr.run_tests(())
+
+        self.assertEqual(mock_run.call_args[0][0], 123)
