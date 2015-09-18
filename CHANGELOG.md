@@ -1,3 +1,10 @@
+# Version 2.0.7
+##### 18 September 2015
+
+- Fixed help documentation for `-s/--processes` to account for changes made in
+  the 2.0.0 overhaul.  Fixes #83.
+
+
 # Version 2.0.6
 ##### 14 September 2015
 
