@@ -164,12 +164,11 @@ def parseArguments(): # pragma: no cover
             "tests need to be written to avoid using the same resources (temp "
             "files, sockets, ports, etc.) for the multi-process mode to work "
             "well (--initializer and --finalizer can help provision "
-            "per-process resources). Default is 1, meaning just use a single "
-            "process (maximizes compatibility with standard unittest and other "
-            "test runners). 0 means try to autodetect the number of CPUs in "
-            "the system. Note that for a small number of trivial tests, "
-            "running everything in a single process may be faster than the "
-            "overhead of initializing all the processes.",
+            "per-process resources). Default is to run the same number of "
+            "processes as your machine has logical CPUs. Note that for a small "
+            "number of trivial tests, running everything in a single process "
+            "may be faster than the overhead of initializing all the "
+            "processes.",
         default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-i', '--initializer', action='store',
