@@ -47,7 +47,7 @@ Features
 Screenshots
 -----------
 
-#### Top: Without Green.  Bottom: With Green!
+#### Top: With Green!  Bottom: Without Green :-(
 
 ![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
 
