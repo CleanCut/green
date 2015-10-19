@@ -484,6 +484,11 @@ def mergeConfig(args, testing=False): # pragma: no cover
         omit_patterns.extend(new_args.omit_patterns.split(','))
     new_args.omit_patterns = omit_patterns
 
+    if new_args.include_patterns:
+        new_args.include_patterns = new_args.include_patterns.split(',')
+    else:
+        new_args.include_patterns = []
+
     if new_args.run_coverage:
         if not coverage:
             print(
@@ -494,7 +499,7 @@ def mergeConfig(args, testing=False): # pragma: no cover
             return args
         if not testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns,
-                    include=new_args.include_patterns.split(','))
+                    include=new_args.include_patterns)
             cov.start()
         new_args.cov = cov
 
