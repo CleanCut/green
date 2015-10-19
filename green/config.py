@@ -41,35 +41,36 @@ import multiprocessing      # pragma: no cover
 files_loaded = [] # pragma: no cover
 
 # Set the defaults in a re-usable way
-default_args = argparse.Namespace( # pragma: no cover
-        targets         = ['.'], # Not in configs
-        processes       = multiprocessing.cpu_count(),
-        initializer     = '',
-        finalizer       = '',
-        termcolor       = None,
-        notermcolor     = None,
-        allow_stdout    = False,
-        no_skip_report  = False,
-        help            = False, # Not in configs
-        version         = False,
-        logging         = False,
-        debug           = 0,
-        verbose         = 1,
-        failfast        = False,
-        config          = None,  # Not in configs
-        file_pattern    = 'test*.py',
-        test_pattern    = '*',
-        run_coverage    = False,
-        clear_omit      = False,
-        omit_patterns   = None,
-        completion_file = False,
-        completions     = False,
-        options         = False,
+default_args             = argparse.Namespace( # pragma: no cover
+        targets          = ['.'], # Not in configs
+        processes        = multiprocessing.cpu_count(),
+        initializer      = '',
+        finalizer        = '',
+        termcolor        = None,
+        notermcolor      = None,
+        allow_stdout     = False,
+        no_skip_report   = False,
+        help             = False, # Not in configs
+        version          = False,
+        logging          = False,
+        debug            = 0,
+        verbose          = 1,
+        failfast         = False,
+        config           = None,  # Not in configs
+        file_pattern     = 'test*.py',
+        test_pattern     = '*',
+        run_coverage     = False,
+        clear_omit       = False,
+        omit_patterns    = None,
+        include_patterns = None,
+        completion_file  = False,
+        completions      = False,
+        options          = False,
         # These are not really options, they are added later for convenience
-        parser          = None,
-        store_opt       = None,
+        parser           = None,
+        store_opt        = None,
         # not implemented, but unittest stub in place
-        warnings        = '',
+        warnings         = '',
         )
 
 
@@ -253,6 +254,14 @@ def parseArguments(): # pragma: no cover
             "like'*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python system "
             "packages)*' -- only longer."),
         default=argparse.SUPPRESS))
+    store_opt(cov_args.add_argument('-u', '--include-patterns', action='store',
+        metavar='PATTERN',
+        help=("Comma-separated file-patterns to includie in coverage.  This "
+            "implies that anything that does not match the include pattern is "
+            "omitted from coverage reporting.  Note that the pattern needs to "
+            "match an entire relative path, including a file extension, even "
+            "though coverage 4.x doesn't show the file extension."),
+        default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-o', '--omit-patterns', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  For "
@@ -371,11 +380,12 @@ def mergeConfig(args, testing=False): # pragma: no cover
     argument items that are set to default value.
 
     Returns: I return a new argparse.Namespace, adding members:
-        shouldExit    = default False
-        exitCode      = default 0
-        omit_patterns = omit-patterns settings converted to list and extended,
-                        taking clear-omit into account.
-        cov           = coverage object default None
+        shouldExit       = default False
+        exitCode         = default 0
+        include patterns = include-patterns setting converted to list.
+        omit_patterns    = omit-patterns settings converted to list and
+                           extended, taking clear-omit into account.
+        cov              = coverage object default None
     """
     config = getConfig(getattr(args, 'config', default_args.config))
     new_args = copy.deepcopy(default_args) # Default by default!
@@ -391,7 +401,7 @@ def mergeConfig(args, testing=False): # pragma: no cover
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
         elif name in ['file_pattern', 'finalizer', 'initializer',
-                'omit_patterns', 'warnings', 'test_pattern']:
+            'include_patterns', 'omit_patterns', 'warnings', 'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass # Some options only make sense coming on the command-line.
@@ -483,7 +493,8 @@ def mergeConfig(args, testing=False): # pragma: no cover
             args.exitCode = 3
             return args
         if not testing:
-            cov = coverage.coverage(data_file='.coverage', omit=omit_patterns)
+            cov = coverage.coverage(data_file='.coverage', omit=omit_patterns,
+                    include=new_args.include_patterns)
             cov.start()
         new_args.cov = cov
 
