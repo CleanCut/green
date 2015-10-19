@@ -1,3 +1,11 @@
+# Version 2.1.1
+##### 19 October 2015
+
+- Fixed the new `-u/--include-patterns` to actually break apart the
+  comma-separated list into separate entries.  It was already working fine if
+  you only included a single pattern.
+
+
 # Version 2.1.0
 ##### 19 October 2015
 
