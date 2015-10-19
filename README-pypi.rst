@@ -23,7 +23,7 @@ Features
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with `coverage`_
 - **Modern** - Supports Python 2.7, 3.4+, `PyPy`_ and `PyPy3`_
-- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows most of the time).
+- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows on Python 2.7 and mostly on 3.4+)
 - **Living** - This project grows and changes.  See the `changelog`_
 
 

@@ -39,7 +39,7 @@ Features
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
 - **Modern** - Supports Python 2.7, 3.4+, [PyPy](http://pypy.org), and [PyPy3](http://pypy.org).
-- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows most of the time).
+- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows on Python 2.7 and mostly on 3.4+).
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
 
