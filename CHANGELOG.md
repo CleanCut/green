@@ -1,3 +1,27 @@
+# Version 2.1.0
+##### 19 October 2015
+
+- Removed official Python 3.4+ support on Windows, due to AppVeyor's
+  aggravating fail-4-times-out-of-5 behavior which I can't replicate at all on
+  real windows.  If someone wants to help find the problem so we can have
+  consistent builds, I would be happy to restore official Python 3.4+ support
+  on Windows.  In practice, everything functions fine on Windows as far as I
+  can tell, but this will drift in the future without builds to let us know
+  what breaks.
+
+- Added `-u/--include-patterns` argument to pass through a list of include
+  patterns to coverage. See the help docs for more info.
+
+- Fixed a crash during handling a crash in loader code due to incorrect string
+  formatting - contributed by jayvdb
+
+- Green can now be run as a module with `python -m green` syntax - contributed
+  by krisztianfekete, fixes #91
+
+- Fixed the text describing the ordering of the screenshots - reported by
+  robertlagrant
+
+
 # Version 2.0.7
 ##### 18 September 2015
 
