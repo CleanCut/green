@@ -260,7 +260,7 @@ def discover(current_path, file_pattern='test*.py'):
     current_abspath = os.path.abspath(current_path)
     if not os.path.isdir(current_abspath):
         raise ImportError(
-                "'%s' is not a directory".format(str(current_path)))
+                "'{}' is not a directory".format(str(current_path)))
     suite = GreenTestSuite()
     for file_or_dir_name in sorted(os.listdir(current_abspath)):
         path = os.path.join(current_abspath, file_or_dir_name)
