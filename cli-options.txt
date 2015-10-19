@@ -84,6 +84,13 @@ Coverage Options (Coverage 3.7.1):
                         back in with --omit-add. The default list is
                         somethinglike'*/test*,*/termstyle*,*/mock*,*(temp
                         dir)*,*(python system packages)*' -- only longer.
+  -u PATTERN, --include-patterns PATTERN
+                        Comma-separated file-patterns to includie in coverage.
+                        This implies that anything that does not match the
+                        include pattern is omitted from coverage reporting.
+                        Note that the pattern needs to match an entire
+                        relative path, including a file extension, even though
+                        coverage 4.x doesn't show the file extension.
   -o PATTERN, --omit-patterns PATTERN
                         Comma-separated file-patterns to omit from coverage.
                         For example, if coverage reported a file
