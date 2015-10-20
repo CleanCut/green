@@ -6,6 +6,7 @@ language: "python"
 python:
   - "2.7"
   - "3.4"
+  - "3.5"
   - "pypy"
   - "pypy3"
 install:
@@ -18,3 +19,4 @@ after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
 matrix:
     allow_failures:
         - os: "osx"
+        - python: "3.5"
