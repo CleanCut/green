@@ -364,7 +364,7 @@ class GreenTestResult(BaseTestResult):
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
 
 
-    def stopTestRun(self, testing=False):
+    def stopTestRun(self):
         """
         Called once after all tests have run
         """
@@ -372,12 +372,17 @@ class GreenTestResult(BaseTestResult):
         self.timeTaken = self.stopTime - self.startTime
         self.printErrors()
         if self.args.run_coverage:
-            self.stream.writeln()
-            self.args.cov.stop()
-            self.args.cov.save()
-            self.args.cov.combine()
-            self.args.cov.save()
-            self.args.cov.report(file=self.stream, omit=self.args.omit_patterns)
+            from coverage.misc import CoverageException
+            try:
+                self.stream.writeln()
+                self.args.cov.stop()
+                self.args.cov.save()
+                self.args.cov.combine()
+                self.args.cov.save()
+                self.args.cov.report(file=self.stream, omit=self.args.omit_patterns)
+            except CoverageException as ce:
+                if (len(ce.args) == 1) and ("No data to report" not in ce.args[0]):
+                    raise ce
 
         if self.testsRun and not self.shouldStop:
             self.stream.writeln()

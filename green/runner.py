@@ -127,7 +127,7 @@ def run(suite, stream, args, testing=False):
         pool.close()
         pool.join()
 
-        result.stopTestRun(testing)
+        result.stopTestRun()
 
     removeResult(result)
 

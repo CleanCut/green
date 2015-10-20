@@ -1,3 +1,10 @@
+# Version 2.1.2
+##### 20 October 2015
+
+- Intercept and handle coverage 4.x's new exception that occurs if there is no
+  coverage to report.
+
+
 # Version 2.1.1
 ##### 19 October 2015
 

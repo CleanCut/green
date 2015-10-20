@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import copy
+from coverage.misc import CoverageException
 import sys
 import unittest
 
@@ -14,9 +15,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 except:
-    from mock import MagicMock
+    from mock import MagicMock, patch
 
 
 
@@ -310,6 +311,23 @@ class TestGreenTestResult(unittest.TestCase):
     def tearDown(self):
         del(self.stream)
         del(self.args)
+
+
+    @patch('green.result.GreenTestResult.printErrors')
+    def test_stopTestRun(self, mock_printErrors):
+        """
+        We ignore coverage's error about not having anything to cover.
+        """
+        self.args.cov = MagicMock()
+        self.args.cov.stop = MagicMock(
+                side_effect=CoverageException('Different Exception'))
+        self.args.run_coverage = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.startTestRun()
+        self.assertRaises(CoverageException, gtr.stopTestRun)
+
+        self.args.cov.stop = MagicMock(
+                side_effect=CoverageException('No data to report'))
 
 
     def test_tryRecordingStdoutStderr(self):
