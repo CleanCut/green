@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import copy
-from coverage.misc import CoverageException
 import sys
 import unittest
 
@@ -318,6 +317,10 @@ class TestGreenTestResult(unittest.TestCase):
         """
         We ignore coverage's error about not having anything to cover.
         """
+        try:
+            from coverage.misc import CoverageException
+        except:
+            self.skipTest("Coverage needs to be installed for this test.")
         self.args.cov = MagicMock()
         self.args.cov.stop = MagicMock(
                 side_effect=CoverageException('Different Exception'))
