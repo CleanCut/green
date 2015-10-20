@@ -411,6 +411,10 @@ class TestProcesses(unittest.TestCase):
         """
         Running coverage in process mode doesn't crash
         """
+        try:
+            import coverage; coverage
+        except:
+            self.skipTest("Coverage needs to be installed for this test")
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
         fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
