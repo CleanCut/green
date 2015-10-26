@@ -1,3 +1,19 @@
+# Version 2.2.0
+##### 26 October 2015
+
+- Python 3.5 support is now real, including automated builds for every commit.
+  We now compensate for Python 3.5's new behavior of creating a dummy TestCase
+  when failing to load a test target via a dotted name.  All tests now pass on
+  Python 3.5 for the first time!  Lets keep it that way.  I'm crossing my
+  fingers that this might fix #93, #96, or #98 (which I'll work on next if it
+  didn't).  Fixes #99.
+
+- When the summary output of a test case is longer than the terminal width and
+  wraps to the next line, we now rewind the cursor back to the original spot
+  when rewriting in the final color.  This means no more "duplicate" lines in
+  verbose output with narrow terminal windows.  Fixes #84.
+
+
 # Version 2.1.2
 ##### 20 October 2015
 
