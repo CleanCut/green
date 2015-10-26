@@ -2,12 +2,18 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from collections import OrderedDict
+from math import ceil
 import time
 import traceback
 from unittest.result import failfast
 
 from green.output import Colors, debug
+from green.terminal import getTerminalSize
 from green.version import pretty_version
+
+
+terminal_width, _ignored = getTerminalSize()
+
 
 
 def proto_test(test):
@@ -467,17 +473,17 @@ class GreenTestResult(BaseTestResult):
             reason=''):
         test = proto_test(test)
         if self.showAll:
-            # Move the cursor back to the start of the line in terminal mode
             if self.stream.isatty():
-                self.stream.write('\r')
-            self.stream.write(
-                color_func(
-                    self.stream.formatLine(
-                        test.getDescription(self.verbose),
-                        indent=2,
-                        outcome_char=outcome_char)
-                )
-            )
+                self.stream.write(self.colors.start_of_line())
+            text_output = self.stream.formatLine(
+                test.getDescription(self.verbose),
+                indent=2,
+                outcome_char=outcome_char)
+            if terminal_width:
+                cursor_rewind = int(ceil(float(len(text_output)) / terminal_width)) - 1
+                if cursor_rewind:
+                    self.stream.write(self.colors.up(cursor_rewind))
+            self.stream.write(color_func(text_output))
             if reason:
                 self.stream.write(color_func(' -- ' + reason))
             self.stream.writeln()

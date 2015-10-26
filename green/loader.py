@@ -373,7 +373,7 @@ def loadTarget(target, file_pattern='test*.py'):
         try:
             tests = loader.loadTestsFromName(target)
             for index, test in enumerate(tests):
-                if test.__class__.__name__ == '_FailedTest':
+                if test.__class__.__name__ == '_FailedTest': # pragma: no cover
                     del(tests._tests[index])
 
         except Exception as e:

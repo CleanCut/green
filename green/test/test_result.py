@@ -461,6 +461,24 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('.', self.stream.getvalue())
 
 
+    def test_reportOutcomeCursorUp(self):
+        """
+        _reportOutcome moves the cursor up when it needs to
+        """
+        self.args.verbose = 2
+        def isatty():
+            return True
+        gs = GreenStream(self.stream)
+        gs.isatty = isatty
+        gtr = GreenTestResult(self.args, gs)
+        r = 'a fake reason'
+        t = MagicMock()
+        t.__str__.return_value = 'x' * 1000
+        gtr._reportOutcome(t, '.', lambda x: x, None, r)
+        self.assertIn(r, self.stream.getvalue())
+        self.assertLess(len(self.stream.getvalue()), 2000)
+
+
     def test_reportOutcomeVerbose(self):
         """
         _reportOutcome contains output we expect in verbose mode

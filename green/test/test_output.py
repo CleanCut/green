@@ -63,6 +63,16 @@ class TestColors(unittest.TestCase):
         self.assertTrue(c.termcolor in [True, False])
 
 
+    def testUp(self):
+        """
+        calling up gives us a non-blank string
+        """
+        c = Colors()
+        up = c.up()
+        self.assertEqual(type(up), str)
+        self.assertNotEqual(up, '')
+
+
     def testTermstyleColorsDoNotCrash(self):
         """
         termstyle-based colors don't crash and output something

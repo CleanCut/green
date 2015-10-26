@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+from colorama.ansi import Cursor
+from colorama.initialise import wrap_stream
 import logging
 import os
 import platform
@@ -55,6 +57,14 @@ class Colors:
             termstyle.enable()
         else:
             termstyle.disable()
+
+    # Movement
+    def start_of_line(self):
+        return '\r'
+
+
+    def up(self, lines=1):
+        return Cursor.UP(lines)
 
 
     # Real colors and styles
@@ -139,7 +149,6 @@ class GreenStream(object):
         if override_appveyor or (
                 (platform.system() == 'Windows')
                 and (not os.environ.get('APPVEYOR', False))): # pragma: no cover
-            from colorama.initialise import wrap_stream
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.closed = False
 
