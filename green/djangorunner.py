@@ -13,7 +13,7 @@ from argparse import Namespace
 import os
 import sys
 
-from green.config import default_args, mergeConfig
+from green.config import mergeConfig
 from green.loader import loadTargets
 from green.output import GreenStream
 from green.runner import run
