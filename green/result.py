@@ -566,7 +566,7 @@ class GreenTestResult(BaseTestResult):
     def printErrors(self):
         """
         Print a list of all tracebacks from errors and failures, as well as
-        captured stdout (even if the test passed).
+        captured stdout (even if the test passed, except with quiet_stdout option).
         """
         if self.dots:
             self.stream.writeln()
@@ -580,11 +580,12 @@ class GreenTestResult(BaseTestResult):
                     reason))
 
         # Captured output for non-failing tests
-        failing_tests = set([x[0] for x in self.all_errors])
-        for test in list(self.stdout_output):
-            if test not in failing_tests:
-                self.displayStdout(test)
-                self.displayStderr(test)
+        if not self.args.quiet_stdout:
+            failing_tests = set([x[0] for x in self.all_errors])
+            for test in list(self.stdout_output):
+                if test not in failing_tests:
+                    self.displayStdout(test)
+                    self.displayStderr(test)
 
         # Actual tracebacks and captured output for failing tests
         for (test, color_func, outcome, err) in self.all_errors:
