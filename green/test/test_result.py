@@ -525,6 +525,58 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn(output, self.stream.getvalue())
 
 
+    def test_printErrorsStdoutQuietStdoutOnSuccess(self):
+        """
+        printErrors() prints out the captured stdout
+        except when quiet_stdout is set to True
+        for successful tests
+        """
+        self.args.quiet_stdout = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        output = 'this is what the test should not spit out to stdout'
+        gtr.recordStdout(pt, output)
+        gtr.addSuccess(pt)
+        gtr.printErrors()
+        self.assertNotIn(output, self.stream.getvalue())
+
+
+    def test_printErrorsStdoutQuietStdoutOnError(self):
+        """
+        printErrors() prints out the captured stdout
+        except when quiet_stdout is set to True
+        for successful tests, but here we are on a
+        failling test.
+        """
+        self.args.quiet_stdout = True
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        output = 'this is what the test should spit out to stdout'
+        gtr.recordStdout(pt, output)
+        gtr.addError(pt, proto_error(err))
+        gtr.printErrors()
+        self.assertIn(output, self.stream.getvalue())
+
+
+    def test_printErrorsStderrQuietStdoutOnSuccess(self):
+        """
+        printErrors() prints out the captured stdout
+        except when quiet_stdout is set to True
+        for successful tests
+        """
+        self.args.quiet_stdout = True
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        output = 'this is what the test should not spit out to stdout'
+        gtr.recordStderr(pt, output)
+        gtr.addSuccess(pt)
+        gtr.printErrors()
+        self.assertNotIn(output, self.stream.getvalue())
+
     def test_printErrorsDots(self):
         """
         printErrors() looks correct in verbose=1 (dots) mode
