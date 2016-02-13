@@ -22,7 +22,8 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 flakes:
-	flake8
+	@flake8 --version | grep putty -q || sudo pip install flake8-putty
+	flake8 green
 
 test-local:
 	@sudo -H pip install -r requirements-optional.txt
