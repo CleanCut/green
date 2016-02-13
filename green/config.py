@@ -49,6 +49,7 @@ default_args             = argparse.Namespace( # pragma: no cover
         termcolor        = None,
         notermcolor      = None,
         allow_stdout     = False,
+        quiet_stdout     = False,
         no_skip_report   = False,
         help             = False, # Not in configs
         version          = False,
@@ -201,6 +202,11 @@ def parseArguments(): # pragma: no cover
     store_opt(out_args.add_argument('-a', '--allow-stdout', action='store_true',
         help=("Instead of capturing the stdout and stderr and presenting it in "
         "the summary of results, let it come through."),
+        default=argparse.SUPPRESS))
+    store_opt(out_args.add_argument('-q', '--quiet-stdout', action='store_true',
+        help=("Instead of capturing the stdout and stderr and presenting it in "
+        "the summary of results, discard it completly for successful tests. "
+        "--allow-stdout option overrides it."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-k', '--no-skip-report',
         action='store_true', help=("Don't print the report of skipped tests "
@@ -393,9 +399,9 @@ def mergeConfig(args, testing=False): # pragma: no cover
     for name, default_value in dict(default_args._get_kwargs()).items():
         # Config options overwrite default options
         config_getter = None
-        if name in ['termcolor', 'notermcolor', 'allow_stdout', 'help',
-                'logging', 'version', 'failfast', 'run_coverage', 'options',
-                'completions', 'completion_file', 'clear_omit',
+        if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
+                'help', 'logging', 'version', 'failfast', 'run_coverage',
+                'options', 'completions', 'completion_file', 'clear_omit',
                 'no_skip_report']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
