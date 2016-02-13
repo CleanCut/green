@@ -13,7 +13,9 @@ install:
   - "pip install ."
   - "pip install virtualenv"
   - "pip install coveralls"
+  - pip install flake8-putty
 script:
+  - make flakes
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
 matrix:

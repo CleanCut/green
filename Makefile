@@ -21,6 +21,9 @@ test: test-versions test-installed test-coverage
 	# test-coverage needs to be last in deps, don't clean after it runs!
 	@echo "\n(test) completed\n"
 
+flakes:
+	flake8
+
 test-local:
 	@sudo -H pip install -r requirements-optional.txt
 	-@sudo -H pip uninstall green
