@@ -16,9 +16,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import MagicMock, patch
+    from unittest.mock import MagicMock
 except:
-    from mock import MagicMock, patch
+    from mock import MagicMock
 
 
 
