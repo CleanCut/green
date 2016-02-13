@@ -1,3 +1,14 @@
+# Version 2.3.0
+##### 13 February 2016
+
+- Added `-q/--quiet-stdout` output option.  Instead of capturing the stdout and
+  stderr and presenting it in the summary of results, discard it completly for
+  successful tests. --allow-stdout option overrides it.  Contributed by
+  nMustaki.
+
+- Fixed Windows build due to URL change for `get-pip.py`.  Contributed by
+  nMustaki.
+
 # Version 2.2.0
 ##### 26 October 2015
 

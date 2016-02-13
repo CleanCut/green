@@ -48,8 +48,10 @@ Output Options:
   -a, --allow-stdout    Instead of capturing the stdout and stderr and
                         presenting it in the summary of results, let it come
                         through.
-  -q, --quiet-stdout    Instead of capturing the stdout and stderr and presenting it in
-                        the summary of results, discard it completly for successful tests. --allow-stdout option overrides it.
+  -q, --quiet-stdout    Instead of capturing the stdout and stderr and
+                        presenting it in the summary of results, discard it
+                        completly for successful tests. --allow-stdout option
+                        overrides it.
   -k, --no-skip-report  Don't print the report of skipped tests after testing
                         is done. Skips will still show up in the progress
                         report and summary count.
