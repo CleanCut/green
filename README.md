@@ -436,7 +436,7 @@ version and none of us in my small shop had ever even heard of unit testing
 the test running.  If most of my projects at my day job hadn't moved to Python
 3,  I probably would have just stuck with trial, but at the time I wrote green
 [trial didn't run on Python 3](http://twistedmatrix.com/trac/ticket/5965)
-(still doesn't as I write this). Trial was and is the foundation for my
+(but since 15.4.0 it does). Trial was and is the foundation for my
 inspiration for having better-than-unittest output in the first place.  It's a
 great example of reducing redundancy (report module/class once, not on every
 line), lining up status vertically, and using color.  I feel like Green trumps
