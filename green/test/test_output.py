@@ -115,13 +115,13 @@ class TestGreenStream(unittest.TestCase):
         self.assertEqual(s.getvalue(), msg)
 
 
-    def testNoWindowsTrue(self):
+    def testDisableWindowsTrue(self):
         """
-        nowindows=True: ANSI color codes are present in the stream
+        disable_windows=True: ANSI color codes are present in the stream
         """
         c = Colors(termcolor=True)
         s = StringIO()
-        gs = GreenStream(s, no_windows=True)
+        gs = GreenStream(s, disable_windows=True)
         msg = c.red("some colored string")
         gs.write(msg)
         self.assertEqual(len(gs.stream.getvalue()), len(msg))
@@ -129,13 +129,13 @@ class TestGreenStream(unittest.TestCase):
 
     @unittest.skipIf(platform.system() != 'Windows',
                      "Colorama won't strip ANSI unless runing on Windows")
-    def testNoWindowsFalse(self):
+    def testDisableWindowsFalse(self):
         """
-        no_windows=False: Colorama strips ANSI color codes from the stream
+        disable_windows=False: Colorama strips ANSI color codes from the stream
         """
         c = Colors(termcolor=True)
         s = StringIO()
-        gs = GreenStream(s, override_appveyor=True, no_windows=False)
+        gs = GreenStream(s, override_appveyor=True, disable_windows=False)
         colored_msg = c.red("a")
         gs.write(colored_msg)
         import colorama

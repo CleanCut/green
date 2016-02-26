@@ -142,14 +142,16 @@ class GreenStream(object):
 
     indent_spaces = 2
 
-    def __init__(self, stream, override_appveyor=False, no_windows=False):
+    def __init__(self, stream, override_appveyor=False, disable_windows=False):
         self.stream = stream
         # Ironically, AppVeyor doesn't support windows win32 system calls for
         # colors, but it WILL interpret posix ansi escape codes!
-        if override_appveyor or (
-                (platform.system() == 'Windows')
-                and (not os.environ.get('APPVEYOR', False))
-                and not no_windows): # pragma: no cover
+        on_windows = platform.system() == 'Windows'
+        on_appveyor = os.environ.get('APPVEYOR', False)
+
+        if (override_appveyor
+                or ((on_windows and not on_appveyor)
+                    and not disable_windows)): # pragma: no cover
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.closed = False
 
