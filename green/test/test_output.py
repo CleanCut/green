@@ -135,10 +135,9 @@ class TestGreenStream(unittest.TestCase):
         """
         c = Colors(termcolor=True)
         s = StringIO()
-        gs = GreenStream(s, no_windows=False)
+        gs = GreenStream(s, override_appveyor=True, no_windows=False)
         colored_msg = c.red("a")
         gs.write(colored_msg)
-#        self.assertLess(len(gs.stream.getvalue()), len(colored_msg))
         import colorama
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
