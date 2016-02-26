@@ -133,6 +133,14 @@ class TestMain(unittest.TestCase):
         cmdline.main(testing=True)
 
 
+    def test_disableWindowsSupport(self):
+        """
+        --nowindows
+        """
+        cmdline.sys.argv = ['', '--nowindows']
+        cmdline.main(testing=True)
+
+
     def test_noCoverage(self):
         """
         The absence of coverage prompts a return code of 3
