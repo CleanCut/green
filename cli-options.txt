@@ -43,6 +43,7 @@ Concurrency Options:
 Format Options:
   -t, --termcolor       Force terminal colors on. Default is to autodetect.
   -T, --notermcolor     Force terminal colors off. Default is to autodetect.
+  -W, --nowindows       Disable Windows support by turning off Colorama.
 
 Output Options:
   -a, --allow-stdout    Instead of capturing the stdout and stderr and
