@@ -61,7 +61,7 @@ def run(suite, stream, args, testing=False):
     Any args.stream passed in will be wrapped in a GreenStream
     """
     if not issubclass(GreenStream, type(stream)):
-        stream = GreenStream(stream, disable_windows=args.nowindows)
+        stream = GreenStream(stream, disable_windows=args.disable_windows)
     result = GreenTestResult(args, stream)
 
     # Note: Catching SIGINT isn't supported by Python on windows (python

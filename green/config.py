@@ -48,7 +48,7 @@ default_args             = argparse.Namespace( # pragma: no cover
         finalizer        = '',
         termcolor        = None,
         notermcolor      = None,
-        nowindows        = False,
+        disable_windows  = False,
         allow_stdout     = False,
         quiet_stdout     = False,
         no_skip_report   = False,
@@ -199,7 +199,7 @@ def parseArguments(): # pragma: no cover
         help="Force terminal colors off.  Default is to autodetect.",
         default=argparse.SUPPRESS))
     store_opt(
-        format_args.add_argument('-W', '--nowindows', action='store_true',
+        format_args.add_argument('-W', '--disable-windows', action='store_true',
         help="Disable Windows support by turning off Colorama",
         default=argparse.SUPPRESS))
 
@@ -407,7 +407,7 @@ def mergeConfig(args, testing=False): # pragma: no cover
         if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
                 'help', 'logging', 'version', 'failfast', 'run_coverage',
                 'options', 'completions', 'completion_file', 'clear_omit',
-                'no_skip_report', 'nowindows']:
+                'no_skip_report', 'disable_windows']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint

@@ -135,9 +135,9 @@ class TestMain(unittest.TestCase):
 
     def test_disableWindowsSupport(self):
         """
-        --nowindows
+        --disable-windows
         """
-        cmdline.sys.argv = ['', '--nowindows']
+        cmdline.sys.argv = ['', '--disable-windows']
         cmdline.main(testing=True)
 
 
