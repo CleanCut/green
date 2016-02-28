@@ -12,5 +12,6 @@ install:
       - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
 test_script:
     - "%PYTHON%/python.exe -m green.cmdline -vvv -t green"
+    - "%PYTHON%/python.exe -m green.cmdline -vvv -W green"
 platform:
     - AnyCPU
