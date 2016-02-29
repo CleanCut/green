@@ -150,8 +150,8 @@ class GreenStream(object):
         on_appveyor = os.environ.get('APPVEYOR', False)
 
         if (override_appveyor
-                or ((on_windows and not on_appveyor)
-                    and not disable_windows)): # pragma: no cover
+                or ((on_windows and not on_appveyor))):
+                    #and not disable_windows)): # pragma: no cover
             self.stream = wrap_stream(self.stream, None, None, None, True)
         self.closed = False
 
