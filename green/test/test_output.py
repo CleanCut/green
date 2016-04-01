@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import platform
 import sys
 import unittest
 
@@ -112,3 +113,31 @@ class TestGreenStream(unittest.TestCase):
             bad_str = str(msg)
         gs.write(bad_str)
         self.assertEqual(s.getvalue(), msg)
+
+
+    def testDisableWindowsTrue(self):
+        """
+        disable_windows=True: ANSI color codes are present in the stream
+        """
+        c = Colors(termcolor=True)
+        s = StringIO()
+        gs = GreenStream(s, disable_windows=True)
+        msg = c.red("some colored string")
+        gs.write(msg)
+        self.assertEqual(len(gs.stream.getvalue()), len(msg))
+
+
+    @unittest.skipIf(platform.system() != 'Windows',
+                     "Colorama won't strip ANSI unless runing on Windows")
+    def testDisableWindowsFalse(self):
+        """
+        disable_windows=False: Colorama strips ANSI color codes from the stream
+        """
+        c = Colors(termcolor=True)
+        s = StringIO()
+        gs = GreenStream(s, override_appveyor=True, disable_windows=False)
+        colored_msg = c.red("a")
+        gs.write(colored_msg)
+        import colorama
+        self.assertTrue(issubclass(type(gs.stream),
+                        colorama.ansitowin32.StreamWrapper))

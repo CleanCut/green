@@ -36,7 +36,7 @@ def main(testing=False):
     if args.debug:
         green.output.debug_level = args.debug
 
-    stream = GreenStream(sys.stdout)
+    stream = GreenStream(sys.stdout, disable_windows=args.disable_windows)
 
     # Location of shell completion file
     if args.completion_file:
