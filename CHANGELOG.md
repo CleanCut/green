@@ -1,3 +1,16 @@
+# Version 2.4.0
+##### 1 April 2016
+
+- Added `-W/--disable-windows` to disable converting colors to windows format.
+  Useful for fake windows terminal environments that want the normal posix
+  color codes.  Contributed by Douglas Thor.
+
+- Minor documentation update.  Contributed by Thijs Triemstra.
+
+- Experimented with a coding style contributed by John Vandenberg.  Decided
+  we're not yet ready for that much structure.  Maybe someday in the future.
+
+
 # Version 2.3.0
 ##### 13 February 2016
 
@@ -8,6 +21,7 @@
 
 - Fixed Windows build due to URL change for `get-pip.py`.  Contributed by
   nMustaki.
+
 
 # Version 2.2.0
 ##### 26 October 2015
