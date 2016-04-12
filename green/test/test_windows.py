@@ -23,3 +23,6 @@ class TestWindows(unittest.TestCase):
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
 
+    def test_unicode_override(self):
+        pass
+

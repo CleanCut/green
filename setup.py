@@ -12,6 +12,7 @@ with open('README-pypi.rst') as readme_file:
 dependencies = [
     'colorama',
     'python-termstyle',
+    'unidecode',
 ]
 if sys.version_info[0] == 2:
     dependencies.append('mock')
