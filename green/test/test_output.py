@@ -8,6 +8,11 @@ try:
 except:
     from StringIO import StringIO
 
+try:
+    from unittest.mock import patch
+except:
+    from mock import patch
+
 from green.output import Colors, GreenStream, debug
 import green.output
 
@@ -141,3 +146,15 @@ class TestGreenStream(unittest.TestCase):
         import colorama
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
+
+
+    @patch('green.output.unidecode')
+    def testUnidecodeAppveyor(self, mock_unidecode):
+        """
+        When I'm on Appveyor, I run text through Unidecode
+        """
+        mock_unidecode.return_value = 'something'
+        s = StringIO()
+        gs = GreenStream(s, override_appveyor=True)
+        gs.write('something')
+        self.assertTrue(mock_unidecode.called)

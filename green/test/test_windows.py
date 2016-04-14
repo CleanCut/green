@@ -22,7 +22,3 @@ class TestWindows(unittest.TestCase):
         gs = GreenStream(sys.stdout, override_appveyor=True)
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
-
-    def test_unicode_override(self):
-        pass
-

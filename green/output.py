@@ -170,6 +170,7 @@ class GreenStream(object):
     def write(self, text):
         if type(text) == bytes:
             text = text.decode('utf-8')
+        # Compensate for windows' anti-social unicode behavior
         if (self.override_appveyor
                 or ((self.on_windows and not self.on_appveyor)
                     and not self.disable_windows)): # pragma: no cover
