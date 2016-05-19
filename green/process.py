@@ -297,6 +297,11 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         # Loading was successful, lets do this
         try:
             test.run(result)
+            # If your class setUpClass(self) method crashes, the test doesn't
+            # raise an exception, but it does an an entry to errors.
+            if result and getattr(result, 'errors', False):
+                queue.put(test)
+                queue.put(result)
         except:
             # Some frameworks like testtools record the error AND THEN let it
             # through to crash things.  So we only need to manufacture another error
