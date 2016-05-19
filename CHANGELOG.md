@@ -1,3 +1,11 @@
+# Version 2.4.1
+##### 19 May 2016
+
+- The built-in unittest module (stupidly) reports crashes in setUpClass() in a
+  completely different way than any other failure or crash in unittest.  Now we
+  handle that way.  Fixes #121.
+
+
 # Version 2.4.0
 ##### 1 April 2016
 
