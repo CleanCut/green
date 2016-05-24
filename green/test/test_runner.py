@@ -194,8 +194,10 @@ class TestRun(unittest.TestCase):
         """
         When we don't find any tests, we say so.
         """
-        run(GreenTestSuite(), self.stream, self.args)
+        result = run(GreenTestSuite(), self.stream, self.args)
         self.assertIn('No Tests Found', self.stream.getvalue())
+        self.assertEqual(result.testsRun, 0)
+        self.assertEqual(result.wasSuccessful(), False)
 
     def test_failedSaysSo(self):
         """

@@ -417,7 +417,7 @@ class GreenTestResult(BaseTestResult):
             if obj_list:
                 stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
         if not stats:
-            self.stream.writeln(self.colors.passing("No Tests Found"))
+            self.stream.writeln(self.colors.failing("No Tests Found"))
         else:
             grade = self.colors.passing('OK')
             if self.errors or self.failures:
@@ -616,4 +616,8 @@ class GreenTestResult(BaseTestResult):
         """
         Tells whether or not the overall run was successful
         """
-        return len(self.all_errors) == 0
+        # fail if no tests are run.
+        if len(self.all_errors) == 0 and len(self.passing) == 0:
+            return False
+        else:
+            return len(self.all_errors) == 0
