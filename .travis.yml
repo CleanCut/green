@@ -13,10 +13,12 @@ install:
   - "pip install ."
   - "pip install virtualenv"
   - "pip install coveralls"
-  - "pip install flake8-putty"
 script:
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
 matrix:
+    include:
+        - os: osx
+        - language: generic
     allow_failures:
         - os: "osx"
