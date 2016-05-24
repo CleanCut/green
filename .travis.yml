@@ -14,6 +14,10 @@ matrix:
           before_install:
               - brew update
               - sudo easy_install pip
+        install:
+          - "sudo pip install ."
+          - "sudo pip install virtualenv"
+          - "sudo pip install coveralls"
         - os: osx
           osx_image: xcode7.3
           language: generic
