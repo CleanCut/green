@@ -11,21 +11,26 @@ matrix:
         - os: osx
           osx_image: xcode7.1
           language: generic
+          before_install:
+              - brew update
+              - brew install python
         - os: osx
           osx_image: xcode7.3
           language: generic
           env: BREW_PYTHON="python3"
+          script: "make test"
         - os: linux
           python: 2.7
           language: python
         - os: linux
           python: 3.4
-          sudo: required
+          language: python
         - os: linux
           python: 3.5
           language: python
-          sudo: required
         - os: linux
           python: pypy
+          language: python
         - os: linux
           python: pypy3
+          language: python
