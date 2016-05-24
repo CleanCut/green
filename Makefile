@@ -27,7 +27,7 @@ test-local:
 	@sudo -H make test-installed
 	make test-versions
 	make test-coverage
-	@# test-coverage needs to be last in deps, don't clean after it runs!
+	# test-coverage needs to be last in deps, don't clean after it runs!
 
 test-coverage:
 	# Coverage of green should not include coverage of the example project
@@ -51,6 +51,8 @@ test-installed:
 	@echo "\n(test-installed) completed\n"
 
 test-versions:
+	# If we're doing a travis build on a Mac platform that needs a custom python installed, then install it.
+	@if [ "$(BREW_PYTHON)" != "" ] ; then brew update && brew install $(BREW_PYTHON) ; fi
 	# Run the in-place stub under all python versions in the path
 	@make clean-silent
 	./test_versions
