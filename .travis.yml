@@ -1,8 +1,8 @@
 sudo: false
 install:
   - "python -m pip install ."
-  - "pipython -m pip install virtualenv"
-  - "pipython -m pip install coveralls"
+  - "python -m pip install virtualenv"
+  - "python -m pip install coveralls"
 script:
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
