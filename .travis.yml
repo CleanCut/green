@@ -13,31 +13,33 @@ matrix:
           language: generic
           before_install:
               - brew update
-              - sudo easy_install pip
-        install:
-          - "sudo pip install ."
-          - "sudo pip install virtualenv"
-          - "sudo pip install coveralls"
+              - brew install python
+              - hash -r
         - os: osx
           osx_image: xcode7.3
           language: generic
           before_install:
               - brew update
               - brew install python3
-              - which python3
-              - which pip3
+              - ln -s /usr/local/bin/python3 /usr/local/bin/python
+              - ln -s /usr/local/bin/pip3 /usr/local/bin/pip
         - os: osx
           osx_image: xcode7.3
           language: generic
           before_install:
               - brew update
               - brew install pypy
+              - ln -s /usr/local/bin/pypy /usr/local/bin/python
+              - which pip
         - os: osx
           osx_image: xcode7.3
           language: generic
           before_install:
               - brew update
               - brew install pypy3
+              - ln -s /usr/local/bin/pypy3 /usr/local/bin/python
+              - which pip
+              - which pip3
         - os: linux
           python: 2.7
           language: python
