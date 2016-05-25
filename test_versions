@@ -45,10 +45,10 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         exit 5
     fi
 
-    if [ "${TRAVIS}" == "true" ] ; then
-        pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
-        continue
-    fi
+    #if [ "${TRAVIS}" == "true" ] ; then
+        #pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
+        #continue
+    #fi
 
     if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
         echo "Please install virtualenv under ${PYTHON}"
@@ -86,7 +86,7 @@ for TEST in ${TESTS} ; do
         echo ""
         set -x
         # Actually run it!
-        if ! PYTHONPATH="." ${PYTHON} -m green.cmdline -s 8 ${TEST} ; then
+        if ! PYTHONPATH="." ${PYTHON} -m green.cmdline -s 8 -k ${TEST} ; then
             exit 3
         fi
         { set +x; } 2>/dev/null
