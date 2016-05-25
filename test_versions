@@ -45,6 +45,11 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         exit 5
     fi
 
+    # Don't know why this is only a problem on linux+pypy3+travisci
+    if [ "${TRAVIS_PYTHON_VERSION}" == "pypy3" ] ; then
+        pip install virtualenv
+    fi
+
     if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
         echo "Please install virtualenv under ${PYTHON}"
         exit 6
