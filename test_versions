@@ -86,7 +86,7 @@ for TEST in ${TESTS} ; do
         echo ""
         set -x
         # Actually run it!
-        if ! PYTHONPATH="." ${PYTHON} -m green.cmdline -s 8 -k ${TEST} ; then
+        if ! PYTHONPATH="." ${PYTHON} -m green.cmdline -s 0 -k ${TEST} ; then
             exit 3
         fi
         { set +x; } 2>/dev/null
