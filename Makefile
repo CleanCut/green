@@ -18,7 +18,7 @@ super-clean: super-clean-message clean-silent
 
 
 test: test-versions test-installed test-coverage
-	# test-coverage needs to be last in deps, don't clean after it runs!
+	@# test-coverage needs to be last in deps, don't clean after it runs!
 	@echo "\n(test) completed\n"
 
 test-local:
@@ -27,14 +27,14 @@ test-local:
 	@sudo -H make test-installed
 	make test-versions
 	make test-coverage
-	# test-coverage needs to be last in deps, don't clean after it runs!
+	@# test-coverage needs to be last in deps, don't clean after it runs!
 
 test-coverage:
 	# Coverage of green should not include coverage of the example project
 	@make clean-silent
 	! ./g -r green | grep example/
 	@make clean-silent
-	# Generate coverage files for travis builds (don't clean after this!)
+	@# Generate coverage files for travis builds (don't clean after this!)
 	./g -s 0 -r -vvv green
 	@echo "\n(test-coverage) completed\n"
 
