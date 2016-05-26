@@ -30,7 +30,12 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         PYTHON=pypy
         shift
     elif [ "${PYTHON_VERSION}" == "pypy3" ] ; then
-        PYTHON=pypy3
+        # Don't know why this is only a problem on linux+pypy3+travisci
+        if [ "${TRAVIS_PYTHON_VERSION}" == "pypy3" ] ; then
+            PYTHON=${VENV_DIR}/python
+        else
+            PYTHON=pypy3
+        fi
         shift
     elif [[ -e `which python${PYTHON_VERSION}` ]] ; then
         PYTHON=python${PYTHON_VERSION}
@@ -43,15 +48,6 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     if ! ${PYTHON} -m pip > /dev/null ; then
         echo "Please install pip under ${PYTHON}"
         exit 5
-    fi
-
-    # Don't know why this is only a problem on linux+pypy3+travisci
-    if [ "${TRAVIS_PYTHON_VERSION}" == "pypy3" ] ; then
-        echo "contents of ${VIRTUAL_ENV}"
-        ls ${VIRTUAL_ENV}/bin
-        echo "contents of /opt/python/pypy3-2.4.0/bin"
-        ls /opt/python/pypy3-2.4.0/bin
-        sudo /opt/python/pypy3-2.4.0/bin/pip install virtualenv
     fi
 
     if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
