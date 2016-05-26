@@ -80,7 +80,7 @@ Other Options:
                         Pattern to match test method names after 'test'.
                         Default is '*', meaning match methods named 'test*'.
 
-Coverage Options (Coverage 3.7.1):
+Coverage Options (Coverage 4.0.3):
   -r, --run-coverage    Produce coverage output.
   -O, --clear-omit      Green tries really hard to set up a good list of
                         patterns of files to omit from coverage reports. If

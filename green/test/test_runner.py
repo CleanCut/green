@@ -350,6 +350,7 @@ class TestProcesses(unittest.TestCase):
             """
             import os
             import tempfile
+            import time
             import unittest
             import {}.some_module
             class A(unittest.TestCase):
@@ -361,13 +362,21 @@ class TestProcesses(unittest.TestCase):
                         fh = open(self.filename, 'w')
                         fh.write(msg)
                         fh.close()
-                        self.assertEqual(msg, open(self.filename).read())
+                        time.sleep(.01)
+                        fh = open(self.filename)
+                        actual = fh.read()
+                        fh.close()
+                        self.assertEqual(msg, actual)
                 def testTwo(self):
                     for msg in [str(x) for x in range(100,200)]:
                         fh = open(self.filename, 'w')
                         fh.write(msg)
                         fh.close()
-                        self.assertEqual(msg, open(self.filename).read())
+                        time.sleep(.01)
+                        fh = open(self.filename)
+                        actual = fh.read()
+                        fh.close()
+                        self.assertEqual(msg, actual)
             """.format(os.path.basename(sub_tmpdir))))
         fh.close()
         # Load the tests

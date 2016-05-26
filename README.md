@@ -31,7 +31,7 @@ Features
 
 - **Clean** - Low redundancy in output. Result statistics for each test is vertically aligned.
 - **Colorful** - Terminal output makes good use of color when the terminal supports it.
-- **Fast** - Tests run in independent processes.  (Only 1 by default for compatibility, try `-s 0` for best results)
+- **Fast** - Tests run in independent processes.  (One per processor by default.  Does *not* play nicely with `gevent`)
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.

@@ -1,22 +1,79 @@
 sudo: false
-os:
-  - "linux"
-  - "osx"
-language: "python"
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "pypy"
-  - "pypy3"
 install:
   - "pip install ."
   - "pip install virtualenv"
   - "pip install coveralls"
-  - "pip install flake8-putty"
 script:
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
 matrix:
-    allow_failures:
-        - os: "osx"
+    include:
+        - os: osx
+          osx_image: xcode7.1
+          language: generic
+          env: HINT=Yosemite
+          before_install:
+              - brew update
+              - sleep 1
+              - brew install python
+              - sleep 1
+              - brew install python3
+              - sleep 1
+              - brew install pypy
+              - sleep 1
+              - brew install pypy3
+              - sleep 1
+              - pip3 install .
+              - sleep 1
+              - pip3 install virtualenv
+              - sleep 1
+              - pip_pypy install .
+              - sleep 1
+              - pip_pypy install virtualenv
+              - sleep 1
+              - pip_pypy3 install .
+              - sleep 1
+              - pip_pypy3 install virtualenv
+              - sleep 1
+        - os: osx
+          osx_image: xcode7.3
+          language: generic
+          env: HINT=ElCapitan
+          before_install:
+              - brew update
+              - sleep 1
+              - brew install python
+              - sleep 1
+              - brew install python3
+              - sleep 1
+              - brew install pypy
+              - sleep 1
+              - brew install pypy3
+              - sleep 1
+              - pip3 install .
+              - sleep 1
+              - pip3 install virtualenv
+              - sleep 1
+              - pip_pypy install .
+              - sleep 1
+              - pip_pypy install virtualenv
+              - sleep 1
+              - pip_pypy3 install .
+              - sleep 1
+              - pip_pypy3 install virtualenv
+              - sleep 1
+        - os: linux
+          python: 2.7
+          language: python
+        - os: linux
+          python: 3.4
+          language: python
+        - os: linux
+          python: 3.5
+          language: python
+        - os: linux
+          python: pypy
+          language: python
+        - os: linux
+          python: pypy3
+          language: python
