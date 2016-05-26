@@ -173,6 +173,10 @@ class GreenStream(object):
             text = text.decode('utf-8')
         # Compensate for windows' anti-social unicode behavior
         if self._ascii_only_output:
+            # on Python 2, convert text explicitely to unicode. Python 3 is
+            # all-unicode by default
+            if platform.python_version_tuple()[0] == '2': # pragma: no cover
+                text = unicode(text)
             text = unidecode(text)
         self.stream.write(text)
 
