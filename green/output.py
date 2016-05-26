@@ -183,7 +183,7 @@ class GreenStream(object):
             # And then appveyor has to muck everything up by using a posix-like
             # stdout system on top of Windows, which means we've got to
             # special-case it all over the place.
-            if self.on_appveyor:
+            if self.on_appveyor: # pragma: no cover
                 text = unicode(text)
         self.stream.write(text)
 
