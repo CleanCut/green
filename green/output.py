@@ -6,6 +6,7 @@ import os
 import platform
 import sys
 import termstyle
+from unidecode import unidecode
 
 global debug_level
 debug_level = 0
@@ -141,6 +142,7 @@ class GreenStream(object):
     """
 
     indent_spaces = 2
+    _ascii_only_output = False  # default to printing output in unicode
 
     def __init__(self, stream, override_appveyor=False, disable_windows=False):
         self.stream = stream
@@ -153,6 +155,8 @@ class GreenStream(object):
                 or ((on_windows and not on_appveyor)
                     and not disable_windows)): # pragma: no cover
             self.stream = wrap_stream(self.stream, None, None, None, True)
+            # set output is ascii-only
+            self._ascii_only_output = True
         self.closed = False
 
 
@@ -167,6 +171,13 @@ class GreenStream(object):
     def write(self, text):
         if type(text) == bytes:
             text = text.decode('utf-8')
+        # Compensate for windows' anti-social unicode behavior
+        if self._ascii_only_output:
+            # on Python 2, convert text explicitely to unicode. Python 3 is
+            # all-unicode by default
+            if platform.python_version_tuple()[0] == '2': # pragma: no cover
+                text = unicode(text)
+            text = unidecode(text)
         self.stream.write(text)
 
 

@@ -1,3 +1,4 @@
 colorama
 mock
 python-termstyle
+unidecode
