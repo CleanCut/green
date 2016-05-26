@@ -32,7 +32,6 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     elif [ "${PYTHON_VERSION}" == "pypy3" ] ; then
         # Don't know why this is only a problem on linux+pypy3+travisci
         if [ "${TRAVIS_PYTHON_VERSION}" == "pypy3" ] ; then
-            env
             PYTHON=${VIRTUAL_ENV}/bin/python
         else
             PYTHON=pypy3
