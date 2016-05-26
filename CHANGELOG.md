@@ -1,3 +1,14 @@
+# Version 2.4.2
+##### 26 May 2016
+
+- On Windows we now mangle non-ascii output into ascii output,
+  because...Windows.  Contributed by MinchinWeb.  Fixes #119.
+
+- We now run TravisCI builds for OS X 10.10 and 10.11.  We had already been
+  manually running tests on the latest OS X, but now TravisCI will do it for
+  us.
+
+
 # Version 2.4.1
 ##### 19 May 2016
 
