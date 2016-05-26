@@ -51,7 +51,7 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         ls ${VIRTUAL_ENV}/bin
         echo "contents of /opt/python/pypy3-2.4.0/bin"
         ls /opt/python/pypy3-2.4.0/bin
-        ${VIRTUAL_ENV}/bin/pip install virtualenv
+        /opt/python/pypy3-2.4.0/bin/pip install virtualenv
     fi
 
     if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
