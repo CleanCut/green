@@ -830,6 +830,8 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        self.assertEqual(gtr.wasSuccessful(), False)
+        gtr.passing.append('anything')
         self.assertEqual(gtr.wasSuccessful(), True)
         gtr.all_errors.append('anything')
         self.assertEqual(gtr.wasSuccessful(), False)
