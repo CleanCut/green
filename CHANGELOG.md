@@ -1,3 +1,12 @@
+# Version 2.5.0
+##### 31 May 2016
+
+- No tests being loaded is now reported as an error, rather than a pass.  This
+  should help people more quickly discover when they have a typo in their
+  command-line resulting in no tests being loaded.  Contributed by Douglas
+  Thor.  Fixes #123.
+
+
 # Version 2.4.2
 ##### 26 May 2016
 
