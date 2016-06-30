@@ -1,3 +1,15 @@
+# Version 2.5.1
+##### 30 June 2016
+
+- Expose `green.version.__version__` as `green.__version__`. Reported by Bryant
+  Mairs. Fixes #128.
+
+- Fix a crash that could occur if the test loader loaded an unrunnable object.
+  Contributed by Eli Skeggs. PR #125.
+
+- Fixed a source of a double-submission bug that was being worked around
+  internally.  Contributed by Eli Skeggs.  PR #126.
+
 # Version 2.5.0
 ##### 31 May 2016
 
