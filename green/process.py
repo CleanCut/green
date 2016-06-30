@@ -288,7 +288,6 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)
-        queue.put(t)
         queue.put(result)
         cleanup()
         return
