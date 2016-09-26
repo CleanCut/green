@@ -4,10 +4,7 @@ from __future__ import print_function
 from fnmatch import fnmatch
 import sys
 from unittest.suite import _isnotsuite, TestSuite
-try:
-    from io import StringIO
-except: # pragma: no cover
-    from cStringIO import StringIO
+from io import StringIO
 
 from green.config import default_args
 from green.output import GreenStream

@@ -149,10 +149,10 @@ class GreenStream(object):
         # Ironically, AppVeyor doesn't support windows win32 system calls for
         # colors, but it WILL interpret posix ansi escape codes!
         on_windows = platform.system() == 'Windows'
-        self.on_appveyor = os.environ.get('APPVEYOR', False)
+        on_appveyor = os.environ.get('APPVEYOR', False)
 
         if (override_appveyor
-                or ((on_windows and not self.on_appveyor)
+                or ((on_windows and not on_appveyor)
                     and not disable_windows)): # pragma: no cover
             self.stream = wrap_stream(self.stream, None, None, None, True)
             # set output is ascii-only
@@ -173,18 +173,9 @@ class GreenStream(object):
             text = text.decode('utf-8')
         # Compensate for windows' anti-social unicode behavior
         if self._ascii_only_output:
-            # on Python 2, convert text explicitely to unicode. Python 3 is
-            # all-unicode by default
-            if platform.python_version_tuple()[0] == '2': # pragma: no cover
-                text = unicode(text)
-            # Then, of course, Windows doesn't actually want unicode, so we get
+            # Windows doesn't actually want unicode, so we get
             # the closest ASCII equivalent
-            text = unidecode(text)
-            # And then appveyor has to muck everything up by using a posix-like
-            # stdout system on top of Windows, which means we've got to
-            # special-case it all over the place.
-            if self.on_appveyor: # pragma: no cover
-                text = unicode(text)
+            text = text_type(unidecode(text))
         self.stream.write(text)
 
 
