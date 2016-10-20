@@ -140,7 +140,27 @@ class LoggingDaemonlessPool(Pool):
 import platform
 import multiprocessing.pool
 from multiprocessing import util
-from multiprocessing.pool import MaybeEncodingError
+try:
+    from multiprocessing.pool import MaybeEncodingError
+except:
+    # Python 2.7.4 introduced this class.  If we're on Python 2.7.0 to 2.7.3
+    # then we'll have to define it ourselves. :-/
+    class MaybeEncodingError(Exception):
+        """Wraps possible unpickleable errors, so they can be
+        safely sent through the socket."""
+
+        def __init__(self, exc, value):
+            self.exc = repr(exc)
+            self.value = repr(value)
+            super(MaybeEncodingError, self).__init__(self.exc, self.value)
+
+        def __str__(self):
+            return "Error sending result: '%s'. Reason: '%s'" % (self.value,
+                                                                 self.exc)
+
+        def __repr__(self):
+            return "<MaybeEncodingError: %s>" % str(self)
+
 
 # Python 2 and 3 raise a different error when they exit
 if platform.python_version_tuple()[0] == '2': # pragma: no cover
