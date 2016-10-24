@@ -142,7 +142,7 @@ import multiprocessing.pool
 from multiprocessing import util
 try:
     from multiprocessing.pool import MaybeEncodingError
-except:
+except: # pragma: no cover
     # Python 2.7.4 introduced this class.  If we're on Python 2.7.0 to 2.7.3
     # then we'll have to define it ourselves. :-/
     class MaybeEncodingError(Exception):
