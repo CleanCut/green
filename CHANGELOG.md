@@ -1,3 +1,22 @@
+# Version 2.5.2
+##### 20 October 2016
+
+- Fix crash that would occur on Python 2.7.0, 2.7.1, 2.7.2, and 2.7.3.
+  Reported by Christopher Gurnee.  Fixes #137.
+
+- Fix print statements inside of tests on Windows with Python 2.7.  Contributed
+  by Christopher Gurnee.  PR #138.
+
+- Remove TravisCI builds for Xcode 7.1, since they no longer support those
+  builds.  Unfortunately, the other OS X builds on Travis are broken for some
+  reason that doesn't exist on real OS X.  If anyone has any ideas, please
+  share.
+
+- Remaining OS X builds on TravisCI are failing right now trying to execute
+  PyPy itself (library linking errors).  Since the tests work fine on actual OS
+  X installations, I'm going to ignore the failing builds and shake my hand
+  furiously at TravisCI.
+
 # Version 2.5.1
 ##### 30 June 2016
 
