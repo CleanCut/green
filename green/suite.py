@@ -33,10 +33,11 @@ class GreenTestSuite(TestSuite):
         Override default behavior with some green-specific behavior.
         """
         if (self.full_test_pattern
-        # test can actually be suites and things.  Only tests have _testMethodName
+        # test can actually be suites and things.  Only tests have
+        # _testMethodName
                 and getattr(test, '_testMethodName', False)
-        # Fake test cases (generated for module import failures, for example) do
-        # not start with 'test'.  We still want to see those fake cases.
+        # Fake test cases (generated for module import failures, for example)
+        # do not start with 'test'.  We still want to see those fake cases.
                 and test._testMethodName.startswith('test')
                 ):
             if not fnmatch(test._testMethodName, self.full_test_pattern):
@@ -97,7 +98,7 @@ class GreenTestSuite(TestSuite):
                 result._previousTestClass = test.__class__
 
                 if (getattr(test.__class__, '_classSetupFailed', False) or
-                    getattr(result, '_moduleSetUpFailed', False)):
+                        getattr(result, '_moduleSetUpFailed', False)):
                     continue
 
                 if not self.allow_stdout:
@@ -116,14 +117,14 @@ class GreenTestSuite(TestSuite):
                     sys.stderr = saved_stderr
                     result.recordStdout(test, captured_stdout.getvalue())
                     result.recordStderr(test, captured_stderr.getvalue())
-                # Since we're intercepting the stdout/stderr out here at the suite
-                # level, we need to poke the test result and let it know when we're
-                # ready to transmit results back up to the parent process.  I would
-                # rather just do it automatically at test stop time, but we don't
-                # have the captured stuff at that point.  Messy...but the only other
-                # alternative I can think of is monkey-patching loaded TestCases --
-                # which could be from unittest or twisted or some other custom
-                # subclass.
+                # Since we're intercepting the stdout/stderr out here at the
+                # suite level, we need to poke the test result and let it know
+                # when we're ready to transmit results back up to the parent
+                # process.  I would rather just do it automatically at test
+                # stop time, but we don't have the captured stuff at that
+                # point.  Messy...but the only other alternative I can think of
+                # is monkey-patching loaded TestCases -- which could be from
+                # unittest or twisted or some other custom subclass.
                 result.finalize()
 
             self._removeTestAtIndex(index)

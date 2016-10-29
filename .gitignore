@@ -40,3 +40,6 @@ tags
 
 # virtualenvs
 venv*
+env*
+
+*.sublime-workspace

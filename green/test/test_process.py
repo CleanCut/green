@@ -20,17 +20,17 @@ except:
 
 class TestProcessLogger(unittest.TestCase):
 
-
     def test_callThrough(self):
         """
         Calls are passed through to the wrapped callable
         """
         message = "some message"
+
         def func():
             return message
+
         l = ProcessLogger(func)
         self.assertEqual(l(), message)
-
 
     def test_exception(self):
         """
@@ -38,24 +38,27 @@ class TestProcessLogger(unittest.TestCase):
         """
         saved_get_logger = process.multiprocessing.get_logger
         mock_logger = MagicMock()
+
         def addHandler(ignore):
             mock_logger.handlers = [MagicMock()]
+
         mock_logger.addHandler = addHandler
         mock_logger.handlers = False
         mock_get_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
         process.multiprocessing.get_logger = mock_get_logger
-        self.addCleanup(setattr, process.multiprocessing, 'get_logger', saved_get_logger)
+        self.addCleanup(setattr, process.multiprocessing, 'get_logger',
+                        saved_get_logger)
+
         def func():
             raise AttributeError
+
         l = ProcessLogger(func)
         self.assertRaises(AttributeError, l)
         mock_get_logger.assert_any_call()
 
 
-
 class TestDaemonlessProcess(unittest.TestCase):
-
 
     def test_daemonIsFalse(self):
         """
@@ -73,16 +76,13 @@ class TestDaemonlessProcess(unittest.TestCase):
         self.assertEqual(dp.daemon, False)
 
 
-
 class TestPoolRunner(unittest.TestCase):
-
 
     # Setup
     @classmethod
     def setUpClass(cls):
         cls.startdir = os.getcwd()
         cls.container_dir = tempfile.mkdtemp()
-
 
     @classmethod
     def tearDownClass(cls):
@@ -91,16 +91,13 @@ class TestPoolRunner(unittest.TestCase):
         cls.startdir = None
         shutil.rmtree(cls.container_dir)
 
-
     def setUp(self):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
 
-
     def tearDown(self):
         os.chdir(self.container_dir)
         shutil.rmtree(self.tmpdir)
-
 
     # Tests
     def test_normalRun(self):
@@ -133,7 +130,6 @@ class TestPoolRunner(unittest.TestCase):
         result.get()
         self.assertEqual(len(result.get().passing), 1)
 
-
     def test_SyntaxErrorInUnitTest(self):
         """
         SyntaxError gets reported as an error loading the unit test
@@ -156,7 +152,6 @@ class TestPoolRunner(unittest.TestCase):
         poolRunner(basename, result, 1)
         result.get()
         self.assertEqual(len(result.get().errors), 1)
-
 
     def test_error(self):
         """
@@ -184,5 +179,3 @@ class TestPoolRunner(unittest.TestCase):
         poolRunner(module_name, result)
         result.get()
         self.assertEqual(len(result.get().errors), 1)
-
-

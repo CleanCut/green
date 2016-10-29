@@ -1,5 +1,5 @@
-from __future__ import unicode_literals # pragma: no cover
-from __future__ import print_function   # pragma: no cover
+from __future__ import unicode_literals  # pragma: no cover
+from __future__ import print_function    # pragma: no cover
 """
 Configuration settings are read in this order:
 
@@ -29,20 +29,20 @@ except:                     # pragma: no cover
     coverage = None
     coverage_version = "Coverage Not Installed"
 
-import copy                 # pragma: no cover
-import logging              # pragma: no cover
-import os                   # pragma: no cover
-import sys                  # pragma: no cover
-import tempfile             # pragma: no cover
-from textwrap import dedent # pragma: no cover
-import multiprocessing      # pragma: no cover
+import copy                  # pragma: no cover
+import logging               # pragma: no cover
+import os                    # pragma: no cover
+import sys                   # pragma: no cover
+import tempfile              # pragma: no cover
+from textwrap import dedent  # pragma: no cover
+import multiprocessing       # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.
-files_loaded = [] # pragma: no cover
+files_loaded = []  # pragma: no cover
 
 # Set the defaults in a re-usable way
-default_args             = argparse.Namespace( # pragma: no cover
-        targets          = ['.'], # Not in configs
+default_args             = argparse.Namespace(  # pragma: no cover
+        targets          = ['.'],  # Not in configs
         processes        = multiprocessing.cpu_count(),
         initializer      = '',
         finalizer        = '',
@@ -52,7 +52,7 @@ default_args             = argparse.Namespace( # pragma: no cover
         allow_stdout     = False,
         quiet_stdout     = False,
         no_skip_report   = False,
-        help             = False, # Not in configs
+        help             = False,  # Not in configs
         version          = False,
         logging          = False,
         debug            = 0,
@@ -76,25 +76,21 @@ default_args             = argparse.Namespace( # pragma: no cover
         )
 
 
-class StoreOpt(): # pragma: no cover
+class StoreOpt():  # pragma: no cover
     """
     Helper class for storing lists of the options themselves to hand out to the
     shell completion scripts.
     """
 
-
     def __init__(self):
         self.options = []
         self.options = []
-
 
     def __call__(self, action):
         self.options.extend(action.option_strings[0:2])
 
 
-
-
-def parseArguments(): # pragma: no cover
+def parseArguments():  # pragma: no cover
     """
     I parse arguments in sys.argv and return the args object.  The parser
     itself is available as args.parser.
@@ -168,20 +164,20 @@ def parseArguments(): # pragma: no cover
             "files, sockets, ports, etc.) for the multi-process mode to work "
             "well (--initializer and --finalizer can help provision "
             "per-process resources). Default is to run the same number of "
-            "processes as your machine has logical CPUs. Note that for a small "
-            "number of trivial tests, running everything in a single process "
-            "may be faster than the overhead of initializing all the "
+            "processes as your machine has logical CPUs. Note that for a "
+            "small number of trivial tests, running everything in a single "
+            "process may be faster than the overhead of initializing all the "
             "processes.",
-        default=argparse.SUPPRESS))
+            default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-i', '--initializer', action='store',
             metavar='DOTTED_FUNCTION',
             help="Python function to run inside of a single worker process "
             "before it starts running tests.  This is the way to provision "
             "external resources that each concurrent worker process needs to "
-            "have exclusive access to. Specify the function in dotted notation "
-            "in a way that will be importable from the location you are "
-            "running green from.",
+            "have exclusive access to. Specify the function in dotted "
+            "notation in a way that will be importable from the location you "
+            "are running green from.",
             default=argparse.SUPPRESS))
     store_opt(
         concurrency_args.add_argument('-z', '--finalizer', action='store',
@@ -205,13 +201,13 @@ def parseArguments(): # pragma: no cover
 
     out_args = parser.add_argument_group("Output Options")
     store_opt(out_args.add_argument('-a', '--allow-stdout', action='store_true',
-        help=("Instead of capturing the stdout and stderr and presenting it in "
-        "the summary of results, let it come through."),
+        help=("Instead of capturing the stdout and stderr and presenting it "
+        "in the summary of results, let it come through."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-q', '--quiet-stdout', action='store_true',
-        help=("Instead of capturing the stdout and stderr and presenting it in "
-        "the summary of results, discard it completly for successful tests. "
-        "--allow-stdout option overrides it."),
+        help=("Instead of capturing the stdout and stderr and presenting it "
+        "in the summary of results, discard it completly for successful "
+        "tests. --allow-stdout option overrides it."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-k', '--no-skip-report',
         action='store_true', help=("Don't print the report of skipped tests "
@@ -232,8 +228,9 @@ def parseArguments(): # pragma: no cover
         "be specified up to three times for more debug output."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-v', '--verbose', action='count',
-        help=("Verbose. Can be specified up to three times for more verbosity. "
-        "Recommended levels are -v and -vv."), default=argparse.SUPPRESS))
+        help=("Verbose. Can be specified up to three times for more "
+        "vebosity. Recommended levels are -v and -vv."),
+        default=argparse.SUPPRESS))
 
     other_args = parser.add_argument_group("Other Options")
     store_opt(other_args.add_argument('-f', '--failfast', action='store_true',
@@ -258,12 +255,12 @@ def parseArguments(): # pragma: no cover
         help=("Produce coverage output."), default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-O', '--clear-omit', action='store_true',
         help=("Green tries really hard to set up a good list of patterns of "
-            "files to omit from coverage reports.  If the default list catches "
-            "files that you DO want to cover you can specify this flag to "
-            "leave the default list empty to start with.  You can then add "
-            "patterns back in with --omit-add. The default list is something"
-            "like'*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python system "
-            "packages)*' -- only longer."),
+            "files to omit from coverage reports.  If the default list "
+            "catches files that you DO want to cover you can specify this "
+            "flag to leave the default list empty to start with.  You can "
+            "then add patterns back in with --omit-add. The default list is "
+            "something like'*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python "
+            "system packages)*' -- only longer."),
         default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-u', '--include-patterns', action='store',
         metavar='PATTERN',
@@ -287,8 +284,8 @@ def parseArguments(): # pragma: no cover
             "COMPLETION below."), default=argparse.SUPPRESS))
     store_opt(integration_args.add_argument('--completions',
         action='store_true',
-        help=("Output possible completions of the given target.  Used by bash- "
-        "and zsh-completion."), default=argparse.SUPPRESS))
+        help=("Output possible completions of the given target.  Used by "
+        "bash- and zsh-completion."), default=argparse.SUPPRESS))
     store_opt(integration_args.add_argument('--options', action='store_true',
         help="Output all options.  Used by bash- and zsh-completion.",
         default=argparse.SUPPRESS))
@@ -302,7 +299,7 @@ def parseArguments(): # pragma: no cover
     return args
 
 
-class ConfigFile(object): # pragma: no cover
+class ConfigFile(object):  # pragma: no cover
     """
     Filehandle wrapper that adds a "[green]" section to the start of a config
     file so that users don't actually have to manually add a [green] section.
@@ -310,11 +307,9 @@ class ConfigFile(object): # pragma: no cover
     Works with configparser versions from both Python 2 and 3
     """
 
-
     def __init__(self, filepath):
         self.first = True
         self.lines = open(filepath).readlines()
-
 
     # Python 2
     def readline(self):
@@ -323,11 +318,9 @@ class ConfigFile(object): # pragma: no cover
         except StopIteration:
             return ''
 
-
     # Python 3
     def __iter__(self):
         return self
-
 
     def __next__(self):
         if self.first:
@@ -338,10 +331,9 @@ class ConfigFile(object): # pragma: no cover
         raise StopIteration
 
 
-
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
-def getConfig(filepath=None): # pragma: no cover
+def getConfig(filepath=None):  # pragma: no cover
     """
     Get the Green config file settings.
 
@@ -384,7 +376,7 @@ def getConfig(filepath=None): # pragma: no cover
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
-def mergeConfig(args, testing=False): # pragma: no cover
+def mergeConfig(args, testing=False):  # pragma: no cover
     """
     I take in a namespace created by the ArgumentParser in cmdline.main() and
     merge in options from configuration files.  The config items only replace
@@ -399,31 +391,32 @@ def mergeConfig(args, testing=False): # pragma: no cover
         cov              = coverage object default None
     """
     config = getConfig(getattr(args, 'config', default_args.config))
-    new_args = copy.deepcopy(default_args) # Default by default!
+    new_args = copy.deepcopy(default_args)  # Default by default!
 
     for name, default_value in dict(default_args._get_kwargs()).items():
         # Config options overwrite default options
         config_getter = None
         if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
-                'help', 'logging', 'version', 'failfast', 'run_coverage',
-                'options', 'completions', 'completion_file', 'clear_omit',
-                'no_skip_report', 'disable_windows']:
+                    'help', 'logging', 'version', 'failfast', 'run_coverage',
+                    'options', 'completions', 'completion_file', 'clear_omit',
+                    'no_skip_report', 'disable_windows']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
         elif name in ['file_pattern', 'finalizer', 'initializer',
-            'include_patterns', 'omit_patterns', 'warnings', 'test_pattern']:
+                      'include_patterns', 'omit_patterns', 'warnings',
+                      'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
-            pass # Some options only make sense coming on the command-line.
+            pass  # Some options only make sense coming on the command-line.
         elif name in ['store_opt', 'parser']:
-            pass # These are convenience objects, not actual settings
+            pass  # These are convenience objects, not actual settings
         else:
             raise NotImplementedError(name)
 
         if config_getter:
             try:
-                config_value = config_getter('green', name.replace('_','-'))
+                config_value = config_getter('green', name.replace('_', '-'))
                 setattr(new_args, name, config_value)
             except (configparser.NoSectionError, configparser.NoOptionError):
                 pass
@@ -439,7 +432,7 @@ def mergeConfig(args, testing=False): # pragma: no cover
     new_args.cov = None
 
     # Help?
-    if new_args.help: # pragma: no cover
+    if new_args.help:  # pragma: no cover
         new_args.parser.print_help()
         new_args.shouldExit = True
         return new_args
@@ -471,22 +464,22 @@ def mergeConfig(args, testing=False): # pragma: no cover
         '*/argparse*',
         '*/colorama*',
         '*/django/*',
-        '*/distutils*',       # Gets pulled in on Travis-CI CPython
-        '*/extras*',          # pulled in by testtools
-        '*/linecache2*',      # pulled in by testtools
-        '*/mimeparse*',       # pulled in by testtools
+        '*/distutils*',        # Gets pulled in on Travis-CI CPython
+        '*/extras*',           # pulled in by testtools
+        '*/linecache2*',       # pulled in by testtools
+        '*/mimeparse*',        # pulled in by testtools
         '*/mock*',
-        '*/pbr*',             # pulled in by testtools
-        '*/pkg_resources*',   # pulled in by django
+        '*/pbr*',              # pulled in by testtools
+        '*/pkg_resources*',    # pulled in by django
         '*/pypy*',
-        '*/pytz*',            # pulled in by django
-        '*/six*',             # pulled in by testtools
+        '*/pytz*',             # pulled in by django
+        '*/six*',              # pulled in by testtools
         '*/termstyle*',
         '*/test*',
-        '*/traceback2*',      # pulled in by testtools
-        '*/unittest2*',       # pulled in by testtools
-        '*Python.framework*', # OS X system python
-        '*site-packages*',    # System python for other OS's
+        '*/traceback2*',       # pulled in by testtools
+        '*/unittest2*',        # pulled in by testtools
+        '*Python.framework*',  # OS X system python
+        '*site-packages*',     # System python for other OS's
         tempfile.gettempdir() + '*',
     ]
     if new_args.clear_omit:
@@ -510,7 +503,7 @@ def mergeConfig(args, testing=False): # pragma: no cover
             return args
         if not testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns,
-                    include=new_args.include_patterns)
+                                    include=new_args.include_patterns)
             cov.start()
         new_args.cov = cov
 

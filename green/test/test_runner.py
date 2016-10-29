@@ -36,11 +36,12 @@ except:
     skip_testtools = True
 
 
-
-#--- Helper stuff ---
+# --- Helper stuff ---
 
 global importable_function_worked
 importable_function_worked = False
+
+
 def _importableFunction():
     """
     Used by TestInitializerOrFinalizer.test_importable()
@@ -48,7 +49,8 @@ def _importableFunction():
     global importable_function_worked
     importable_function_worked = True
 
-non_callable = None # Used by TestInitializerOrFinalizer.test_not_callable()
+non_callable = None  # Used by TestInitializerOrFinalizer.test_not_callable()
+
 
 def _crashy():
     """
@@ -56,8 +58,7 @@ def _crashy():
     """
     raise Exception('Oops!  I crashed.')
 
-#--- End of helper stuff
-
+# --- End of helper stuff
 
 
 class TestInitializerOrFinalizer(unittest.TestCase):
@@ -77,7 +78,6 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         initializer = InitializerOrFinalizer('garbagejunk.nonexistant')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
-
     def test_importable(self):
         """
         Given an actual importable module and function, the function is run.
@@ -87,7 +87,6 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         InitializerOrFinalizer('green.test.test_runner._importableFunction')()
         self.assertTrue(importable_function_worked)
 
-
     def test_not_callable(self):
         """
         An importable, but not-callable-object also raises an
@@ -96,14 +95,12 @@ class TestInitializerOrFinalizer(unittest.TestCase):
         initializer = InitializerOrFinalizer('green.test.test_runner.non_callable')
         self.assertRaises(InitializerOrFinalizerError, initializer)
 
-
     def test_crash(self):
         """
         An importable, callable object...crashes.
         """
         initializer = InitializerOrFinalizer('green.test.test_runner._crashy')
         self.assertRaises(InitializerOrFinalizerError, initializer)
-
 
 
 class TestRun(unittest.TestCase):
@@ -243,7 +240,6 @@ class TestRun(unittest.TestCase):
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 1)
 
-
     def test_systemExit(self):
         """
         Raising a SystemExit gets caught and reported.
@@ -265,7 +261,6 @@ class TestRun(unittest.TestCase):
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 2)
-
 
 
 class TestProcesses(unittest.TestCase):
@@ -473,7 +468,8 @@ class TestProcesses(unittest.TestCase):
         """
         Exceptions that escape the test framework get caught by poolRunner and
         reported as a failure.  For example, the testtools implementation of
-        TestCase unwisely (but deliberately) lets SystemExit exceptions through.
+        TestCase unwisely (but deliberately) lets SystemExit exceptions
+        through.
         """
         global skip_testtools
         if skip_testtools:

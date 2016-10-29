@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 import os
 import sys
 
-try: # pragma: no cover
+try:  # pragma: no cover
     import coverage
     coverage_version = "Coverage {}".format(coverage.__version__)
-except: # pragma: no cover
+except:  # pragma: no cover
     coverage = None
     coverage_version = "Coverage Not Installed"
 
@@ -62,8 +62,8 @@ def main(testing=False):
     # Discover/Load the test suite
     if testing:
         test_suite = None
-    else: # pragma: no cover
-        test_suite = loadTargets(args.targets, file_pattern = args.file_pattern)
+    else:  # pragma: no cover
+        test_suite = loadTargets(args.targets, file_pattern=args.file_pattern)
 
     # We didn't even load 0 tests...
     if not test_suite:
@@ -77,6 +77,5 @@ def main(testing=False):
     return(int(not result.wasSuccessful()))
 
 
-
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main())

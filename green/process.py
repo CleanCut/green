@@ -8,9 +8,9 @@ import sys
 import tempfile
 import traceback
 
-try: # pragma: no cover
+try:  # pragma: no cover
     import coverage
-except: # pragma: no cover
+except:  # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
@@ -18,10 +18,9 @@ from green.loader import loadTargets
 from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
-
 # Super-useful debug function for finding problems in the subprocesses, and it
 # even works on windows
-def ddebug(msg, err=None): # pragma: no cover
+def ddebug(msg, err=None):  # pragma: no cover
     """
     err can be an instance of sys.exc_info() -- which is the latest traceback
     info
@@ -35,17 +34,14 @@ def ddebug(msg, err=None): # pragma: no cover
     sys.__stdout__.flush()
 
 
-
 class ProcessLogger(object):
     """
     I am used by LoggingDaemonlessPool to get crash output out to the logger,
     instead of having process crashes be silent
     """
 
-
     def __init__(self, callable):
         self.__callable = callable
-
 
     def __call__(self, *args, **kwargs):
         try:
@@ -66,25 +62,20 @@ class ProcessLogger(object):
         return result
 
 
-
 class DaemonlessProcess(multiprocessing.Process):
     """
     I am used by LoggingDaemonlessPool to make pool workers NOT run in
     daemon mode (daemon mode process can't launch their own subprocesses)
     """
 
-
     def _get_daemon(self):
         return False
-
 
     def _set_daemon(self, value):
         pass
 
-
     # 'daemon' attribute needs to always return False
     daemon = property(_get_daemon, _set_daemon)
-
 
 
 class LoggingDaemonlessPool(Pool):
@@ -94,17 +85,16 @@ class LoggingDaemonlessPool(Pool):
 
     Process = DaemonlessProcess
 
-
     def apply_async(self, func, args=(), kwds={}, callback=None):
         return Pool.apply_async(
                 self, ProcessLogger(func), args, kwds, callback)
 
-#-------------------------------------------------------------------------------
-# START of Worker Finalization Monkey Patching
-#
-# I started with code from cpython/Lib/multiprocessing/pool.py from version
-# 3.5.0a4+ of the main python mercurial repository.  Then altered it to run on
-# 2.7+ and added the finalizer/finalargs parameter handling.
+    # -------------------------------------------------------------------------
+    # START of Worker Finalization Monkey Patching
+    #
+    # I started with code from cpython/Lib/multiprocessing/pool.py from version
+    # 3.5.0a4+ of the main python mercurial repository.  Then altered it to run
+    # on 2.7+ and added the finalizer/finalargs parameter handling.
     _wrap_exception = True
 
     def __init__(self, processes=None, initializer=None, initargs=(),
@@ -113,8 +103,7 @@ class LoggingDaemonlessPool(Pool):
         self._finalizer = finalizer
         self._finalargs = finalargs
         super(LoggingDaemonlessPool, self).__init__(processes, initializer,
-                initargs, maxtasksperchild)
-
+                                                    initargs, maxtasksperchild)
 
     def _repopulate_pool(self):
         """
@@ -129,7 +118,7 @@ class LoggingDaemonlessPool(Pool):
                                    self._wrap_exception,
                                    self._finalizer,
                                    self._finalargs)
-                            )
+                             )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'PoolWorker')
             w.daemon = True
@@ -142,7 +131,7 @@ import multiprocessing.pool
 from multiprocessing import util
 try:
     from multiprocessing.pool import MaybeEncodingError
-except: # pragma: no cover
+except:  # pragma: no cover
     # Python 2.7.4 introduced this class.  If we're on Python 2.7.0 to 2.7.3
     # then we'll have to define it ourselves. :-/
     class MaybeEncodingError(Exception):
@@ -163,14 +152,14 @@ except: # pragma: no cover
 
 
 # Python 2 and 3 raise a different error when they exit
-if platform.python_version_tuple()[0] == '2': # pragma: no cover
+if platform.python_version_tuple()[0] == '2':  # pragma: no cover
     PortableOSError = IOError
-else: # pragma: no cover
+else:  # pragma: no cover
     PortableOSError = OSError
 
 
 def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
-        wrap_exception=False, finalizer=None, finalargs=()): # pragma: no cover
+           wrap_exception=False, finalizer=None, finalargs=()):  # pragma: no cover
     assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
@@ -221,37 +210,38 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
     util.debug('worker exiting after %d tasks' % completed)
 
 
-
 # Unmodified (see above)
-class RemoteTraceback(Exception): # pragma: no cover
+class RemoteTraceback(Exception):  # pragma: no cover
     def __init__(self, tb):
         self.tb = tb
+
     def __str__(self):
         return self.tb
 
 
 # Unmodified (see above)
-class ExceptionWithTraceback: # pragma: no cover
+class ExceptionWithTraceback:  # pragma: no cover
     def __init__(self, exc, tb):
         tb = traceback.format_exception(type(exc), exc, tb)
         tb = ''.join(tb)
         self.exc = exc
         self.tb = '\n"""\n%s"""' % tb
+
     def __reduce__(self):
         return rebuild_exc, (self.exc, self.tb)
 
 
 # Unmodified (see above)
-def rebuild_exc(exc, tb): # pragma: no cover
+def rebuild_exc(exc, tb):  # pragma: no cover
     exc.__cause__ = RemoteTraceback(tb)
     return exc
 
 multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma: no cover
+def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma: no cover
     """
     I am the function that pool worker processes run.  I run one unit test.
     """
@@ -283,6 +273,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
 
     # What to do each time an individual test is started
     already_sent = set()
+
     def start_callback(test):
         # Let the main process know what test we are starting
         test = proto_test(test)
@@ -323,9 +314,9 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
                 queue.put(result)
         except:
             # Some frameworks like testtools record the error AND THEN let it
-            # through to crash things.  So we only need to manufacture another error
-            # if the underlying framework didn't, but either way we don't want to
-            # crash.
+            # through to crash things.  So we only need to manufacture another
+            # error if the underlying framework didn't, but either way we don't
+            # want to crash.
             if result.errors:
                 queue.put(result)
             else:
@@ -335,9 +326,14 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]): # pragma:
                 result.stopTest(test)
                 queue.put(result)
     else:
-        # loadTargets() returned an object without a run() method, probably None
-        description = 'Test loader returned an un-runnable object.  Is "{}" importable from your current location?  Maybe you forgot an __init__.py in your directory?  Unrunnable object looks like: {} of type {} with dir {}'.format(
-                target, str(test), type(test), dir(test))
+        # loadTargets() returned an object without a run() method, probably
+        # None
+        description = ('Test loader returned an un-runnable object.  Is "{}" '
+                       'importable from your current location?  Maybe you '
+                       'forgot an __init__.py in your directory?  Unrunnable '
+                       'object looks like: {} of type {} with dir {}'
+                       .format(target, str(test), type(test), dir(test))
+                       )
         err = (TypeError, TypeError(description), None)
         t             = ProtoTest()
         target_list = target.split('.')

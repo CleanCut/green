@@ -12,7 +12,6 @@ from green.suite import GreenTestSuite
 from green.config import default_args
 
 
-
 class TestGreenTestSuite(unittest.TestCase):
 
     def test_empty(self):
@@ -21,14 +20,12 @@ class TestGreenTestSuite(unittest.TestCase):
         """
         GreenTestSuite()
 
-
     def test_defaultArgs(self):
         """
         Passing in default arguments causes attributes to be set.
         """
         gts = GreenTestSuite(args=default_args)
         self.assertEqual(gts.allow_stdout, default_args.allow_stdout)
-
 
     def test_shouldStop(self):
         """
@@ -54,7 +51,6 @@ class TestGreenTestSuite(unittest.TestCase):
         mock_result.shouldStop = False
         gts.run(mock_result)
 
-
     def test_addTest_testPattern(self):
         """
         Setting test_pattern will cause a test to be filtered.
@@ -71,7 +67,6 @@ class TestGreenTestSuite(unittest.TestCase):
         gts.addTest(mock_test2)
         self.assertEqual(gts._tests, [mock_test2])
 
-
     def test_allow_stdout(self):
         """
         The allow_stdout setting should not get ignored.
@@ -82,4 +77,3 @@ class TestGreenTestSuite(unittest.TestCase):
         args.allow_stdout = True
         gts = GreenTestSuite(args=args)
         self.assertEqual(gts.allow_stdout, True)
-

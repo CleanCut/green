@@ -19,7 +19,6 @@ except:
     from mock import MagicMock, patch
 
 
-
 class MyProtoTest(ProtoTest):
     """
     For quickly making a ProtoTest
@@ -31,9 +30,7 @@ class MyProtoTest(ProtoTest):
         self.docstr_part = "My docstring"
 
 
-
 class TestBaseTestResult(unittest.TestCase):
-
 
     def test_stdoutOutput(self):
         """
@@ -45,7 +42,6 @@ class TestBaseTestResult(unittest.TestCase):
         btr.recordStdout(pt, o)
         self.assertEqual(btr.stdout_output[pt], o)
 
-
     def test_stdoutNoOutput(self):
         """
         recordStdout ignores empty output sent to it
@@ -54,7 +50,6 @@ class TestBaseTestResult(unittest.TestCase):
         pt = ProtoTest()
         btr.recordStdout(pt, '')
         self.assertEqual(btr.stdout_output, {})
-
 
     def test_displayStdout(self):
         """
@@ -68,7 +63,6 @@ class TestBaseTestResult(unittest.TestCase):
         btr.displayStdout(pt)
         self.assertIn(noise, stream.getvalue())
 
-
     def test_stderrErrput(self):
         """
         recordStderr records errput.
@@ -79,7 +73,6 @@ class TestBaseTestResult(unittest.TestCase):
         btr.recordStderr(pt, o)
         self.assertEqual(btr.stderr_errput[pt], o)
 
-
     def test_stderrNoErrput(self):
         """
         recordStderr ignores empty errput sent to it
@@ -88,7 +81,6 @@ class TestBaseTestResult(unittest.TestCase):
         pt = ProtoTest()
         btr.recordStderr(pt, '')
         self.assertEqual(btr.stderr_errput, {})
-
 
     def test_displayStderr(self):
         """
@@ -103,10 +95,7 @@ class TestBaseTestResult(unittest.TestCase):
         self.assertIn(noise, stream.getvalue())
 
 
-
-
 class TestProtoTestResult(unittest.TestCase):
-
 
     def test_addSuccess(self):
         """
@@ -116,7 +105,6 @@ class TestProtoTestResult(unittest.TestCase):
         test = proto_test(MagicMock())
         ptr.addSuccess(test)
         self.assertEqual(test, ptr.passing[0])
-
 
     def test_addError(self):
         """
@@ -132,7 +120,6 @@ class TestProtoTestResult(unittest.TestCase):
         self.assertEqual(test, ptr.errors[0][0])
         self.assertEqual(err, ptr.errors[0][1])
 
-
     def test_addFailure(self):
         """
         addFailure adds a test and error correctly
@@ -147,7 +134,6 @@ class TestProtoTestResult(unittest.TestCase):
         self.assertEqual(test, ptr.failures[0][0])
         self.assertEqual(err, ptr.failures[0][1])
 
-
     def test_addSkip(self):
         """
         addSkip adds a test and reason correctly
@@ -158,7 +144,6 @@ class TestProtoTestResult(unittest.TestCase):
         ptr.addSkip(test, reason)
         self.assertEqual(test, ptr.skipped[0][0])
         self.assertEqual(reason, ptr.skipped[0][1])
-
 
     def test_addExpectedFailure(self):
         """
@@ -174,7 +159,6 @@ class TestProtoTestResult(unittest.TestCase):
         self.assertEqual(test, ptr.expectedFailures[0][0])
         self.assertEqual(err, ptr.expectedFailures[0][1])
 
-
     def test_addUnexpectedSuccess(self):
         """
         addUnexpectedSuccess adds a test correctly
@@ -186,7 +170,6 @@ class TestProtoTestResult(unittest.TestCase):
 
 
 class TestProtoError(unittest.TestCase):
-
 
     def test_str(self):
         """
@@ -201,9 +184,7 @@ class TestProtoError(unittest.TestCase):
         self.assertIn(test_str, str(pe))
 
 
-
 class TestProtoTest(unittest.TestCase):
-
 
     def test_ProtoTestBlank(self):
         """
@@ -213,7 +194,6 @@ class TestProtoTest(unittest.TestCase):
         for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual('', getattr(pt, i, None))
 
-
     def test_str(self):
         """
         Running a ProtoTest through str() is the same as getting .dotted_name
@@ -221,7 +201,6 @@ class TestProtoTest(unittest.TestCase):
         pt = ProtoTest()
         pt.module = 'aoeusnth'
         self.assertEqual(str(pt), pt.dotted_name)
-
 
     def test_ProtoTestFromTest(self):
         """
@@ -239,7 +218,6 @@ class TestProtoTest(unittest.TestCase):
 
         for i in ['module', 'class_name', 'docstr_part', 'method_name']:
             self.assertEqual(locals()[i], getattr(pt, i, None))
-
 
     def test_getDescription(self):
         """
@@ -266,7 +244,6 @@ class TestProtoTest(unittest.TestCase):
         self.assertEqual(t.getDescription(3), 'test_stuff')
         self.assertEqual(t.getDescription(4), 'test_stuff')
 
-
     def test_newlineDocstring(self):
         """
         Docstrings starting with a newline are properly handled.
@@ -279,7 +256,6 @@ class TestProtoTest(unittest.TestCase):
                 pass
         test = proto_test(MyTests('test_stuff'))
         self.assertIn('tricky', test.getDescription(3))
-
 
     def test_multilineDocstring(self):
         """
@@ -298,19 +274,15 @@ class TestProtoTest(unittest.TestCase):
         self.assertNotIn('garbage', test.getDescription(3))
 
 
-
 class TestGreenTestResult(unittest.TestCase):
-
 
     def setUp(self):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
 
-
     def tearDown(self):
         del(self.stream)
         del(self.args)
-
 
     @patch('green.result.GreenTestResult.printErrors')
     def test_stopTestRun(self, mock_printErrors):
@@ -332,7 +304,6 @@ class TestGreenTestResult(unittest.TestCase):
         self.args.cov.stop = MagicMock(
                 side_effect=CoverageException('No data to report'))
 
-
     def test_tryRecordingStdoutStderr(self):
         """
         Recording stdout and stderr works correctly.
@@ -344,21 +315,19 @@ class TestGreenTestResult(unittest.TestCase):
         output = 'apple'
         test1 = MagicMock()
         ptr1 = MagicMock()
-        ptr1.stdout_output = {test1:output}
+        ptr1.stdout_output = {test1: output}
         ptr1.stderr_errput = {}
 
         errput = 'banana'
         test2 = MagicMock()
         ptr2 = MagicMock()
         ptr2.stdout_output = {}
-        ptr2.stderr_errput = {test2:errput}
-
+        ptr2.stderr_errput = {test2: errput}
 
         gtr.tryRecordingStdoutStderr(test1, ptr1)
         gtr.recordStdout.assert_called_with(test1, output)
         gtr.tryRecordingStdoutStderr(test2, ptr2)
         gtr.recordStderr.assert_called_with(test2, errput)
-
 
     def test_failfastAddError(self):
         """
@@ -375,7 +344,6 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.addError(MyProtoTest(), proto_error(err))
         self.assertEqual(gtr.shouldStop, True)
 
-
     def test_failfastAddFailure(self):
         """
         addFailure triggers failfast when it is set
@@ -391,7 +359,6 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.addFailure(MyProtoTest(), proto_error(err))
         self.assertEqual(gtr.shouldStop, True)
 
-
     def test_failfastAddUnexpectedSuccess(self):
         """
         addUnexpectedSuccess triggers failfast when it is set
@@ -402,7 +369,6 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertEqual(gtr.shouldStop, False)
         gtr.addUnexpectedSuccess(MyProtoTest())
         self.assertEqual(gtr.shouldStop, True)
-
 
     def _outputFromVerboseTest(self):
         """
@@ -424,7 +390,8 @@ class TestGreenTestResult(unittest.TestCase):
         """
         self.stream.isatty = lambda: True
         output_lines = self._outputFromVerboseTest()
-        # Output should look like (I'm not putting the termcolor formatting here)
+        # Output should look like (I'm not putting the termcolor formatting
+        # here)
         # green.test.test_runner
         #   FakeCase
         #     test_it
@@ -433,14 +400,14 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('  ', output_lines[1])
         self.assertIn('    ', output_lines[2])
 
-
     def test_startTestVerbosePipe(self):
         """
         startTest() contains output we expect in verbose mode on a pipe
         """
         self.stream.isatty = lambda: False
         output_lines = self._outputFromVerboseTest()
-        # Output should look like (I'm not putting the termcolor formatting here)
+        # Output should look like (I'm not putting the termcolor formatting
+        # here)
         # green.test.test_runner
         #   FakeCase
         #     test_it
@@ -450,24 +417,24 @@ class TestGreenTestResult(unittest.TestCase):
         # No carriage return or extra lines printed
         self.assertIn('', output_lines[2])
 
-
     def test_reportOutcome(self):
         """
-        _reportOutcome contains output we expect
+        _reportOutcome contains output we expect.
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr._reportOutcome(None, '.', lambda x: x)
         self.assertIn('.', self.stream.getvalue())
 
-
     def test_reportOutcomeCursorUp(self):
         """
-        _reportOutcome moves the cursor up when it needs to
+        _reportOutcome moves the cursor up when it needs to.
         """
         self.args.verbose = 2
+
         def isatty():
             return True
+
         gs = GreenStream(self.stream)
         gs.isatty = isatty
         gtr = GreenTestResult(self.args, gs)
@@ -478,14 +445,15 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn(r, self.stream.getvalue())
         self.assertLess(len(self.stream.getvalue()), 2000)
 
-
     def test_reportOutcomeVerbose(self):
         """
-        _reportOutcome contains output we expect in verbose mode
+        _reportOutcome contains output we expect in verbose mode.
         """
         self.args.verbose = 2
+
         def isatty():
             return True
+
         gs = GreenStream(self.stream)
         gs.isatty = isatty
         gtr = GreenTestResult(self.args, gs)
@@ -495,10 +463,9 @@ class TestGreenTestResult(unittest.TestCase):
         gtr._reportOutcome(t, '.', lambda x: x, None, r)
         self.assertIn(r, self.stream.getvalue())
 
-
     def test_printErrorsSkipreport(self):
         """
-        printErrors() prints the skip report
+        printErrors() prints the skip report.
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
@@ -508,11 +475,9 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.printErrors()
         self.assertIn(reason, self.stream.getvalue())
 
-
-
     def test_printErrorsStdout(self):
         """
-        printErrors() prints out the captured stdout
+        printErrors() prints out the captured stdout.
         """
         self.args.verbose = 1
         self.args.termcolor = False
@@ -524,12 +489,11 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.printErrors()
         self.assertIn(output, self.stream.getvalue())
 
-
     def test_printErrorsStdoutQuietStdoutOnSuccess(self):
         """
         printErrors() prints out the captured stdout
         except when quiet_stdout is set to True
-        for successful tests
+        for successful tests.
         """
         self.args.quiet_stdout = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
@@ -539,7 +503,6 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.addSuccess(pt)
         gtr.printErrors()
         self.assertNotIn(output, self.stream.getvalue())
-
 
     def test_printErrorsStdoutQuietStdoutOnError(self):
         """
@@ -561,12 +524,11 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.printErrors()
         self.assertIn(output, self.stream.getvalue())
 
-
     def test_printErrorsStderrQuietStdoutOnSuccess(self):
         """
         printErrors() prints out the captured stdout
         except when quiet_stdout is set to True
-        for successful tests
+        for successful tests.
         """
         self.args.quiet_stdout = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
@@ -579,7 +541,7 @@ class TestGreenTestResult(unittest.TestCase):
 
     def test_printErrorsDots(self):
         """
-        printErrors() looks correct in verbose=1 (dots) mode
+        printErrors() looks correct in verbose=1 (dots) mode.
         """
         try:
             raise Exception
@@ -596,10 +558,9 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
 
-
     def test_printErrorsVerbose2(self):
         """
-        printErrors() looks correct in verbose=2 mode
+        printErrors() looks correct in verbose=2 mode.
         """
         try:
             raise Exception
@@ -616,10 +577,9 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
 
-
     def test_printErrorsVerbose3(self):
         """
-        printErrors() looks correct in verbose=3 mode
+        printErrors() looks correct in verbose=3 mode.
         """
         try:
             raise Exception
@@ -636,10 +596,9 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
 
-
     def test_printErrorsVerbose4(self):
         """
-        printErrors() looks correct in verbose=4 mode
+        printErrors() looks correct in verbose=4 mode.
         """
         try:
             raise Exception
@@ -657,10 +616,9 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
 
-
     def test_addProtoTestResult(self):
         """
-        addProtoTestResult adds the correct things to the correct places
+        addProtoTestResult adds the correct things to the correct places.
         """
         ptr = ProtoTestResult()
 
@@ -707,9 +665,7 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertEqual(gtr.unexpectedSuccesses, [us_t])
 
 
-
 class TestGreenTestResultAdds(unittest.TestCase):
-
 
     def setUp(self):
         self.stream = StringIO()
@@ -718,11 +674,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.gtr._reportOutcome = MagicMock()
 
-
     def tearDown(self):
         del(self.stream)
         del(self.gtr)
-
 
     def test_addSuccess(self):
         """
@@ -735,7 +689,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr.addSuccess(test)
         self.gtr._reportOutcome.assert_called_with(
                 test, '.', self.gtr.colors.passing)
-
 
     def test_addError(self):
         """
@@ -750,7 +703,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr.addError(test, err)
         self.gtr._reportOutcome.assert_called_with(
                 test, 'E', self.gtr.colors.error, err)
-
 
     def test_addFailure(self):
         """
@@ -767,7 +719,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
                 test, 'F', self.gtr.colors.failing, err)
 
-
     def test_addFailureTwistedSkip(self):
         """
         Twisted's practice of calling addFailure() with their skips is detected
@@ -782,11 +733,10 @@ class TestGreenTestResultAdds(unittest.TestCase):
         reason = "Twisted is odd"
         err = proto_error(err)
         err.traceback_lines = ["UnsupportedTrialFeature: ('skip', '{}')"
-                .format(reason)]
+                               .format(reason)]
         self.gtr.addFailure(test, err)
         self.gtr._reportOutcome.assert_called_with(
                 test, 's', self.gtr.colors.skipped, reason=reason)
-
 
     def test_addSkip(self):
         """
@@ -797,7 +747,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr.addSkip(test, reason)
         self.gtr._reportOutcome.assert_called_with(
                 test, 's', self.gtr.colors.skipped, reason=reason)
-
 
     def test_addExpectedFailure(self):
         """
@@ -813,7 +762,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
                 test, 'x', self.gtr.colors.expectedFailure, err)
 
-
     def test_addUnexpectedSuccess(self):
         """
         addUnexpectedSuccess() makes the correct calls to other functions.
@@ -823,10 +771,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
                 test, 'u', self.gtr.colors.unexpectedSuccess)
 
-
     def test_wasSuccessful(self):
         """
-        wasSuccessful returns what we expect
+        wasSuccessful returns what we expect.
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))

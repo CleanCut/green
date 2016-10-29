@@ -4,11 +4,11 @@ import struct
 import platform
 import subprocess
 
-# This module was adapted from https://gist.github.com/jtriley/1108174 as it was
-# on 2015-10-26
+# This module was adapted from https://gist.github.com/jtriley/1108174 as it
+# was on 2015-10-26
 
 
-def getTerminalSize(): # pragma: no cover
+def getTerminalSize():  # pragma: no cover
     """
     Get width and height of console. Works on Linux, OS X, Windows, and Cygwin.
 
@@ -21,7 +21,7 @@ def getTerminalSize(): # pragma: no cover
         tuple_xy = _getTerminalSizeWindows()
         if tuple_xy is None:
             tuple_xy = _getTerminalSizeTput()
-            # needed for window's python in cygwin's xterm!
+            # needed for Window's python in cygwin's xterm!
     if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
         tuple_xy = _getTerminalSizeLinux()
     if tuple_xy is None:
@@ -29,7 +29,7 @@ def getTerminalSize(): # pragma: no cover
     return tuple_xy
 
 
-def _getTerminalSizeWindows(): # pragma: no cover
+def _getTerminalSizeWindows():  # pragma: no cover
     try:
         from ctypes import windll, create_string_buffer
         # stdin handle is -10
@@ -40,7 +40,7 @@ def _getTerminalSizeWindows(): # pragma: no cover
         res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
         if res:
             (bufx, bufy, curx, cury, wattr, left, top, right, bottom, maxx,
-                    maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+                maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
             sizex = right - left + 1
             sizey = bottom - top + 1
             return sizex, sizey
@@ -48,7 +48,7 @@ def _getTerminalSizeWindows(): # pragma: no cover
         pass
 
 
-def _getTerminalSizeTput(): # pragma: no cover
+def _getTerminalSizeTput():  # pragma: no cover
     try:
         cols = int(subprocess.check_call(shlex.split('tput cols')))
         rows = int(subprocess.check_call(shlex.split('tput lines')))
@@ -57,7 +57,7 @@ def _getTerminalSizeTput(): # pragma: no cover
         pass
 
 
-def _getTerminalSizeLinux(): # pragma: no cover
+def _getTerminalSizeLinux():  # pragma: no cover
     def ioctl_GWINSZ(fd):
         try:
             import fcntl
