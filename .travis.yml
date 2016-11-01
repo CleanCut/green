@@ -6,7 +6,9 @@ install:
 script:
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
+cache: pip
 matrix:
+    fast_finish: true
     include:
         - os: osx
           osx_image: xcode7.3
@@ -43,8 +45,19 @@ matrix:
           python: 3.5
           language: python
         - os: linux
+          python: '3.6-dev'
+          language: python
+        - os: linux
+          python: 'nightly'
+          language: python
+        - os: linux
           python: pypy
           language: python
         - os: linux
           python: pypy3
           language: python
+
+    allow_failures:
+        - python: '3.6-dev'
+        - python: "nightly"
+        - os: "osx"
