@@ -15,7 +15,6 @@ from green.version import pretty_version
 terminal_width, _ignored = getTerminalSize()
 
 
-
 def proto_test(test):
     """
     If test is a ProtoTest, I just return it.  Otherwise I create a ProtoTest
@@ -38,11 +37,10 @@ def proto_error(err):
         return ProtoError(err)
 
 
-
 class ProtoTest():
     """
-    I take a full-fledged TestCase and preserve just the information we need and
-    can pass between processes.
+    I take a full-fledged TestCase and preserve just the information we need
+    and can pass between processes.
     """
     def __init__(self, test=None):
         if test:
@@ -66,23 +64,18 @@ class ProtoTest():
             self.method_name = ''
             self.docstr_part = ''
 
-
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
-
 
     def __hash__(self):
         return hash(self.dotted_name)
 
-
     def __str__(self):
         return self.dotted_name
-
 
     @property
     def dotted_name(self, ignored=None):
         return self.module + '.' + self.class_name + '.' + self.method_name
-
 
     def getDescription(self, verbose):
         if verbose == 2:
@@ -93,7 +86,6 @@ class ProtoTest():
             return ''
 
 
-
 class ProtoError():
     """
     I take a full-fledged test error and preserve just the information we need
@@ -102,13 +94,11 @@ class ProtoError():
     def __init__(self, err=None):
         self.traceback_lines = traceback.format_exception(*err)
 
-
     def __str__(self):
         return '\n'.join(self.traceback_lines)
 
 
-
-class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
+class BaseTestResult(object):  # Breaks subclasses in 2.7 not inheriting object
     """
     I am inherited by ProtoTestResult and GreenTestResult.
     """
@@ -136,7 +126,6 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
             test = proto_test(test)
             self.stderr_errput[test] = errput
 
-
     def displayStdout(self, test):
         """
         Displays AND REMOVES the output captured from a specific test.  The
@@ -151,7 +140,6 @@ class BaseTestResult(object): # Breaks subclasses in 2.7 not inheriting object
                     self.colors.bold(test.dotted_name),
                     self.stdout_output[test]))
             del(self.stdout_output[test])
-
 
     def displayStderr(self, test):
         """
@@ -191,7 +179,6 @@ class ProtoTestResult(BaseTestResult):
                 ]
         self.reinitialize()
 
-
     def reinitialize(self):
         self.shouldStop = False
         self.errors              = []
@@ -201,8 +188,7 @@ class ProtoTestResult(BaseTestResult):
         self.skipped             = []
         self.unexpectedSuccesses = []
 
-
-    def __repr__(self): # pragma: no cover
+    def __repr__(self):  # pragma: no cover
         return (
             "errors" + str(self.errors) + ', ' +
             "expectedFailures" + str(self.expectedFailures) + ', ' +
@@ -210,7 +196,6 @@ class ProtoTestResult(BaseTestResult):
             "passing" + str(self.passing) + ', ' +
             "skipped" + str(self.skipped) + ', ' +
             "unexpectedSuccesses" + str(self.unexpectedSuccesses))
-
 
     def __getstate__(self):
         """
@@ -221,7 +206,6 @@ class ProtoTestResult(BaseTestResult):
             result_dict[pickle_attr] = self.__dict__[pickle_attr]
         return result_dict
 
-
     def __setstate__(self, dict):
         """
         Since the callback functions weren't pickled, we need to init them
@@ -229,7 +213,6 @@ class ProtoTestResult(BaseTestResult):
         self.__dict__.update(dict)
         self.start_callback = None
         self.finalize_callback = None
-
 
     def startTest(self, test):
         """
@@ -240,24 +223,21 @@ class ProtoTestResult(BaseTestResult):
         if self.start_callback:
             self.start_callback(test)
 
-
     def stopTest(self, test):
         """
         Called after each test runs
         """
         pass
 
-
     def finalize(self):
         """
         I am here so that after the GreenTestSuite has had a chance to inject
-        the captured stdout/stderr back into me, I can relay that through to the
-        worker process's poolRunner who will send me back up to the parent
+        the captured stdout/stderr back into me, I can relay that through to
+        the worker process's poolRunner who will send me back up to the parent
         process.
         """
         if self.finalize_callback:
             self.finalize_callback(self)
-
 
     def addSuccess(self, test):
         """
@@ -265,13 +245,11 @@ class ProtoTestResult(BaseTestResult):
         """
         self.passing.append(proto_test(test))
 
-
     def addError(self, test, err):
         """
         Called when a test raises an exception
         """
         self.errors.append((proto_test(test), proto_error(err)))
-
 
     def addFailure(self, test, err):
         """
@@ -279,13 +257,11 @@ class ProtoTestResult(BaseTestResult):
         """
         self.failures.append((proto_test(test), proto_error(err)))
 
-
     def addSkip(self, test, reason):
         """
         Called when a test is skipped
         """
         self.skipped.append((proto_test(test), reason))
-
 
     def addExpectedFailure(self, test, err):
         """
@@ -293,13 +269,11 @@ class ProtoTestResult(BaseTestResult):
         """
         self.expectedFailures.append((proto_test(test), proto_error(err)))
 
-
     def addUnexpectedSuccess(self, test):
         """
         Called when a test passed, but we expected a failure
         """
         self.unexpectedSuccesses.append(proto_test(test))
-
 
 
 class GreenTestResult(BaseTestResult):
@@ -327,17 +301,14 @@ class GreenTestResult(BaseTestResult):
         # Combination of all errors and failures
         self.all_errors = []
 
-
     def stop(self):
         self.shouldStop = True
-
 
     def tryRecordingStdoutStderr(self, test, proto_test_result):
         if proto_test_result.stdout_output.get(test, False):
             self.recordStdout(test, proto_test_result.stdout_output[test])
         if proto_test_result.stderr_errput.get(test, False):
             self.recordStderr(test, proto_test_result.stderr_errput[test])
-
 
     def addProtoTestResult(self, proto_test_result):
         for test, err in proto_test_result.errors:
@@ -359,7 +330,6 @@ class GreenTestResult(BaseTestResult):
             self.addUnexpectedSuccess(test)
             self.tryRecordingStdoutStderr(test, proto_test_result)
 
-
     def startTestRun(self):
         """
         Called once before any tests run
@@ -368,7 +338,6 @@ class GreenTestResult(BaseTestResult):
         # Really verbose information
         if self.verbose > 2:
             self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
-
 
     def stopTestRun(self):
         """
@@ -385,7 +354,8 @@ class GreenTestResult(BaseTestResult):
                 self.args.cov.save()
                 self.args.cov.combine()
                 self.args.cov.save()
-                self.args.cov.report(file=self.stream, omit=self.args.omit_patterns)
+                self.args.cov.report(file=self.stream,
+                                     omit=self.args.omit_patterns)
             except CoverageException as ce:
                 if (len(ce.args) == 1) and ("No data to report" not in ce.args[0]):
                     raise ce
@@ -398,9 +368,9 @@ class GreenTestResult(BaseTestResult):
                 "Warning: Some tests may not have been run."))
             self.stream.writeln()
         self.stream.writeln("Ran %s test%s in %ss" %
-            (self.colors.bold(str(self.testsRun)),
-            self.testsRun != 1 and "s" or "",
-            self.colors.bold("%.3f" % self.timeTaken)))
+                            (self.colors.bold(str(self.testsRun)),
+                             self.testsRun != 1 and "s" or "",
+                             self.colors.bold("%.3f" % self.timeTaken)))
         self.stream.writeln()
         results = [
             (self.errors, 'errors', self.colors.error),
@@ -415,7 +385,8 @@ class GreenTestResult(BaseTestResult):
         stats = []
         for obj_list, name, color_func in results:
             if obj_list:
-                stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
+                stats.append("{}={}".format(name,
+                                            color_func(str(len(obj_list)))))
         if not stats:
             self.stream.writeln(self.colors.failing("No Tests Found"))
         else:
@@ -423,7 +394,6 @@ class GreenTestResult(BaseTestResult):
             if self.errors or self.failures:
                 grade = self.colors.failing('FAILED')
             self.stream.writeln("{} ({})".format(grade, ', '.join(stats)))
-
 
     def startTest(self, test):
         """
@@ -462,15 +432,13 @@ class GreenTestResult(BaseTestResult):
         if current_class != self.last_class:
             self.last_class = current_class
 
-
     def stopTest(self, test):
         """
         Called after the end of each test
         """
 
-
     def _reportOutcome(self, test, outcome_char, color_func, err=None,
-            reason=''):
+                       reason=''):
         test = proto_test(test)
         if self.showAll:
             if self.stream.isatty():
@@ -500,7 +468,6 @@ class GreenTestResult(BaseTestResult):
         self.passing.append(test)
         self._reportOutcome(test, '.', self.colors.passing)
 
-
     @failfast
     def addError(self, test, err):
         """
@@ -512,14 +479,13 @@ class GreenTestResult(BaseTestResult):
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
-
     @failfast
     def addFailure(self, test, err):
         """
         Called when a test fails a unittest assertion
         """
-        # Special case: Catch Twisted's skips that come thtrough as failures and
-        # treat them as skips instead
+        # Special case: Catch Twisted's skips that come thtrough as failures
+        # and treat them as skips instead
         if len(err.traceback_lines) == 1:
             if err.traceback_lines[0].startswith('UnsupportedTrialFeature'):
                 reason = eval(err.traceback_lines[0][25:])[1]
@@ -532,7 +498,6 @@ class GreenTestResult(BaseTestResult):
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
-
     def addSkip(self, test, reason):
         """
         Called when a test is skipped
@@ -541,7 +506,6 @@ class GreenTestResult(BaseTestResult):
         self.skipped.append((test, reason))
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
-
 
     def addExpectedFailure(self, test, err):
         """
@@ -552,7 +516,6 @@ class GreenTestResult(BaseTestResult):
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
-
     @failfast
     def addUnexpectedSuccess(self, test):
         """
@@ -562,11 +525,11 @@ class GreenTestResult(BaseTestResult):
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
-
     def printErrors(self):
         """
         Print a list of all tracebacks from errors and failures, as well as
-        captured stdout (even if the test passed, except with quiet_stdout option).
+        captured stdout (even if the test passed, except with quiet_stdout
+        option).
         """
         if self.dots:
             self.stream.writeln()
@@ -598,7 +561,7 @@ class GreenTestResult(BaseTestResult):
             relevant_frames = []
             for i, frame in enumerate(err.traceback_lines):
                 debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
-                      + "\n{}".format(self.colors.yellow(frame)), level = 3)
+                      + "\n{}".format(self.colors.yellow(frame)), level=3)
                 # Ignore useless frames
                 if self.verbose < 4:
                     if frame.strip() == "Traceback (most recent call last):":
@@ -610,7 +573,6 @@ class GreenTestResult(BaseTestResult):
             # Captured output for failing tests
             self.displayStdout(test)
             self.displayStderr(test)
-
 
     def wasSuccessful(self):
         """

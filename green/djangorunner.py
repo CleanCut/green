@@ -67,14 +67,11 @@ def django_missing():
 
 try:
     import django
-    if django.VERSION[:2] < (1, 6): # pragma: no cover
+    if django.VERSION[:2] < (1, 6):  # pragma: no cover
         raise ImportError("Green integration supports Django 1.6+")
     from django.test.runner import DiscoverRunner
 
-
-
     class DjangoRunner(DiscoverRunner):
-
 
         def run_tests(self, test_labels, extra_tests=None, **kwargs):
             """
@@ -114,6 +111,5 @@ try:
             return self.suite_result(suite, result)
 
 
-
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     DjangoRunner = django_missing

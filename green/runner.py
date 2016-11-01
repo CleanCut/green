@@ -7,9 +7,9 @@ from unittest.signals import (
         registerResult, installHandler, removeResult)
 import warnings
 
-try: # pragma: no cover
+try:  # pragma: no cover
     import coverage
-except: # pragma: no cover
+except:  # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
@@ -17,7 +17,6 @@ from green.loader import toParallelTargets
 from green.output import GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
-
 
 
 class InitializerOrFinalizer:
@@ -32,16 +31,17 @@ class InitializerOrFinalizer:
         self.module_part = '.'.join(dotted_function.split('.')[:-1])
         self.function_part = '.'.join(dotted_function.split('.')[-1:])
 
-
     def __call__(self, *args):
         if not self.module_part:
             return
         try:
             __import__(self.module_part)
-            loaded_function = getattr(modules[self.module_part], self.function_part, None)
+            loaded_function = getattr(modules[self.module_part],
+                                      self.function_part, None)
         except Exception as e:
             raise InitializerOrFinalizerError("Couldn't load '{}' - got: {}"
-                    .format(self.function_part, str(e)))
+                                              .format(self.function_part,
+                                                      str(e)))
         if not loaded_function:
             raise InitializerOrFinalizerError(
                     "Loaded module '{}', but couldn't find function '{}'"
@@ -50,8 +50,8 @@ class InitializerOrFinalizer:
             loaded_function()
         except Exception as e:
             raise InitializerOrFinalizerError("Error running '{}' - got: {}"
-                    .format(self.function_part, str(e)))
-
+                                              .format(self.function_part,
+                                                      str(e)))
 
 
 def run(suite, stream, args, testing=False):
@@ -70,7 +70,7 @@ def run(suite, stream, args, testing=False):
     registerResult(result)
 
     with warnings.catch_warnings():
-        if args.warnings: # pragma: no cover
+        if args.warnings:  # pragma: no cover
             # if args.warnings is set, use it to filter all the warnings
             warnings.simplefilter(args.warnings)
             # if the filter is 'default' or 'always', special-case the
@@ -80,14 +80,14 @@ def run(suite, stream, args, testing=False):
             # only when args.warnings is None.
             if args.warnings in ['default', 'always']:
                 warnings.filterwarnings('module',
-                        category=DeprecationWarning,
-                        message='Please use assert\w+ instead.')
+                                        category=DeprecationWarning,
+                                        message='Please use assert\w+ instead.')
 
         result.startTestRun()
 
         pool = LoggingDaemonlessPool(processes=args.processes or None,
-                initializer=InitializerOrFinalizer(args.initializer),
-                finalizer=InitializerOrFinalizer(args.finalizer))
+                                     initializer=InitializerOrFinalizer(args.initializer),
+                                     finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
         targets = [(target, manager.Queue()) for target in toParallelTargets(suite, args.targets)]
         if targets:

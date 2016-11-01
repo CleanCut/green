@@ -5,7 +5,6 @@ from green.version import __version__, pretty_version
 import green.version
 
 
-
 class TestVersion(unittest.TestCase):
 
     def test_versionType(self):
@@ -14,13 +13,11 @@ class TestVersion(unittest.TestCase):
         """
         self.assertEqual(type(__version__), type(''))
 
-
     def test_versionSet(self):
         """
         __version__ is not blank
         """
         self.assertTrue(len(__version__) > 0)
-
 
     def test_pretty_version(self):
         """
@@ -31,4 +28,3 @@ class TestVersion(unittest.TestCase):
         self.assertTrue('Python' in pv)
         if green.version.coverage:
             self.assertTrue('Coverage' in pv)
-

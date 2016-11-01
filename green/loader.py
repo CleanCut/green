@@ -25,7 +25,7 @@ def toProtoTestList(suite, test_list=None, doing_completions=False):
     This function is recursive.  Pass it a suite, and it will re-call itself
     with smaller parts of the suite.
     """
-    if test_list == None:
+    if test_list is None:
         test_list = []
     # Python's lousy handling of module import failures during loader discovery
     # makes this crazy special case necessary.  See _make_failed_import_test in
@@ -138,7 +138,7 @@ def getCompletions(target):
 
 def isPackage(file_path):
     """
-    Determines whether or not a given path is a (sub)package or not.
+    Determine whether or not a given path is a (sub)package or not.
     """
     return (os.path.isdir(file_path) and
             os.path.isfile(os.path.join(file_path, '__init__.py')))
@@ -174,7 +174,7 @@ def isTestCaseDisabled(test_case_class, method_name):
     nose's parameterized tests with green as a runner.
     """
     test_method = getattr(test_case_class, method_name)
-    return getattr(test_method, "__test__", 'not nose') == False
+    return getattr(test_method, "__test__", 'not nose') is False
 
 
 def loadFromTestCase(test_case_class):
@@ -217,9 +217,11 @@ def loadFromModuleFilename(filename):
         # refactor it and simplify it after we make sure it works.
         # This is a cause of the traceback mangling I observed.
         reason = str(e)
+
         @unittest.case.skip(reason)
         def testSkipped(self):
-            pass # pragma: no cover
+            pass  # pragma: no cover
+
         TestClass = type(
                 str("ModuleSkipped"),
                 (unittest.case.TestCase,),
@@ -231,8 +233,10 @@ def loadFromModuleFilename(filename):
         # This is a cause of the traceback mangling I observed.
         message = ('Failed to import {} computed from filename {}\n{}').format(
                        dotted_module, filename, traceback.format_exc())
+
         def testFailure(self):
             raise ImportError(message)
+
         TestClass = type(
                 str("ModuleImportFailure"),
                 (unittest.case.TestCase,),
@@ -341,7 +345,7 @@ def loadTarget(target, file_pattern='test*.py'):
     bare_dir = target
     # some.real.dir
     if ('.' in target) and (len(target) > 1):
-        dot_dir  = target[0] + target[1:].replace('.', os.sep)
+        dot_dir = target[0] + target[1:].replace('.', os.sep)
     else:
         dot_dir = None
     # pyzmq.tests  (Package (=dir) in PYTHONPATH, including installed ones)
@@ -357,23 +361,22 @@ def loadTarget(target, file_pattern='test*.py'):
     # => DISCOVER DIRS
     tests = None
     for candidate in [bare_dir, dot_dir, pkg_in_path_dir]:
-        if (candidate == None) or (not os.path.isdir(candidate)):
+        if (candidate is None) or (not os.path.isdir(candidate)):
             continue
         tests = discover(candidate, file_pattern=file_pattern)
         if tests and tests.countTestCases():
             debug("Load method: DISCOVER - {}".format(candidate))
             return tests
 
-
     # DOTTED OBJECT - These will discover a specific object if it is
     # globally importable or importable from the current working directory.
     # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
     tests = None
-    if target and (target[0] != '.'): # We don't handle relative dot objects
+    if target and (target[0] != '.'):  # We don't handle relative dot objects
         try:
             tests = loader.loadTestsFromName(target)
             for index, test in enumerate(tests):
-                if test.__class__.__name__ == '_FailedTest': # pragma: no cover
+                if test.__class__.__name__ == '_FailedTest':  # pragma: no cover
                     del(tests._tests[index])
 
         except Exception as e:
@@ -381,7 +384,6 @@ def loadTarget(target, file_pattern='test*.py'):
         if tests and tests.countTestCases():
             debug("Load method: DOTTED OBJECT - {}".format(target))
             return tests
-
 
     # FILE VARIATIONS - These will import a specific file and any tests
     # accessible from its scope.
@@ -391,7 +393,7 @@ def loadTarget(target, file_pattern='test*.py'):
     # some/file
     pyless_file = target + '.py'
     for candidate in [bare_file, pyless_file]:
-        if (candidate == None) or (not os.path.isfile(candidate)):
+        if (candidate is None) or (not os.path.isfile(candidate)):
             continue
         need_cleanup = False
         cwd = os.getcwd()
@@ -401,7 +403,7 @@ def loadTarget(target, file_pattern='test*.py'):
         try:
             dotted_path = target.replace('.py', '').replace(os.sep, '.')
             tests = loader.loadTestsFromName(dotted_path)
-        except: # Any exception could occur here
+        except:  # Any exception could occur here
             # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
             # refactor it and simplify it after we make sure it works.
             # This is a cause of the traceback mangling I observed.
@@ -411,12 +413,14 @@ def loadTarget(target, file_pattern='test*.py'):
             # If the line that caused the exception has unicode literals in it
             # anywhere, then python 2.7 will crash on traceback.format_exc().
             # Python 3 is ok.
-            except UnicodeDecodeError: # pragma: no cover
+            except UnicodeDecodeError:  # pragma: no cover
                 message = ('Failed to import "{}", and the import traceback '
-                    'has a unicode decode error, so I can\'t display it.'
-                    .format(dotted_path))
+                           'has a unicode decode error, so I can\'t display '
+                           'it.'.format(dotted_path))
+
             def testFailure(self):
                 raise ImportError(message)
+
             TestClass = type(
                     str("ModuleImportFailure"),
                     (unittest.case.TestCase,),

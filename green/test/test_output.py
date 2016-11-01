@@ -17,9 +17,7 @@ from green.output import Colors, GreenStream, debug
 import green.output
 
 
-
 class TestDebug(unittest.TestCase):
-
 
     def testDebug(self):
         """
@@ -35,13 +33,10 @@ class TestDebug(unittest.TestCase):
         debug("Something should happen", level=1)
         self.assertNotEqual('', s.getvalue())
 
-
         green.output.logging.debug = orig_logging
 
 
-
 class TestColors(unittest.TestCase):
-
 
     def testTermcolorTrue(self):
         """
@@ -51,7 +46,6 @@ class TestColors(unittest.TestCase):
         self.assertTrue(c.termcolor)
         self.assertTrue(len(c.bold("")) > 0)
 
-
     def testTermcolorFalse(self):
         """
         termcolor=False results in no terminal output
@@ -60,14 +54,12 @@ class TestColors(unittest.TestCase):
         self.assertFalse(c.termcolor)
         self.assertFalse(len(c.bold("")) > 0)
 
-
     def testTermcolorAuto(self):
         """
         termcolor=None causes termcolor autodetected and set to True or False
         """
         c = Colors()
         self.assertTrue(c.termcolor in [True, False])
-
 
     def testUp(self):
         """
@@ -78,22 +70,20 @@ class TestColors(unittest.TestCase):
         self.assertEqual(type(up), str)
         self.assertNotEqual(up, '')
 
-
     def testTermstyleColorsDoNotCrash(self):
         """
         termstyle-based colors don't crash and output something
         """
         c = Colors(termcolor=True)
         for func in [c.bold, c.blue, c.green, c.red, c.yellow, c.passing,
-                c.failing, c.error, c.skipped, c.unexpectedSuccess,
-                c.expectedFailure, c.moduleName]:
+                     c.failing, c.error, c.skipped, c.unexpectedSuccess,
+                     c.expectedFailure, c.moduleName]:
             self.assertTrue(len(func("")) > 0)
         # c.className is a special case
         c.className("")
 
 
 class TestGreenStream(unittest.TestCase):
-
 
     def testFormatText(self):
         """
@@ -104,7 +94,6 @@ class TestGreenStream(unittest.TestCase):
         msg = u"Unindented line.\n  Indented.\n    Double-indented.\n\n\n"
         self.assertEqual(gs.formatText(msg), str(msg))
 
-
     def testBadStringType(self):
         """
         passing the wrong stream type to GreenStream gets auto-converted
@@ -112,13 +101,12 @@ class TestGreenStream(unittest.TestCase):
         s = StringIO()
         gs = GreenStream(s)
         msg = "some string"
-        if sys.version_info[0] == 3: # pragma: no cover
+        if sys.version_info[0] == 3:  # pragma: no cover
             bad_str = bytes(msg, 'utf-8')
-        else: # pragma: no cover
+        else:  # pragma: no cover
             bad_str = str(msg)
         gs.write(bad_str)
         self.assertEqual(s.getvalue(), msg)
-
 
     def testDisableWindowsTrue(self):
         """
@@ -130,7 +118,6 @@ class TestGreenStream(unittest.TestCase):
         msg = c.red("some colored string")
         gs.write(msg)
         self.assertEqual(len(gs.stream.getvalue()), len(msg))
-
 
     @unittest.skipIf(platform.system() != 'Windows',
                      "Colorama won't strip ANSI unless runing on Windows")
@@ -146,7 +133,6 @@ class TestGreenStream(unittest.TestCase):
         import colorama
         self.assertTrue(issubclass(type(gs.stream),
                         colorama.ansitowin32.StreamWrapper))
-
 
     @patch('green.output.unidecode')
     def testUnidecodeAppveyor(self, mock_unidecode):
