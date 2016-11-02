@@ -23,6 +23,10 @@ if [[ "${PYTHON_VERSIONS}" == *-dev ]] ; then
     PYTHON_VERSIONS="${PYTHON_VERSIONS::-4}"
 fi
 
+if [[ "${PYTHON_VERSIONS}" == pypy3* ]] ; then
+    PYTHON_VERSIONS="pypy3"
+fi
+
 echo "Identified python versions: `echo ${PYTHON_VERSIONS} | tr '\n' ' '`"
 
 # Make sure each of the pythons has the necessary requirements installed
