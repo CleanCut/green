@@ -3,6 +3,10 @@ build: false
 environment:
     matrix:
         - PYTHON: "C:/Python27"
+        - PYTHON: "C:/Python33"
+        - PYTHON: "C:/Python34"
+        - PYTHON: "C:/Python35"
+        - PYTHON: "C:/Python35-x64"
 init:
     - "ECHO %PYTHON%"
     - ps: "ls C:/Python*"
@@ -10,6 +14,8 @@ install:
       - ps: (new-object net.webclient).DownloadFile('https://bootstrap.pypa.io/get-pip.py', 'C:/get-pip.py')
       - "%PYTHON%/python.exe C:/get-pip.py"
       - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
+      # install extra dependancies for testing
+      - "%PYTHON%/Scripts/pip.exe install coverage django testtools"
 test_script:
     - "%PYTHON%/python.exe -m green.cmdline -vvv -t green"
 platform:
