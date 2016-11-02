@@ -8,12 +8,15 @@ import traceback
 from unittest.result import failfast
 
 from green.output import Colors, debug
-from green.terminal import getTerminalSize
 from green.version import pretty_version
 
+# introduced in Python 3.3
+try:
+    from shutil import get_terminal_size
+except ImportError:
+    from backports.shutil_get_terminal_size import get_terminal_size
 
-terminal_width, _ignored = getTerminalSize()
-
+terminal_width, _ignored = get_terminal_size()
 
 def proto_test(test):
     """

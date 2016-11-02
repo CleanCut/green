@@ -2,3 +2,4 @@ colorama
 mock
 python-termstyle
 unidecode
+backports.shutil_get_terminal_size; python_version < '3.3'

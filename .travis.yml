@@ -21,8 +21,6 @@ matrix:
               - sleep 1
               - brew install pypy
               - sleep 1
-              - brew install pypy3
-              - sleep 1
               - pip3 install .
               - sleep 1
               - pip3 install virtualenv
@@ -30,10 +28,6 @@ matrix:
               - pip_pypy install .
               - sleep 1
               - pip_pypy install virtualenv
-              - sleep 1
-              - pip_pypy3 install .
-              - sleep 1
-              - pip_pypy3 install virtualenv
               - sleep 1
         - os: linux
           python: 2.7
@@ -54,10 +48,11 @@ matrix:
           python: pypy
           language: python
         - os: linux
-          python: pypy3
+          python: 'pypy3'
           language: python
 
     allow_failures:
         - python: '3.6-dev'
         - python: "nightly"
+        - python: 'pypy3'
         - os: "osx"
