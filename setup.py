@@ -28,7 +28,7 @@ setup(
         ':sys_platform=="win32"': ['colorama>=0.2.5'],
         # shutil.get_terminal_size() introduced in Python 3.3
         ':python_version=="2.7"': ['backports.shutil_get_terminal_size>=1.0.0'],
-        # add here for PyPy3
+        # add here for PyPy3.3
         ':python_version=="3.3"': ['backports.shutil_get_terminal_size>=1.0.0'],
     },
     entry_points = {

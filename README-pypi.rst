@@ -22,7 +22,7 @@ Features
 - **Descriptive** - Four verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with `coverage`_
-- **Modern** - Supports Python 2.7, 3.4+, `PyPy`_ and `PyPy3`_
+- **Modern** - Supports Python 2.7, 3.4+, and `PyPy`_
 - **Portable** - Completely supports OS X, Linux, and BSDs (and Windows on Python 2.7 and mostly on 3.4+)
 - **Living** - This project grows and changes.  See the `changelog`_
 
@@ -31,5 +31,4 @@ Features
 .. _tutorial on how to correctly layout unit tests: https://github.com/CleanCut/green#unit-test-structure-tutorial
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
-.. _PyPy3: http://pypy.org
 .. _changelog: https://github.com/CleanCut/green/blob/master/CHANGELOG.md
