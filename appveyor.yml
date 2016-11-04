@@ -3,7 +3,6 @@ build: false
 environment:
     matrix:
         - PYTHON: "C:/Python27"
-        - PYTHON: "C:/Python33"
         - PYTHON: "C:/Python34"
         - PYTHON: "C:/Python35"
         - PYTHON: "C:/Python35-x64"
@@ -17,6 +16,6 @@ install:
       # install extra dependancies for testing
       - "%PYTHON%/Scripts/pip.exe install coverage django testtools"
 test_script:
-    - "%PYTHON%/python.exe -m green.cmdline -vvv -t green"
+    - "%PYTHON%/python.exe -m green.cmdline -vvv -t green -s 1"
 platform:
     - AnyCPU
