@@ -358,7 +358,8 @@ class GreenTestResult(BaseTestResult):
                 self.args.cov.combine()
                 self.args.cov.save()
                 self.args.cov.report(file=self.stream,
-                                     omit=self.args.omit_patterns)
+                                     omit=self.args.omit_patterns,
+                                     show_missing=True)
             except CoverageException as ce:
                 if (len(ce.args) == 1) and ("No data to report" not in ce.args[0]):
                     raise ce
@@ -450,7 +451,7 @@ class GreenTestResult(BaseTestResult):
                 test.getDescription(self.verbose),
                 indent=2,
                 outcome_char=outcome_char)
-            if terminal_width:
+            if terminal_width: # pragma: no cover
                 cursor_rewind = int(ceil(float(len(text_output)) / terminal_width)) - 1
                 if cursor_rewind:
                     self.stream.write(self.colors.up(cursor_rewind))

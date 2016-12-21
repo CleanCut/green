@@ -120,7 +120,7 @@ class TestGreenStream(unittest.TestCase):
         self.assertEqual(len(gs.stream.getvalue()), len(msg))
 
     @unittest.skipIf(platform.system() != 'Windows',
-                     "Colorama won't strip ANSI unless runing on Windows")
+                     "Colorama won't strip ANSI unless running on Windows")
     def testDisableWindowsFalse(self):
         """
         disable_windows=False: Colorama strips ANSI color codes from the stream
