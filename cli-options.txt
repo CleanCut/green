@@ -80,15 +80,15 @@ Other Options:
                         Pattern to match test method names after 'test'.
                         Default is '*', meaning match methods named 'test*'.
 
-Coverage Options (Coverage 4.0.3):
+Coverage Options (Coverage 4.2):
   -r, --run-coverage    Produce coverage output.
   -O, --clear-omit      Green tries really hard to set up a good list of
                         patterns of files to omit from coverage reports. If
                         the default list catches files that you DO want to
                         cover you can specify this flag to leave the default
                         list empty to start with. You can then add patterns
-                        back in with --omit-add. The default list is
-                        somethinglike'*/test*,*/termstyle*,*/mock*,*(temp
+                        back in with --omit-add. The default list is something
+                        like'*/test*,*/termstyle*,*/mock*,*(temp
                         dir)*,*(python system packages)*' -- only longer.
   -u PATTERN, --include-patterns PATTERN
                         Comma-separated file-patterns to includie in coverage.

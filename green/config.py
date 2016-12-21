@@ -229,7 +229,7 @@ def parseArguments():  # pragma: no cover
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more "
-        "vebosity. Recommended levels are -v and -vv."),
+        "verbosity. Recommended levels are -v and -vv."),
         default=argparse.SUPPRESS))
 
     other_args = parser.add_argument_group("Other Options")
