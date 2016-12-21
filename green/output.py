@@ -121,6 +121,10 @@ class GreenStream(object):
     1) A handy writeln() method (which calls write() under-the-hood)
     2) Handy formatLine() and formatText() methods, which support indent
        levels, and outcome codes.
+    3) Compatibility with real file objects (by implementing real file object
+       methods as we discover people need them).  So far we have implemented the
+       following functions just for compatibility:
+           writelines(lines)
     """
 
     indent_spaces = 2
@@ -156,6 +160,13 @@ class GreenStream(object):
             # the closest ASCII equivalent
             text = text_type(unidecode(text))
         self.stream.write(text)
+
+    def writelines(self, lines):
+        """
+        Just for better compatibility with real file objects
+        """
+        for line in lines:
+            self.write(line)
 
     def formatText(self, text, indent=0, outcome_char=''):
         # We'll go through each line in the text, modify it, and store it in a

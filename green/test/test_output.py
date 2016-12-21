@@ -9,9 +9,9 @@ except:
     from StringIO import StringIO
 
 try:
-    from unittest.mock import patch
+    from unittest.mock import MagicMock, patch
 except:
-    from mock import patch
+    from mock import MagicMock, patch
 
 from green.output import Colors, GreenStream, debug
 import green.output
@@ -144,3 +144,13 @@ class TestGreenStream(unittest.TestCase):
         gs = GreenStream(s, override_appveyor=True)
         gs.write('something')
         self.assertTrue(mock_unidecode.called)
+
+    def testWritelines(self):
+        """
+        Compatibility function writelines(lines) repeatedly calls write()
+        """
+        s = StringIO()
+        gs = GreenStream(s)
+        gs.write = MagicMock()
+        gs.writelines(["one", "two", "three"])
+        self.assertEqual(len(gs.write.mock_calls), 3)

@@ -1,3 +1,10 @@
+# Version 2.5.3
+##### 20 December 2016
+
+- Improved file object compatibility of GreenStream.  Code that now tries to
+  access the writelines() function on sys.stdout or sys.stderr should no longer
+  crash.  Fixes #146.
+
 # Version 2.5.2
 ##### 20 October 2016
 
