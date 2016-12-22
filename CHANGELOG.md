@@ -5,6 +5,9 @@
   access the writelines() function on sys.stdout or sys.stderr should no longer
   crash.  Fixes #146.
 
+- Explicitly tell coverage to include missing line numbers to restore the
+  default behavior that changed in coverage 4.1 and later.
+
 # Version 2.5.2
 ##### 20 October 2016
 
