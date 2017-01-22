@@ -82,6 +82,8 @@ Other Options:
 
 Coverage Options (Coverage 4.2):
   -r, --run-coverage    Produce coverage output.
+  -R, --quiet-coverage  Do not print coverage report to stdout (coverage files
+                        will still be created). Implies --run-coverage
   -O, --clear-omit      Green tries really hard to set up a good list of
                         patterns of files to omit from coverage reports. If
                         the default list catches files that you DO want to

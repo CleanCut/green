@@ -255,8 +255,8 @@ def parseArguments():  # pragma: no cover
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
         help=("Produce coverage output."), default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-R', '--quiet-coverage', action='store_true',
-        help=("Run coverage and write down results without displaying the "
-             "coverage report in the end. --run-coverage is implied."),
+        help=("Do not print coverage report to stdout (coverage files will "
+            "still be created). Implies --run-coverage"),
         default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-O', '--clear-omit', action='store_true',
         help=("Green tries really hard to set up a good list of patterns of "

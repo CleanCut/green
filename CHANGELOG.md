@@ -1,3 +1,11 @@
+# Version 2.6.0
+##### 22 January 2017
+
+- The `-R, --quiet-coverage` flag can be used to run coverage without printing
+  the coverage report to stdout.  Contributed by Martin Larralde. PR #149.
+  Resolves feature request #148.
+
+
 # Version 2.5.3
 ##### 20 December 2016
 
@@ -7,6 +15,7 @@
 
 - Explicitly tell coverage to include missing line numbers to restore the
   default behavior that changed in coverage 4.1 and later.
+
 
 # Version 2.5.2
 ##### 20 October 2016
@@ -27,6 +36,7 @@
   X installations, I'm going to ignore the failing builds and shake my hand
   furiously at TravisCI.
 
+
 # Version 2.5.1
 ##### 30 June 2016
 
@@ -38,6 +48,7 @@
 
 - Fixed a source of a double-submission bug that was being worked around
   internally.  Contributed by Eli Skeggs.  PR #126.
+
 
 # Version 2.5.0
 ##### 31 May 2016
