@@ -349,7 +349,7 @@ class GreenTestResult(BaseTestResult):
         self.stopTime = time.time()
         self.timeTaken = self.stopTime - self.startTime
         self.printErrors()
-        if self.args.run_coverage:
+        if self.args.run_coverage or self.args.quiet_coverage:
             from coverage.misc import CoverageException
             try:
                 self.stream.writeln()
@@ -357,9 +357,10 @@ class GreenTestResult(BaseTestResult):
                 self.args.cov.save()
                 self.args.cov.combine()
                 self.args.cov.save()
-                self.args.cov.report(file=self.stream,
-                                     omit=self.args.omit_patterns,
-                                     show_missing=True)
+                if not self.args.quiet_coverage:
+                    self.args.cov.report(file=self.stream,
+                                         omit=self.args.omit_patterns,
+                                         show_missing=True)
             except CoverageException as ce:
                 if (len(ce.args) == 1) and ("No data to report" not in ce.args[0]):
                     raise ce

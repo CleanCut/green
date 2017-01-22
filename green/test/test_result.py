@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 import copy
 import sys
+import os
 import unittest
+import tempfile
 
 from green.config import default_args
 from green.output import Colors, GreenStream
@@ -10,13 +12,18 @@ from green.result import GreenTestResult, proto_test, \
 
 try:
     from io import StringIO
-except:
+except ImportError:
     from StringIO import StringIO
 
 try:
     from unittest.mock import MagicMock, patch
-except:
+except ImportError:
     from mock import MagicMock, patch
+
+try:
+    from coverage import coverage, CoverageException
+except ImportError:
+    coverage = None
 
 
 class MyProtoTest(ProtoTest):
@@ -284,15 +291,12 @@ class TestGreenTestResult(unittest.TestCase):
         del(self.stream)
         del(self.args)
 
+    @unittest.skipUnless(coverage, "coverage is required for this test.")
     @patch('green.result.GreenTestResult.printErrors')
     def test_stopTestRun(self, mock_printErrors):
         """
         We ignore coverage's error about not having anything to cover.
         """
-        try:
-            from coverage.misc import CoverageException
-        except:
-            self.skipTest("Coverage needs to be installed for this test.")
         self.args.cov = MagicMock()
         self.args.cov.stop = MagicMock(
                 side_effect=CoverageException('Different Exception'))
@@ -782,3 +786,46 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.assertEqual(gtr.wasSuccessful(), True)
         gtr.all_errors.append('anything')
         self.assertEqual(gtr.wasSuccessful(), False)
+
+
+@unittest.skipUnless(coverage, "coverage is required for this test.")
+class TestGreenTestRunCoverage(unittest.TestCase):
+
+    def setUp(self):
+        self.args = copy.deepcopy(default_args)
+
+        cov_file = tempfile.NamedTemporaryFile(delete=False)
+        cov_file.close()
+
+        self.args.cov = coverage(data_file=cov_file.name,
+                                 omit=self.args.omit_patterns,
+                                 include=self.args.include_patterns,
+                                 timid=True)
+        self.args.cov.start()
+        self.stream = StringIO()
+
+    def tearDown(self):
+        os.remove(self.args.cov.data_files.filename)
+        del(self.stream)
+        del(self.args)
+
+    def _outputFromTest(self, args):
+        class FakeCase(unittest.TestCase):
+            def runTest(self):
+                pass
+        gtr = GreenTestResult(args, GreenStream(self.stream))
+        gtr.startTestRun()
+        gtr.startTest(FakeCase())
+        gtr.stopTestRun()
+        output = self.stream.getvalue()
+        return output.split('\n')
+
+    def test_coverage(self):
+        self.args.run_coverage = True
+        output = self._outputFromTest(self.args)
+        self.assertIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
+
+    def test_quiet_coverage(self):
+        self.args.quiet_coverage = True
+        output = self._outputFromTest(self.args)
+        self.assertNotIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
