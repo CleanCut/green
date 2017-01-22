@@ -62,6 +62,7 @@ default_args             = argparse.Namespace(  # pragma: no cover
         file_pattern     = 'test*.py',
         test_pattern     = '*',
         run_coverage     = False,
+        quiet_coverage   = False,
         clear_omit       = False,
         omit_patterns    = None,
         include_patterns = None,
@@ -253,6 +254,10 @@ def parseArguments():  # pragma: no cover
         "Coverage Options ({})".format(coverage_version))
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
         help=("Produce coverage output."), default=argparse.SUPPRESS))
+    store_opt(cov_args.add_argument('-R', '--quiet-coverage', action='store_true',
+        help=("Run coverage and write down results without displaying the "
+             "coverage report in the end. --run-coverage is implied."),
+        default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-O', '--clear-omit', action='store_true',
         help=("Green tries really hard to set up a good list of patterns of "
             "files to omit from coverage reports.  If the default list "
@@ -399,7 +404,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
                     'help', 'logging', 'version', 'failfast', 'run_coverage',
                     'options', 'completions', 'completion_file', 'clear_omit',
-                    'no_skip_report', 'disable_windows']:
+                    'no_skip_report', 'disable_windows', 'quiet_coverage']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
@@ -492,6 +497,9 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         new_args.include_patterns = new_args.include_patterns.split(',')
     else:
         new_args.include_patterns = []
+
+    if new_args.quiet_coverage:
+        new_args.run_coverage = True
 
     if new_args.run_coverage:
         if not coverage:
