@@ -267,7 +267,7 @@ The other option is to start mirroring your subpackage layout from within a sing
     ├── foo.py
     ├── subpkg
     │   ├── __init__.py
-    │   ├── bar.py
+    │   └── bar.py
     └── test
         ├── __init__.py
         ├── subpkg            # mirror sub-package layout inside test dir
