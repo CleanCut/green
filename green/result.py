@@ -168,6 +168,7 @@ class ProtoTestResult(BaseTestResult):
         super(ProtoTestResult, self).__init__(None, None)
         self.start_callback = start_callback
         self.finalize_callback = finalize_callback
+        self.finalize_callback_called = False
         self.pickle_attrs = [
                 'errors',
                 'expectedFailures',
@@ -241,6 +242,7 @@ class ProtoTestResult(BaseTestResult):
         """
         if self.finalize_callback:
             self.finalize_callback(self)
+            self.finalize_callback_called = True
 
     def addSuccess(self, test):
         """

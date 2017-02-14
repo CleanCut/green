@@ -13,9 +13,9 @@ from green.process import ProcessLogger, DaemonlessProcess, poolRunner
 from green import process
 
 try:
-    from Queue import Queue
+    from Queue import Queue, Empty
 except:
-    from queue import Queue
+    from queue import Queue, Empty
 
 
 class TestProcessLogger(unittest.TestCase):
@@ -179,3 +179,34 @@ class TestPoolRunner(unittest.TestCase):
         poolRunner(module_name, result)
         result.get()
         self.assertEqual(len(result.get().errors), 1)
+
+
+    def test_bad_attr(self):
+        """
+        Accessing a bad attribute is only reported once (see #150)
+        """
+        # Parent directory setup
+        os.chdir(self.tmpdir)
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        basename = os.path.basename(sub_tmpdir)
+        # Child setup
+        fh = open(os.path.join(basename, '__init__.py'), 'w')
+        fh.write('\n')
+        fh.close()
+        fh = open(os.path.join(basename, 'test_pool_runner_bad_attr.py'), 'w')
+        fh.write(dedent(
+            """
+            import unittest
+            class A(unittest.TestCase):
+                def testBadAttr(self):
+                    "".garbage
+            """))
+        fh.close()
+        module_name = basename + '.test_pool_runner_bad_attr.A.testBadAttr'
+        result = Queue()
+        poolRunner(module_name, result)
+        result.get_nowait() # should get the target name
+        result.get_nowait() # should get the result
+        result.get_nowait() # should get None
+        # should raise Empty unless the extra result bug is present
+        self.assertRaises(Empty, result.get_nowait)

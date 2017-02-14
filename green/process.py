@@ -308,8 +308,10 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
         try:
             test.run(result)
             # If your class setUpClass(self) method crashes, the test doesn't
-            # raise an exception, but it does an an entry to errors.
-            if result and getattr(result, 'errors', False):
+            # raise an exception, but it does add an entry to errors.  Some
+            # other things add entries to errors as well, but they all call the
+            # finalize callback.
+            if result and (not result.finalize_callback_called) and getattr(result, 'errors', False):
                 queue.put(test)
                 queue.put(result)
         except:
