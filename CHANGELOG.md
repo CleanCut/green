@@ -1,3 +1,10 @@
+# Version 2.6.1
+##### 14 February 2017
+
+- Fixed a bug that caused a strange extra test result to be output when your
+  test tried to access a member of an object that didn't exist. Fixes #150.
+
+
 # Version 2.6.0
 ##### 22 January 2017
 
