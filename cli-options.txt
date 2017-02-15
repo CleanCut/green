@@ -80,7 +80,7 @@ Other Options:
                         Pattern to match test method names after 'test'.
                         Default is '*', meaning match methods named 'test*'.
 
-Coverage Options (Coverage 4.2):
+Coverage Options (Coverage 4.3.4):
   -r, --run-coverage    Produce coverage output.
   -R, --quiet-coverage  Do not print coverage report to stdout (coverage files
                         will still be created). Implies --run-coverage
