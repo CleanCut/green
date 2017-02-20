@@ -107,7 +107,7 @@ def parseArguments():  # pragma: no cover
             add_help=False,
             description=dedent(
                 """
-                Green is a clean, colorful test runner for Python unit tests.
+                Green is a clean, colorful, fast test runner for Python unit tests.
                 """.rstrip()),
             epilog=dedent(
                 """
@@ -264,16 +264,14 @@ def parseArguments():  # pragma: no cover
             "catches files that you DO want to cover you can specify this "
             "flag to leave the default list empty to start with.  You can "
             "then add patterns back in with --omit-add. The default list is "
-            "something like'*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python "
+            "something like '*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python "
             "system packages)*' -- only longer."),
         default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-u', '--include-patterns', action='store',
         metavar='PATTERN',
-        help=("Comma-separated file-patterns to includie in coverage.  This "
+        help=("Comma-separated file-patterns to include in coverage.  This "
             "implies that anything that does not match the include pattern is "
-            "omitted from coverage reporting.  Note that the pattern needs to "
-            "match an entire relative path, including a file extension, even "
-            "though coverage 4.x doesn't show the file extension."),
+            "omitted from coverage reporting."),
         default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-o', '--omit-patterns', action='store',
         metavar='PATTERN',

@@ -1,3 +1,9 @@
+# Version 2.6.2
+##### 20 February 2017
+
+- Fix some minor issues in help strings that I discovered while working on
+  "Python Testing with Green"
+
 # Version 2.6.1
 ##### 14 February 2017
 
