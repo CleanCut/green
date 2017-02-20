@@ -1,3 +1,9 @@
+# Version 2.6.3
+##### 20 February 2017
+
+- Switched the release process to use python2 for everything, because python3
+  isn't installed in all TravisCI environments.
+
 # Version 2.6.2
 ##### 20 February 2017
 

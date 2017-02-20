@@ -22,9 +22,9 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 test-local:
-	@sudo -H pip3 install -r requirements-optional.txt
-	-@sudo -H pip3 uninstall green
-	@sudo -H make test-installed
+	@pip install -r requirements-optional.txt
+	-@pip uninstall green
+	@make test-installed
 	make test-versions
 	make test-coverage
 	@# test-coverage needs to be last in deps, don't clean after it runs!
@@ -39,14 +39,14 @@ test-coverage:
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
-	# Install under the default python3 and run self-tests
+	# Install under the default python and run self-tests
 	@make clean-silent
-	pip3 install -r requirements-optional.txt
-	python3 setup.py sdist
+	pip install -r requirements-optional.txt
+	python setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	bash -c "cd green-$(VERSION) && python3 setup.py install"
+	bash -c "cd green-$(VERSION) && python setup.py install"
 	bash -c "cd && green -vvv green"
-	pip3 uninstall -y green
+	pip uninstall -y green
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
 
@@ -69,7 +69,7 @@ sanity-checks:
 
 release-test: test-local sanity-checks
 	@echo "\n== CHECKING PyPi-Test =="
-	python3 setup.py sdist upload -r pypi-test
+	python setup.py sdist upload -r pypi-test
 	if [ "`git diff MANIFEST`" != "" ] ; then git add MANIFEST && git commit -m "Added the updated MANIFEST file." ; fi
 
 release-tag:
@@ -78,6 +78,6 @@ release-tag:
 
 release-unsafe:
 	@echo "\n== Releasing Version $(VERSION) =="
-	python3 setup.py sdist upload -r pypi
+	python setup.py sdist upload -r pypi
 
 release: release-test release-tag release-unsafe
