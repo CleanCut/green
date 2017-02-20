@@ -22,8 +22,8 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 test-local:
-	@sudo -H pip install -r requirements-optional.txt
-	-@sudo -H pip uninstall green
+	@sudo -H pip3 install -r requirements-optional.txt
+	-@sudo -H pip3 uninstall green
 	@sudo -H make test-installed
 	make test-versions
 	make test-coverage
@@ -39,14 +39,14 @@ test-coverage:
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
-	# Install under the default python and run self-tests
+	# Install under the default python3 and run self-tests
 	@make clean-silent
-	pip install -r requirements-optional.txt
-	python setup.py sdist
+	pip3 install -r requirements-optional.txt
+	python3 setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	bash -c "cd green-$(VERSION) && python setup.py install"
+	bash -c "cd green-$(VERSION) && python3 setup.py install"
 	bash -c "cd && green -vvv green"
-	pip uninstall -y green
+	pip3 uninstall -y green
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
 

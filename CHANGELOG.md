@@ -3,6 +3,8 @@
 
 - Fix some minor issues in help strings that I discovered while working on
   "Python Testing with Green"
+- Updated the release process so that instead of using a confusing mix of
+  python2 and python3 to test and release, we just use python3.
 
 # Version 2.6.1
 ##### 14 February 2017
