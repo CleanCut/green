@@ -75,7 +75,7 @@ try:
 
         def __init__(self, verbose=1, **kwargs):
 
-            super ().__init__ ()
+            super(DjangoRunner, self).__init__()
             self.verbose = verbose
 
         @classmethod
