@@ -1,3 +1,10 @@
+# Version 2.7.0
+##### 2 March 2017
+
+- When used as a Django test runner, we now inject a `--green-verbosity`
+  command-line argument that can be used to control green's verbosity level
+  from Django.  Contributed by Anomitra Saha.  Resolves #37 and #153.
+
 # Version 2.6.3
 ##### 20 February 2017
 

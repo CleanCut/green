@@ -20,9 +20,7 @@ class TestDjangoMissing(unittest.TestCase):
 
     def test_importError(self):
         """
-
-        Raises the appropriate exception if Django
-        is not available
+        Raises ImportError if Django is not available
         """
         self.assertRaises(ImportError, djangorunner.django_missing)
 
@@ -41,7 +39,7 @@ class TestDjangoRunner(unittest.TestCase):
 
     def test_run_testsWithLabel(self):
         """
-        Labelled tests run okay
+        Labeled tests run okay
         """
         dr = djangorunner.DjangoRunner()
         dr.setup_test_environment    = MagicMock()
@@ -130,7 +128,6 @@ class TestDjangoRunner(unittest.TestCase):
         self.assertEqual(mock_run.call_args[0][0], 123)
 
     def test_check_verbosity_argument_recognised(self):
-
         """
         Ensure that the python manage.py test command
         recognises the --green-verbosity flag
@@ -146,10 +143,9 @@ class TestDjangoRunner(unittest.TestCase):
         parser = ArgumentParser()
         test_command.add_arguments(parser)
         args = parser.parse_args()
-        self.assertIn('verbose', args)
+        self.assertIn('verbosity', args)
 
     def test_check_default_verbosity(self):
-
         """
         If no verbosity is passed, default value is set
         """
@@ -164,10 +160,9 @@ class TestDjangoRunner(unittest.TestCase):
         parser = ArgumentParser()
         test_command.add_arguments(parser)
         args = parser.parse_args()
-        self.assertEqual(args.verbose,-1)
+        self.assertEqual(args.verbosity,-1)
 
     def test_run_with_verbosity_flag(self):
-
         """
         Tests should run fine if verbosity is passed
         through CLI flag
@@ -177,7 +172,7 @@ class TestDjangoRunner(unittest.TestCase):
         dr.setup_databases           = MagicMock()
         dr.teardown_databases        = MagicMock()
         dr.teardown_test_environment = MagicMock()
-        dr.verbose = 2
+        dr.verbosity = 2
         saved_loadTargets = djangorunner.loadTargets
         djangorunner.loadTargets = MagicMock()
         self.addCleanup(setattr, djangorunner, 'loadTargets',
