@@ -184,6 +184,13 @@ Django can use green as the test runner for running tests.
 ```python
 TEST_RUNNER="green.djangorunner.DjangoRunner"
 ```
+- For verbosity, green adds an extra command-line option to `manage.py` which
+  you can pass the number of `v`'s you would have used on green.
+```
+./manage.py test --green-verbosity 3
+```
+- For all other non-default green configuration under Django, you will need to
+  use green configuration files.
 
 ### nose-parameterized
 
