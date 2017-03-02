@@ -73,6 +73,19 @@ try:
 
     class DjangoRunner(DiscoverRunner):
 
+        def __init__(self, verbose=-1, **kwargs):
+
+            super(DjangoRunner, self).__init__()
+            self.verbose = verbose
+
+        @classmethod
+        def add_arguments(cls, parser):
+            parser.add_argument ('--green-verbosity',
+                                    action='store', dest='verbose', default=-1,
+                                    help="""Used to select a verbosity level for the tests.
+                                    Values can range from 1-3 and overrides the configuration
+                                    provided in the .green file""")
+
         def run_tests(self, test_labels, extra_tests=None, **kwargs):
             """
             Run the unit tests for all the test labels in the provided list.
@@ -98,6 +111,8 @@ try:
                 test_labels = ['.']
 
             args = mergeConfig(Namespace())
+            if int(self.verbose) in (1,2,3):
+                args.verbose = int(self.verbose)
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
             suite = loadTargets(args.targets)
