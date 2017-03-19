@@ -13,7 +13,7 @@ from green.version import pretty_version
 # introduced in Python 3.3
 try:
     from shutil import get_terminal_size
-except ImportError:
+except ImportError: # pragma: no cover
     from backports.shutil_get_terminal_size import get_terminal_size
 
 terminal_width, _ignored = get_terminal_size()
