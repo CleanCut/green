@@ -254,7 +254,8 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
 
     def cleanup():
         # Restore the state of the temp directory
-        shutil.rmtree(tempfile.tempdir, ignore_errors=True)
+        if sys.version_info[0] == 2: # pragma: no cover
+            shutil.rmtree(tempfile.tempdir, ignore_errors=True)
         tempfile.tempdir = saved_tempdir
         queue.put(None)
         # Finish coverage
