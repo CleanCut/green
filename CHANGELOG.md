@@ -1,3 +1,14 @@
+# Version 2.7.1
+##### 19 March 2017
+
+- Stop cleaning up the temporary directory on versions of Python other than 2,
+  since some things like multiprocess.Value in versions > 2 trigger an
+  auto-cleanup of the temporary directory that crashes if it has already been
+  cleaned up.  Resolves #154.
+
+- macOS builds on TravisCI have been passing awhile.  Start counting them
+  towards global pass/fail.
+
 # Version 2.7.0
 ##### 2 March 2017
 
