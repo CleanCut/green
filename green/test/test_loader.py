@@ -102,7 +102,6 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase2.__module__ = self._fake_module_name2
 
         targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
-        print(targets)
         self.assertEqual(targets, ["my_test_module", "my_test_module2"])
 
 
