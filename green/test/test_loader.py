@@ -46,11 +46,17 @@ class TestToParallelTargets(unittest.TestCase):
         class FakeModule(object):
             pass
 
+        class FakeModule2(object):
+            pass
+
         self._fake_module_name = "my_test_module"
+        self._fake_module_name2 = "my_test_module2"
         sys.modules[self._fake_module_name] = FakeModule
+        sys.modules[self._fake_module_name2] = FakeModule2
 
     def tearDown(self):
         del sys.modules[self._fake_module_name]
+        del sys.modules[self._fake_module_name2]
         super(TestToParallelTargets, self).tearDown()
 
     def test_methods_with_no_constraints(self):
@@ -79,6 +85,25 @@ class TestToParallelTargets(unittest.TestCase):
 
         targets = loader.toParallelTargets(NormalTestCase(), [full_name])
         self.assertEqual(targets, [full_name])
+
+    def test_filter_out_dot(self):
+        """
+        toParallelTargets() correctly returns modules when '.' is in target list
+        """
+        class NormalTestCase(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        class NormalTestCase2(unittest.TestCase):
+            def runTest(self):
+                pass
+
+        NormalTestCase.__module__ = self._fake_module_name
+        NormalTestCase2.__module__ = self._fake_module_name2
+
+        targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
+        print(targets)
+        self.assertEqual(targets, ["my_test_module", "my_test_module2"])
 
 
 class TestCompletions(unittest.TestCase):

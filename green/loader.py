@@ -54,6 +54,7 @@ def toParallelTargets(suite, targets):
     when a dotted name representing something more granular than a module was
     input (like an individal test case or test method)
     """
+    targets = filter(lambda x: x != '.', targets)
     # First, convert the suite to a proto test list - proto tests nicely parse
     # things like the fully dotted name of the test and the finest-grained
     # module it belongs to, which simplifies our job.

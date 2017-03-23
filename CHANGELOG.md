@@ -1,3 +1,11 @@
+# Version 2.7.2
+##### 22 March 2017
+
+- Fixed a corner-case where targets wouldn't be parallelized if you ran green
+  inside a directory containing only test modules (files) with no packages
+  (directories).  The result would be a single worker process would handle all
+  testing while the other worker processes sat idle.
+
 # Version 2.7.1
 ##### 19 March 2017
 
