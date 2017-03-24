@@ -1,3 +1,4 @@
+# encoding: utf-8
 from __future__ import unicode_literals
 import copy
 import sys
@@ -619,6 +620,25 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn('test_printErrorsVerbose4', self.stream.getvalue())
         self.assertIn('raise Exception', self.stream.getvalue())
         self.assertIn('Error', self.stream.getvalue())
+
+    def test_printErrors_Py2Unicode(self):
+        """
+        printErrors() doesn't crash in Python 2 when tracebacks contain unicode
+        """
+        try:
+            raise Exception(u'Das Böse ist immer und überall')
+        except:
+            err = sys.exc_info()
+        self.args.verbose = 1
+        self.args.termcolor = False
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.addError(MyProtoTest(), proto_error(err))
+        gtr.printErrors() # We shouldn't hit an exception here
+        self.assertIn('\n\n', self.stream.getvalue())
+        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
+        self.assertIn('raise Exception', self.stream.getvalue())
+        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn('Böse', self.stream.getvalue())
 
     def test_addProtoTestResult(self):
         """

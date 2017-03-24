@@ -3,6 +3,7 @@ from __future__ import print_function
 
 from collections import OrderedDict
 from math import ceil
+import sys
 import time
 import traceback
 from unittest.result import failfast
@@ -567,6 +568,14 @@ class GreenTestResult(BaseTestResult):
             # Frame Line
             relevant_frames = []
             for i, frame in enumerate(err.traceback_lines):
+                # Python2 tracebacks containing unicode need some special handling
+                # This doesn't always make it readable, but at least it doesn't
+                # crash
+                if sys.version_info[0] == 2: # pragma: no cover
+                    try:
+                        ''.join([frame]) # intentionally trigger exceptions
+                    except UnicodeDecodeError:
+                        frame = frame.decode('utf-8')
                 debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
                       + "\n{}".format(self.colors.yellow(frame)), level=3)
                 # Ignore useless frames

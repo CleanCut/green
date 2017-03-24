@@ -1,3 +1,9 @@
+# Version 2.7.3
+##### 24 March 2017
+
+- Fixed a green crash that could occur when dealing with unicode literals in
+  raised exceptions under Python 2.
+
 # Version 2.7.2
 ##### 22 March 2017
 
