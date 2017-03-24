@@ -23,7 +23,6 @@ test: test-versions test-installed test-coverage
 
 test-local:
 	@pip install -r requirements-optional.txt
-	-@pip uninstall green
 	@make test-installed
 	make test-versions
 	make test-coverage
@@ -37,13 +36,13 @@ test-coverage:
 
 test-installed:
 	# Install under the default python and run self-tests
+	-@pip uninstall green
 	@make clean-silent
 	pip install -r requirements-optional.txt
 	python setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
 	bash -c "cd green-$(VERSION) && python setup.py install"
 	bash -c "cd && green -vvv green"
-	pip uninstall -y green
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
 
