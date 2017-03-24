@@ -36,7 +36,7 @@ test-coverage:
 
 test-installed:
 	# Install under the default python and run self-tests
-	-@pip uninstall green
+	-@pip uninstall -y green
 	@make clean-silent
 	pip install -r requirements-optional.txt
 	python setup.py sdist
