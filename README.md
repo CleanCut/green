@@ -56,7 +56,7 @@ Getting Help
 
 Submit **questions** about Green to [Stack
 Overflow](http://stackoverflow.com/questions/ask?tags=python-green).  That gives a
-large audience a chance to participate, and also make it much more likely that
+large audience a chance to participate and also makes it much more likely that
 the question will show up in search engines.
 
 For **feature requests** and **bug reports** [submit an issue
