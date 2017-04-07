@@ -223,7 +223,9 @@ def parseArguments():  # pragma: no cover
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-l', '--logging', action='store_true',
         help="Don't configure the root logger to redirect to /dev/null, "
-        "enabling internal debugging output", default=argparse.SUPPRESS))
+        "enabling internal debugging output, as well as any output test (or "
+        "tested) code may be sending via the root logger.",
+        default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-d', '--debug', action='count',
         help=("Enable internal debugging statements.  Implies --logging.  Can "
         "be specified up to three times for more debug output."),
