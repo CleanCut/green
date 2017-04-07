@@ -53,4 +53,5 @@ matrix:
 
     allow_failures:
         - python: "nightly"
+        - python: 'pypy'
         - python: 'pypy3'

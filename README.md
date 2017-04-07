@@ -209,7 +209,7 @@ interested.
 Unit Test Structure Tutorial
 ----------------------------
 
-This tutorial *does* cover:
+This tutorial covers:
 
 - External structure of your project (directory and file layout)
 - Skeleton of a real test module
@@ -217,7 +217,7 @@ This tutorial *does* cover:
 - Gotchas about naming...everything.
 - Where to run green from and what the output could look like.
 
-For more online training please check out
+For more in-depth online training please check out
 [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md):
 
 - Layout your test packages and modules correctly
