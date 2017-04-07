@@ -51,10 +51,10 @@ For **questions**, **comments**, **feature requests**, and **bug reports**
 issue tracker for Green.
 
 
-Contribute
-----------
+Contributing
+------------
 
-- Advance your learning and support the project financially by subscribing to
+- *Advance your learning* and *support Green financially* by subscribing to
   [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
 - Submit a Pull Request with a bug fix or new feature.
 - Let us know how you use green, or what issues you are having with green.
