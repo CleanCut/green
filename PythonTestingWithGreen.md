@@ -49,20 +49,21 @@ You have the means, and you are a generous soul.
 - **$150** - _25% off_ - [GREEN_SPONSOR](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_SPONSOR)
 - **$200** - _Full Price_ - [GREEN_ANGEL](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL) -
   With this "coupon", $194 reaches the project.  Without it, only $94 of the
-  $200 list price reaches the project.  Hence the code.
+  full purchase reaches the project.  Hence the code.  Use the code!
 
-Custom Stuff
--------------
+Custom Discounts
+----------------
 
-I am happy to give custom discounts for students, bulk purchases, and special
-needs.  I am also open to paid contract work to implement your favorite feature
+I am happy to give custom discounts for students, bulk purchases, user group
+meetings, conferences, special needs, etc.  I am also open to paid contract
+work to implement your favorite feature
 (but only if it won't have a negative impact on Green and the community).  Just
 [send me an email](mailto:nathan.stocks@gmail.com).  Note that I'll try to
 _eventually_ get to all enhancements anyway, but with 2 jobs and a wife and
-kids it is not like I have an abundant amount of extra time.
+kids it is not like I have an abundant amount of extra time.  
 
-Contributors Get It FREE
-------------------------
+Contributors Get TWO FREE
+-------------------------
 
 If submit a pull request to Green which is accepted, or report a bug in Green
 that we accept as valid, I would be happy to send you a code for **TWO FREE**
