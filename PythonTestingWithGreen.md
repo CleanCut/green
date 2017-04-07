@@ -27,15 +27,15 @@ least 53% of the purchase price** if you don't use a coupon (sometimes even
 more, if they are doing their own sales or advertising).  If you use the
 coupon, then I get 97% of the purchase.
 
-Temporary Offer
+Early Bird Discount - First 100 Subscribers
 ---------------
 
-- **$20** - _90% off_ - [GREEN_EARLYBIRD](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_EARLYBIRD) - First 100 subscribers only!  (I'll remove this code once it has been used up).
+- **$20** - _90% off_ - [GREEN_EARLYBIRD](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_EARLYBIRD) - First 100 subscribers only!  (I'll remove this code once it has been used up, go ahead and give it a try until then).
 
 Standard Awesome Discount
 -------------------------
 
-You came to Github.  You read this page.  You deserve an awesome discount.
+You came to Github.  You read this page.  You deserve an awesome discount!
 
 - **$50** - _75% off_ - [GREEN_GITHUB](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB) - Thank you!
 
@@ -61,11 +61,10 @@ needs.  I am also open to paid contract work to implement your favorite feature
 _eventually_ get to all enhancements anyway, but with 2 jobs and a wife and
 kids it is not like I have an abundant amount of extra time.
 
-Contributors
-------------
+Contributors Get It FREE
+------------------------
 
-If you ever submit a pull request to Green which is accepted, or report a bug
-in Green that we accept as valid, I would be happy to send you a code for **TWO
-FREE** subscriptions (one for you, and one to give away!).  Just
+If submit a pull request to Green which is accepted, or report a bug in Green
+that we accept as valid, I would be happy to send you a code for **TWO FREE**
+subscriptions (one for you, and one to give away!).  Just
 [send me an email](mailto:nathan.stocks@gmail.com).
-
