@@ -217,16 +217,20 @@ This tutorial *does* cover:
 - Gotchas about naming...everything.
 - Where to run green from and what the output could look like.
 
-This tutorial *does not* cover:
+For more online training please check out
+[Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md):
 
-- [Why you should write unit tests at
-  all](http://stackoverflow.com/questions/67299/is-unit-testing-worth-the-effort)
-- The benefits of [Test-Driven
-  Development](http://en.wikipedia.org/wiki/Test-driven_development)
-- How to use the [unittest](https://docs.python.org/library/unittest.html) module.
-- How to write
-  [good](http://stackoverflow.com/questions/61400/what-makes-a-good-unit-test)
-  unit tests.
+- Layout your test packages and modules correctly
+- Organize your tests effectively
+- Learn the tools in the `unittest` and `mock` modules
+- Write meaningful tests that enable quick refactoring
+- Learn the difference between unit and integration tests
+- Use advanced tips and tricks to get the most out of your tests
+- Improve code quality
+- Refactor code without fear
+- Have a better coding experience
+- Be able to better help others
+
 
 ### External Structure ###
 
