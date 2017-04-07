@@ -22,7 +22,7 @@ it's a win-win.  Use the coupon and you save money while I receive more money
 and can actually spend more time on implementing enhancement proposals and
 fixing bugs.
 
-**Seriously, *DON'T* ** buy the course **without using a coupon!**  I get as
+Seriously, **DON'T** buy the course **without using a coupon!**  I get as
 little as 25%-50% of the purchase price if you don't use a coupon (depending on
 whether you go through an affiliate site or Udemy directly), but when you use
 a coupon, then I can get 97% of the purchase price in many circumstances.
