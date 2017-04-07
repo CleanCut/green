@@ -1,18 +1,21 @@
 Python Testing with Green
 =========================
 
-Hi! I'm Nathan Stocks.  I spent several hundred hours creating Green as an open
-source project, and I continue to spend some hours each week maintaining it.
-
-I would like to _continue_ improving green, but I would also like to support my
-family.  Rather than simply beg for funds, I decided to create something of
-value.
-
 [Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL)
 is an online training course where you can not only learn advanced usage of
 Green, but also learn how to write effective, meaningful Python tests and dive
 deep into the `unittest` and `mock` libraries.  Please support Green by
 subscribing to the course!
+
+The Story
+---------
+
+Hi! I'm Nathan Stocks.  I spent several hundred hours creating Green as an open
+source project, and I continue to spend some hours each week maintaining it.
+
+I would like to _continue_ improving Green, but I would also like to support my
+family.  Rather than simply beg for funds, I decided to create something of
+value.
 
 I actually get *more* money if you buy the course using one of my coupons.  So
 it's a win-win.  Use the coupon and you save money while I receive more money
