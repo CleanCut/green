@@ -25,7 +25,7 @@ fixing bugs.
 **Seriously, *DON'T* ** buy the course **without using a coupon!**  I get as
 little as 25%-50% of the purchase price if you don't use a coupon (depending on
 whether you go through an affiliate site or Udemy directly), but when you use
-a coupon, then I get 97% of the purchase price.  Better for both of us.
+a coupon, then I can get 97% of the purchase price in many circumstances.
 
 Early Bird Discount - First 100 Subscribers
 ---------------
