@@ -56,7 +56,7 @@ Contributing
 
 - *Advance your learning* and *support Green financially* by subscribing to
   [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
-- Submit a Pull Request with a bug fix or new feature.
+- Submit a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) with a bug fix or new feature.
 - Let us know how you use green, or what issues you are having with green.
   Either way, put it on the
   [issue tracker](https://github.com/CleanCut/green/issues/new). Communication

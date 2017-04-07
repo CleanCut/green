@@ -65,7 +65,7 @@ kids it is not like I have an abundant amount of extra time.
 Contributors Get TWO FREE
 -------------------------
 
-If submit a pull request to Green which is accepted, or report a bug in Green
-that we accept as valid, I would be happy to send you a code for **TWO FREE**
-subscriptions (one for you, and one to give away)!  Just
+If you submit a pull request to Green which is accepted, or report a bug in
+Green that we accept as valid, I would be happy to send you a code for **TWO
+FREE** subscriptions (one for you, and one to give away)!  Just
 [send me an email](mailto:nathan.stocks@gmail.com).
