@@ -22,10 +22,10 @@ it's a win-win.  Use the coupon and you save money while I receive more money
 and can actually spend more time on implementing enhancement proposals and
 fixing bugs.
 
-**Seriously, *DON'T* ** buy the course **without using a coupon!**  Udemy takes **at
-least 53% of the purchase price** if you don't use a coupon (sometimes even
-more, if they are doing their own sales or advertising).  If you use the
-coupon, then I get 97% of the purchase.
+**Seriously, *DON'T* ** buy the course **without using a coupon!**  I get as
+little as 25%-50% of the purchase price if you don't use a coupon (depending on
+whether you go through an affiliate site or Udemy directly), but when you use
+a coupon, then I get 97% of the purchase price.  Better for both of us.
 
 Early Bird Discount - First 100 Subscribers
 ---------------
