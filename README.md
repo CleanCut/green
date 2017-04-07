@@ -9,20 +9,21 @@
 #### Table of Contents
 
 1. [Features](https://github.com/CleanCut/green#features)
-2. [Screenshots](https://github.com/CleanCut/green#screenshots)
-3. [Getting Help](https://github.com/CleanCut/green#getting-help)
-4. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
-5. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
-6. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
-7. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
-8. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
-9. [Integration](https://github.com/CleanCut/green#integration)
+2. [Getting Help](https://github.com/CleanCut/green#getting-help)
+3. [Contribute](https://github.com/CleanCut/green#contribute)
+4. [Screenshots](https://github.com/CleanCut/green#screenshots)
+5. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
+6. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
+7. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
+8. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
+9. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
+10. [Integration](https://github.com/CleanCut/green#integration)
   - [Bash and Zsh](https://github.com/CleanCut/green#bash-and-zsh)
   - [coverage](https://github.com/CleanCut/green#coverage)
   - [Django](https://github.com/CleanCut/green#django)
   - [nose-parameterized](https://github.com/CleanCut/green#nose-parameterized)
-10. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
-11. [Origin Story](https://github.com/CleanCut/green#origin-story)
+11. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
+12. [Origin Story](https://github.com/CleanCut/green#origin-story)
 
 
 Features
@@ -37,11 +38,29 @@ Features
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
-- **Modern** - Supports Python 2.7, 3.4+, and [PyPy](http://pypy.org).
-- **Portable** - Completely supports OS X, Linux, and BSDs (and Windows on Python 2.7 and mostly on 3.4+).
+- **Modern** - Supports Python 2.7, and 3.4+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
+- **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
 
+Getting Help
+------------
+
+For **questions**, **comments**, **feature requests**, and **bug reports**
+[submit an issue](https://github.com/CleanCut/green/issues/new) to the GitHub
+issue tracker for Green.
+
+
+Contribute
+----------
+
+- Advance your learning and support the project financially by subscribing to
+  [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
+- Submit a Pull Request with a bug fix or new feature.
+- Let us know how you use green, or what issues you are having with green.
+  Either way, put it on the
+  [issue tracker](https://github.com/CleanCut/green/issues/new). Communication
+  with real users improves the project.
 
 Screenshots
 -----------
@@ -49,19 +68,6 @@ Screenshots
 #### Top: With Green!  Bottom: Without Green :-(
 
 ![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
-
-
-Getting Help
-------------
-
-Submit **questions** about Green to [Stack
-Overflow](http://stackoverflow.com/questions/ask?tags=python-green).  That gives a
-large audience a chance to participate and also makes it much more likely that
-the question will show up in search engines.
-
-For **feature requests** and **bug reports** [submit an issue
-](https://github.com/CleanCut/green/issues/new) to the GitHub issue tracker for
-Green.
 
 
 Basic Usage
