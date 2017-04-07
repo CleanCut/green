@@ -34,7 +34,7 @@ Features
 - **Fast** - Tests run in independent processes.  (One per processor by default.  Does *not* play nicely with `gevent`)
 - **Powerful** - Multi-target + auto-discovery.
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
-- **Descriptive** - Four verbosity levels, from just dots to full docstring output.
+- **Descriptive** - Multiple verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).

@@ -22,7 +22,7 @@ it's a win-win.  Use the coupon and you save money while I receive more money
 and can actually spend more time on implementing enhancement proposals and
 fixing bugs.
 
-**Seriously, *DON'T* buy the course without using a coupon!**  Udemy takes **at
+**Seriously, *DON'T* ** buy the course **without using a coupon!**  Udemy takes **at
 least 53% of the purchase price** if you don't use a coupon (sometimes even
 more, if they are doing their own sales or advertising).  If you use the
 coupon, then I get 97% of the purchase.
@@ -59,7 +59,7 @@ meetings, conferences, special needs, etc.  I am also open to paid contract
 work to implement your favorite feature
 (but only if it won't have a negative impact on Green and the community).  Just
 [send me an email](mailto:nathan.stocks@gmail.com).  Note that I'll try to
-_eventually_ get to all enhancements anyway, but with 2 jobs and a wife and
+_eventually_ get to all enhancements anyway, but with two jobs and a wife and
 kids it is not like I have an abundant amount of extra time.  
 
 Contributors Get TWO FREE
@@ -67,5 +67,5 @@ Contributors Get TWO FREE
 
 If submit a pull request to Green which is accepted, or report a bug in Green
 that we accept as valid, I would be happy to send you a code for **TWO FREE**
-subscriptions (one for you, and one to give away!).  Just
+subscriptions (one for you, and one to give away)!  Just
 [send me an email](mailto:nathan.stocks@gmail.com).
