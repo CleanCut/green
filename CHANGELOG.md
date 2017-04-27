@@ -5,6 +5,8 @@
   only a small number of skips, expectedFailures, and unexpectedSuccesses were
   run (and no passes, fails, or errors).
 
+- Improved the help message for `-l, --logging`
+
 # Version 2.7.3
 ##### 24 March 2017
 

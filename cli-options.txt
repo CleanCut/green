@@ -60,7 +60,9 @@ Output Options:
   -h, --help            Show this help message and exit.
   -V, --version         Print the version of Green and Python and exit.
   -l, --logging         Don't configure the root logger to redirect to
-                        /dev/null, enabling internal debugging output
+                        /dev/null, enabling internal debugging output, as well
+                        as any output test (or tested) code may be sending via
+                        the root logger.
   -d, --debug           Enable internal debugging statements. Implies
                         --logging. Can be specified up to three times for more
                         debug output.
