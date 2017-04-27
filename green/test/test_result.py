@@ -807,6 +807,42 @@ class TestGreenTestResultAdds(unittest.TestCase):
         gtr.all_errors.append('anything')
         self.assertEqual(gtr.wasSuccessful(), False)
 
+    def test_wasSuccessful_expectedFailures(self):
+        """
+        wasSuccessful returns what we expect when we only have expectedFailures
+        """
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.expectedFailures.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), True)
+
+    def test_wasSuccessful_passing(self):
+        """
+        wasSuccessful returns what we expect when we only have passing tests
+        """
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.passing.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), True)
+
+    def test_wasSuccessful_skipped(self):
+        """
+        wasSuccessful returns what we expect when we only have skipped tests
+        """
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.skipped.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), True)
+
+    def test_wasSuccessful_unexpectedSuccesses(self):
+        """
+        wasSuccessful returns what we expect when we only have unexpectedSuccesses
+        """
+        self.args.verbose = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.unexpectedSuccesses.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), True)
+
 
 @unittest.skipUnless(coverage, "coverage is required for this test.")
 class TestGreenTestRunCoverage(unittest.TestCase):

@@ -595,7 +595,13 @@ class GreenTestResult(BaseTestResult):
         Tells whether or not the overall run was successful
         """
         # fail if no tests are run.
-        if len(self.all_errors) == 0 and len(self.passing) == 0:
+        if sum(len(x) for x in [
+                self.errors,
+                self.expectedFailures,
+                self.failures,
+                self.passing,
+                self.skipped,
+                self.unexpectedSuccesses]) == 0:
             return False
         else:
             return len(self.all_errors) == 0
