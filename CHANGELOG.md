@@ -1,6 +1,16 @@
 # Version 2.7.4
 ##### 26 April 2017
 
+- Added a page about the Udemy course
+  [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md),
+  with lots of nice coupons and discount codes just for finding the Github
+  page.  Check it out!
+
+- PyPy support is now best-effort for all versions of PyPy.  TravisCI's PyPy
+  installations are just...flaky.  They seem to work everywhere else, we just
+  don't fail due to failing PyPy builds anymore, because we just can't take the
+  weirdness.
+
 - Fixed a condition where green could return failure to the calling shell if
   only a small number of skips, expectedFailures, and unexpectedSuccesses were
   run (and no passes, fails, or errors).
