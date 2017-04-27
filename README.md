@@ -1,30 +1,11 @@
-# Green
-## A clean, colorful, fast python test runner.
-
 [![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 [![Posix Build Status](https://img.shields.io/travis/CleanCut/green.svg?style=flat)](https://travis-ci.org/CleanCut/green)
 [![Windows Build Status](http://img.shields.io/appveyor/ci/CleanCut/green.svg?style=flat)](https://ci.appveyor.com/project/CleanCut/green)
 [![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
 
+# Green -- A clean, colorful, fast python test runner.
+
 #### Table of Contents
-
-1. [Features](https://github.com/CleanCut/green#features)
-2. [Getting Help](https://github.com/CleanCut/green#getting-help)
-3. [Contribute](https://github.com/CleanCut/green#contribute)
-4. [Screenshots](https://github.com/CleanCut/green#screenshots)
-5. [Basic Usage](https://github.com/CleanCut/green#basic-usage)
-6. [Basic Troubleshooting](https://github.com/CleanCut/green#basic-troubleshooting)
-7. [Verbosity Levels](https://github.com/CleanCut/green#verbosity-levels)
-8. [Canned Examples](https://github.com/CleanCut/green#canned-examples)
-9. [Advanced Usage](https://github.com/CleanCut/green#advanced-usage)
-10. [Integration](https://github.com/CleanCut/green#integration)
-  * [Bash and Zsh](https://github.com/CleanCut/green#bash-and-zsh)
-  * [coverage](https://github.com/CleanCut/green#coverage)
-  * [Django](https://github.com/CleanCut/green#django)
-  * [nose-parameterized](https://github.com/CleanCut/green#nose-parameterized)
-11. [Unit Test Structure Tutorial](https://github.com/CleanCut/green#unit-test-structure-tutorial)
-12. [Origin Story](https://github.com/CleanCut/green#origin-story)
-
 
 Features
 --------
@@ -43,41 +24,41 @@ Features
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
 
-Getting Help
-------------
+Community
+---------
 
-For **questions**, **comments**, **feature requests**, and **bug reports**
-[submit an issue](https://github.com/CleanCut/green/issues/new) to the GitHub
-issue tracker for Green.
-
-
-Contributing
-------------
-
-- *Advance your learning* and *support Green financially* by subscribing to
-  [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
+- For **questions**, **comments**, **feature requests**, and **bug reports**
+  [submit an issue](https://github.com/CleanCut/green/issues/new) to the GitHub
+  issue tracker for Green.
 - Submit a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) with a bug fix or new feature.
 - Let us know how you use green, or what issues you are having with green.
   Either way, put it on the
   [issue tracker](https://github.com/CleanCut/green/issues/new). Communication
   with real users improves the project.
 
+Training Course -- Python Testing with Green
+--------
+
+Advance your learning and support Green by subscribing to
+[Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL).
+We have [many discounts available](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
+if you do not have the means to pay full price!
+
+<a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL" rel="Python Testing with Green - Full Price">![Python Testing with Green - Full Price](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)]</a>
+
 Screenshots
 -----------
 
 #### Top: With Green!  Bottom: Without Green :-(
 
-![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/screenshot.png)
+![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/img/screenshot.png)
 
 
-Basic Usage
+Quick Start
 -----------
 
-You may need to prepend the installation command with `sudo` or run it as root
-if your normal user cannot write to the local Python package directory.
-
 ```bash
-pip3 install green    # To upgrade: "pip3 install --upgrade green"
+pip install green    # To upgrade: "pip install --upgrade green"
 ```
 
 Now run green...
@@ -97,9 +78,20 @@ green test_stuff.py
 # Assuming you want to run TestClass.test_function inside
 # package/test/test_module.py ...
 green package.test.test_module.TestClass.test_function
+
+# To see all examples of all the failures, errors, etc. that could occur:
+green green.examples
+
+
+# To run Green's own internal unit tests:
+green green
 ```
 
-Basic Troubleshooting
+For more help, see the [complete command-line
+options](https://github.com/CleanCut/green/blob/master/cli-options.txt) or run
+`green --help`.
+
+Troubleshooting
 ---------------------
 
 One easy way to avoid common importing problems is to navigate to the *parent*
@@ -122,42 +114,6 @@ export PYTHONPATH=/parent/directory
 cd /parent/directory/code_directory
 green
 ```
-
-Verbosity Levels
-----------------
-
-By default, Green mimics the verbosity levels of vanilla unittest, meaning that
-output is mostly just dots.  For Green we recommend adding more verbosity by
-using the `-v` or `-vv` options.
-
-Levels:
-- `default` - Dots, tracebacks, and summary line.
-- `-v` - Add module/class heirarchy and function names
-- `-vv` - Version information added. Function names are replaced with first line of docstring.
-- `-vvv` - Highest verbosity level recognized.  Details coming soon.
-
-See the section entitled [Running Green](#running-green) for example output.
-
-Canned Examples
----------------
-
-To see all examples of all the failures, errors, etc. that could occur:
-
-    green green.examples
-
-
-To run Green's own internal unit tests:
-
-    green green
-
-
-Advanced Usage
---------------
-
-See the [complete command-line
-options](https://github.com/CleanCut/green/blob/master/cli-options.txt) or run
-`green --help`.
-
 
 Integration
 -----------
