@@ -5,8 +5,6 @@
 
 # Green -- A clean, colorful, fast python test runner.
 
-#### Table of Contents
-
 Features
 --------
 
@@ -29,12 +27,10 @@ Community
 
 - For **questions**, **comments**, **feature requests**, and **bug reports**
   [submit an issue](https://github.com/CleanCut/green/issues/new) to the GitHub
-  issue tracker for Green.
-- Submit a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) with a bug fix or new feature.
-- Let us know how you use green, or what issues you are having with green.
-  Either way, put it on the
-  [issue tracker](https://github.com/CleanCut/green/issues/new). Communication
-  with real users improves the project.
+  issue tracker for Green.  Communication with real users improves the project.
+- Submit a [pull
+  request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
+  with a bug fix or new feature.
 
 Training Course -- Python Testing with Green
 --------
