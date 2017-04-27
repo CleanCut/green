@@ -1,3 +1,10 @@
+# Version 2.7.4
+##### 26 April 2017
+
+- Fixed a condition where green could return failure to the calling shell if
+  only a small number of skips, expectedFailures, and unexpectedSuccesses were
+  run (and no passes, fails, or errors).
+
 # Version 2.7.3
 ##### 24 March 2017
 
