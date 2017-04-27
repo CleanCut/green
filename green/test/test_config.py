@@ -79,6 +79,7 @@ class ConfigBase(unittest.TestCase):
 
     def setUp(self):
         self.tmpd = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpd)
         # Set CWD to known empty directory so we don't pick up some other .green
         # file from the CWD tests are actuall run from.
         save_cwd = os.getcwd()
@@ -119,9 +120,6 @@ class ConfigBase(unittest.TestCase):
                           "omit-patterns = {}".format(self.cmd_filename),
                           "run-coverage = {}".format(self.cmd_run_coverage),
                           ])
-
-    def tearDown(self):
-        shutil.rmtree(self.tmpd)
 
 
 class TestConfig(ConfigBase):
