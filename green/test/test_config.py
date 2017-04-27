@@ -79,6 +79,15 @@ class ConfigBase(unittest.TestCase):
 
     def setUp(self):
         self.tmpd = tempfile.mkdtemp()
+        # Set CWD to known empty directory so we don't pick up some other .green
+        # file from the CWD tests are actuall run from.
+        save_cwd = os.getcwd()
+        self.addCleanup(os.chdir, save_cwd)
+        cwd_dir = os.path.join(self.tmpd, 'cwd')
+        os.mkdir(cwd_dir)
+        os.chdir(cwd_dir)
+        # This represents the $HOME config file, and doubles for the current
+        # working directory config file if we set CWD to self.tmpd
         self.default_filename = os.path.join(self.tmpd, ".green")
         self.default_logging = False
         self.default_version = False
@@ -119,22 +128,6 @@ class TestConfig(ConfigBase):
     """
     All variations of config file parsing works as expected.
     """
-
-    def test_cmd_env_def(self):
-        """
-        Setup: --config on cmd, $GREEN_CONFIG is set, $HOME/.green exists
-        Result: load --config
-        """
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename,
-                                 HOME=self.tmpd):
-            cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ae(["green"],               cfg.sections())
-            ae(self.cmd_filename,       cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage,   cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging,        cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ae(self.default_version,    cfg.getboolean("green", "version"))
 
     def test_cmd_env_nodef(self):
         """
@@ -189,6 +182,25 @@ class TestConfig(ConfigBase):
             ae(self.cmd_logging,           cfg.getboolean("green", "logging"))
             ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
             ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
+
+    def test_nocmd_env_cwd(self):
+        """
+        Setup: no --config option, $GREEN_CONFIG is set, .green in local dir
+        Result: load $GREEN_CONFIG
+        """
+        os.chdir(self.tmpd) # setUp is already set to restore us to our pre-testing cwd
+        os.unlink(self.cmd_filename)
+        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename,
+                                 HOME=self.tmpd):
+            cfg = config.getConfig()
+            ae = self.assertEqual
+            ar = self.assertRaises
+            ae(["green"],                  cfg.sections())
+            ae(self.default_filename,      cfg.get("green", "omit-patterns"))
+            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
+            ae(self.default_logging,           cfg.getboolean("green", "logging"))
+            ae(self.env_no_skip_report,    cfg.getboolean("green", "no-skip-report"))
+            ae(self.default_version,       cfg.getboolean("green", "version"))
 
     def test_nocmd_env_def(self):
         """

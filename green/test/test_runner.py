@@ -355,7 +355,7 @@ class TestProcesses(unittest.TestCase):
                     self.tmpdir = tempfile.gettempdir()
                     self.filename = os.path.join(tempfile.gettempdir(), 'file.txt')
                 def testOne(self):
-                    for msg in [str(x) for x in range(100)]:
+                    for msg in [str(x) for x in range(50)]:
                         fh = open(self.filename, 'w')
                         fh.write(msg)
                         fh.close()
@@ -365,7 +365,7 @@ class TestProcesses(unittest.TestCase):
                         fh.close()
                         self.assertEqual(msg, actual)
                 def testTwo(self):
-                    for msg in [str(x) for x in range(100,200)]:
+                    for msg in [str(x) for x in range(50,100)]:
                         fh = open(self.filename, 'w')
                         fh.write(msg)
                         fh.close()

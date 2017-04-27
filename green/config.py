@@ -236,8 +236,9 @@ def parseArguments():  # pragma: no cover
         help=("Stop execution at the first test that fails, errors, or "
         "unexpectedly succeeds."), default=argparse.SUPPRESS))
     store_opt(other_args.add_argument('-c', '--config', action='store',
-        metavar='FILE', help="Use this config file instead of the one pointed "
-        "to by environment variable GREEN_CONFIG or the default ~/.green",
+        metavar='FILE', help="Use this config file to override any values from "
+        "the config file specified by environment variable GREEN_CONFIG, "
+        "~/.green, and .green in the current working directory.",
         default=argparse.SUPPRESS))
     store_opt(other_args.add_argument('-p', '--file-pattern', action='store',
         metavar='PATTERN',
@@ -354,12 +355,17 @@ def getConfig(filepath=None):  # pragma: no cover
         if os.path.isfile(default_filepath):
             filepaths.append(default_filepath)
 
-    # Medium priority
+    # Low priority
     env_filepath = os.getenv("GREEN_CONFIG")
     if env_filepath and os.path.isfile(env_filepath):
         filepaths.append(env_filepath)
 
-    # Highest priority
+    # Medium priority
+    cwd_filepath = os.path.join(os.getcwd(), ".green")
+    if os.path.isfile(cwd_filepath):
+        filepaths.append(cwd_filepath)
+
+    # High priority
     if filepath and os.path.isfile(filepath):
         filepaths.append(filepath)
 
