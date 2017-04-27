@@ -1,3 +1,12 @@
+# Version 2.8.0
+##### 27 April 2017
+
+- Green now also searches the current working directory for a .green config
+  file.  This can be used as per-project configuration -- just place the .green
+  config file for your project in the same directory you would run your tests
+  from (usually the root of the project).  See `green --help` for the
+  resolution order of the various config files.  Resolves #116.
+
 # Version 2.7.4
 ##### 26 April 2017
 
