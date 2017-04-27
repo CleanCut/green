@@ -1,21 +1,7 @@
 from __future__ import unicode_literals  # pragma: no cover
 from __future__ import print_function    # pragma: no cover
-"""
-Configuration settings are read in this order:
-
-1) ~/.green
-2) A config file specified by the environment variable $GREEN_CONFIG
-3) A config file specified by the command-line argument --config FILE
-4) Command-line arguments.
-
-Any arguments specified in more than one place will be overwritten by the value
-of the last place the setting is seen.  So, for example, if a setting is turned
-on in ~/.green and turned off by a command-line argument, then the setting will
-be turned off.
-
-We have to use this entire file before we can turn coverage on, so we exclude
-it from coverage.  We still have tests, though!
-"""
+# We have to use this entire file before we can turn coverage on, so we exclude
+# it from coverage.  We still have tests, though!
 
 import argparse             # pragma: no cover
 try:                        # pragma: no cover
@@ -123,12 +109,22 @@ def parseArguments():  # pragma: no cover
 
                 CONFIG FILES
 
-                  Green will look for and process three config files if found:
-                  1) $HOME/.green
-                  2) $GREEN_CONFIG
-                  3) A file specified with "--config FILE"
 
-                  Config file format is simply "option = value" on separate lines.  "option" is
+                  Configuration settings are resolved in this order, with settings found later in
+                  the resolution chain overwriting earlier settings (last setting wins).
+
+                  1) $HOME/.green
+                  2) A config file specified by the environment variable $GREEN_CONFIG
+                  3) .green in the local directory (the current working directory of the test run)
+                  4) A config file specified by the command-line argument "--config FILE"
+                  5) Command-line arguments.
+
+                  Any arguments specified in more than one place will be overwritten by the value
+                  of the LAST place the setting is seen.  So, for example, if a setting is turned
+                  on in ~/.green and turned off by a command-line argument, then the setting will
+                  be turned off.
+
+                  Config file format syntax is "option = value" on separate lines.  "option" is
                   the same as the long options above, just without the "--".
 
                   Most values should be "True" or "False".  Accumulated values (verbose, debug)
