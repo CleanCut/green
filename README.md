@@ -40,7 +40,7 @@ Advance your learning and support Green by subscribing to
 We have [many discounts available](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
 if you do not have the means to pay full price!
 
-<a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL" rel="Python Testing with Green - Full Price">![Python Testing with Green - Full Price](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)]</a>
+<a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL" rel="Python Testing with Green - Full Price"> ![Python Testing with Green - Full Price](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)</a>
 
 Screenshots
 -----------
