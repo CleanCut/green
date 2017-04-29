@@ -1,3 +1,10 @@
+# Version 3.8.1
+##### 29 April 2017
+
+- An unexpectedSuccess does not count as a failure for the test run as a whole,
+  so `-f, --failfast` has been updated so that an unexpectedSuccess no longer
+  triggers early termination. Using @expectedFailure is discouraged.
+
 # Version 2.8.0
 ##### 27 April 2017
 

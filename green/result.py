@@ -524,7 +524,6 @@ class GreenTestResult(BaseTestResult):
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
-    @failfast
     def addUnexpectedSuccess(self, test):
         """
         Called when a test passed, but we expected a failure

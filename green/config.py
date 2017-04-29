@@ -233,8 +233,8 @@ def parseArguments():  # pragma: no cover
 
     other_args = parser.add_argument_group("Other Options")
     store_opt(other_args.add_argument('-f', '--failfast', action='store_true',
-        help=("Stop execution at the first test that fails, errors, or "
-        "unexpectedly succeeds."), default=argparse.SUPPRESS))
+        help=("Stop execution at the first test that fails or errors."),
+        default=argparse.SUPPRESS))
     store_opt(other_args.add_argument('-c', '--config', action='store',
         metavar='FILE', help="Use this config file to override any values from "
         "the config file specified by environment variable GREEN_CONFIG, "

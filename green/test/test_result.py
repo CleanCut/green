@@ -366,14 +366,14 @@ class TestGreenTestResult(unittest.TestCase):
 
     def test_failfastAddUnexpectedSuccess(self):
         """
-        addUnexpectedSuccess triggers failfast when it is set
+        addUnexpectedSuccess no longer triggers failfast when it is set
         """
         self.args.failfast = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.assertEqual(gtr.failfast, True)
         self.assertEqual(gtr.shouldStop, False)
         gtr.addUnexpectedSuccess(MyProtoTest())
-        self.assertEqual(gtr.shouldStop, True)
+        self.assertEqual(gtr.shouldStop, False)
 
     def _outputFromVerboseTest(self):
         """
