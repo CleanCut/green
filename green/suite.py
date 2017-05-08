@@ -3,7 +3,8 @@ from __future__ import print_function
 
 from fnmatch import fnmatch
 import sys
-from unittest.suite import _isnotsuite, TestSuite
+from unittest.suite import _call_if_exists, _isnotsuite, TestSuite
+import unittest
 from io import StringIO
 
 from green.config import default_args
@@ -78,6 +79,44 @@ class GreenTestSuite(TestSuite):
             if test:
                 cases += test.countTestCases()
         return cases
+
+    def _handleClassSetUp(self, test, result):
+        previousClass = getattr(result, '_previousTestClass', None)
+        currentClass = test.__class__
+        if currentClass == previousClass:
+            return
+        if result._moduleSetUpFailed:
+            return
+        if getattr(currentClass, "__unittest_skip__", False):
+            return
+
+        try:
+            currentClass._classSetupFailed = False
+        except TypeError:
+            # test may actually be a function
+            # so its class will be a builtin-type
+            pass
+
+        setUpClass = getattr(currentClass, 'setUpClass', None)
+        if setUpClass is not None:
+            _call_if_exists(result, '_setupStdout')
+            try:
+                setUpClass()
+            # THIS is the part Python forgot to implement -- so Green will
+            except unittest.case.SkipTest as e:
+                currentClass.__unittest_skip__ = True
+                currentClass.__unittest_skip_why__ = str(e)
+            # -- END of fix
+            except Exception as e:
+                if isinstance(result, _DebugResult):
+                    raise
+                currentClass._classSetupFailed = True
+                className = util.strclass(currentClass)
+                errorName = 'setUpClass (%s)' % className
+                self._addClassOrModuleLevelException(result, e, errorName)
+            finally:
+                _call_if_exists(result, '_restoreStdout')
+
 
     def run(self, result):
         """
