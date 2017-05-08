@@ -14,7 +14,7 @@ except:  # pragma: no cover
 
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import toParallelTargets
-from green.output import GreenStream
+from green.output import debug, GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
 
@@ -96,6 +96,7 @@ def run(suite, stream, args, testing=False):
                     coverage_number = index + 1
                 else:
                     coverage_number = None
+                debug("Sending {} to runner {}".format(target, poolRunner))
                 pool.apply_async(
                     poolRunner,
                     (target, queue, coverage_number, args.omit_patterns))
