@@ -313,12 +313,16 @@ class ConfigFile(object):  # pragma: no cover
         self.first = True
         self.lines = open(filepath).readlines()
 
-    # Python 2
+    # Python 2.7 (Older dot versions)
     def readline(self):
         try:
             return self.__next__()
         except StopIteration:
             return ''
+
+    # Python 2.7 (Newer dot versions)
+    def next(self):
+        return self.__next__()
 
     # Python 3
     def __iter__(self):
