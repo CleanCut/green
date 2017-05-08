@@ -33,9 +33,9 @@ setup(
     },
     entry_points = {
         'console_scripts' : [
-            'green = green:main',
-            'green%d = green:main' % sys.version_info[:1],    # green2 or green3
-            'green%d.%d = green:main' % sys.version_info[:2], # green3.4 etc.
+            'green = green.cmdline:main',
+            'green%d = green.cmdline:main' % sys.version_info[:1],    # green2 or green3
+            'green%d.%d = green.cmdline:main' % sys.version_info[:2], # green3.4 etc.
             ],
     },
     test_suite='green.test',
