@@ -1,3 +1,19 @@
+# Version 3.8.2
+##### 7 May 2017
+
+- Work around Python's failure to skip tests in a consistent way -- in
+  particular, if SkipTest was raised in setUpClass(), then different versions
+  of Python did different things, none of them very sensible.  We take the
+  approach that Python _should have_ taken and skip each test as the SkipTest
+  exception is raised.  This results in one skip entry per test in the class
+  that was skipped. Resolves #159.
+
+- Fixed the warning in Python 3.6 due to an inadvertant double-import issue.
+
+- Fixed crash that could occur running self-tests on newer versions of Python
+  2.7 which expect to use an iterator with a next() function.
+
+
 # Version 3.8.1
 ##### 29 April 2017
 
