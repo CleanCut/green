@@ -3,7 +3,8 @@ from __future__ import print_function
 
 from fnmatch import fnmatch
 import sys
-from unittest.suite import _call_if_exists, _isnotsuite, TestSuite
+from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite
+from unittest import util
 import unittest
 from io import StringIO
 
@@ -87,12 +88,12 @@ class GreenTestSuite(TestSuite):
             return
         if result._moduleSetUpFailed:
             return
-        if getattr(currentClass, "__unittest_skip__", False):
+        if getattr(currentClass, "__unittest_skip__", False): # pragma: no cover
             return
 
         try:
             currentClass._classSetupFailed = False
-        except TypeError:
+        except TypeError: # pragma: no cover
             # test may actually be a function
             # so its class will be a builtin-type
             pass
@@ -107,7 +108,7 @@ class GreenTestSuite(TestSuite):
                 currentClass.__unittest_skip__ = True
                 currentClass.__unittest_skip_why__ = str(e)
             # -- END of fix
-            except Exception as e:
+            except Exception as e: # pragma: no cover
                 if isinstance(result, _DebugResult):
                     raise
                 currentClass._classSetupFailed = True
