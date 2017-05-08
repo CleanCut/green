@@ -110,7 +110,7 @@ def run(suite, stream, args, testing=False):
                     if not msg:
                         break
                     else:
-                        # Result guarunteed after this message, we're
+                        # Result guaranteed after this message, we're
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output
                         result.startTest(msg)
