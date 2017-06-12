@@ -458,11 +458,10 @@ I finally went and started reading unittest (Python 2.7 and 3.4) source code.
 unittest is its own special kind of mess, but it's universally built-in, and
 most importantly, subclassing or replacing unittest objects to customize the
 output looked a lot *easier* than writing a plugin for nose and nose2.  And it
-was, for the output portion!  Writing the rest of the test runner other turned
-out to be quite a project, though.  I started over on Green *again*, starting
-down the road to what we have now.  A custom runner that subclasses or replaces
-bits of unittest to provide exactly the output (and other feature creep) that I
-wanted.
+was, for the output portion!  Writing the rest of the test runner turned out to
+be quite a project, though.  I started over on Green *again*, starting down the
+road to what we have now.  A custom runner that subclasses or replaces bits of
+unittest to provide exactly the output (and other feature creep) that I wanted.
 
 
 I had three initial goals for Green:

@@ -8,7 +8,7 @@
   exception is raised.  This results in one skip entry per test in the class
   that was skipped. Resolves #159.
 
-- Fixed the warning in Python 3.6 due to an inadvertant double-import issue.
+- Fixed the warning in Python 3.6 due to an inadvertent double-import issue.
 
 - Fixed crash that could occur running self-tests on newer versions of Python
   2.7 which expect to use an iterator with a next() function.
