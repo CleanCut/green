@@ -14,7 +14,7 @@ except:  # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
-from green.loader import loadTargets
+from green.loader import GreenTestLoader
 from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
@@ -289,7 +289,8 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
     result = ProtoTestResult(start_callback, finalize_callback)
     test = None
     try:
-        test = loadTargets(target)
+        loader = GreenTestLoader()
+        test = loader.loadTargets(target)
     except:
         err = sys.exc_info()
         t             = ProtoTest()
