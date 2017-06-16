@@ -94,6 +94,7 @@ class GreenTestLoader(unittest.TestLoader):
             # to the list if we haven't already.
             if test.module not in parallel_targets:
                 parallel_targets.append(test.module)
+
         return parallel_targets
 
     @classmethod
@@ -250,6 +251,9 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
+    def loadTestsFromName(self, name, module=None):
+        tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
+        return self.suiteClass(tests)
 
     def discover(self, current_path, file_pattern='test*.py', top_level_dir=None):
         """
@@ -369,7 +373,7 @@ class GreenTestLoader(unittest.TestLoader):
         tests = None
         if target and (target[0] != '.'):  # We don't handle relative dot objects
             try:
-                tests = self.loadTestsFromName(target)
+                tests = self.suiteClass(self.loadTestsFromName(target))
                 for index, test in enumerate(tests):
                     if test.__class__.__name__ == '_FailedTest':  # pragma: no cover
                         del(tests._tests[index])
@@ -397,7 +401,7 @@ class GreenTestLoader(unittest.TestLoader):
                 sys.path.insert(0, cwd)
             try:
                 dotted_path = target.replace('.py', '').replace(os.sep, '.')
-                tests = self.loadTestsFromName(dotted_path)
+                tests = self.suiteClass(self.loadTestsFromName(dotted_path))
             except:  # Any exception could occur here
                 # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
                 # refactor it and simplify it after we make sure it works.
