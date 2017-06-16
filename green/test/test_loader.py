@@ -288,7 +288,8 @@ class TestDottedModule(unittest.TestCase):
         """
         self.assertRaises(
                 ValueError,
-                GreenTestLoader.findDottedModuleAndParentDir, tempfile.tempdir)
+                GreenTestLoader.findDottedModuleAndParentDir,
+                tempfile.tempdir)
 
     def test_good_path(self):
         """
