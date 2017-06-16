@@ -722,7 +722,7 @@ class TestLoadTargets(unittest.TestCase):
         # Load the tests
         tests = self.loader.loadTargets(malformed_module)
         self.assertEqual(tests.countTestCases(), 1)
-        test = tests._tests[0]._tests[0]
+        test = tests._tests[0]
         test_method = getattr(test, test._testMethodName)
         self.assertRaises(ImportError, test_method)
 

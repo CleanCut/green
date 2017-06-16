@@ -185,6 +185,18 @@ class GreenTestLoader(unittest.TestLoader):
         test_method = getattr(test_case_class, method_name)
         return getattr(test_method, "__test__", 'not nose') is False
 
+    @classmethod
+    def flattenTestSuite(cls, test_suite):
+        if not test_suite:
+            return ()
+        tests = []
+        for test in test_suite:
+            if isinstance(test, unittest.BaseTestSuite):
+                tests.extend(cls.flattenTestSuite(test))
+            else:
+                tests.append(test)
+        return cls.suiteClass(tests)
+
     def loadTestsFromTestCase(self, testCaseClass):
         debug("Examining test case {}".format(testCaseClass.__name__), 3)
 
@@ -201,7 +213,7 @@ class GreenTestLoader(unittest.TestLoader):
 
         if not test_case_names and hasattr(testCaseClass, 'runTest'):
             test_case_names = ['runTest']
-        return self.suiteClass(map(testCaseClass, test_case_names))
+        return self.flattenTestSuite(map(testCaseClass, test_case_names))
 
     def loadFromModuleFilename(self, filename):
         dotted_module, parent_dir = self.findDottedModuleAndParentDir(filename)
@@ -251,9 +263,13 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
+    def loadTestsFromModule(self, module, pattern=None):
+        tests = super(GreenTestLoader, self).loadTestsFromModule(module, pattern=pattern)
+        return self.flattenTestSuite(tests)
+
     def loadTestsFromName(self, name, module=None):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
-        return self.suiteClass(tests)
+        return self.flattenTestSuite(tests)
 
     def discover(self, current_path, file_pattern='test*.py', top_level_dir=None):
         """
@@ -298,7 +314,7 @@ class GreenTestLoader(unittest.TestLoader):
                 if module_suite:
                     suite.addTest(module_suite)
 
-        return suite if suite.countTestCases() else None
+        return self.flattenTestSuite(suite) if suite.countTestCases() else None
 
     def loadTargets(self, targets, file_pattern='test*.py'):
         # If a string was passed in, put it into a list.
@@ -322,7 +338,7 @@ class GreenTestLoader(unittest.TestLoader):
             debug("Found {} test{} for target '{}'".format(
                 num_tests, '' if (num_tests == 1) else 's', target))
 
-        return GreenTestSuite(suites) if suites else None
+        return self.flattenTestSuite(suites) if suites else None
 
     def loadTarget(self, target, file_pattern='test*.py'):
         """
@@ -365,7 +381,7 @@ class GreenTestLoader(unittest.TestLoader):
             tests = self.discover(candidate, file_pattern=file_pattern)
             if tests and tests.countTestCases():
                 debug("Load method: DISCOVER - {}".format(candidate))
-                return tests
+                return self.flattenTestSuite(tests)
 
         # DOTTED OBJECT - These will discover a specific object if it is
         # globally importable or importable from the current working directory.
@@ -382,7 +398,7 @@ class GreenTestLoader(unittest.TestLoader):
                 debug("IGNORED exception: {}".format(e))
             if tests and tests.countTestCases():
                 debug("Load method: DOTTED OBJECT - {}".format(target))
-                return tests
+                return self.flattenTestSuite(tests)
 
         # FILE VARIATIONS - These will import a specific file and any tests
         # accessible from its scope.
@@ -424,7 +440,7 @@ class GreenTestLoader(unittest.TestLoader):
                         str("ModuleImportFailure"),
                         (unittest.case.TestCase,),
                         {dotted_path: testFailure})
-                return GreenTestSuite((TestClass(dotted_path),))
+                return self.suiteClass((TestClass(dotted_path),))
             if need_cleanup:
                 sys.path.remove(cwd)
             if tests and tests.countTestCases():
