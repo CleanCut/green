@@ -18,7 +18,7 @@ except:
     from mock import MagicMock
 
 from green.config import default_args
-from green.loader import loadTargets
+from green.loader import GreenTestLoader
 from green.runner import run
 from green.suite import GreenTestSuite
 
@@ -126,6 +126,7 @@ class TestFunctional(unittest.TestCase):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
         self.tmpdir = tempfile.mkdtemp()
+        self.loader = GreenTestLoader()
 
     def tearDown(self):
         del(self.tmpdir)
@@ -152,7 +153,8 @@ class TestFunctional(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_skipped')
+
+        tests = self.loader.loadTargets('test_skipped')
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(len(result.skipped), 2)
