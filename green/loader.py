@@ -263,9 +263,18 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
-    def loadTestsFromModule(self, module, pattern=None):
-        tests = super(GreenTestLoader, self).loadTestsFromModule(module, pattern=pattern)
-        return self.flattenTestSuite(tests)
+    if sys.version_info >= (3,5):
+
+        def loadTestsFromModule(self, module, pattern=None):
+            tests = super(GreenTestLoader, self).loadTestsFromModule(module, pattern=pattern)
+            return self.flattenTestSuite(tests)
+
+    else:
+
+        def loadTestsFromModule(self, module):
+            tests = super(GreenTestLoader, self).loadTestsFromModule(module)
+            return self.flattenTestSuite(tests)
+
 
     def loadTestsFromName(self, name, module=None):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
