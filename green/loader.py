@@ -187,8 +187,6 @@ class GreenTestLoader(unittest.TestLoader):
 
     @classmethod
     def flattenTestSuite(cls, test_suite):
-        if not test_suite:
-            return ()
         tests = []
         for test in test_suite:
             if isinstance(test, unittest.BaseTestSuite):
