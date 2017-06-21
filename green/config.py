@@ -365,9 +365,10 @@ def getConfig(filepath=None):  # pragma: no cover
         filepaths.append(env_filepath)
 
     # Medium priority
-    cwd_filepath = os.path.join(os.getcwd(), ".green")
-    if os.path.isfile(cwd_filepath):
-        filepaths.append(cwd_filepath)
+    for cfg_file in (".green", "setup.cfg"):
+        cwd_filepath = os.path.join(os.getcwd(), cfg_file)
+        if os.path.isfile(cwd_filepath):
+            filepaths.append(cwd_filepath)
 
     # High priority
     if filepath and os.path.isfile(filepath):
@@ -380,7 +381,12 @@ def getConfig(filepath=None):  # pragma: no cover
         # parser.readfp(obj_with_readline)
         read_func = getattr(parser, 'read_file', getattr(parser, 'readfp'))
         for filepath in filepaths:
-            read_func(ConfigFile(filepath))
+            # Users are expected to put a [green] section
+            # only if they use setup.cfg
+            if filepath.endswith('setup.cfg'):
+                read_func(open(filepath))
+            else:
+                read_func(ConfigFile(filepath))
 
     return parser
 
