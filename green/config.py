@@ -115,9 +115,10 @@ def parseArguments():  # pragma: no cover
 
                   1) $HOME/.green
                   2) A config file specified by the environment variable $GREEN_CONFIG
-                  3) .green in the current working directory of the test run
-                  4) A config file specified by the command-line argument "--config FILE"
-                  5) Command-line arguments.
+                  3) setup.cfg in the current working directory of test run
+                  4) .green in the current working directory of the test run
+                  5) A config file specified by the command-line argument "--config FILE"
+                  6) Command-line arguments.
 
                   Any arguments specified in more than one place will be overwritten by the
                   value of the LAST place the setting is seen.  So, for example, if a setting
@@ -311,7 +312,8 @@ class ConfigFile(object):  # pragma: no cover
 
     def __init__(self, filepath):
         self.first = True
-        self.lines = open(filepath).readlines()
+        with open(filepath) as f:
+            self.lines = f.readlines()
 
     # Python 2.7 (Older dot versions)
     def readline(self):
@@ -365,9 +367,10 @@ def getConfig(filepath=None):  # pragma: no cover
         filepaths.append(env_filepath)
 
     # Medium priority
-    cwd_filepath = os.path.join(os.getcwd(), ".green")
-    if os.path.isfile(cwd_filepath):
-        filepaths.append(cwd_filepath)
+    for cfg_file in ("setup.cfg", ".green"):
+        cwd_filepath = os.path.join(os.getcwd(), cfg_file)
+        if os.path.isfile(cwd_filepath):
+            filepaths.append(cwd_filepath)
 
     # High priority
     if filepath and os.path.isfile(filepath):
@@ -380,7 +383,13 @@ def getConfig(filepath=None):  # pragma: no cover
         # parser.readfp(obj_with_readline)
         read_func = getattr(parser, 'read_file', getattr(parser, 'readfp'))
         for filepath in filepaths:
-            read_func(ConfigFile(filepath))
+            # Users are expected to put a [green] section
+            # only if they use setup.cfg
+            if filepath.endswith('setup.cfg'):
+                with open(filepath) as f:
+                    read_func(f)
+            else:
+                read_func(ConfigFile(filepath))
 
     return parser
 
