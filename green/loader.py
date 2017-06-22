@@ -4,6 +4,7 @@ from fnmatch import fnmatch
 import functools
 import glob
 import importlib
+import operator
 import os
 import re
 import sys
@@ -34,9 +35,9 @@ class GreenTestLoader(unittest.TestLoader):
         """
         if test_list is None:
             test_list = []
-        # Python's lousy handling of module import failures during loader discovery
-        # makes this crazy special case necessary.  See _make_failed_import_test in
-        # the source code for unittest.loader
+        # Python's lousy handling of module import failures during loader
+        # discovery makes this crazy special case necessary.  See
+        # _make_failed_import_test in the source code for unittest.loader
         if suite.__class__.__name__ == 'ModuleImportFailure':
             if doing_completions:
                 return test_list
@@ -58,13 +59,13 @@ class GreenTestLoader(unittest.TestLoader):
         Produce a list of targets which should be tested in parallel.
 
         For the most part this will be a list of test modules.  The exception is
-        when a dotted name representing something more granular than a module was
-        input (like an individal test case or test method)
+        when a dotted name representing something more granular than a module
+        was input (like an individal test case or test method)
         """
         targets = filter(lambda x: x != '.', targets)
-        # First, convert the suite to a proto test list - proto tests nicely parse
-        # things like the fully dotted name of the test and the finest-grained
-        # module it belongs to, which simplifies our job.
+        # First, convert the suite to a proto test list - proto tests nicely
+        # parse things like the fully dotted name of the test and the
+        # finest-grained module it belongs to, which simplifies our job.
         proto_test_list = cls.toProtoTestList(suite)
         # Extract a list of the modules that all of the discovered tests are in
         modules = set([x.module for x in proto_test_list])
@@ -78,20 +79,20 @@ class GreenTestLoader(unittest.TestLoader):
         for test in proto_test_list:
             found = False
             for target in non_module_targets:
-                # target is a dotted name of either a test case or test method here
-                # test.dotted name is always a dotted name of a method
+                # target is a dotted name of either a test case or test method
+                # here test.dotted name is always a dotted name of a method
                 if (target in test.dotted_name):
                     if target not in parallel_targets:
-                        # Explicitly specified targets get their own entry to run
-                        # parallel to everything else
+                        # Explicitly specified targets get their own entry to
+                        # run parallel to everything else
                         parallel_targets.append(target)
                     found = True
                     break
             if found:
                 continue
-            # This test does not appear to be part of a specified target, so its
-            # entire module must have been discovered, so just add the whole module
-            # to the list if we haven't already.
+            # This test does not appear to be part of a specified target, so
+            # its entire module must have been discovered, so just add the
+            # whole module to the list if we haven't already.
             if test.module not in parallel_targets:
                 parallel_targets.append(test.module)
 
@@ -126,12 +127,14 @@ class GreenTestLoader(unittest.TestLoader):
             # Reduce the suite to a list of relevant dotted names
             dotted_names = set()
             if test_suite:
-                for dotted_name in [x.dotted_name for x in cls.toProtoTestList(test_suite, doing_completions=True)]:
+                dotted_names = map(operator.attrgetter('dotted_name'),
+                                   cls.toProtoTestList(test_suite, None, True))
+                for dotted_name in dotted_names:
                     if dotted_name.startswith(target):
                         dotted_names.add(dotted_name)
                 # We have the fully dotted test names.  Now add the intermediate
-                # completions.  bash and zsh will filter out the intermediates that
-                # don't match.
+                # completions.  bash and zsh will filter out the intermediates
+                # that don't match.
                 for dotted_name in list(dotted_names):
                     while True:
                         idx = dotted_name.rfind('.')
@@ -161,8 +164,8 @@ class GreenTestLoader(unittest.TestLoader):
 
         If the python file is not part of a package, I return (None, None).
 
-        For for filepath /a/b/c/d.py where b is the package, ('b.c.d', '/a') would
-        be returned.
+        For for filepath /a/b/c/d.py where b is the package, ('b.c.d', '/a')
+        would be returned.
         """
         if not os.path.isfile(file_path):
             raise ValueError("'{}' is not a file.".format(file_path))
@@ -179,8 +182,8 @@ class GreenTestLoader(unittest.TestLoader):
     def isTestCaseDisabled(test_case_class, method_name):
         """
         I check to see if a method on a TestCase has been disabled via nose's
-        convention for disabling a TestCase.  This makes it so that users can mix
-        nose's parameterized tests with green as a runner.
+        convention for disabling a TestCase.  This makes it so that users can
+        mix nose's parameterized tests with green as a runner.
         """
         test_method = getattr(test_case_class, method_name)
         return getattr(test_method, "__test__", 'not nose') is False
@@ -207,7 +210,8 @@ class GreenTestLoader(unittest.TestLoader):
         debug("Test case names: {}".format(test_case_names))
 
         # Use default unittest.TestSuite sorting method if not overriden
-        test_case_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
+        test_case_names.sort(
+            key=functools.cmp_to_key(self.sortTestMethodsUsing))
 
         if not test_case_names and hasattr(testCaseClass, 'runTest'):
             test_case_names = ['runTest']
@@ -242,20 +246,21 @@ class GreenTestLoader(unittest.TestLoader):
             # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
             # refactor it and simplify it after we make sure it works.
             # This is a cause of the traceback mangling I observed.
-            message = ('Failed to import {} computed from filename {}\n{}').format(
-                           dotted_module, filename, traceback.format_exc())
+            message = (
+                'Failed to import {} computed from filename {}\n{}').format(
+                    dotted_module, filename, traceback.format_exc()
+            )
 
             def testFailure(self):
                 raise ImportError(message)
 
-            TestClass = type(
-                    str("ModuleImportFailure"),
-                    (unittest.case.TestCase,),
-                    {filename: testFailure})
+            TestClass = type(str("ModuleImportFailure"),
+                             (unittest.case.TestCase,),
+                             {filename: testFailure})
             return self.suiteClass((TestClass(filename),))
         finally:
             # This gets called before return statements in except clauses
-            # actually return.  Yay!
+            # actually return. Yay!
             sys.path.pop(0)
 
         # --- Find the tests inside the loaded module ---
@@ -264,7 +269,8 @@ class GreenTestLoader(unittest.TestLoader):
     if sys.version_info >= (3,5):
 
         def loadTestsFromModule(self, module, pattern=None):
-            tests = super(GreenTestLoader, self).loadTestsFromModule(module, pattern=pattern)
+            tests = super(GreenTestLoader, self).loadTestsFromModule(
+                module, pattern=pattern)
             return self.flattenTestSuite(tests)
 
     else:
@@ -278,7 +284,8 @@ class GreenTestLoader(unittest.TestLoader):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
         return self.flattenTestSuite(tests)
 
-    def discover(self, current_path, file_pattern='test*.py', top_level_dir=None):
+    def discover(self, current_path, file_pattern='test*.py',
+                 top_level_dir=None):
         """
         I take a path to a directory and discover all the tests inside files
         matching file_pattern.
@@ -296,7 +303,8 @@ class GreenTestLoader(unittest.TestLoader):
         for file_or_dir_name in sorted(os.listdir(current_abspath)):
             path = os.path.join(current_abspath, file_or_dir_name)
             # Recurse into directories, attempting to skip virtual environments
-            if os.path.isdir(path) and not os.path.isfile(os.path.join(path, 'bin', 'activate')):
+            bin_activate = os.path.join(path, 'bin', 'activate')
+            if os.path.isdir(path) and not os.path.isfile(bin_activate):
                 # Don't follow symlinks
                 if os.path.islink(path):
                     continue
@@ -304,8 +312,11 @@ class GreenTestLoader(unittest.TestLoader):
                 if not python_dir_pattern.match(file_or_dir_name):
                     continue
 
-                subdir_suite = self.discover(path, file_pattern=file_pattern,
-                                             top_level_dir=top_level_dir or current_path)
+                subdir_suite = self.discover(
+                    path, file_pattern=file_pattern,
+                    top_level_dir=top_level_dir or current_path
+                )
+
                 if subdir_suite:
                     suite.addTest(subdir_suite)
 
@@ -353,9 +364,9 @@ class GreenTestLoader(unittest.TestLoader):
         debug("Attempting to load target '{}' with file_pattern '{}'".format(
             target, file_pattern))
 
-        # For a test loader, we want to always the current working directory to be
-        # the first item in sys.path, just like when a python interpreter is loaded
-        # interactively.  See also
+        # For a test loader, we want to always the current working directory to
+        # be the first item in sys.path, just like when a python interpreter is
+        # loaded interactively.  See also
         # https://docs.python.org/3.4/library/sys.html#sys.path
         if sys.path[0] != '':
             sys.path.insert(0, '')
@@ -394,11 +405,11 @@ class GreenTestLoader(unittest.TestLoader):
         # globally importable or importable from the current working directory.
         # Examples: pkg, pkg.module, pkg.module.class, pkg.module.class.func
         tests = None
-        if target and (target[0] != '.'):  # We don't handle relative dot objects
-            try:
+        if target and (target[0] != '.'):  # We don't handle relative
+            try:                           # dot objects
                 tests = self.suiteClass(self.loadTestsFromName(target))
                 for index, test in enumerate(tests):
-                    if test.__class__.__name__ == '_FailedTest':  # pragma: no cover
+                    if test.__class__.__name__ == '_FailedTest': # pragma: no cover
                         del(tests._tests[index])
 
             except Exception as e:
@@ -426,8 +437,8 @@ class GreenTestLoader(unittest.TestLoader):
                 dotted_path = target.replace('.py', '').replace(os.sep, '.')
                 tests = self.suiteClass(self.loadTestsFromName(dotted_path))
             except:  # Any exception could occur here
-                # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
-                # refactor it and simplify it after we make sure it works.
+                # TODO: #25 - Right now this mimics the behavior in unittest.
+                # Lets refactor it and simplify it after we make sure it works.
                 # This is a cause of the traceback mangling I observed.
                 try:
                     message = ('Failed to import "{}":\n{}').format(
@@ -436,9 +447,11 @@ class GreenTestLoader(unittest.TestLoader):
                 # anywhere, then python 2.7 will crash on traceback.format_exc().
                 # Python 3 is ok.
                 except UnicodeDecodeError:  # pragma: no cover
-                    message = ('Failed to import "{}", and the import traceback '
-                               'has a unicode decode error, so I can\'t display '
-                               'it.'.format(dotted_path))
+                    message = (
+                        'Failed to import "{}", and the import traceback has a'
+                        ' unicode decode error, so I can\'t display '
+                        'it.'.format(dotted_path)
+                    )
 
                 def testFailure(self):
                     raise ImportError(message)
