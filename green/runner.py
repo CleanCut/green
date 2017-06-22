@@ -13,7 +13,7 @@ except:  # pragma: no cover
     coverage = None
 
 from green.exceptions import InitializerOrFinalizerError
-from green.loader import GreenTestLoader
+from green.loader import toParallelTargets
 from green.output import debug, GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
 from green.result import GreenTestResult
@@ -89,7 +89,8 @@ def run(suite, stream, args, testing=False):
                                      initializer=InitializerOrFinalizer(args.initializer),
                                      finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
-        targets = [(target, manager.Queue()) for target in GreenTestLoader.toParallelTargets(suite, args.targets)]
+        targets = [(target, manager.Queue())
+                   for target in toParallelTargets(suite, args.targets)]
         if targets:
             for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:

@@ -279,7 +279,6 @@ class GreenTestLoader(unittest.TestLoader):
             tests = super(GreenTestLoader, self).loadTestsFromModule(module)
             return self.flattenTestSuite(tests)
 
-
     def loadTestsFromName(self, name, module=None):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
         return self.flattenTestSuite(tests)
@@ -468,3 +467,12 @@ class GreenTestLoader(unittest.TestLoader):
                 return tests
 
         return None
+
+
+toProtoTestList = GreenTestLoader.toProtoTestList
+toParallelTargets = GreenTestLoader.toParallelTargets
+getCompletions = GreenTestLoader.getCompletions
+isPackage = GreenTestLoader.isPackage
+findDottedModuleAndParentDir = GreenTestLoader.findDottedModuleAndParentDir
+isTestCaseDisabled = GreenTestLoader.isTestCaseDisabled
+flattenTestSuite = GreenTestLoader.flattenTestSuite

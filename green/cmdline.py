@@ -26,7 +26,7 @@ def main(testing=False):
     sys.argv = sys.argv[:1]
 
     # Set up our various main objects
-    from green.loader import GreenTestLoader
+    from green.loader import GreenTestLoader, getCompletions
     from green.runner import run
     from green.output import GreenStream, debug
     import green.output
@@ -45,7 +45,7 @@ def main(testing=False):
 
     # Argument-completion for bash and zsh (for test-target completion)
     if args.completions:
-        print(GreenTestLoader.getCompletions(args.targets))
+        print(getCompletions(args.targets))
         return 0
 
     # Option-completion for bash and zsh
