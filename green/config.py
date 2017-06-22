@@ -312,7 +312,8 @@ class ConfigFile(object):  # pragma: no cover
 
     def __init__(self, filepath):
         self.first = True
-        self.lines = open(filepath).readlines()
+        with open(filepath) as f:
+            self.lines = f.readlines()
 
     # Python 2.7 (Older dot versions)
     def readline(self):
@@ -385,7 +386,8 @@ def getConfig(filepath=None):  # pragma: no cover
             # Users are expected to put a [green] section
             # only if they use setup.cfg
             if filepath.endswith('setup.cfg'):
-                read_func(open(filepath))
+                with open(filepath) as f:
+                    read_func(f)
             else:
                 read_func(ConfigFile(filepath))
 
