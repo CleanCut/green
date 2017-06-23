@@ -25,186 +25,13 @@ class GreenTestLoader(unittest.TestLoader):
 
     suiteClass = GreenTestSuite
 
-    @classmethod
-    def toProtoTestList(cls, suite, test_list=None, doing_completions=False):
-        """
-        Take a test suite and turn it into a list of ProtoTests.
-
-        This function is recursive.  Pass it a suite, and it will re-call itself
-        with smaller parts of the suite.
-        """
-        if test_list is None:
-            test_list = []
-        # Python's lousy handling of module import failures during loader
-        # discovery makes this crazy special case necessary.  See
-        # _make_failed_import_test in the source code for unittest.loader
-        if suite.__class__.__name__ == 'ModuleImportFailure':
-            if doing_completions:
-                return test_list
-            exception_method = str(suite).split()[0]
-            getattr(suite, exception_method)()
-        # On to the real stuff
-        if issubclass(type(suite), unittest.TestCase):
-            # Skip actual blank TestCase objects that twisted inserts
-            if str(type(suite)) != "<class 'twisted.trial.unittest.TestCase'>":
-                test_list.append(proto_test(suite))
-        else:
-            for i in suite:
-                cls.toProtoTestList(i, test_list, doing_completions)
-        return test_list
-
-    @classmethod
-    def toParallelTargets(cls, suite, targets):
-        """
-        Produce a list of targets which should be tested in parallel.
-
-        For the most part this will be a list of test modules.  The exception is
-        when a dotted name representing something more granular than a module
-        was input (like an individal test case or test method)
-        """
-        targets = filter(lambda x: x != '.', targets)
-        # First, convert the suite to a proto test list - proto tests nicely
-        # parse things like the fully dotted name of the test and the
-        # finest-grained module it belongs to, which simplifies our job.
-        proto_test_list = cls.toProtoTestList(suite)
-        # Extract a list of the modules that all of the discovered tests are in
-        modules = set([x.module for x in proto_test_list])
-        # Get the list of user-specified targets that are NOT modules
-        non_module_targets = []
-        for target in targets:
-            if not list(filter(None, [target in x for x in modules])):
-                non_module_targets.append(target)
-        # Main loop -- iterating through all loaded test methods
-        parallel_targets = []
-        for test in proto_test_list:
-            found = False
-            for target in non_module_targets:
-                # target is a dotted name of either a test case or test method
-                # here test.dotted name is always a dotted name of a method
-                if (target in test.dotted_name):
-                    if target not in parallel_targets:
-                        # Explicitly specified targets get their own entry to
-                        # run parallel to everything else
-                        parallel_targets.append(target)
-                    found = True
-                    break
-            if found:
-                continue
-            # This test does not appear to be part of a specified target, so
-            # its entire module must have been discovered, so just add the
-            # whole module to the list if we haven't already.
-            if test.module not in parallel_targets:
-                parallel_targets.append(test.module)
-
-        return parallel_targets
-
-    @classmethod
-    def getCompletions(cls, target):
-            # This option expects 0 or 1 targets
-            if type(target) == list:
-                target = target[0]
-            if target == '.':
-                target = ''
-
-            # Discover tests and load them into a suite
-
-            # First try the completion as-is.  It might be at a valid spot.
-            loader = cls()
-            test_suite = loader.loadTargets(target)
-            if not test_suite:
-                # Next, try stripping to the previous '.'
-                last_dot_idx = target.rfind('.')
-                to_complete = None
-                if last_dot_idx > 0:
-                    to_complete = target[:last_dot_idx]
-                elif len(target):
-                    # Oops, there was no previous '.' -- try filesystem matches
-                    to_complete = glob.glob(target + '*')
-                if not to_complete:
-                    to_complete = '.'
-                test_suite = loader.loadTargets(to_complete)
-
-            # Reduce the suite to a list of relevant dotted names
-            dotted_names = set()
-            if test_suite:
-                dotted_names = map(operator.attrgetter('dotted_name'),
-                                   cls.toProtoTestList(test_suite, None, True))
-                for dotted_name in dotted_names:
-                    if dotted_name.startswith(target):
-                        dotted_names.add(dotted_name)
-                # We have the fully dotted test names.  Now add the intermediate
-                # completions.  bash and zsh will filter out the intermediates
-                # that don't match.
-                for dotted_name in list(dotted_names):
-                    while True:
-                        idx = dotted_name.rfind('.')
-                        if idx == -1:
-                            break
-                        dotted_name = dotted_name[:idx]
-                        if dotted_name.startswith(target):
-                            dotted_names.add(dotted_name)
-                        else:
-                            break
-            return('\n'.join(sorted(list(dotted_names))))
-
-    @staticmethod
-    def isPackage(file_path):
-        """
-        Determine whether or not a given path is a (sub)package or not.
-        """
-        return (os.path.isdir(file_path) and
-                os.path.isfile(os.path.join(file_path, '__init__.py')))
-
-    @classmethod
-    def findDottedModuleAndParentDir(cls, file_path):
-        """
-        I return a tuple (dotted_module, parent_dir) where dotted_module is the
-        full dotted name of the module with respect to the package it is in, and
-        parent_dir is the absolute path to the parent directory of the package.
-
-        If the python file is not part of a package, I return (None, None).
-
-        For for filepath /a/b/c/d.py where b is the package, ('b.c.d', '/a')
-        would be returned.
-        """
-        if not os.path.isfile(file_path):
-            raise ValueError("'{}' is not a file.".format(file_path))
-        parent_dir = os.path.dirname(os.path.abspath(file_path))
-        dotted_module = os.path.basename(file_path).replace('.py', '')
-        while cls.isPackage(parent_dir):
-            dotted_module = os.path.basename(parent_dir) + '.' + dotted_module
-            parent_dir = os.path.dirname(parent_dir)
-        debug("Dotted module: {} -> {}".format(
-            parent_dir, dotted_module), 2)
-        return (dotted_module, parent_dir)
-
-    @staticmethod
-    def isTestCaseDisabled(test_case_class, method_name):
-        """
-        I check to see if a method on a TestCase has been disabled via nose's
-        convention for disabling a TestCase.  This makes it so that users can
-        mix nose's parameterized tests with green as a runner.
-        """
-        test_method = getattr(test_case_class, method_name)
-        return getattr(test_method, "__test__", 'not nose') is False
-
-    @classmethod
-    def flattenTestSuite(cls, test_suite):
-        tests = []
-        for test in test_suite:
-            if isinstance(test, unittest.BaseTestSuite):
-                tests.extend(cls.flattenTestSuite(test))
-            else:
-                tests.append(test)
-        return cls.suiteClass(tests)
-
     def loadTestsFromTestCase(self, testCaseClass):
         debug("Examining test case {}".format(testCaseClass.__name__), 3)
 
         def filter_test_methods(attrname):
             return attrname.startswith(self.testMethodPrefix) \
                and callable(getattr(testCaseClass, attrname)) \
-               and not self.isTestCaseDisabled(testCaseClass, attrname)
+               and not isTestCaseDisabled(testCaseClass, attrname)
 
         test_case_names = list(filter(filter_test_methods, dir(testCaseClass)))
         debug("Test case names: {}".format(test_case_names))
@@ -215,10 +42,10 @@ class GreenTestLoader(unittest.TestLoader):
 
         if not test_case_names and hasattr(testCaseClass, 'runTest'):
             test_case_names = ['runTest']
-        return self.flattenTestSuite(map(testCaseClass, test_case_names))
+        return flattenTestSuite(map(testCaseClass, test_case_names))
 
     def loadFromModuleFilename(self, filename):
-        dotted_module, parent_dir = self.findDottedModuleAndParentDir(filename)
+        dotted_module, parent_dir = findDottedModuleAndParentDir(filename)
         # Adding the parent path of the module to the start of sys.path is
         # the closest we can get to an absolute import in Python that I can
         # find.
@@ -271,17 +98,17 @@ class GreenTestLoader(unittest.TestLoader):
         def loadTestsFromModule(self, module, pattern=None):
             tests = super(GreenTestLoader, self).loadTestsFromModule(
                 module, pattern=pattern)
-            return self.flattenTestSuite(tests)
+            return flattenTestSuite(tests)
 
     else:
 
         def loadTestsFromModule(self, module):
             tests = super(GreenTestLoader, self).loadTestsFromModule(module)
-            return self.flattenTestSuite(tests)
+            return flattenTestSuite(tests)
 
     def loadTestsFromName(self, name, module=None):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
-        return self.flattenTestSuite(tests)
+        return flattenTestSuite(tests)
 
     def discover(self, current_path, file_pattern='test*.py',
                  top_level_dir=None):
@@ -331,7 +158,7 @@ class GreenTestLoader(unittest.TestLoader):
                 if module_suite:
                     suite.addTest(module_suite)
 
-        return self.flattenTestSuite(suite) if suite.countTestCases() else None
+        return flattenTestSuite(suite) if suite.countTestCases() else None
 
     def loadTargets(self, targets, file_pattern='test*.py'):
         # If a string was passed in, put it into a list.
@@ -355,7 +182,7 @@ class GreenTestLoader(unittest.TestLoader):
             debug("Found {} test{} for target '{}'".format(
                 num_tests, '' if (num_tests == 1) else 's', target))
 
-        return self.flattenTestSuite(suites) if suites else None
+        return flattenTestSuite(suites) if suites else None
 
     def loadTarget(self, target, file_pattern='test*.py'):
         """
@@ -398,7 +225,7 @@ class GreenTestLoader(unittest.TestLoader):
             tests = self.discover(candidate, file_pattern=file_pattern)
             if tests and tests.countTestCases():
                 debug("Load method: DISCOVER - {}".format(candidate))
-                return self.flattenTestSuite(tests)
+                return flattenTestSuite(tests)
 
         # DOTTED OBJECT - These will discover a specific object if it is
         # globally importable or importable from the current working directory.
@@ -415,7 +242,7 @@ class GreenTestLoader(unittest.TestLoader):
                 debug("IGNORED exception: {}".format(e))
             if tests and tests.countTestCases():
                 debug("Load method: DOTTED OBJECT - {}".format(target))
-                return self.flattenTestSuite(tests)
+                return flattenTestSuite(tests)
 
         # FILE VARIATIONS - These will import a specific file and any tests
         # accessible from its scope.
@@ -469,10 +296,176 @@ class GreenTestLoader(unittest.TestLoader):
         return None
 
 
-toProtoTestList = GreenTestLoader.toProtoTestList
-toParallelTargets = GreenTestLoader.toParallelTargets
-getCompletions = GreenTestLoader.getCompletions
-isPackage = GreenTestLoader.isPackage
-findDottedModuleAndParentDir = GreenTestLoader.findDottedModuleAndParentDir
-isTestCaseDisabled = GreenTestLoader.isTestCaseDisabled
-flattenTestSuite = GreenTestLoader.flattenTestSuite
+
+
+
+def toProtoTestList(suite, test_list=None, doing_completions=False):
+    """
+    Take a test suite and turn it into a list of ProtoTests.
+
+    This function is recursive.  Pass it a suite, and it will re-call itself
+    with smaller parts of the suite.
+    """
+    if test_list is None:
+        test_list = []
+    # Python's lousy handling of module import failures during loader
+    # discovery makes this crazy special case necessary.  See
+    # _make_failed_import_test in the source code for unittest.loader
+    if suite.__class__.__name__ == 'ModuleImportFailure':
+        if doing_completions:
+            return test_list
+        exception_method = str(suite).split()[0]
+        getattr(suite, exception_method)()
+    # On to the real stuff
+    if issubclass(type(suite), unittest.TestCase):
+        # Skip actual blank TestCase objects that twisted inserts
+        if str(type(suite)) != "<class 'twisted.trial.unittest.TestCase'>":
+            test_list.append(proto_test(suite))
+    else:
+        for i in suite:
+            toProtoTestList(i, test_list, doing_completions)
+    return test_list
+
+
+def toParallelTargets(suite, targets):
+    """
+    Produce a list of targets which should be tested in parallel.
+
+    For the most part this will be a list of test modules.  The exception is
+    when a dotted name representing something more granular than a module
+    was input (like an individal test case or test method)
+    """
+    targets = filter(lambda x: x != '.', targets)
+    # First, convert the suite to a proto test list - proto tests nicely
+    # parse things like the fully dotted name of the test and the
+    # finest-grained module it belongs to, which simplifies our job.
+    proto_test_list = toProtoTestList(suite)
+    # Extract a list of the modules that all of the discovered tests are in
+    modules = set([x.module for x in proto_test_list])
+    # Get the list of user-specified targets that are NOT modules
+    non_module_targets = []
+    for target in targets:
+        if not list(filter(None, [target in x for x in modules])):
+            non_module_targets.append(target)
+    # Main loop -- iterating through all loaded test methods
+    parallel_targets = []
+    for test in proto_test_list:
+        found = False
+        for target in non_module_targets:
+            # target is a dotted name of either a test case or test method
+            # here test.dotted name is always a dotted name of a method
+            if (target in test.dotted_name):
+                if target not in parallel_targets:
+                    # Explicitly specified targets get their own entry to
+                    # run parallel to everything else
+                    parallel_targets.append(target)
+                found = True
+                break
+        if found:
+            continue
+        # This test does not appear to be part of a specified target, so
+        # its entire module must have been discovered, so just add the
+        # whole module to the list if we haven't already.
+        if test.module not in parallel_targets:
+            parallel_targets.append(test.module)
+
+    return parallel_targets
+
+
+def getCompletions(target):
+        # This option expects 0 or 1 targets
+        if type(target) == list:
+            target = target[0]
+        if target == '.':
+            target = ''
+
+        # Discover tests and load them into a suite
+
+        # First try the completion as-is.  It might be at a valid spot.
+        loader = GreenTestLoader()
+        test_suite = loader.loadTargets(target)
+        if not test_suite:
+            # Next, try stripping to the previous '.'
+            last_dot_idx = target.rfind('.')
+            to_complete = None
+            if last_dot_idx > 0:
+                to_complete = target[:last_dot_idx]
+            elif len(target):
+                # Oops, there was no previous '.' -- try filesystem matches
+                to_complete = glob.glob(target + '*')
+            if not to_complete:
+                to_complete = '.'
+            test_suite = loader.loadTargets(to_complete)
+
+        # Reduce the suite to a list of relevant dotted names
+        dotted_names = set()
+        if test_suite:
+            for dotted_name in map(operator.attrgetter('dotted_name'),
+                                   toProtoTestList(test_suite, None, True)):
+                if dotted_name.startswith(target):
+                    dotted_names.add(dotted_name)
+            # We have the fully dotted test names.  Now add the intermediate
+            # completions.  bash and zsh will filter out the intermediates
+            # that don't match.
+            for dotted_name in list(dotted_names):
+                while True:
+                    idx = dotted_name.rfind('.')
+                    if idx == -1:
+                        break
+                    dotted_name = dotted_name[:idx]
+                    if dotted_name.startswith(target):
+                        dotted_names.add(dotted_name)
+                    else:
+                        break
+        return('\n'.join(sorted(list(dotted_names))))
+
+
+def isPackage(file_path):
+    """
+    Determine whether or not a given path is a (sub)package or not.
+    """
+    return (os.path.isdir(file_path) and
+            os.path.isfile(os.path.join(file_path, '__init__.py')))
+
+
+def findDottedModuleAndParentDir(file_path):
+    """
+    I return a tuple (dotted_module, parent_dir) where dotted_module is the
+    full dotted name of the module with respect to the package it is in, and
+    parent_dir is the absolute path to the parent directory of the package.
+
+    If the python file is not part of a package, I return (None, None).
+
+    For for filepath /a/b/c/d.py where b is the package, ('b.c.d', '/a')
+    would be returned.
+    """
+    if not os.path.isfile(file_path):
+        raise ValueError("'{}' is not a file.".format(file_path))
+    parent_dir = os.path.dirname(os.path.abspath(file_path))
+    dotted_module = os.path.basename(file_path).replace('.py', '')
+    while isPackage(parent_dir):
+        dotted_module = os.path.basename(parent_dir) + '.' + dotted_module
+        parent_dir = os.path.dirname(parent_dir)
+    debug("Dotted module: {} -> {}".format(
+        parent_dir, dotted_module), 2)
+    return (dotted_module, parent_dir)
+
+
+def isTestCaseDisabled(test_case_class, method_name):
+    """
+    I check to see if a method on a TestCase has been disabled via nose's
+    convention for disabling a TestCase.  This makes it so that users can
+    mix nose's parameterized tests with green as a runner.
+    """
+    test_method = getattr(test_case_class, method_name)
+    return getattr(test_method, "__test__", 'not nose') is False
+
+
+def flattenTestSuite(test_suite):
+    tests = []
+    for test in test_suite:
+        if isinstance(test, unittest.BaseTestSuite):
+            tests.extend(flattenTestSuite(test))
+        else:
+            tests.append(test)
+    return GreenTestLoader.suiteClass(tests)

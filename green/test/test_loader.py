@@ -26,7 +26,7 @@ class TestToProtoTestList(unittest.TestCase):
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
-        self.assertRaises(AttributeError, GreenTestLoader.toProtoTestList, (suite,))
+        self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
 
     def test_moduleImportFailureIgnored(self):
         """
@@ -36,7 +36,7 @@ class TestToProtoTestList(unittest.TestCase):
         suite.__class__.__name__ = str('ModuleImportFailure')
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
-        self.assertEqual(GreenTestLoader.toProtoTestList(suite, doing_completions=True), [])
+        self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
 
 
 class TestToParallelTargets(unittest.TestCase):
@@ -70,7 +70,7 @@ class TestToParallelTargets(unittest.TestCase):
 
         NormalTestCase.__module__ = self._fake_module_name
 
-        targets = GreenTestLoader.toParallelTargets(NormalTestCase(), [])
+        targets = loader.toParallelTargets(NormalTestCase(), [])
         self.assertEqual(targets, ["my_test_module"])
 
     def test_methods_with_constraints(self):
@@ -84,7 +84,7 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase.__module__ = self._fake_module_name
         full_name = "my_test_module.NormalTestCase.runTest"
 
-        targets = GreenTestLoader.toParallelTargets(NormalTestCase(), [full_name])
+        targets = loader.toParallelTargets(NormalTestCase(), [full_name])
         self.assertEqual(targets, [full_name])
 
     def test_filter_out_dot(self):
@@ -102,7 +102,7 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase.__module__ = self._fake_module_name
         NormalTestCase2.__module__ = self._fake_module_name2
 
-        targets = GreenTestLoader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
+        targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
         self.assertEqual(targets, ["my_test_module", "my_test_module2"])
 
 
@@ -112,13 +112,13 @@ class TestCompletions(unittest.TestCase):
         """
         Bad match generates no completions
         """
-        self.assertEqual('', GreenTestLoader.getCompletions('garbage.in'))
+        self.assertEqual('', loader.getCompletions('garbage.in'))
 
     def test_completionExact(self):
         """
         Correct completions are generated for an exact match.
         """
-        c = set(GreenTestLoader.getCompletions('green').split('\n'))
+        c = set(loader.getCompletions('green').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
         self.assertIn('green.test.test_loader', c)
@@ -134,7 +134,7 @@ class TestCompletions(unittest.TestCase):
         green_parent = dirname(dirname(dirname(os.path.abspath(__file__))))
         os.chdir(green_parent)
         self.addCleanup(os.chdir, cwd)
-        c = set(GreenTestLoader.getCompletions('gre').split('\n'))
+        c = set(loader.getCompletions('gre').split('\n'))
         self.assertIn('green', c)
         self.assertIn('green.test', c)
         self.assertIn('green.test.test_loader', c)
@@ -146,7 +146,7 @@ class TestCompletions(unittest.TestCase):
         """
         Correct completions generated for partial match.  2nd target ignored.
         """
-        c = set(GreenTestLoader.getCompletions(['green.te', 'green']).split('\n'))
+        c = set(loader.getCompletions(['green.te', 'green']).split('\n'))
         self.assertIn('green.test', c)
         self.assertIn('green.test.test_loader', c)
         self.assertIn('green.test.test_loader.TestCompletions', c)
@@ -179,7 +179,7 @@ class TestCompletions(unittest.TestCase):
                     pass
             """))
         fh.close()
-        c = set(GreenTestLoader.getCompletions('').split('\n'))
+        c = set(loader.getCompletions('').split('\n'))
         self.assertIn('the_pkg', c)
         self.assertIn('the_pkg.test_things', c)
         self.assertIn('the_pkg.test_things.A.testOne', c)
@@ -210,7 +210,7 @@ class TestCompletions(unittest.TestCase):
                     pass
             """))
         fh.close()
-        c = set(GreenTestLoader.getCompletions('.').split('\n'))
+        c = set(loader.getCompletions('.').split('\n'))
         self.assertIn('my_pkg', c)
         self.assertIn('my_pkg.test_things', c)
         self.assertIn('my_pkg.test_things.A.testOne', c)
@@ -248,7 +248,7 @@ class TestCompletions(unittest.TestCase):
         fh = open(os.path.join('my_pkg2', 'test_crash03.py'), 'w')
         fh.write(contents)
         fh.close()
-        c = set(GreenTestLoader.getCompletions('.').split('\n'))
+        c = set(loader.getCompletions('.').split('\n'))
         self.assertIn('my_pkg2', c)
         self.assertIn('my_pkg2.test_crash01', c)
         self.assertIn('my_pkg2.test_crash01.A.testOne', c)
@@ -269,7 +269,7 @@ class TestIsPackage(unittest.TestCase):
         fh = open(os.path.join(tmpdir, '__init__.py'), 'w')
         fh.write('pass\n')
         fh.close()
-        self.assertTrue(GreenTestLoader.isPackage(tmpdir))
+        self.assertTrue(loader.isPackage(tmpdir))
 
     def test_no(self):
         """
@@ -277,7 +277,7 @@ class TestIsPackage(unittest.TestCase):
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        self.assertFalse(GreenTestLoader.isPackage(tmpdir))
+        self.assertFalse(loader.isPackage(tmpdir))
 
 
 class TestDottedModule(unittest.TestCase):
@@ -288,7 +288,7 @@ class TestDottedModule(unittest.TestCase):
         """
         self.assertRaises(
                 ValueError,
-                GreenTestLoader.findDottedModuleAndParentDir,
+                loader.findDottedModuleAndParentDir,
                 tempfile.tempdir)
 
     def test_good_path(self):
@@ -305,7 +305,7 @@ class TestDottedModule(unittest.TestCase):
             fh = open(filename, 'w')
             fh.write('pass\n')
             fh.close()
-        self.assertEqual(GreenTestLoader.findDottedModuleAndParentDir(module),
+        self.assertEqual(loader.findDottedModuleAndParentDir(module),
                          ('c.d.stuff', os.path.join(tmpdir, 'a', 'b')))
 
 
@@ -521,7 +521,7 @@ class TestLoadTargets(unittest.TestCase):
         # Discover stuff
         suite = self.loader.loadTargets('.')
         # This should resolve it to the module that's not importable from here
-        test = self.loader.toParallelTargets(suite, [])[0]
+        test =loader.toParallelTargets(suite, [])[0]
         self.loader.loadTargets(test)
 
     def test_emptyDirAbsolute(self):
@@ -596,7 +596,7 @@ class TestLoadTargets(unittest.TestCase):
         # Dotted name should start with the package!
         self.assertEqual(
                 pkg_name + '.test.test_target_module.A.testPass',
-                self.loader.toProtoTestList(test_suite)[0].dotted_name)
+                loader.toProtoTestList(test_suite)[0].dotted_name)
 
     def test_DirWithInit(self):
         """
