@@ -1,3 +1,16 @@
+# Version 3.9.0
+##### 23 June 2017
+
+- Green now supports unittest's `load_test` protocol. Contributed by Martin
+  Larralde in #160.  Resolves #87.
+
+- Add support for a `[green]` configuration section inside of `setup.cfg` in
+  the current working directory.  See the `CONFIG FILES` section of `green
+  --help` for a list of relative configuration file priority and how to use them.
+  Contributed by Martin Larralde in #161.
+
+- Minor grammar/spelling fixes.
+
 # Version 3.8.2
 ##### 7 May 2017
 
