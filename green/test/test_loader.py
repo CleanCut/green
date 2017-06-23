@@ -13,6 +13,7 @@ except:
     from mock import MagicMock
 
 from green import loader
+from green.loader import GreenTestLoader
 
 
 class TestToProtoTestList(unittest.TestCase):
@@ -287,7 +288,8 @@ class TestDottedModule(unittest.TestCase):
         """
         self.assertRaises(
                 ValueError,
-                loader.findDottedModuleAndParentDir, tempfile.tempdir)
+                loader.findDottedModuleAndParentDir,
+                tempfile.tempdir)
 
     def test_good_path(self):
         """
@@ -307,7 +309,10 @@ class TestDottedModule(unittest.TestCase):
                          ('c.d.stuff', os.path.join(tmpdir, 'a', 'b')))
 
 
-class TestLoadFromTestCase(unittest.TestCase):
+class TestLoadTestsFromTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.loader = GreenTestLoader()
 
     def test_runTest(self):
         """
@@ -324,7 +329,7 @@ class TestLoadFromTestCase(unittest.TestCase):
             def runTest(self):
                 pass
 
-        suite = loader.loadFromTestCase(MyTestCase)
+        suite = self.loader.loadTestsFromTestCase(MyTestCase)
         self.assertEqual(suite.countTestCases(), 1)
         self.assertEqual(suite._tests[0]._testMethodName, 'runTest')
 
@@ -339,7 +344,7 @@ class TestLoadFromTestCase(unittest.TestCase):
             def test_method2(self):
                 pass
 
-        suite = loader.loadFromTestCase(Normal)
+        suite = self.loader.loadTestsFromTestCase(Normal)
         self.assertEqual(suite.countTestCases(), 2)
         self.assertEqual(set([x._testMethodName for x in suite._tests]),
                          set(['test_method1', 'test_method2']))
@@ -354,11 +359,14 @@ class TestLoadFromTestCase(unittest.TestCase):
 
             test_method.__test__ = False
 
-        suite = loader.loadFromTestCase(HasDisabled)
+        suite = self.loader.loadTestsFromTestCase(HasDisabled)
         self.assertEqual(suite.countTestCases(), 0)
 
 
 class TestLoadFromModuleFilename(unittest.TestCase):
+
+    def setUp(self):
+        self.loader = GreenTestLoader()
 
     def test_skipped_module(self):
         """
@@ -379,7 +387,7 @@ class TestLoadFromModuleFilename(unittest.TestCase):
                     pass
             """))
         fh.close()
-        suite = loader.loadFromModuleFilename(filename)
+        suite = self.loader.loadFromModuleFilename(filename)
         self.assertEqual(suite.countTestCases(), 1)
         self.assertRaises(unittest.case.SkipTest,
                           getattr(suite._tests[0],
@@ -388,19 +396,22 @@ class TestLoadFromModuleFilename(unittest.TestCase):
 
 class TestDiscover(unittest.TestCase):
 
+    def setUp(self):
+        self.loader = GreenTestLoader()
+
     def test_bad_input(self):
         """
         discover() raises ImportError when passed a non-directory
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        self.assertRaises(ImportError, loader.discover,
+        self.assertRaises(ImportError, self.loader.discover,
                           os.path.join(tmpdir, 'garbage_in'))
         filename = os.path.join(tmpdir, 'some_file.py')
         fh = open(filename, 'w')
         fh.write('pass\n')
         fh.close()
-        self.assertRaises(ImportError, loader.discover, filename)
+        self.assertRaises(ImportError, self.loader.discover, filename)
 
     def test_bad_pkg_name(self):
         """
@@ -429,7 +440,7 @@ class TestDiscover(unittest.TestCase):
                     pass
             """))
         fh.close()
-        self.assertEqual(loader.discover(tmpdir), None)
+        self.assertEqual(self.loader.discover(tmpdir), None)
 
     def test_symlink(self):
         """
@@ -461,7 +472,7 @@ class TestDiscover(unittest.TestCase):
                     pass
             """))
         fh.close()
-        self.assertEqual(loader.discover(tmpdir2), None)
+        self.assertEqual(self.loader.discover(tmpdir2), None)
 
 
 class TestLoadTargets(unittest.TestCase):
@@ -482,6 +493,7 @@ class TestLoadTargets(unittest.TestCase):
     def setUp(self):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
+        self.loader = GreenTestLoader()
 
     def tearDown(self):
         os.chdir(self.container_dir)
@@ -507,16 +519,16 @@ class TestLoadTargets(unittest.TestCase):
             ))
         fh.close()
         # Discover stuff
-        suite = loader.loadTargets('.')
+        suite = self.loader.loadTargets('.')
         # This should resolve it to the module that's not importable from here
-        test = loader.toParallelTargets(suite, [])[0]
-        loader.loadTargets(test)
+        test =loader.toParallelTargets(suite, [])[0]
+        self.loader.loadTargets(test)
 
     def test_emptyDirAbsolute(self):
         """
         Absolute path to empty directory returns None
         """
-        tests = loader.loadTargets(self.tmpdir)
+        tests = self.loader.loadTargets(self.tmpdir)
         self.assertTrue(tests is None)
 
     def test_emptyDirRelative(self):
@@ -525,7 +537,7 @@ class TestLoadTargets(unittest.TestCase):
         """
         os.chdir(self.tmpdir)
         os.chdir('..')
-        tests = loader.loadTargets(os.path.dirname(self.tmpdir))
+        tests = self.loader.loadTargets(os.path.dirname(self.tmpdir))
         self.assertEqual(tests, None)
 
     def test_emptyDirDot(self):
@@ -533,7 +545,7 @@ class TestLoadTargets(unittest.TestCase):
         '.' while in an empty directory returns None
         """
         os.chdir(self.tmpdir)
-        tests = loader.loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.assertTrue(tests is None)
 
     def test_relativeDotDir(self):
@@ -543,7 +555,7 @@ class TestLoadTargets(unittest.TestCase):
         os.chdir(self.tmpdir)
         os.chdir('..')
         target = os.path.join('.', os.path.basename(self.tmpdir))
-        tests = loader.loadTargets(target)
+        tests = self.loader.loadTargets(target)
         self.assertTrue(tests is None)
 
     def test_BigDirWithAbsoluteImports(self):
@@ -579,7 +591,7 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        test_suite = loader.loadTargets(pkg_name)
+        test_suite = self.loader.loadTargets(pkg_name)
         self.assertEqual(test_suite.countTestCases(), 1)
         # Dotted name should start with the package!
         self.assertEqual(
@@ -609,7 +621,7 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = os.path.basename(self.tmpdir)
-        tests = loader.loadTargets(module_name)
+        tests = self.loader.loadTargets(module_name)
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_DottedName(self):
@@ -635,7 +647,7 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = basename + ".test_module_dotted_name"
-        tests = loader.loadTargets(module_name)
+        tests = self.loader.loadTargets(module_name)
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_DottedNamePackageFromPath(self):
@@ -661,7 +673,7 @@ class TestLoadTargets(unittest.TestCase):
         os.chdir(self.startdir)
         sys.path.insert(0, self.tmpdir)
         # Load the tests
-        tests = loader.loadTargets(os.path.basename(tmp_subdir))
+        tests = self.loader.loadTargets(os.path.basename(tmp_subdir))
         sys.path.remove(self.tmpdir)
         self.assertTrue(tests.countTestCases(), 1)
 
@@ -686,7 +698,7 @@ class TestLoadTargets(unittest.TestCase):
             """))
         fh.close()
         # Load the tests
-        tests = loader.loadTargets(named_module)
+        tests = self.loader.loadTargets(named_module)
         try:
             self.assertEqual(tests.countTestCases(), 1)
         except:
@@ -708,9 +720,9 @@ class TestLoadTargets(unittest.TestCase):
         fh.write("This is a malformed module.")
         fh.close()
         # Load the tests
-        tests = loader.loadTargets(malformed_module)
+        tests = self.loader.loadTargets(malformed_module)
         self.assertEqual(tests.countTestCases(), 1)
-        test = tests._tests[0]._tests[0]
+        test = tests._tests[0]
         test_method = getattr(test, test._testMethodName)
         self.assertRaises(ImportError, test_method)
 
@@ -737,7 +749,7 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
         # Load the tests
         module_name = basename + ".existing_module.nonexistant_object"
-        tests = loader.loadTargets(module_name)
+        tests = self.loader.loadTargets(module_name)
         self.assertEqual(tests, None)
 
     def test_multiple_targets(self):
@@ -772,8 +784,8 @@ class TestLoadTargets(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = loader.loadTargets([pkg + '.' + 'test_target1',
-                                    pkg + '.' + 'test_target2'])
+        tests = self.loader.loadTargets([pkg + '.' + 'test_target1',
+                                         pkg + '.' + 'test_target2'])
         self.assertEqual(tests.countTestCases(), 2)
 
     def test_duplicate_targets(self):
@@ -796,9 +808,9 @@ class TestLoadTargets(unittest.TestCase):
 
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = loader.loadTargets([pkg + '.' + 'test_dupe_target',
-                                    pkg + '.' + 'test_dupe_target',
-                                    pkg + '.' + 'test_dupe_target'])
+        tests = self.loader.loadTargets([pkg + '.' + 'test_dupe_target',
+                                         pkg + '.' + 'test_dupe_target',
+                                         pkg + '.' + 'test_dupe_target'])
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_explicit_filename_error(self):
@@ -812,7 +824,7 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
 
         os.chdir(sub_tmpdir)
-        tests = loader.loadTargets('mod_with_import_error.py')
+        tests = self.loader.loadTargets('mod_with_import_error.py')
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_file_pattern(self):
@@ -857,5 +869,5 @@ class TestLoadTargets(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = loader.loadTargets(pkg, file_pattern='*_tests.py')
+        tests = self.loader.loadTargets(pkg, file_pattern='*_tests.py')
         self.assertEqual(tests.countTestCases(), 2)

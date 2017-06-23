@@ -12,7 +12,7 @@ import weakref
 
 from green.config import default_args
 from green.exceptions import InitializerOrFinalizerError
-from green.loader import loadTargets
+from green.loader import GreenTestLoader
 from green.output import GreenStream
 from green.runner import InitializerOrFinalizer, run
 from green.suite import GreenTestSuite
@@ -119,6 +119,7 @@ class TestRun(unittest.TestCase):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
         self.tmpdir = tempfile.mkdtemp()
+        self.loader = GreenTestLoader()
 
     def tearDown(self):
         del(self.tmpdir)
@@ -158,7 +159,7 @@ class TestRun(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_verbose3')
+        tests = self.loader.loadTargets('test_verbose3')
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 1)
@@ -181,7 +182,7 @@ class TestRun(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_warnings')
+        tests = self.loader.loadTargets('test_warnings')
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 1)
@@ -211,7 +212,7 @@ class TestRun(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_failed')
+        tests = self.loader.loadTargets('test_failed')
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 1)
@@ -234,7 +235,7 @@ class TestRun(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_failfast')
+        tests = self.loader.loadTargets('test_failfast')
         self.args.failfast = True
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
@@ -257,7 +258,7 @@ class TestRun(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_systemexit')
+        tests = self.loader.loadTargets('test_systemexit')
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(result.testsRun, 2)
@@ -283,6 +284,7 @@ class TestProcesses(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
         self.stream = StringIO()
         self.args = copy.deepcopy(default_args)
+        self.loader = GreenTestLoader()
 
     def tearDown(self):
         os.chdir(self.startdir)
@@ -316,7 +318,7 @@ class TestProcesses(unittest.TestCase):
             """.format(os.getpid())))
         fh.close()
         os.chdir(sub_tmpdir)
-        tests = loadTargets('test_sigint')
+        tests = self.loader.loadTargets('test_sigint')
         self.args.processes = 2
         run(tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
@@ -378,7 +380,7 @@ class TestProcesses(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.args.processes = 2
         self.args.termcolor = False
         try:
@@ -407,7 +409,7 @@ class TestProcesses(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.args.processes = 0
         run(tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)
@@ -436,7 +438,7 @@ class TestProcesses(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.args.processes = 2
         self.args.run_coverage = True
         self.args.cov = MagicMock()
@@ -459,7 +461,7 @@ class TestProcesses(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.args.processes = 2
         os.chdir(TestProcesses.startdir)
         self.assertRaises(ImportError, run, tests, self.stream, self.args)
@@ -491,7 +493,7 @@ class TestProcesses(unittest.TestCase):
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
-        tests = loadTargets('.')
+        tests = self.loader.loadTargets('.')
         self.args.processes = 2
         run(tests, self.stream, self.args)
         os.chdir(TestProcesses.startdir)

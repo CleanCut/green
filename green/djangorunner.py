@@ -14,7 +14,7 @@ import os
 import sys
 
 from green.config import mergeConfig
-from green.loader import loadTargets
+from green.loader import GreenTestLoader
 from green.output import GreenStream
 from green.runner import run
 from green.suite import GreenTestSuite
@@ -77,6 +77,7 @@ try:
 
             super(DjangoRunner, self).__init__()
             self.verbosity = verbosity
+            self.loader = GreenTestLoader()
 
         @classmethod
         def add_arguments(cls, parser):
@@ -116,7 +117,7 @@ try:
                 args.verbosity = self.verbosity
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
-            suite = loadTargets(args.targets)
+            suite = self.loader.loadTargets(args.targets)
             if not suite:
                 suite = GreenTestSuite()
             result = run(suite, stream, args)

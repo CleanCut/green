@@ -26,7 +26,7 @@ def main(testing=False):
     sys.argv = sys.argv[:1]
 
     # Set up our various main objects
-    from green.loader import loadTargets
+    from green.loader import GreenTestLoader, getCompletions
     from green.runner import run
     from green.output import GreenStream, debug
     import green.output
@@ -45,7 +45,6 @@ def main(testing=False):
 
     # Argument-completion for bash and zsh (for test-target completion)
     if args.completions:
-        from green.loader import getCompletions
         print(getCompletions(args.targets))
         return 0
 
@@ -63,7 +62,9 @@ def main(testing=False):
     if testing:
         test_suite = None
     else:  # pragma: no cover
-        test_suite = loadTargets(args.targets, file_pattern=args.file_pattern)
+        loader = GreenTestLoader()
+        test_suite = loader.loadTargets(args.targets,
+                                        file_pattern=args.file_pattern)
 
     # We didn't even load 0 tests...
     if not test_suite:

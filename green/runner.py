@@ -89,7 +89,8 @@ def run(suite, stream, args, testing=False):
                                      initializer=InitializerOrFinalizer(args.initializer),
                                      finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
-        targets = [(target, manager.Queue()) for target in toParallelTargets(suite, args.targets)]
+        targets = [(target, manager.Queue())
+                   for target in toParallelTargets(suite, args.targets)]
         if targets:
             for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:
