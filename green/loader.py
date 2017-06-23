@@ -93,7 +93,7 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
-    if sys.version_info >= (3,5):
+    if sys.version_info >= (3,5): # pragma: no cover
 
         def loadTestsFromModule(self, module, pattern=None):
             tests = super(GreenTestLoader, self).loadTestsFromModule(
