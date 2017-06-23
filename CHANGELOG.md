@@ -1,4 +1,4 @@
-# Version 3.9.0
+# Version 2.9.0
 ##### 23 June 2017
 
 - Green now supports unittest's `load_test` protocol. Contributed by Martin
@@ -11,7 +11,7 @@
 
 - Minor grammar/spelling fixes.
 
-# Version 3.8.2
+# Version 2.8.2
 ##### 7 May 2017
 
 - Work around Python's failure to skip tests in a consistent way -- in
@@ -27,7 +27,7 @@
   2.7 which expect to use an iterator with a next() function.
 
 
-# Version 3.8.1
+# Version 2.8.1
 ##### 29 April 2017
 
 - An unexpectedSuccess does not count as a failure for the test run as a whole,
