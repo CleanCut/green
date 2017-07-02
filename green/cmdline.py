@@ -13,7 +13,7 @@ except:  # pragma: no cover
 import green.config as config
 
 
-def main(testing=False):
+def main(argv=sys.argv[1:], testing=False):
     args = config.parseArguments()
     args = config.mergeConfig(args, testing)
 
@@ -23,7 +23,7 @@ def main(testing=False):
     # Clear out all the passed-in-options just in case someone tries to run a
     # test that assumes sys.argv is clean.  I can't guess at the script name
     # that they want, though, so we'll just leave ours.
-    sys.argv = sys.argv[:1]
+    #sys.argv = sys.argv[:1]
 
     # Set up our various main objects
     from green.loader import GreenTestLoader, getCompletions
