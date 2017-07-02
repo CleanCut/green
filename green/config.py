@@ -63,7 +63,7 @@ default_args             = argparse.Namespace(  # pragma: no cover
         )
 
 
-class StoreOpt():  # pragma: no cover
+class StoreOpt(object):  # pragma: no cover
     """
     Helper class for storing lists of the options themselves to hand out to the
     shell completion scripts.
@@ -71,13 +71,14 @@ class StoreOpt():  # pragma: no cover
 
     def __init__(self):
         self.options = []
-        self.options = []
+        self.actions = []
 
     def __call__(self, action):
+        self.actions.append(action)
         self.options.extend(action.option_strings[0:2])
 
 
-def parseArguments():  # pragma: no cover
+def parseArguments(argv=None):  # pragma: no cover
     """
     I parse arguments in sys.argv and return the args object.  The parser
     itself is available as args.parser.
@@ -293,7 +294,7 @@ def parseArguments():  # pragma: no cover
         help="Output all options.  Used by bash- and zsh-completion.",
         default=argparse.SUPPRESS))
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv or None)
 
     # Add additional members
     args.parser    = parser
