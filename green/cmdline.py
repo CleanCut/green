@@ -14,7 +14,7 @@ import green.config as config
 
 
 def main(argv=sys.argv[1:], testing=False):
-    args = config.parseArguments()
+    args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
 
     if args.shouldExit:
