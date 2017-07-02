@@ -42,6 +42,13 @@ class green(Command):
     def run(self):
         self.ensure_finalized()
 
+        if self.distribution.install_requires:
+            self.distribution.fetch_build_eggs(
+                self.distribution.install_requires)
+        if self.distribution.tests_require:
+            self.distribution.fetch_build_eggs(
+                self.distribution.tests_require)
+
         script_args = self.distribution.script_args[1:]
         if self.distribution.test_suite is not None:
             script_args.append(self.distribution.test_suite)
