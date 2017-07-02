@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import sys
+
 try:
     from setuptools import Command
-except ImportError:
+except ImportError: # pragma: no cover
     from distutils.cmd import Command
 
 from green.config import parseArguments
@@ -32,7 +34,7 @@ class green(Command):
 
     def initialize_options(self):
         for name, _, _ in self.user_options:
-            setattr(self, name.replace('-', '_'), None)
+            setattr(self, name.replace('-', '_').rstrip('='), None)
 
     def finalize_options(self):
         pass
@@ -40,7 +42,10 @@ class green(Command):
     def run(self):
         self.ensure_finalized()
 
-        #print(vars(self.distribution))
-        error_code = main(self.distribution.script_args[1:])
+        script_args = self.distribution.script_args[1:]
+        if self.distribution.test_suite is not None:
+            script_args.append(self.distribution.test_suite)
+
+        error_code = main(script_args)
         if error_code:
             sys.exit(error_code)
