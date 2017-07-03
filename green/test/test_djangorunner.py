@@ -137,7 +137,7 @@ class TestDjangoRunner(unittest.TestCase):
         test_command.test_runner = "green.djangorunner.DjangoRunner"
         parser = ArgumentParser()
         test_command.add_arguments(parser)
-        args = parser.parse_args()
+        args = parser.parse_args([])
         self.assertIn('verbosity', args)
 
     def test_check_default_verbosity(self):
@@ -154,7 +154,7 @@ class TestDjangoRunner(unittest.TestCase):
         test_command.test_runner = "green.djangorunner.DjangoRunner"
         parser = ArgumentParser()
         test_command.add_arguments(parser)
-        args = parser.parse_args()
+        args = parser.parse_args([])
         self.assertEqual(args.verbosity,-1)
 
     def test_run_with_verbosity_flag(self):
