@@ -31,6 +31,7 @@ Community
 - Submit a [pull
   request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
   with a bug fix or new feature.
+- Do you need someone else to implement a feature?  [Contact me](mailto:nathan.stocks@gmail.com) to sponsor features you need.
 
 Training Course -- Python Testing with Green
 --------

@@ -25,6 +25,12 @@ fixing bugs.
 Seriously, **use a coupon!**  Udemy takes up to 75% of the sale for "marketing
 the course" if you don't use a coupon provided here.
 
+Commercial Features
+-------------------
+
+Do you need a specific feature for your business?
+[Contact me](mailto:nathan.stocks@gmail.com) to sponsor features you need.
+
 Choose Your Price
 --------------------
 
@@ -45,9 +51,3 @@ any way, I'd be happy to give you a free subscription.
 _**† Use a coupon!**  When you use any coupons on this page, 97% reaches the project.
 Without it, only 25% to 47% of the price you pay reaches the project.  Use a
 coupon!_
-
-Commercial Features
--------------------
-
-[Send me an email](mailto:nathan.stocks@gmail.com) if you are interested in
-contracting me to implement features you need commercially.
