@@ -36,8 +36,8 @@ Training Course -- Python Testing with Green
 --------
 
 Advance your learning and support Green by subscribing to
-[Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL).
-[You can choose your own price!](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
+[Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB).
+You can [choose your own price!](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
 
 <a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB" rel="Python Testing with Green"> ![Python Testing with Green](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)</a>
 
