@@ -22,34 +22,35 @@ it's a win-win.  Use the coupon and you save money while I receive more money
 and can actually spend more time on implementing enhancement proposals and
 fixing bugs.
 
-Seriously, **DON'T** buy the course **without using a coupon!**  I get as
-little as 25%-50% of the purchase price if you don't use a coupon (depending on
-whether you go through an affiliate site or Udemy directly), but when you use
-a coupon, then I can get 97% of the purchase price in many circumstances.
+Seriously, **use a coupon!**  Udemy takes up to 75% of the sale for "marketing
+the course" if you don't use a coupon provided here.
 
 Early Bird Discount - First 100 Subscribers
 ---------------
 
-- **$20** - _90% off_ - [GREEN_EARLYBIRD](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_EARLYBIRD) - First 100 subscribers only!  (I'll remove this code once it has been used up, go ahead and give it a try until then).
+- **$10** - _80% off_ - [GREEN_HOUSEWARMING](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_HOUSEWARMING) - First 25 subscribers only!  (I'll remove this code once it has been used up, go ahead and give it a try until then).
 
 Standard Awesome Discount
 -------------------------
 
 You came to Github.  You read this page.  You deserve an awesome discount!
 
-- **$50** - _75% off_ - [GREEN_GITHUB](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB) - Thank you!
+- **$25** - _50% off_ - [GREEN_COMMUNITY](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_COMMUNITY) - Thank you!
 
 Premium Support
 ---------------
 
 You have the means, and you are a generous soul.
 
-- **$75** - _62.5% off_ - [GREEN_SUPPORTER](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_SUPPORTER)
-- **$100** - _50% off_ - [GREEN_PROMOTER](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_PROMOTER)
-- **$150** - _25% off_ - [GREEN_SPONSOR](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_SPONSOR)
-- **$200** - _Full Price_ - [GREEN_ANGEL](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL) -
-  With this "coupon", $194 reaches the project.  Without it, only $94 of the
-  full purchase reaches the project.  Hence the code.  Use the code!
+- **$50** - [GREEN_GITHUB](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB)
+- **$75** - [GREEN_SUPPORTER](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_SUPPORTER)
+- **$100** - [GREEN_PROMOTER](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_PROMOTER)
+- **$150** - [GREEN_SPONSOR](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_SPONSOR)
+- **$200** - [GREEN_ANGEL](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL)
+
+**Use a coupon!**  When you use any coupons on this page, 97% reaches the project.
+Without it, only 25% to 47% of the price you pay reaches the project.  Use a
+coupon!
 
 Custom Discounts
 ----------------
