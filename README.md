@@ -88,7 +88,7 @@ options](https://github.com/CleanCut/green/blob/master/cli-options.txt) or run
 `green --help`.
 
 Troubleshooting
----------------------
+---------------
 
 One easy way to avoid common importing problems is to navigate to the *parent*
 directory of the directory your python code is in.  Then pass green the
