@@ -294,7 +294,7 @@ def parseArguments(argv=None):  # pragma: no cover
         help="Output all options.  Used by bash- and zsh-completion.",
         default=argparse.SUPPRESS))
 
-    args = parser.parse_args(argv or None)
+    args = parser.parse_args(argv)
 
     # Add additional members
     args.parser    = parser
