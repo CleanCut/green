@@ -9,7 +9,7 @@ try:
 except ImportError:
     from distutil.dist import Distribution
 
-from mock import patch
+from mock import patch, MagicMock, call
 
 from green import command
 from green.config import StoreOpt
@@ -105,3 +105,18 @@ class TestCommand(unittest.TestCase):
         with self.assertRaises(SystemExit) as se:
             cmd.run()
         self.assertEqual(se.exception.code, 125)
+
+    @patch('green.command.main', return_value=0)
+    def test_requires(self, main):
+        d = Distribution({'script_name': 'setup.py',
+                          'script_args': ['green'],
+                          'install_requires': ['six'],
+                          'tests_require': ['mock', 'unittest2']})
+        d.fetch_build_eggs = MagicMock()
+        cmd = command.green(d)
+        cmd.run()
+
+        d.fetch_build_eggs.assert_has_calls([
+            call(['six']),
+            call(['mock', 'unittest2']),
+        ])
