@@ -1,3 +1,12 @@
+# Version 2.10.0
+##### 8 July 2017
+
+- Green can now be used as a `setup.py` test runner.  See `green --help` or the
+  main readme for details.  Contributed by Martin Larralde in #165.  Resolves
+  enhancement request #158.
+
+- Lower prices on training course.  Choose your own price.
+
 # Version 2.9.0
 ##### 23 June 2017
 
