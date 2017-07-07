@@ -13,8 +13,8 @@ except:  # pragma: no cover
 import green.config as config
 
 
-def main(testing=False):
-    args = config.parseArguments()
+def main(argv=None, testing=False):
+    args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
 
     if args.shouldExit:

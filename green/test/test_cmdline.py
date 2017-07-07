@@ -42,8 +42,8 @@ class TestMain(unittest.TestCase):
         cwd = os.getcwd()
         os.chdir(tmpdir)
         sys.path.insert(0, cwd)
-        config.sys.argv = ['', tmpdir]
-        cmdline.main()
+        argv = [tmpdir]
+        cmdline.main(argv)
         os.chdir(cwd)
         del(sys.path[0])
         shutil.rmtree(tmpdir)
@@ -57,16 +57,16 @@ class TestMain(unittest.TestCase):
         fh = open(filename, 'w')
         fh.write("debug = 2")
         fh.close()
-        cmdline.sys.argv = ['', '-dd', '--config', filename]
-        cmdline.main(testing=True)
+        argv = ['-dd', '--config', filename]
+        cmdline.main(argv, testing=True)
         shutil.rmtree(tmpdir)
 
     def test_completionFile(self):
         """
         --completion-file causes a version string to be output
         """
-        config.sys.argv = ['', '--completion-file']
-        cmdline.main(testing=True)
+        argv = ['--completion-file']
+        cmdline.main(argv, testing=True)
         self.assertIn('shell_completion.sh', self.s.getvalue())
 
     def test_completions(self):
@@ -76,8 +76,8 @@ class TestMain(unittest.TestCase):
         cwd = os.getcwd()
         path = os.path.abspath(__file__)
         os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(path))))
-        config.sys.argv = ['', '--completions', 'green']
-        cmdline.main(testing=True)
+        argv = ['--completions', 'green']
+        cmdline.main(argv, testing=True)
         os.chdir(cwd)
         self.assertIn('green.test', self.s.getvalue())
 
@@ -85,8 +85,8 @@ class TestMain(unittest.TestCase):
         """
         --options causes options to be output
         """
-        cmdline.sys.argv = ['', '--options']
-        cmdline.main(testing=True)
+        argv = ['--options']
+        cmdline.main(argv, testing=True)
         self.assertIn('--options', self.s.getvalue())
         self.assertIn('--version', self.s.getvalue())
 
@@ -94,8 +94,8 @@ class TestMain(unittest.TestCase):
         """
         --version causes a version string to be output
         """
-        cmdline.sys.argv = ['', '--version']
-        cmdline.main(testing=True)
+        argv = ['--version']
+        cmdline.main(argv, testing=True)
         self.assertIn('Green', self.s.getvalue())
         self.assertIn('Python', self.s.getvalue())
 
@@ -103,11 +103,11 @@ class TestMain(unittest.TestCase):
         """
         --debug causes the log-level to be set to debug
         """
-        config.sys.argv = ['', '--debug']
+        argv = ['--debug']
         saved_basicConfig = config.logging.basicConfig
         self.addCleanup(setattr, config.logging, 'basicConfig', saved_basicConfig)
         config.logging.basicConfig = MagicMock()
-        cmdline.main(testing=True)
+        cmdline.main(argv, testing=True)
         config.logging.basicConfig.assert_called_with(
             level=logging.DEBUG,
             format="%(asctime)s %(levelname)9s %(message)s",
@@ -117,15 +117,15 @@ class TestMain(unittest.TestCase):
         """
         --notermcolor causes coverage of the line disabling termcolor
         """
-        cmdline.sys.argv = ['', '--notermcolor']
-        cmdline.main(testing=True)
+        argv = ['--notermcolor']
+        cmdline.main(argv, testing=True)
 
     def test_disableWindowsSupport(self):
         """
         --disable-windows
         """
-        cmdline.sys.argv = ['', '--disable-windows']
-        cmdline.main(testing=True)
+        argv = ['--disable-windows']
+        cmdline.main(argv, testing=True)
 
     def test_noCoverage(self):
         """
@@ -135,8 +135,8 @@ class TestMain(unittest.TestCase):
         config.sys.stdout = MagicMock()
         save_coverage = config.coverage
         config.coverage = None
-        config.sys.argv = ['', '--run-coverage']
-        self.assertEqual(cmdline.main(), 3)
+        argv = ['--run-coverage']
+        self.assertEqual(cmdline.main(argv), 3)
         config.coverage = save_coverage
         config.sys.stdout = save_stdout
 
@@ -146,8 +146,8 @@ class TestMain(unittest.TestCase):
         Coverage test, since loading the module inside the main function (due
         to coverage handling constraints) prevents injecting a mock.
         """
-        cmdline.sys.argv = ['', '/tmp/non-existent/path']
-        cmdline.main(testing=True)
+        argv = ['', '/tmp/non-existent/path']
+        cmdline.main(argv, testing=True)
 
     def test_import_cmdline_module(self):
         """

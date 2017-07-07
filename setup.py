@@ -37,6 +37,9 @@ setup(
             'green%d = green.cmdline:main' % sys.version_info[:1],    # green2 or green3
             'green%d.%d = green.cmdline:main' % sys.version_info[:2], # green3.4 etc.
             ],
+        'distutils.commands' : [
+            'green = green.command:green'
+        ]
     },
     test_suite='green.test',
     description = 'Green is a clean, colorful, fast python test runner.',
