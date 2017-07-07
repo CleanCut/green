@@ -122,6 +122,23 @@ ENABLING SHELL COMPLETION
   Warning!  Generating a completion list actually discovers and loads tests
   -- this can be very slow if you run it in huge directories!
 
+SETUP.PY RUNNER
+
+  To run green as a setup.py command, simply add green to the 'setup_requires'
+  section in the setup.py file, and specify a target as the 'test_suite'
+  parameter if you do not want green to load all the tests:
+
+     setup(
+         setup_requires = ['green'],
+         install_requires = 'myproject.tests'
+     )
+
+  Then simply run green as any other setup.py command (it accepts the same
+  parameters as the 'green' executable):
+
+     python setup.py green
+     python setup.py green -r   # to run with coverage, etc.
+
 CONFIG FILES
 
   Configuration settings are resolved in this order, with settings found later
