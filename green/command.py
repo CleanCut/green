@@ -18,9 +18,9 @@ def get_user_options():
     options = []
 
     for action in r.store_opt.actions:
-        names = [name.lstrip('-') for name in action.option_strings]
+        names = [str(name.lstrip('-')) for name in action.option_strings]
         if len(names) == 1: names.insert(0, None)
-        if not action.const: names[1] += "="
+        if not action.const: names[1] += str("=")
         options.append((names[1], names[0], action.help))
 
     return options
