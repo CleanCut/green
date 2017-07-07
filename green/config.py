@@ -63,7 +63,7 @@ default_args             = argparse.Namespace(  # pragma: no cover
         )
 
 
-class StoreOpt():  # pragma: no cover
+class StoreOpt(object):  # pragma: no cover
     """
     Helper class for storing lists of the options themselves to hand out to the
     shell completion scripts.
@@ -71,13 +71,14 @@ class StoreOpt():  # pragma: no cover
 
     def __init__(self):
         self.options = []
-        self.options = []
+        self.actions = []
 
     def __call__(self, action):
+        self.actions.append(action)
         self.options.extend(action.option_strings[0:2])
 
 
-def parseArguments():  # pragma: no cover
+def parseArguments(argv=None):  # pragma: no cover
     """
     I parse arguments in sys.argv and return the args object.  The parser
     itself is available as args.parser.
@@ -106,6 +107,24 @@ def parseArguments():  # pragma: no cover
 
                   Warning!  Generating a completion list actually discovers and loads tests
                   -- this can be very slow if you run it in huge directories!
+
+                SETUP.PY RUNNER
+
+                  To run green as a setup.py command, simply add green to the 'setup_requires'
+                  section in the setup.py file, and specify a target as the 'test_suite'
+                  parameter if you do not want green to load all the tests:
+
+                     setup(
+                         setup_requires = ['green'],
+                         install_requires = 'myproject.tests'
+                     )
+
+                  Then simply run green as any other setup.py command (it accepts the same
+                  parameters as the 'green' executable):
+
+                     python setup.py green
+                     python setup.py green -r   # to run with coverage, etc.
+
 
                 CONFIG FILES
 
@@ -293,7 +312,7 @@ def parseArguments():  # pragma: no cover
         help="Output all options.  Used by bash- and zsh-completion.",
         default=argparse.SUPPRESS))
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Add additional members
     args.parser    = parser
