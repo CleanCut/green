@@ -17,6 +17,7 @@ Features
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in, optional integration with
   [coverage](http://nedbatchelder.com/code/coverage/).
+- **Embedded** - Can be run with a setup command without in-site installation.
 - **Modern** - Supports Python 2.7, and 3.4+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the
@@ -129,6 +130,36 @@ which green >& /dev/null && source "$( green --completion-file )"
 Green has built-in integration support for the
 [coverage](http://coverage.readthedocs.org/) module.  Just make sure `coverage`
 is installed, and then add `-r` or `--run-coverage` when you run green.
+
+### `setup.py` command
+
+Green is available as a `setup.py` runner, invoked as any other setup command:
+```
+python setup.py green
+```
+This simply requires green to be present in the `setup_requires` section of
+your `setup.py` file. To run green on a specific target, use the `test_suite`
+argument (or leave blank to let green discover tests itself):
+```python
+# setup.py
+from setuptools import setup
+
+setup(
+    ...
+    setup_requires = ['green'],
+    # test_suite = ["my_project.tests"]
+)
+```
+
+You can also add an alias to the `setup.cfg` file, so that `python setup.py test` actually runs green:
+
+```ini
+# setup.cfg
+
+[aliases]
+test = green
+```
+
 
 ### Django
 
@@ -501,5 +532,3 @@ some awesome suggestions?  Whatever the case, go submit it as an
 not picky about what goes into the Issue tracker.  Questions, comments, bugs,
 feature requests, just letting me know that I should go look at some other cool
 tool.  Go for it.
-
-
