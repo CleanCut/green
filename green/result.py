@@ -48,9 +48,13 @@ class ProtoTest():
     """
     def __init__(self, test=None):
         if test:
+            method_parts = str(test).split(None, 2)
+            if hasattr(test, 'test_case'):
+                test = test.test_case
             self.module      = test.__module__
             self.class_name  = test.__class__.__name__
-            self.method_name = str(test).split()[0]
+            self.method_name = method_parts[0] if len(method_parts) < 3 \
+                else ' '.join((method_parts[0], method_parts[2]))
             # docstr_part strips initial whitespace, then combines all lines
             # into one string until the first completely blank line in the
             # docstring
@@ -182,6 +186,7 @@ class ProtoTestResult(BaseTestResult):
                 'stdout_output',
                 'unexpectedSuccesses',
                 ]
+        self.failfast = False
         self.reinitialize()
 
     def reinitialize(self):
@@ -280,6 +285,13 @@ class ProtoTestResult(BaseTestResult):
         Called when a test passed, but we expected a failure
         """
         self.unexpectedSuccesses.append(proto_test(test))
+
+    def addSubTest(self, test, subtest, err):
+        if err is not None:
+            if issubclass(err[0], test.failureException):
+                self.addFailure(subtest, err)
+            else:
+                self.addError(subtest, err)
 
 
 class GreenTestResult(BaseTestResult):
