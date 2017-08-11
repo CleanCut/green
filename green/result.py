@@ -47,14 +47,24 @@ class ProtoTest():
     and can pass between processes.
     """
     def __init__(self, test=None):
+        self.module = ''
+        self.class_name = ''
+        self.method_name = ''
+        self.docstr_part = ''
+        self.subtest_part = ''
+        self.is_subtest = False
+
+        # Is this a subtest?
+        if getattr(test, '_subDescription', None):
+            self.is_subtest = True
+            self.subtest_part = ' ' + test._subDescription()
+            test = test.test_case
+
+        # Is this a TestCase?
         if test:
-            method_parts = str(test).split(None, 2)
-            if hasattr(test, 'test_case'):
-                test = test.test_case
             self.module      = test.__module__
             self.class_name  = test.__class__.__name__
-            self.method_name = method_parts[0] if len(method_parts) < 3 \
-                else ' '.join((method_parts[0], method_parts[2]))
+            self.method_name = str(test).split()[0]
             # docstr_part strips initial whitespace, then combines all lines
             # into one string until the first completely blank line in the
             # docstring
@@ -66,11 +76,6 @@ class ProtoTest():
                         break
                     doc_segments.append(line)
             self.docstr_part = ' '.join(doc_segments)
-        else:
-            self.module = ''
-            self.class_name = ''
-            self.method_name = ''
-            self.docstr_part = ''
 
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
@@ -83,13 +88,13 @@ class ProtoTest():
 
     @property
     def dotted_name(self, ignored=None):
-        return self.module + '.' + self.class_name + '.' + self.method_name
+        return self.module + '.' + self.class_name + '.' + self.method_name + self.subtest_part
 
     def getDescription(self, verbose):
         if verbose == 2:
-            return self.method_name
+            return self.method_name + self.subtest_part
         elif verbose > 2:
-            return self.docstr_part or self.method_name
+            return (self.docstr_part + self.subtest_part) or (self.method_name + self.subtest_part)
         else:
             return ''
 
@@ -186,7 +191,7 @@ class ProtoTestResult(BaseTestResult):
                 'stdout_output',
                 'unexpectedSuccesses',
                 ]
-        self.failfast = False
+        self.failfast = False  # Because unittest inspects the attribute
         self.reinitialize()
 
     def reinitialize(self):
@@ -287,11 +292,19 @@ class ProtoTestResult(BaseTestResult):
         self.unexpectedSuccesses.append(proto_test(test))
 
     def addSubTest(self, test, subtest, err):
+        """
+        Called at the end of a subtest no matter its result.
+
+        The test that runs the subtests is calls the other test methods to
+        record its own result.  We use this method to record each subtest as a
+        separate test result.  It's very meta.
+        """
         if err is not None:
             if issubclass(err[0], test.failureException):
                 self.addFailure(subtest, err)
             else:
                 self.addError(subtest, err)
+
 
 
 class GreenTestResult(BaseTestResult):
@@ -300,15 +313,16 @@ class GreenTestResult(BaseTestResult):
     """
     def __init__(self, args, stream):
         super(GreenTestResult, self).__init__(stream, Colors(args.termcolor))
-        self.args = args
-        self.showAll       = args.verbose > 1
-        self.dots          = args.verbose == 1
-        self.verbose       = args.verbose
-        self.last_module   = ''
-        self.last_class    = ''
-        self.failfast      = args.failfast
-        self.shouldStop    = False
-        self.testsRun      = 0
+        self.args              = args
+        self.showAll           = args.verbose > 1
+        self.dots              = args.verbose == 1
+        self.verbose           = args.verbose
+        self.last_module       = ''
+        self.last_class        = ''
+        self.first_text_output = ''
+        self.failfast          = args.failfast
+        self.shouldStop        = False
+        self.testsRun          = 0
         # Individual lists
         self.errors              = []
         self.expectedFailures    = []
@@ -419,8 +433,6 @@ class GreenTestResult(BaseTestResult):
         """
         Called before the start of each test
         """
-        self.testsRun += 1
-
         # Get our bearings
         test = proto_test(test)
         current_module = test.module
@@ -435,15 +447,14 @@ class GreenTestResult(BaseTestResult):
             if current_class != self.last_class:
                 self.stream.writeln(self.colors.className(
                     self.stream.formatText(current_class, indent=1)))
-            # Test name or description
             if self.stream.isatty():
                 # In the terminal, we will write a placeholder, and then
-                # rewrite it in color after the test has run.
-                self.stream.write(
-                    self.colors.bold(
-                        self.stream.formatLine(
-                            test.getDescription(self.verbose),
-                            indent=2)))
+                # modify the first character and rewrite it in color after
+                # the test has run.
+                self.first_text_output = self.stream.formatLine(
+                    test.getDescription(self.verbose),
+                    indent=2)
+                self.stream.write(self.colors.bold(self.first_text_output))
             self.stream.flush()
 
         # Set state for next time
@@ -454,24 +465,29 @@ class GreenTestResult(BaseTestResult):
 
     def stopTest(self, test):
         """
-        Called after the end of each test
+        Supposed to be called after each test, but as far as I can tell that's a
+        lie and this is simply never called.
         """
+
 
     def _reportOutcome(self, test, outcome_char, color_func, err=None,
                        reason=''):
+        self.testsRun += 1
         test = proto_test(test)
         if self.showAll:
             if self.stream.isatty():
                 self.stream.write(self.colors.start_of_line())
-            text_output = self.stream.formatLine(
+            # Can end up being different from the first time due to subtest
+            # information only being available after a test result comes in.
+            second_text_output = self.stream.formatLine(
                 test.getDescription(self.verbose),
                 indent=2,
                 outcome_char=outcome_char)
             if terminal_width: # pragma: no cover
-                cursor_rewind = int(ceil(float(len(text_output)) / terminal_width)) - 1
+                cursor_rewind = int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
                 if cursor_rewind:
                     self.stream.write(self.colors.up(cursor_rewind))
-            self.stream.write(color_func(text_output))
+            self.stream.write(color_func(second_text_output))
             if reason:
                 self.stream.write(color_func(' -- ' + reason))
             self.stream.writeln()

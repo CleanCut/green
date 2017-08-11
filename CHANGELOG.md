@@ -1,3 +1,11 @@
+# Version 2.11.0
+##### 10 Aug 2017
+
+- SubTest context manager support introduced in Python 3.4 is now explicitly
+  supported.  In previous versions of Green the SubTests would run correctly,
+  but not get reported...sanely.  The bulk of this work was contributed by
+  VladV in #167.  Resolves #111.
+
 # Version 2.10.0
 ##### 8 July 2017
 

@@ -9,7 +9,10 @@ try:
 except ImportError:
     from distutil.dist import Distribution
 
-from mock import patch, MagicMock, call
+try:
+    from mock import patch, MagicMock, call
+except:
+    from unittest.mock import patch, MagicMock, call
 
 from green import command
 from green.config import StoreOpt

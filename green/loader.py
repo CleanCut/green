@@ -100,7 +100,7 @@ class GreenTestLoader(unittest.TestLoader):
                 module, pattern=pattern)
             return flattenTestSuite(tests)
 
-    else:
+    else: # pragma: no cover
 
         def loadTestsFromModule(self, module):
             tests = super(GreenTestLoader, self).loadTestsFromModule(module)
@@ -280,7 +280,7 @@ class GreenTestLoader(unittest.TestLoader):
                     )
 
                 def testFailure(self):
-                    raise ImportError(message)
+                    raise ImportError(message) # pragma: no cover
 
                 TestClass = type(
                         str("ModuleImportFailure"),

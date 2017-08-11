@@ -36,6 +36,7 @@ class MyProtoTest(ProtoTest):
         self.class_name  = "MyClass"
         self.method_name = "myMethod"
         self.docstr_part = "My docstring"
+        self.subtest_part = ""
 
 
 class TestBaseTestResult(unittest.TestCase):
@@ -175,6 +176,34 @@ class TestProtoTestResult(unittest.TestCase):
         test = proto_test(MagicMock())
         ptr.addUnexpectedSuccess(test)
         self.assertEqual(test, ptr.unexpectedSuccesses[0])
+
+    @patch('green.result.ProtoTestResult.addError')
+    @patch('green.result.ProtoTestResult.addFailure')
+    def test_addSubTest_failure(self, mock_addFailure, mock_addError):
+        """
+        addSubTest calls over to addFailure for failures
+        """
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        test.failureException = Exception
+        subtest = MagicMock()
+        err = [Exception]
+        ptr.addSubTest(test, subtest, err)
+        mock_addFailure.assert_called_with(subtest, err)
+
+    @patch('green.result.ProtoTestResult.addError')
+    @patch('green.result.ProtoTestResult.addFailure')
+    def test_addSubTest_error(self, mock_addFailure, mock_addError):
+        """
+        addSubTest calls over to addError for errors
+        """
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        test.failureException = KeyError
+        subtest = MagicMock()
+        err = [Exception]
+        ptr.addSubTest(test, subtest, err)
+        mock_addError.assert_called_with(subtest, err)
 
 
 class TestProtoError(unittest.TestCase):
@@ -431,10 +460,14 @@ class TestGreenTestResult(unittest.TestCase):
         gtr._reportOutcome(None, '.', lambda x: x)
         self.assertIn('.', self.stream.getvalue())
 
-    def test_reportOutcomeCursorUp(self):
+    @patch('green.result.proto_test')
+    def test_reportOutcomeCursorUp(self, mock_proto_test):
         """
         _reportOutcome moves the cursor up when it needs to.
         """
+        mockProtoTest = MagicMock()
+        mockProtoTest.getDescription.return_value = 'a description'
+        mock_proto_test.return_value = mockProtoTest
         self.args.verbose = 2
 
         def isatty():
@@ -450,10 +483,14 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertIn(r, self.stream.getvalue())
         self.assertLess(len(self.stream.getvalue()), 2000)
 
-    def test_reportOutcomeVerbose(self):
+    @patch('green.result.proto_test')
+    def test_reportOutcomeVerbose(self, mock_proto_test):
         """
         _reportOutcome contains output we expect in verbose mode.
         """
+        mockProtoTest = MagicMock()
+        mockProtoTest.getDescription.return_value = 'a description'
+        mock_proto_test.return_value = mockProtoTest
         self.args.verbose = 2
 
         def isatty():
