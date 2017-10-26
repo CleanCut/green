@@ -1,3 +1,9 @@
+# Version 2.11.1
+##### 25 Oct 2017
+
+- Fixed bug causing several django testing options to be unavailable when using
+  green as the test runner for django.  Resolves #172.
+
 # Version 2.11.0
 ##### 10 Aug 2017
 
