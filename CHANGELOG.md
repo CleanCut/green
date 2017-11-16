@@ -1,3 +1,8 @@
+# Version 2.11.2
+
+- Fixed temp files not getting properly cleaned up on Windows and Linux in
+  Python 3 (problem persists for macOS). Contributed by Martin Larralde in #173.
+
 # Version 2.11.1
 ##### 25 Oct 2017
 
