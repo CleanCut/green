@@ -1,5 +1,5 @@
 version: "{build}"
-build: off
+build: "Script"
 build_script:
 environment:
     matrix:
