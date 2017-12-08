@@ -1,6 +1,6 @@
 version: "{build}"
 build: "Script"
-build_script:
+    build_script:
 environment:
     matrix:
         - PYTHON: "C:/Python27"
