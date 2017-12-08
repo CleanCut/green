@@ -1,4 +1,5 @@
 colorama
+coverage
 mock
 python-termstyle
 unidecode

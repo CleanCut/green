@@ -127,19 +127,6 @@ class TestMain(unittest.TestCase):
         argv = ['--disable-windows']
         cmdline.main(argv, testing=True)
 
-    def test_noCoverage(self):
-        """
-        The absence of coverage prompts a return code of 3
-        """
-        save_stdout = config.sys.stdout
-        config.sys.stdout = MagicMock()
-        save_coverage = config.coverage
-        config.coverage = None
-        argv = ['--run-coverage']
-        self.assertEqual(cmdline.main(argv), 3)
-        config.coverage = save_coverage
-        config.sys.stdout = save_stdout
-
     def test_noTestsCreatesEmptyTestSuite(self):
         """
         If loadTargets doesn't find any tests, an empty test suite is created.

@@ -1,4 +1,3 @@
-django
-coverage
+django<2
 testtools
 -r requirements.txt

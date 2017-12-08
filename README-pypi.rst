@@ -20,7 +20,7 @@ Features
 - **Traditional** - Use the normal ``unittest`` classes and methods for your unit tests.
 - **Descriptive** - Multiple verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
-- **Thorough** - Built-in, optional integration with `coverage`_
+- **Thorough** - Built-in integration with `coverage`_
 - **Modern** - Supports Python 2.7, and 3.4+.  Additionally, `PyPy` is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the `changelog`_

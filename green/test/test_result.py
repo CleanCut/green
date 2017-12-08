@@ -21,10 +21,7 @@ try:
 except ImportError:
     from mock import MagicMock, patch
 
-try:
-    from coverage import coverage, CoverageException
-except ImportError:
-    coverage = None
+from coverage import coverage, CoverageException
 
 
 class MyProtoTest(ProtoTest):
@@ -321,7 +318,6 @@ class TestGreenTestResult(unittest.TestCase):
         del(self.stream)
         del(self.args)
 
-    @unittest.skipUnless(coverage, "coverage is required for this test.")
     @patch('green.result.GreenTestResult.printErrors')
     def test_stopTestRun(self, mock_printErrors):
         """
@@ -881,7 +877,6 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.assertEqual(gtr.wasSuccessful(), True)
 
 
-@unittest.skipUnless(coverage, "coverage is required for this test.")
 class TestGreenTestRunCoverage(unittest.TestCase):
 
     def setUp(self):

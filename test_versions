@@ -23,6 +23,10 @@ if [[ "${PYTHON_VERSIONS}" == *-dev ]] ; then
     PYTHON_VERSIONS="${PYTHON_VERSIONS::-4}"
 fi
 
+# Deduplicate
+PYTHON_VERSIONS="$(echo $PYTHON_VERSIONS | xargs -n1 | sort -u | xargs)"
+
+
 echo "Identified python versions: `echo ${PYTHON_VERSIONS} | tr '\n' ' '`"
 
 # Make sure each of the pythons has the necessary requirements installed

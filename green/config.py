@@ -8,12 +8,9 @@ try:                        # pragma: no cover
     import configparser
 except:                     # pragma: no cover
     import ConfigParser as configparser
-try:                        # pragma: no cover
-    import coverage
-    coverage_version = "Coverage {}".format(coverage.__version__)
-except:                     # pragma: no cover
-    coverage = None
-    coverage_version = "Coverage Not Installed"
+
+import coverage
+coverage_version = "Coverage {}".format(coverage.__version__)
 
 import copy                  # pragma: no cover
 import logging               # pragma: no cover
@@ -536,13 +533,6 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         new_args.run_coverage = True
 
     if new_args.run_coverage:
-        if not coverage:
-            print(
-                "Fatal: The 'coverage' module is not installed.  Have you "
-                "run 'pip install coverage' ???")
-            args.shouldExit = True
-            args.exitCode = 3
-            return args
         if not testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns,
                                     include=new_args.include_patterns)

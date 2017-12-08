@@ -15,8 +15,7 @@ Features
 - **Traditional** - Use the normal `unittest` classes and methods for your unit tests.
 - **Descriptive** - Multiple verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
-- **Thorough** - Built-in, optional integration with
-  [coverage](http://nedbatchelder.com/code/coverage/).
+- **Thorough** - Built-in integration with [coverage](http://nedbatchelder.com/code/coverage/).
 - **Embedded** - Can be run with a setup command without in-site installation.
 - **Modern** - Supports Python 2.7, and 3.4+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
@@ -128,8 +127,8 @@ which green >& /dev/null && source "$( green --completion-file )"
 ### Coverage
 
 Green has built-in integration support for the
-[coverage](http://coverage.readthedocs.org/) module.  Just make sure `coverage`
-is installed, and then add `-r` or `--run-coverage` when you run green.
+[coverage](http://coverage.readthedocs.org/) module.  Add `-r` or
+`--run-coverage` when you run green.
 
 ### `setup.py` command
 

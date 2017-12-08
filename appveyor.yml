@@ -13,9 +13,7 @@ install:
       - ps: "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
       - ps: (new-object net.webclient).DownloadFile('https://bootstrap.pypa.io/get-pip.py', 'C:/get-pip.py')
       - "%PYTHON%/python.exe C:/get-pip.py"
-      - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
-      # install extra dependancies for testing
-      - "%PYTHON%/Scripts/pip.exe install coverage django testtools"
+      - "%PYTHON%/Scripts/pip.exe install -r requirements-optional.txt"
 test_script:
     - "%PYTHON%/python.exe -m green.cmdline -vvv -t green -s 1"
 platform:

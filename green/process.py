@@ -8,10 +8,7 @@ import sys
 import tempfile
 import traceback
 
-try:  # pragma: no cover
-    import coverage
-except:  # pragma: no cover
-    coverage = None
+import coverage
 
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import GreenTestLoader
@@ -260,12 +257,12 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
         tempfile.tempdir = saved_tempdir
         queue.put(None)
         # Finish coverage
-        if coverage_number and coverage:
+        if coverage_number:
             cov.stop()
             cov.save()
 
     # Each pool starts its own coverage, later combined by the main process.
-    if coverage_number and coverage:
+    if coverage_number:
         cov = coverage.coverage(
                 data_file='.coverage.{}_{}'.format(
                     coverage_number, random.randint(0, 10000)),

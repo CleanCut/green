@@ -26,5 +26,4 @@ class TestVersion(unittest.TestCase):
         pv = pretty_version()
         self.assertTrue('Green' in pv)
         self.assertTrue('Python' in pv)
-        if green.version.coverage:
-            self.assertTrue('Coverage' in pv)
+        self.assertTrue('Coverage' in pv)

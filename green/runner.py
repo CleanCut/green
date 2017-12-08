@@ -7,11 +7,6 @@ from unittest.signals import (
         registerResult, installHandler, removeResult)
 import warnings
 
-try:  # pragma: no cover
-    import coverage
-except:  # pragma: no cover
-    coverage = None
-
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import toParallelTargets
 from green.output import debug, GreenStream

@@ -2,13 +2,6 @@ from __future__ import unicode_literals
 import os
 import sys
 
-try:  # pragma: no cover
-    import coverage
-    coverage_version = "Coverage {}".format(coverage.__version__)
-except:  # pragma: no cover
-    coverage = None
-    coverage_version = "Coverage Not Installed"
-
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
 

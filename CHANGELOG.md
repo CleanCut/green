@@ -1,4 +1,16 @@
+# Version 2.12.0
+## 7 Dec 2017
+
+- Coverage is now required!  Python packages do not support the idea of an
+  optional dependency, and having a de-facto optional dependencies was causing
+  coverage functionality to be broken for packages who want to use green with
+  coverage during `python setup.py test`.  Resolves #174.
+- The `test_versions` utility for testing green itself now deduplicates the
+  versions of Python it finds, so it only runs one test for Python 2.7, for
+  example.  It uses the one it finds first in the $PATH.
+
 # Version 2.11.2
+## 15 Nov 2017
 
 - Fixed temp files not getting properly cleaned up on Windows and Linux in
   Python 3 (problem persists for macOS). Contributed by Martin Larralde in #173.

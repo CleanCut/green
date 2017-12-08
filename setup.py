@@ -11,6 +11,7 @@ with open('README-pypi.rst') as readme_file:
 # Calculate dependencies
 dependencies = [
     'colorama',
+    'coverage',
     'python-termstyle',
     'unidecode',
 ]
