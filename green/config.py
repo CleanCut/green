@@ -9,8 +9,8 @@ try:                        # pragma: no cover
 except:                     # pragma: no cover
     import ConfigParser as configparser
 
-import coverage
-coverage_version = "Coverage {}".format(coverage.__version__)
+import coverage              # pragma: no cover
+coverage_version = "Coverage {}".format(coverage.__version__) # pragma: no cover
 
 import copy                  # pragma: no cover
 import logging               # pragma: no cover

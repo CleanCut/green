@@ -2,7 +2,7 @@ from __future__ import unicode_literals  # pragma: no cover
 import os.path  # pragma nocover
 import sys  # pragma nocover
 
-import coverage
+import coverage # pragma: no cover
 
 __version__ = open(os.path.join(os.path.dirname(__file__), 'VERSION')).read().strip()  # pragma nocover
 if sys.version_info[0] == 2:  # pragma nocover
