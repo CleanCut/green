@@ -178,7 +178,40 @@ TEST_RUNNER="green.djangorunner.DjangoRunner"
 ./manage.py test --green-verbosity 3
 ```
 - For all other non-default green configuration under Django, you will need to
-  use green configuration files.
+  use [green configuration files](#config-files).
+
+
+### Config files
+
+Configuration settings are resolved in this order, with settings found later
+in the resolution chain overwriting earlier settings (last setting wins).
+
+1) $HOME/.green
+2) A config file specified by the environment variable $GREEN_CONFIG
+3) setup.cfg in the current working directory of test run
+4) .green in the current working directory of the test run
+5) A config file specified by the command-line argument "--config FILE"
+6) Command-line arguments.
+
+Any arguments specified in more than one place will be overwritten by the
+value of the LAST place the setting is seen.  So, for example, if a setting
+is turned on in ~/.green and turned off by a command-line argument, then the
+setting will be turned off.
+
+Config file format syntax is "option = value" on separate lines.  "option" is
+the same as the long options above, just without the "--".
+
+Most values should be "True" or "False".  Accumulated values (verbose, debug)
+should be specified as integers ("-vv" would be "verbose = 2").
+
+Example:
+
+```
+verbose       = 2
+logging       = True
+omit-patterns = myproj*,*prototype*
+```
+
 
 ### nose-parameterized
 
