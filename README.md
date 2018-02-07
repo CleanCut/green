@@ -146,7 +146,7 @@ from setuptools import setup
 setup(
     ...
     setup_requires = ['green'],
-    # test_suite = ["my_project.tests"]
+    # test_suite = "my_project.tests"
 )
 ```
 
