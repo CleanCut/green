@@ -12,7 +12,7 @@ with open('README-pypi.rst') as readme_file:
 dependencies = [
     'colorama',
     'coverage',
-    'python-termstyle',
+    'termstyle',
     'unidecode',
 ]
 if sys.version_info[0] == 2:
