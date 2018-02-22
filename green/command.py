@@ -13,8 +13,11 @@ from green.cmdline import main
 
 
 def get_user_options():
-    r = parseArguments()
 
+    if "--help-commands" in sys.argv:
+        return []
+
+    r = parseArguments()
     options = []
 
     for action in r.store_opt.actions:
@@ -29,7 +32,7 @@ def get_user_options():
 class green(Command):
 
     command_name = "green"
-    description = " green is a clean, colorful, fast python test runner"
+    description = "Run unit tests using green"
     user_options = get_user_options()
 
     def initialize_options(self):
