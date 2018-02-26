@@ -1,3 +1,16 @@
+# Version 2.12.1
+## 25 Feb 2017
+
+- Switch from python-termstyle (apparently abandoned) to termstyle.  We should
+  drop termstyle altogether in favor of colorama (see also #186). Contributed
+  by Robert Schüts in #182
+
+- Fix bug that prevented `python setup.py --help-commands` from working
+  properly.  Contributed by Martin Larralde in #184.
+
+- Move the config file documentation to the readme file. Contributed by Yuri
+  Shikanov in #179.
+
 # Version 2.12.0
 ## 7 Dec 2017
 
