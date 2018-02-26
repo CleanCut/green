@@ -14,7 +14,6 @@ matrix:
         - os: osx
           osx_image: xcode9.1
           language: generic
-          sudo: required
           before_install:
               - brew update
               - sleep 1
@@ -31,9 +30,9 @@ matrix:
               - pip_pypy install virtualenv
               - sleep 1
           install:
-            - "sudo pip install ."
-            - "sudo pip install virtualenv"
-            - "sudo pip install coveralls"
+            - "pip install --user $USER ."
+            - "pip install --user $USER virtualenv"
+            - "pip install --user $USER coveralls"
         - os: linux
           python: 2.7
           language: python
