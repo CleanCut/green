@@ -1,3 +1,4 @@
+dist: trusty
 sudo: false
 install:
   - "pip install ."
@@ -13,7 +14,7 @@ matrix:
         - os: osx
           osx_image: xcode9.1
           language: generic
-          env: HINT=Sierra
+          sudo: required
           before_install:
               - brew update
               - sleep 1
@@ -29,6 +30,10 @@ matrix:
               - sleep 1
               - pip_pypy install virtualenv
               - sleep 1
+          install:
+            - "sudo pip install ."
+            - "sudo pip install virtualenv"
+            - "sudo pip install coveralls"
         - os: linux
           python: 2.7
           language: python
