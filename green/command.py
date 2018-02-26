@@ -14,6 +14,8 @@ from green.cmdline import main
 
 def get_user_options():
 
+    # When running "python setup.py --help-commands", setup.py will call this
+    # function -- but green isn't actually being called.
     if "--help-commands" in sys.argv:
         return []
 
