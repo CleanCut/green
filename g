@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# USAGE
-#
-# ./g [python version] [cov [no_delete]] [green options]
+# USAGE: ./g [python version] [green options]
 
 # If the first argument is a version number, use it to run that version of python
 PYTHON=python
