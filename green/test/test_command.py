@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 import argparse
-import unittest
 import contextlib
+import sys
+import unittest
 
 try:
     from setuptools.dist import Distribution
@@ -57,6 +58,16 @@ class TestCommand(unittest.TestCase):
              'Pattern to match test files. Default is test*.py'),
             options
         )
+
+    def test_get_user_options_setup_py(self):
+        """
+        When get_user_options() is called by 'python setup.py --help-commands',
+        it returns [] early and doesn't crash.
+        """
+        sys.argv.append('--help-commands')
+        self.addCleanup(lambda: sys.argv.pop())
+
+        self.assertEqual(command.get_user_options(), [])
 
     @patch('green.command.parseArguments')
     def test_get_user_options_dynamic(self, parseArguments):
