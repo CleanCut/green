@@ -11,6 +11,9 @@
 - Move the config file documentation to the readme file. Contributed by Yuri
   Shikanov in #179.
 
+- Update the TravisCI config and some self-testing procedures to pass updated
+  macOS VM builds.
+
 # Version 2.12.0
 ## 7 Dec 2017
 
