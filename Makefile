@@ -35,14 +35,17 @@ test-coverage:
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
-	# Install under the default python and run self-tests
-	-@pip uninstall -y green
+	# Check that the tests run from an installed version of green
+	@echo "Setting up a virtualenv to run tests from an installed version of green"
+	@rm -rf venv-installed 
+	@virtualenv venv-installed
 	@make clean-silent
-	pip install -r requirements-optional.txt
-	python setup.py sdist
+	source venv-installed/bin/activate; pip install -r requirements-optional.txt
+	source venv-installed/bin/activate; python setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	bash -c "cd green-$(VERSION) && python setup.py install"
-	bash -c "cd && green -vvv green"
+	source venv-installed/bin/activate; cd green-$(VERSION) && python setup.py install
+	source venv-installed/bin/activate; green -vvv green
+	@rm -rf venv-installed
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
 
