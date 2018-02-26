@@ -107,7 +107,8 @@ is turned on in `~/.green` and turned off by a
 then the setting will be turned off.
 
 Config file format syntax is `option = value` on separate lines.  `option` is
-the same as the long options, just without the `--`.
+the same as the long options, just without the double-dash (`--verbose` becomes
+`verbose`).
 
 Most values should be `True` or `False`.  Accumulated values (verbose, debug)
 should be specified as integers (`-vv` would be `verbose = 2`).
