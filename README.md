@@ -170,7 +170,7 @@ Green is available as a `setup.py` runner, invoked as any other setup command:
 ```
 python setup.py green
 ```
-This simply requires green to be present in the `setup_requires` section of
+This requires green to be present in the `setup_requires` section of
 your `setup.py` file. To run green on a specific target, use the `test_suite`
 argument (or leave blank to let green discover tests itself):
 ```python
