@@ -6,7 +6,7 @@ To try running Django tests using green you can run:
 
 To make the change permanent for your project, in settings.py add:
 
-    TEST_RUNNER=green.djangorunner.DjangoRunner
+    TEST_RUNNER="green.djangorunner.DjangoRunner"
 """
 
 from argparse import Namespace
