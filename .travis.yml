@@ -17,8 +17,11 @@ matrix:
           before_install:
               - brew update
               - sleep 1
+              # Update brew's pre-installed python from 2 to 3. Should be unnecessary once travis ships a macOS with brew's preinstall at 3.
               - brew upgrade python
               - sleep 1
+              # Update pip past the TLS 1.0/1.1 deprecation. Also unecessary once travis ships with a newer pip preinstalled
+              - curl https://bootstrap.pypa.io/get-pip.py | python
               - brew install pypy
               - sleep 1
               - pip3 install .
