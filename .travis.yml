@@ -21,7 +21,7 @@ matrix:
               - brew upgrade python
               - sleep 1
               # Update pip past the TLS 1.0/1.1 deprecation. Also unnecessary once travis ships with a newer pip preinstalled
-              - pip install --upgrade pip
+              - curl https://bootstrap.pypa.io/get-pip.py | sudo python
               - brew install pypy
               - sleep 1
               - pip3 install .
