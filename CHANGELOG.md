@@ -11,7 +11,7 @@
 
 - Fix example in `djangorunner.py`. Contributed by Yong Joseph Bakos in #188.
 
-- Tooling fixes
+- Tooling fixes, including using python3, twine and keyring to do releases.
 
 # Version 2.12.1
 ## 25 Feb 2018
