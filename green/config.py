@@ -35,6 +35,7 @@ default_args             = argparse.Namespace(  # pragma: no cover
         allow_stdout     = False,
         quiet_stdout     = False,
         no_skip_report   = False,
+        no_tracebacks    = False,
         help             = False,  # Not in configs
         version          = False,
         logging          = False,
@@ -202,6 +203,10 @@ def parseArguments(argv=None):  # pragma: no cover
         action='store_true', help=("Don't print the report of skipped tests "
         "after testing is done.  Skips will still show up in the progress "
         "report and summary count."),
+        default=argparse.SUPPRESS))
+    store_opt(out_args.add_argument('-e', '--no-tracebacks',
+        action='store_true', help=("Don't print tracebacks for failures and "
+        "errors."),
         default=argparse.SUPPRESS))
     store_opt(out_args.add_argument('-h', '--help', action='store_true',
         help="Show this help message and exit.",
@@ -410,7 +415,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
                     'help', 'logging', 'version', 'failfast', 'run_coverage',
                     'options', 'completions', 'completion_file', 'clear_omit',
-                    'no_skip_report', 'disable_windows', 'quiet_coverage']:
+                    'no_skip_report', 'no_tracebacks', 'disable_windows', 'quiet_coverage']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint

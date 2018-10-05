@@ -592,26 +592,27 @@ class GreenTestResult(BaseTestResult):
                     '\n' + color_func(outcome) +
                     ' in ' + self.colors.bold(test.dotted_name))
 
-            # Frame Line
-            relevant_frames = []
-            for i, frame in enumerate(err.traceback_lines):
-                # Python2 tracebacks containing unicode need some special handling
-                # This doesn't always make it readable, but at least it doesn't
-                # crash
-                if sys.version_info[0] == 2: # pragma: no cover
-                    try:
-                        ''.join([frame]) # intentionally trigger exceptions
-                    except UnicodeDecodeError:
-                        frame = frame.decode('utf-8')
-                debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
-                      + "\n{}".format(self.colors.yellow(frame)), level=3)
-                # Ignore useless frames
-                if self.verbose < 4:
-                    if frame.strip() == "Traceback (most recent call last):":
-                        continue
-                # Done with this frame, capture it.
-                relevant_frames.append(frame)
-            self.stream.write(''.join(relevant_frames))
+            # Traceback
+            if not self.args.no_tracebacks:
+                relevant_frames = []
+                for i, frame in enumerate(err.traceback_lines):
+                    # Python2 tracebacks containing unicode need some special handling
+                    # This doesn't always make it readable, but at least it doesn't
+                    # crash
+                    if sys.version_info[0] == 2: # pragma: no cover
+                        try:
+                            ''.join([frame]) # intentionally trigger exceptions
+                        except UnicodeDecodeError:
+                            frame = frame.decode('utf-8')
+                    debug('\n' + '*' * 30 + "Frame {}:".format(i) + '*' * 30
+                          + "\n{}".format(self.colors.yellow(frame)), level=3)
+                    # Ignore useless frames
+                    if self.verbose < 4:
+                        if frame.strip() == "Traceback (most recent call last):":
+                            continue
+                    # Done with this frame, capture it.
+                    relevant_frames.append(frame)
+                self.stream.write(''.join(relevant_frames))
 
             # Captured output for failing tests
             self.displayStdout(test)

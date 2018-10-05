@@ -547,7 +547,7 @@ class TestGreenTestResult(unittest.TestCase):
         printErrors() prints out the captured stdout
         except when quiet_stdout is set to True
         for successful tests, but here we are on a
-        failling test.
+        failing test.
         """
         self.args.quiet_stdout = True
         try:
@@ -576,6 +576,22 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.addSuccess(pt)
         gtr.printErrors()
         self.assertNotIn(output, self.stream.getvalue())
+
+    def test_printErrorsNoTracebacks(self):
+        """
+        printErrors() omits tracebacks for failures and errors when
+        no_tracebacks is True
+        """
+        self.args.no_tracebacks = True
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        pt = MyProtoTest()
+        gtr.addError(pt, proto_error(err))
+        gtr.printErrors()
+        self.assertNotIn("Exception", self.stream.getvalue())
 
     def test_printErrorsDots(self):
         """

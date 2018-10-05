@@ -1,5 +1,10 @@
+# Version 2.13.0
+
+- Add `-e/--no-tracebacks` to omit traceback output for failures and errors.
+  Resolves feature request #191.
+
 # Version 2.12.1
-## 25 Feb 2017
+## 25 Feb 2018
 
 - Switch from python-termstyle (apparently abandoned) to termstyle.  We should
   drop termstyle altogether in favor of colorama (see also #186). Contributed
