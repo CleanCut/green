@@ -230,7 +230,7 @@ This tutorial covers:
 
 - External structure of your project (directory and file layout)
 - Skeleton of a real test module
-- How to import stuff from from your project into your test module
+- How to import stuff from your project into your test module
 - Gotchas about naming...everything.
 - Where to run green from and what the output could look like.
 
