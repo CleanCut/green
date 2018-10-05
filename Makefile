@@ -70,7 +70,7 @@ twine-installed:
 	# twine installs a man-page to /usr/local/man, which doesn't exist by default in modern macos
 	@if ! ls /usr/local/man &> /dev/null ; then echo "I need to create /usr/local/man so installing twine will succeed." && sudo mkdir /usr/local/man ; fi
 	@if ! pip3 --disable-pip-version-check freeze | grep twine ; then echo "Missing twine. I'll try to install it for you..." && pip3 install twine ; fi
-	@if ! pip3 --disable-pip-version-check freeze | grep keyring ; then echo "Missing keyring. I'll try to install it for you..." && pip3 install keyring && echo "\nSTOP! Now run the following two commands and set the password to what is in 1Password for PyPI.\n\n  keyring set https://test.pypi.org/legacy/ Cleancut\n  keyring set https://upload.pypi.org/legacy/ Cleancut"; fi
+	@if ! pip3 --disable-pip-version-check freeze | grep keyring ; then echo "Missing keyring. I'll try to install it for you..." && pip3 install keyring && echo "\nSTOP! Now run the following two commands and set the password to what is in 1Password for PyPI.\n\n  keyring set https://test.pypi.org/legacy/ CleanCut\n  keyring set https://upload.pypi.org/legacy/ CleanCut"; fi
 
 release-test: test-local sanity-checks twine-installed
 	@echo "\n== CHECKING PyPi-Test =="
