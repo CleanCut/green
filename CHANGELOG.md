@@ -1,7 +1,17 @@
 # Version 2.13.0
+## 5 Oct 2018
 
 - Add `-e/--no-tracebacks` to omit traceback output for failures and errors.
   Resolves feature request #191.
+
+- Fixed travis builds
+
+- Documentation updates (readme, release doc), one by Nattaphoom Chaipreecha
+  in #192.
+
+- Fix example in `djangorunner.py`. Contributed by Yong Joseph Bakos in #188.
+
+- Tooling fixes
 
 # Version 2.12.1
 ## 25 Feb 2018
