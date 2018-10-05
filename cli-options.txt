@@ -57,6 +57,7 @@ Output Options:
   -k, --no-skip-report  Don't print the report of skipped tests after testing
                         is done. Skips will still show up in the progress
                         report and summary count.
+  -e, --no-tracebacks   Don't print tracebacks for failures and errors.
   -h, --help            Show this help message and exit.
   -V, --version         Print the version of Green and Python and exit.
   -l, --logging         Don't configure the root logger to redirect to
