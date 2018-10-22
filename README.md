@@ -125,7 +125,7 @@ Troubleshooting
 ---------------
 
 One easy way to avoid common importing problems is to navigate to the *parent*
-directory of the directory your python code is in.  Then pass green the
+directory of the directory your python code is in.  Then pass `green` the
 directory your code is in and let it autodiscover the tests (see the Tutorial below
 for tips on making your tests discoverable).
 
@@ -137,7 +137,7 @@ green code_directory
 Another way to address importing problems is to carefully set up your
 `PYTHONPATH` environment variable to include the parent path of your code
 directory.  Then you should be able to just run `green` from _inside_ your code
-directory directory.
+directory.
 
 ```bash
 export PYTHONPATH=/parent/directory
@@ -421,7 +421,7 @@ shines when you start getting more verbose:
 
 Notes:
 
-1. Green outputs clean, heirarchical output.
+1. Green outputs clean, hierarchical output.
 
 2. Test status is aligned on the _left_ (the four periods correspond to four
    passing tests)
@@ -447,7 +447,7 @@ Origin Story
 ------------
 
 Green grew out of a desire to see pretty colors.  Really!  A big part of the
-whole the **Red/Green/Refactor** process in test-driven-development is
+whole **Red/Green/Refactor** process in test-driven-development is
 _actually getting to see red and green output_.  Most python unit testing
 actually goes **Gray/Gray/Refactor** (at least on my terminal, which is gray
 text on black background).  That's a shame.  Even TV is in color these days.
