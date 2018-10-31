@@ -401,10 +401,12 @@ class GreenTestResult(BaseTestResult):
             self.stream.writeln(self.colors.yellow(
                 "Warning: Some tests may not have been run."))
             self.stream.writeln()
-        self.stream.writeln("Ran %s test%s in %ss" %
+        self.stream.writeln("Ran %s test%s in %ss using %s process%s" %
                             (self.colors.bold(str(self.testsRun)),
                              self.testsRun != 1 and "s" or "",
-                             self.colors.bold("%.3f" % self.timeTaken)))
+                             self.colors.bold("%.3f" % self.timeTaken),
+                             self.colors.bold("%d" % self.args.processes),
+                             self.args.processes != 1 and "es" or ""))
         self.stream.writeln()
         results = [
             (self.errors, 'errors', self.colors.error),
