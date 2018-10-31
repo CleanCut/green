@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from colorama import Fore, Style
 from colorama.ansi import Cursor
 from colorama.initialise import wrap_stream
 import logging
@@ -24,6 +25,10 @@ def debug(message, level=1):
     """
     if level <= debug_level:
         logging.debug(' ' * (level - 1) * 2 + str(message))
+
+
+def wrap(text, style):
+    return "%s%s%s" % (style, text, Style.RESET_ALL)
 
 
 class Colors:
@@ -66,27 +71,27 @@ class Colors:
     # Real colors and styles
     def bold(self, text):
         self._restoreColor()
-        return termstyle.bold(text)
+        return wrap(text, Style.BRIGHT)
 
     def blue(self, text):
         self._restoreColor()
         if platform.system() == 'Windows':  # pragma: no cover
             # Default blue in windows is unreadable (such awful defaults...)
-            return termstyle.cyan(text)
+            return wrap(text, Fore.CYAN)
         else:
-            return termstyle.blue(text)
+            return wrap(text, Fore.BLUE)
 
     def green(self, text):
         self._restoreColor()
-        return termstyle.green(text)
+        return wrap(text, Fore.GREEN)
 
     def red(self, text):
         self._restoreColor()
-        return termstyle.red(text)
+        return wrap(text, Fore.RED)
 
     def yellow(self, text):
         self._restoreColor()
-        return termstyle.yellow(text)
+        return wrap(text, Fore.YELLOW)
 
     # Abstracted colors and styles
     def passing(self, text):
