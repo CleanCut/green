@@ -272,7 +272,7 @@ def parseArguments(argv=None):  # pragma: no cover
     store_opt(cov_args.add_argument('-o', '--omit-patterns', action='store',
         metavar='PATTERN',
         help=("Comma-separated file-patterns to omit from coverage.  For "
-            "example, if coverage reported a file mypackage/foo/bar you could"
+            "example, if coverage reported a file mypackage/foo/bar you could "
             "omit it from coverage with 'mypackage*', '*/foo/*', or '*bar'"),
         default=argparse.SUPPRESS))
 
