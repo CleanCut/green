@@ -31,7 +31,7 @@ test-local:
 test-coverage:
 	@# Generate coverage files for travis builds (don't clean after this!)
 	@make clean-silent
-	./g 3 -s 0 -r -vvv green
+	./g 3 -r -vvv green
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
