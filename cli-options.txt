@@ -101,7 +101,7 @@ Coverage Options (Coverage 4.4.2):
   -o PATTERN, --omit-patterns PATTERN
                         Comma-separated file-patterns to omit from coverage.
                         For example, if coverage reported a file
-                        mypackage/foo/bar you couldomit it from coverage with
+                        mypackage/foo/bar you could omit it from coverage with
                         'mypackage*', '*/foo/*', or '*bar'
 
 Integration Options:
