@@ -737,6 +737,28 @@ class TestGreenTestResult(unittest.TestCase):
         self.assertEqual(gtr.skipped, [(skip_t, skip_r)])
         self.assertEqual(gtr.unexpectedSuccesses, [us_t])
 
+    def test_stopTestRun_processes_message(self):
+        """
+        StopTestRun adds number of processes used to summary
+        """
+        self.args.processes = 4
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.startTestRun()
+        gtr.stopTestRun()
+
+        self.assertIn("using 4 processes\n", self.stream.getvalue())
+
+    def test_stopTestRun_singular_process_message(self):
+        """
+        StopTestRun adds correct summary when one process is used
+        """
+        self.args.processes = 1
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.startTestRun()
+        gtr.stopTestRun()
+
+        self.assertIn("using 1 process\n", self.stream.getvalue())
+
 
 class TestGreenTestResultAdds(unittest.TestCase):
 
