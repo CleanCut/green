@@ -47,9 +47,9 @@ test-installed:
 	@virtualenv venv-installed
 	@make clean-silent
 	source venv-installed/bin/activate; $(PIP_VERSION) install -r requirements-optional.txt
-	source venv-installed/bin/activate; python3 setup.py sdist
+	source venv-installed/bin/activate; python setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	source venv-installed/bin/activate; cd green-$(VERSION) && python3 setup.py install
+	source venv-installed/bin/activate; cd green-$(VERSION) && python setup.py install
 	source venv-installed/bin/activate; green -vvv green
 	@rm -rf venv-installed
 	@make clean-silent
