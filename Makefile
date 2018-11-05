@@ -37,7 +37,7 @@ test-local:
 test-coverage:
 	@# Generate coverage files for travis builds (don't clean after this!)
 	@make clean-silent
-	./g 3 -r -vvv green
+	./g $(PYTHON_VERSION) -r -vvv green
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
@@ -63,10 +63,10 @@ test-versions:
 	@echo "\n(test-versions) completed\n"
 
 sanity-checks:
-	@if ! ./g -r green | grep TOTAL | grep "0   100%" ; then echo 'Coverage needs to be at 100% for a release!' && exit 1; fi
+	@if ! ./g $(PYTHON_VERSION) -r green | grep TOTAL | grep "0   100%" ; then echo 'Coverage needs to be at 100% for a release!' && exit 1; fi
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
 	@if [[ $(shell git rev-parse --abbrev-ref HEAD) != "master" ]] ; then echo "\nYou need to be on the master branch to release.\n" && exit 1 ; fi
-	@COLUMNS=80 ./g -h > cli-options.txt
+	@COLUMNS=80 ./g $(PYTHON_VERSION) -h > cli-options.txt
 	@printf "\n== SANITY CHECK: GIT STATUS ==\n"
 	@git status
 	@printf "\nIs everything committed?  (Ctrl-C if not!) "
