@@ -83,7 +83,7 @@ Other Options:
                         Pattern to match test method names after 'test'.
                         Default is '*', meaning match methods named 'test*'.
 
-Coverage Options (Coverage 4.4.2):
+Coverage Options (Coverage 4.5.2):
   -r, --run-coverage    Produce coverage output.
   -R, --quiet-coverage  Do not print coverage report to stdout (coverage files
                         will still be created). Implies --run-coverage
@@ -93,8 +93,8 @@ Coverage Options (Coverage 4.4.2):
                         cover you can specify this flag to leave the default
                         list empty to start with. You can then add patterns
                         back in with --omit-add. The default list is something
-                        like '*/test*,*/termstyle*,*/mock*,*(temp
-                        dir)*,*(python system packages)*' -- only longer.
+                        like '*/test*,*/mock*,*(temp dir)*,*(python system
+                        packages)*' -- only longer.
   -u PATTERN, --include-patterns PATTERN
                         Comma-separated file-patterns to include in coverage.
                         This implies that anything that does not match the

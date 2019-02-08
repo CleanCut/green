@@ -41,19 +41,6 @@ class Colors:
             self.termcolor = sys.stdout.isatty()
         else:
             self.termcolor = termcolor
-        self._restoreColor()
-
-    def _restoreColor(self):
-        """
-        Unfortunately other programs (that we test) can mess with termstyle's
-        global settings, so we need to reset termstyle to the correct mode
-        after each test (which I think is faster than just checking whether it
-        matches the current mode...)
-        """
-        if self.termcolor:
-            init()
-        else:
-            deinit()
 
     def wrap(self, text, style):
         if self.termcolor:
@@ -70,11 +57,9 @@ class Colors:
 
     # Real colors and styles
     def bold(self, text):
-        self._restoreColor()
         return self.wrap(text, Style.BRIGHT)
 
     def blue(self, text):
-        self._restoreColor()
         if platform.system() == 'Windows':  # pragma: no cover
             # Default blue in windows is unreadable (such awful defaults...)
             return self.wrap(text, Fore.CYAN)
@@ -82,15 +67,12 @@ class Colors:
             return self.wrap(text, Fore.BLUE)
 
     def green(self, text):
-        self._restoreColor()
         return self.wrap(text, Fore.GREEN)
 
     def red(self, text):
-        self._restoreColor()
         return self.wrap(text, Fore.RED)
 
     def yellow(self, text):
-        self._restoreColor()
         return self.wrap(text, Fore.YELLOW)
 
     # Abstracted colors and styles

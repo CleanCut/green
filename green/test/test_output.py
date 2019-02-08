@@ -70,9 +70,9 @@ class TestColors(unittest.TestCase):
         self.assertEqual(type(up), str)
         self.assertNotEqual(up, '')
 
-    def testTermstyleColorsDoNotCrash(self):
+    def testTerminalColorsDoNotCrash(self):
         """
-        termstyle-based colors don't crash and output something
+        terminal colors don't crash, and they output something
         """
         c = Colors(termcolor=True)
         for func in [c.bold, c.blue, c.green, c.red, c.yellow, c.passing,

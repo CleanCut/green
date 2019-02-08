@@ -260,8 +260,8 @@ def parseArguments(argv=None):  # pragma: no cover
             "catches files that you DO want to cover you can specify this "
             "flag to leave the default list empty to start with.  You can "
             "then add patterns back in with --omit-add. The default list is "
-            "something like '*/test*,*/termstyle*,*/mock*,*(temp dir)*,*(python "
-            "system packages)*' -- only longer."),
+            "something like '*/test*,*/mock*,*(temp dir)*,*(python system "
+            "packages)*' -- only longer."),
         default=argparse.SUPPRESS))
     store_opt(cov_args.add_argument('-u', '--include-patterns', action='store',
         metavar='PATTERN',

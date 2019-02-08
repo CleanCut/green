@@ -1,6 +1,9 @@
 # Version 2.13.1
 ## 8 Feb 2019
 
+- Dropping termstyle dependency in favor of using only colorama. Contributed
+  by Ogaday in #199 to fix #186.
+
 - Show number of processes used in test summary. Contributed in #198 by Ogaday
   to fix #85.
 
