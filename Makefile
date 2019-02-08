@@ -1,5 +1,5 @@
 VERSION=$(shell cat green/VERSION)
-PYTHON_VERSION=$(shell python -c 'import sys; print sys.version_info.major')
+PYTHON_VERSION=$(shell python -c 'import sys; print(sys.version_info.major)')
 ifeq ($(PYTHON_VERSION),2)
 	PIP_VERSION=pip
 else
