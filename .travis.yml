@@ -49,16 +49,16 @@ matrix:
           python: 3.7
           language: python
         - os: linux
-          python: 'nightly'
+          python: nightly
           language: python
         - os: linux
-          python: pypy
+          python: pypy2.7
           language: python
         - os: linux
-          python: 'pypy3'
+          python: pypy3.5
           language: python
 
     allow_failures:
-        - python: "nightly"
-        - python: 'pypy2.7'
-        - python: 'pypy3.5'
+        - python: nightly
+        - python: pypy2.7
+        - python: pypy3.5
