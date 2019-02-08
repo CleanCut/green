@@ -1,3 +1,13 @@
+# Version 2.13.1
+## 8 Feb 2019
+
+- Show number of processes used in test summary. Contributed in #198 by Ogaday
+  to fix #85.
+
+- CI fixes/improvements
+
+- Some typo fixes in README.md and help output
+
 # Version 2.13.0
 ## 5 Oct 2018
 
