@@ -37,19 +37,17 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     if [ "${PYTHON_VERSION}" == "nightly" ] ; then
         PYTHON_VERSION=""
     fi
-    if [ "${PYTHON_VERSION}" == "pypy" ] ; then
+    if [[ -e `which python${PYTHON_VERSION}` ]] ; then
+        PYTHON=python${PYTHON_VERSION}
+        shift
+    elif [[ -e `which ${PYTHON_VERSION}` ]] ; then
+        PYTHON=${PYTHON_VERSION}
+        shift
+    elif [ "${PYTHON_VERSION}" == "pypy2.7-6.0" ] ; then
         PYTHON=pypy
         shift
-    elif [ "${PYTHON_VERSION}" == "pypy3" ] ; then
-        # Don't know why this is only a problem on linux+pypy3+travisci
-        if [ "${TRAVIS_PYTHON_VERSION}" == "pypy3" ] ; then
-            PYTHON=${VIRTUAL_ENV}/bin/python
-        else
-            PYTHON=pypy3
-        fi
-        shift
-    elif [[ -e `which python${PYTHON_VERSION}` ]] ; then
-        PYTHON=python${PYTHON_VERSION}
+    elif [ "${PYTHON_VERSION}" == "pypy3.5-6.0" ] ; then
+        PYTHON=pypy3
         shift
     else
         echo "Failed to determine python binary for python version '${PYTHON_VERSION}'"

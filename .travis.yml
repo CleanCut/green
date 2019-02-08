@@ -12,16 +12,31 @@ matrix:
     fast_finish: true
     include:
         - os: osx
-          osx_image: xcode9.3
+          osx_image: xcode10.1
           language: generic
           before_install:
               - brew update
               - sleep 1
-              # Update brew's pre-installed python from 2 to 3. Should be unnecessary once travis ships a macOS with brew's preinstall at 3.
-              - brew upgrade python
+              - brew install pypy
               - sleep 1
-              # Update pip past the TLS 1.0/1.1 deprecation. Also unnecessary once travis ships with a newer pip preinstalled
-              - curl https://bootstrap.pypa.io/get-pip.py | sudo python
+              - pip3 install .
+              - sleep 1
+              - pip3 install virtualenv
+              - sleep 1
+              - pip_pypy install .
+              - sleep 1
+              - pip_pypy install virtualenv
+              - sleep 1
+          install:
+            - "pip install --user $USER ."
+            - "pip install --user $USER virtualenv"
+            - "pip install --user $USER coveralls"
+        - os: osx
+          osx_image: xcode9.4
+          language: generic
+          before_install:
+              - brew update
+              - sleep 1
               - brew install pypy
               - sleep 1
               - pip3 install .
@@ -52,13 +67,13 @@ matrix:
           python: nightly
           language: python
         - os: linux
-          python: pypy2.7
+          python: pypy2.7-6.0
           language: python
         - os: linux
-          python: pypy3.5
+          python: pypy3.5-6.0
           language: python
 
     allow_failures:
         - python: nightly
-        - python: pypy2.7
-        - python: pypy3.5
+        - python: pypy2.7-6.0
+        - python: pypy3.5-6.0
