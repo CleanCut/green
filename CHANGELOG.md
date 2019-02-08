@@ -1,6 +1,9 @@
 # Version 2.13.1
 ## 8 Feb 2019
 
+- Drop official support for Python 3.4, though Green will probably continue to
+  work in 3.4 for some years to come before something actually breaks.
+
 - Dropping termstyle dependency in favor of using only colorama. Contributed
   by Ogaday in #199 to fix #186.
 

@@ -141,15 +141,10 @@ class TestMain(unittest.TestCase):
         The cmdline module can be imported
         """
         global reload
-        try:  # In Python 3.4+ reload is in importlib
+        try:  # In Python 3 reload is in importlib
             import importlib
             importlib.reload
             reload = importlib.reload
         except:
-            try:  # In Python 3.3 reload is in imp
-                import imp
-                imp.reload
-                reload = imp.reload
-            except:
-                pass  # Python 2.7's reload is builtin
+            pass  # Python 2.7's reload is builtin
         reload(cmdline)

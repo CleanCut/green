@@ -193,7 +193,7 @@ class GreenTestLoader(unittest.TestLoader):
         # For a test loader, we want to always the current working directory to
         # be the first item in sys.path, just like when a python interpreter is
         # loaded interactively. See also
-        # https://docs.python.org/3.4/library/sys.html#sys.path
+        # https://docs.python.org/3.8/library/sys.html#sys.path
         if sys.path[0] != '':
             sys.path.insert(0, '')
 

@@ -16,7 +16,7 @@ class GreenTestSuite(TestSuite):
     """
     This version of a test suite has two important functions:
 
-    1) It brings Python 3.4-like features to Python 2.7
+    1) It brings Python 3.x-like features to Python 2.7
     2) It adds Green-specific features  (see customize())
     """
     args = None
@@ -50,7 +50,7 @@ class GreenTestSuite(TestSuite):
         """
         Green-specific behavior customization via an args dictionary from
         the green.config module.  If you don't pass in an args dictionary,
-        then this class acts like TestSuite from Python 3.4.
+        then this class acts like TestSuite from Python 3.x.
         """
         # Set a new args on the CLASS
         if args:
@@ -64,7 +64,7 @@ class GreenTestSuite(TestSuite):
 
     def _removeTestAtIndex(self, index):
         """
-        Python 3.4-like version of this function for Python 2.7's sake.
+        Python 3.x-like version of this function for Python 2.7's sake.
         """
         test = self._tests[index]
         if hasattr(test, 'countTestCases'):
@@ -73,7 +73,7 @@ class GreenTestSuite(TestSuite):
 
     def countTestCases(self):
         """
-        Python 3.4-like version of this function for Python 2.7's sake.
+        Python 3.x-like version of this function for Python 2.7's sake.
         """
         cases = self._removed_tests
         for test in self:
