@@ -11,7 +11,7 @@ from unittest.result import failfast
 from green.output import Colors, debug
 from green.version import pretty_version
 
-# introduced in Python 3.3
+# introduced in Python 3
 try:
     from shutil import get_terminal_size
 except ImportError: # pragma: no cover
