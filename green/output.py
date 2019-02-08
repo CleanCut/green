@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
+from colorama import init, deinit, Fore, Style
 from colorama.ansi import Cursor
 from colorama.initialise import wrap_stream
 import logging
 import os
 import platform
 import sys
-import termstyle
 from unidecode import unidecode
 
 global debug_level
@@ -38,8 +38,7 @@ class Colors:
             terminal colors on.  If False, force terminal colors off.
         """
         if termcolor is None:
-            termstyle.auto()
-            self.termcolor = bool(termstyle.bold(""))
+            self.termcolor = sys.stdout.isatty()
         else:
             self.termcolor = termcolor
         self._restoreColor()
@@ -52,9 +51,15 @@ class Colors:
         matches the current mode...)
         """
         if self.termcolor:
-            termstyle.enable()
+            init()
         else:
-            termstyle.disable()
+            deinit()
+
+    def wrap(self, text, style):
+        if self.termcolor:
+            return "%s%s%s" % (style, text, Style.RESET_ALL)
+        else:
+            return text
 
     # Movement
     def start_of_line(self):
@@ -66,27 +71,27 @@ class Colors:
     # Real colors and styles
     def bold(self, text):
         self._restoreColor()
-        return termstyle.bold(text)
+        return self.wrap(text, Style.BRIGHT)
 
     def blue(self, text):
         self._restoreColor()
         if platform.system() == 'Windows':  # pragma: no cover
             # Default blue in windows is unreadable (such awful defaults...)
-            return termstyle.cyan(text)
+            return self.wrap(text, Fore.CYAN)
         else:
-            return termstyle.blue(text)
+            return self.wrap(text, Fore.BLUE)
 
     def green(self, text):
         self._restoreColor()
-        return termstyle.green(text)
+        return self.wrap(text, Fore.GREEN)
 
     def red(self, text):
         self._restoreColor()
-        return termstyle.red(text)
+        return self.wrap(text, Fore.RED)
 
     def yellow(self, text):
         self._restoreColor()
-        return termstyle.yellow(text)
+        return self.wrap(text, Fore.YELLOW)
 
     # Abstracted colors and styles
     def passing(self, text):
