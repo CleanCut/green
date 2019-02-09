@@ -252,7 +252,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
     def cleanup():
         # Restore the state of the temp directory
         # TODO: Make this not necessary on macOS+Python3 (see #173)
-        if sys.platform != 'darwin' or sys.version_info[0] == 2:
+        if sys.version_info[0] == 2:
             shutil.rmtree(tempfile.tempdir, ignore_errors=True)
         tempfile.tempdir = saved_tempdir
         queue.put(None)
