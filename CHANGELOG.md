@@ -1,6 +1,10 @@
 # Version 2.13.1
 ## 11 Feb 2019
 
+- Tested Green with Django 2.1.5 -- it seems to work just fine. Something
+  must have changed between Django 2.0.0 and 2.1.5 that eliminated the
+  problem we were having.
+
 - Properly close the version file after reading it so it doesn't leave the
   file handle open for the duration of Green running. Contributed by
   Nickolas Grigoriadis in #200.
