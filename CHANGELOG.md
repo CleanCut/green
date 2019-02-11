@@ -1,19 +1,22 @@
 # Version 2.13.1
-## 8 Feb 2019
+## 11 Feb 2019
+
+- Properly close the version file after reading it so it doesn't leave the
+  file handle open for the duration of Green running. Contributed by
+  Nickolas Grigoriadis in #200.
 
 - Drop official support for Python 3.4, though Green will probably continue to
-  work in 3.4 for some years to come before something actually breaks.
+  work for Python 3.4 for some years before something actually breaks.
 
-- Remove code supporting 3.3. We dropped official support in 2015, and it
-  has probably been broken since then.
+- Remove code supporting 3.3. We dropped official support in 2015.
 
-- Dropping termstyle dependency in favor of using only colorama. Contributed
-  by Ogaday in #199 to fix #186.
+- Drop termstyle dependency in favor of using only colorama. Contributed by
+  Ogaday in #199 to resolve #186.
 
 - Show number of processes used in test summary. Contributed in #198 by Ogaday
-  to fix #85.
+  to resolve #85.
 
-- CI fixes/improvements
+- CI fixes/improvements - the world keeps changing. Also 
 
 - Some typo fixes in README.md and help output
 
