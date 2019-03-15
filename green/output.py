@@ -117,7 +117,9 @@ class GreenStream(object):
     indent_spaces = 2
     _ascii_only_output = False  # default to printing output in unicode
 
-    def __init__(self, stream, override_appveyor=False, disable_windows=False):
+    def __init__(self, stream, override_appveyor=False, disable_windows=False,
+            disable_unidecode=False):
+        self.disable_unidecode = disable_unidecode
         self.stream = stream
         # Ironically, AppVeyor doesn't support windows win32 system calls for
         # colors, but it WILL interpret posix ansi escape codes!
@@ -142,7 +144,7 @@ class GreenStream(object):
         if type(text) == bytes:
             text = text.decode('utf-8')
         # Compensate for windows' anti-social unicode behavior
-        if self._ascii_only_output:
+        if self._ascii_only_output and not self.disable_unidecode:
             # Windows doesn't actually want unicode, so we get
             # the closest ASCII equivalent
             text = text_type(unidecode(text))

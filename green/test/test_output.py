@@ -145,6 +145,17 @@ class TestGreenStream(unittest.TestCase):
         gs.write('something')
         self.assertTrue(mock_unidecode.called)
 
+    @patch('green.output.unidecode')
+    def testUnidecodeDisabled(self, mock_unidecode):
+        """
+        Unidecode can be disabled
+        """
+        mock_unidecode.return_value = 'something'
+        s = StringIO()
+        gs = GreenStream(s, override_appveyor=True, disable_unidecode=True)
+        gs.write('something')
+        self.assertFalse(mock_unidecode.called)
+
     def testWritelines(self):
         """
         Compatibility function writelines(lines) repeatedly calls write()

@@ -24,40 +24,41 @@ import multiprocessing       # pragma: no cover
 files_loaded = []  # pragma: no cover
 
 # Set the defaults in a re-usable way
-default_args             = argparse.Namespace(  # pragma: no cover
-        targets          = ['.'],  # Not in configs
-        processes        = multiprocessing.cpu_count(),
-        initializer      = '',
-        finalizer        = '',
-        termcolor        = None,
-        notermcolor      = None,
-        disable_windows  = False,
-        allow_stdout     = False,
-        quiet_stdout     = False,
-        no_skip_report   = False,
-        no_tracebacks    = False,
-        help             = False,  # Not in configs
-        version          = False,
-        logging          = False,
-        debug            = 0,
-        verbose          = 1,
-        failfast         = False,
-        config           = None,  # Not in configs
-        file_pattern     = 'test*.py',
-        test_pattern     = '*',
-        run_coverage     = False,
-        quiet_coverage   = False,
-        clear_omit       = False,
-        omit_patterns    = None,
-        include_patterns = None,
-        completion_file  = False,
-        completions      = False,
-        options          = False,
+default_args              = argparse.Namespace(  # pragma: no cover
+        targets           = ['.'],  # Not in configs
+        processes         = multiprocessing.cpu_count(),
+        initializer       = '',
+        finalizer         = '',
+        termcolor         = None,
+        notermcolor       = None,
+        disable_windows   = False,
+        allow_stdout      = False,
+        quiet_stdout      = False,
+        no_skip_report    = False,
+        no_tracebacks     = False,
+        help              = False,  # Not in configs
+        version           = False,
+        logging           = False,
+        debug             = 0,
+        verbose           = 1,
+        disable_unidecode = False,
+        failfast          = False,
+        config            = None,  # Not in configs
+        file_pattern      = 'test*.py',
+        test_pattern      = '*',
+        run_coverage      = False,
+        quiet_coverage    = False,
+        clear_omit        = False,
+        omit_patterns     = None,
+        include_patterns  = None,
+        completion_file   = False,
+        completions       = False,
+        options           = False,
         # These are not really options, they are added later for convenience
-        parser           = None,
-        store_opt        = None,
+        parser            = None,
+        store_opt         = None,
         # not implemented, but unittest stub in place
-        warnings         = '',
+        warnings          = '',
         )
 
 
@@ -176,6 +177,7 @@ def parseArguments(argv=None):  # pragma: no cover
             "process's lifetime.  Used to unprovision resources provisioned by "
             "the initializer.",
             default=argparse.SUPPRESS))
+
     format_args = parser.add_argument_group("Format Options")
     store_opt(format_args.add_argument('-t', '--termcolor', action='store_true',
         help="Force terminal colors on.  Default is to autodetect.",
@@ -226,6 +228,10 @@ def parseArguments(argv=None):  # pragma: no cover
     store_opt(out_args.add_argument('-v', '--verbose', action='count',
         help=("Verbose. Can be specified up to three times for more "
         "verbosity. Recommended levels are -v and -vv."),
+        default=argparse.SUPPRESS))
+    store_opt(out_args.add_argument('-U', '--disable-unidecode', action='store_true',
+        help=("Disable unidecode which converts test output from unicode to"
+            "ascii by default on Windows to avoid hard-to-debug crashes."),
         default=argparse.SUPPRESS))
 
     other_args = parser.add_argument_group("Other Options")
@@ -413,9 +419,10 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         # Config options overwrite default options
         config_getter = None
         if name in ['termcolor', 'notermcolor', 'allow_stdout', 'quiet_stdout',
-                    'help', 'logging', 'version', 'failfast', 'run_coverage',
-                    'options', 'completions', 'completion_file', 'clear_omit',
-                    'no_skip_report', 'no_tracebacks', 'disable_windows', 'quiet_coverage']:
+                    'help', 'logging', 'version', 'disable_unidecode', 'failfast',
+                    'run_coverage', 'options', 'completions', 'completion_file',
+                    'clear_omit', 'no_skip_report', 'no_tracebacks',
+                    'disable_windows', 'quiet_coverage']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint

@@ -1,3 +1,11 @@
+# Version 2.14.0
+## 15 Mar 2019
+
+- Added `-U/--disable-unidecode` to disable using unidecode to convert test
+  output from unicode to ascii on Windows. Note that this conversion was
+  done to work around some difficult-to-debug crashes on Windows, so using
+  this option has a possibility of re-introducing those crashes. Resolves #201.
+
 # Version 2.13.1
 ## 11 Feb 2019
 
