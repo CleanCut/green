@@ -69,6 +69,10 @@ Output Options:
                         debug output.
   -v, --verbose         Verbose. Can be specified up to three times for more
                         verbosity. Recommended levels are -v and -vv.
+  -U, --disable-unidecode
+                        Disable unidecode which converts test output from
+                        unicode toascii by default on Windows to avoid hard-
+                        to-debug crashes.
 
 Other Options:
   -f, --failfast        Stop execution at the first test that fails or errors.
