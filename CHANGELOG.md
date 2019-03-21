@@ -1,3 +1,10 @@
+# Version 2.14.1
+## 21 Mar 2019
+
+- Removed a redundant optional dependency that was already a required
+  dependency.  Thanks to @AndreGuerra123, @GjjvdBurg, and @yelectric for
+  researching this.  Resolves #202.
+
 # Version 2.14.0
 ## 15 Mar 2019
 
