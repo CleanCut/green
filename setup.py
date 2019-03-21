@@ -25,7 +25,6 @@ setup(
     version = version,
     install_requires = dependencies,
     extras_require = {
-        ':sys_platform=="win32"': ['colorama>=0.2.5'],
         # shutil.get_terminal_size() introduced in Python 3
         ':python_version=="2.7"': ['backports.shutil_get_terminal_size>=1.0.0'],
     },
