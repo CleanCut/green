@@ -165,3 +165,24 @@ class TestGreenStream(unittest.TestCase):
         gs.write = MagicMock()
         gs.writelines(["one", "two", "three"])
         self.assertEqual(len(gs.write.mock_calls), 3)
+
+    def testEncodingMirrors(self):
+        """
+        The encoding of a stream gets mirrored through
+        """
+        s = StringIO()
+        encoding = "aoeu"
+        try:
+            encoding = s.encoding
+        except:
+            s.encoding = encoding
+        gs = GreenStream(s)
+        self.assertEqual(gs.encoding, encoding)
+
+    def testEncodingDefault(self):
+        """
+        The encoding defaults to 'UTF-8' if we can't find an encoding.
+        """
+        s = MagicMock(spec=1)
+        gs = GreenStream(s)
+        self.assertEqual(gs.encoding, 'UTF-8')
