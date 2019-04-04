@@ -133,6 +133,11 @@ class GreenStream(object):
             # set output is ascii-only
             self._ascii_only_output = True
         self.closed = False
+        # z3 likes to look at sys.stdout.encoding
+        try:
+            self.encoding = stream.encoding
+        except:
+            self.encoding = 'UTF-8'
 
     def flush(self):
         self.stream.flush()

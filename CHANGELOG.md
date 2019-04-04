@@ -1,3 +1,9 @@
+# Version 2.14.2
+## 4 Apr 2019
+
+- Add an .encoding attribute to the wrapped sys.stdout so that things like
+  z3 which expect it to be present don't crash. Resolves #203.
+
 # Version 2.14.1
 ## 21 Mar 2019
 
