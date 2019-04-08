@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from green.config import default_args
 from green.output import GreenStream
 from green.reporting import JUnitXML, JUnitDialect, Verdict
-from green.result import GreenTestResult, ProtoTest, proto_error
+from green.result import GreenTestResult, BaseTestResult, ProtoTest, proto_error
 
 from io import StringIO
 
@@ -41,6 +41,41 @@ class JUnitXMLReportIsGenerated(TestCase):
                 "my_method": {"verdict": Verdict.PASSED}
             }
         })
+
+
+    def test_when_the_results_contain_only_one_test_with_output(self):
+        output = "This is the output of the test"
+        self._test_results.recordStdout(self._test, output)
+        self._test_results.addSuccess(self._test)
+
+        self._adapter.save_as(self._test_results, self._destination)
+
+        self._assert_report_is({
+            "my_module.MyClass": {
+                "my_method": {
+                    "verdict": Verdict.PASSED,
+                    "stdout": output
+                }
+            }
+        })
+
+
+    def test_when_the_results_contain_only_one_test_with_errput(self):
+        errput = "This is the errput of the test"
+        self._test_results.recordStderr(self._test, errput)
+        self._test_results.addSuccess(self._test)
+
+        self._adapter.save_as(self._test_results, self._destination)
+
+        self._assert_report_is({
+            "my_module.MyClass": {
+                "my_method": {
+                    "verdict": Verdict.PASSED,
+                    "stderr": errput
+                }
+            }
+        })
+
 
 
     def test_when_the_results_contain_only_one_failed_test(self):
@@ -124,16 +159,45 @@ class JUnitXMLReportIsGenerated(TestCase):
         expected_test = expected_suite[name]
 
         test_passed = True
-        for each_node in test:
-            if each_node.tag == JUnitDialect.FAILURE:
-                self.assertEqual(Verdict.FAILED, expected_test["verdict"])
-                test_passed = False
-            elif each_node.tag == JUnitDialect.ERROR:
-                self.assertEqual(Verdict.ERROR, expected_test["verdict"])
-                test_passed = False
-            elif each_node.tag == JUnitDialect.SKIPPED:
-                self.assertEqual(Verdict.SKIPPED, expected_test["verdict"])
-                test_passed = False
 
-        if test_passed:
-            self.assertEqual(Verdict.PASSED, expected_test["verdict"])
+        for key, expected in expected_test.items():
+            if key == "verdict":
+                self._assert_verdict(expected, test)
+
+            elif key == "stdout":
+                system_out = test.find(JUnitDialect.SYSTEM_OUT)
+                self.assertIsNotNone(system_out)
+                self.assertEqual(expected, system_out.text)
+
+            elif key == "stderr":
+                system_err = test.find(JUnitDialect.SYSTEM_ERR)
+                self.assertIsNotNone(system_err)
+                self.assertEqual(expected, system_err.text)
+
+
+
+    def _assert_verdict(self, expected_verdict, test):
+        failure = test.find(JUnitDialect.FAILURE)
+        error = test.find(JUnitDialect.ERROR)
+        skipped = test.find(JUnitDialect.SKIPPED)
+
+        if expected_verdict == Verdict.FAILED:
+            self.assertIsNotNone(failure)
+            self.assertIsNone(error)
+            self.assertIsNone(skipped)
+
+        elif expected_verdict == Verdict.ERROR:
+            self.assertIsNone(failure)
+            self.assertIsNotNone(error)
+            self.assertIsNone(skipped)
+
+
+        elif expected_verdict == Verdict.SKIPPED:
+            self.assertIsNone(failure)
+            self.assertIsNone(error)
+            self.assertIsNotNone(skipped)
+
+        else: # Verdict == PASSED
+            self.assertIsNone(failure)
+            self.assertIsNone(error)
+            self.assertIsNone(skipped)

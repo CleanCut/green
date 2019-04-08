@@ -6,13 +6,15 @@ from lxml.etree import Element, SubElement, tostring as to_xml
 
 class JUnitDialect(object):
     """
-    Hold the name of the elements defined in the JUnit XML schema.
+    Hold the name of the elements defined in the JUnit XML schema (for JUnit 4).
     """
     CLASS_NAME = "classname"
     ERROR = "error"
     FAILURE = "failure"
     NAME = "name"
     SKIPPED = "skipped"
+    SYSTEM_ERR = "system-err"
+    SYSTEM_OUT= "system-out"
     TEST_CASE = "testcase"
     TEST_SUITE = "testsuite"
     TEST_SUITES = "testsuites"
@@ -34,13 +36,16 @@ class JUnitXML(object):
     """
     Serialize a GreenTestResult object into a JUnit XML file, that can
     be read by continuous integration servers, for example.
+
+    See GitHub Issue #104
+    See Option '-j' / '--junit-report'
     """
 
     def save_as(self, test_results, destination):
         xml_root = Element(JUnitDialect.TEST_SUITES)
         tests_by_class = self._group_tests_by_class(test_results)
         for name, suite in tests_by_class.items():
-            xml_suite = self._convert_suite(name, suite)
+            xml_suite = self._convert_suite(test_results, name, suite)
             xml_root.append(xml_suite)
         xml = to_xml(xml_root,
                      xml_declaration=True,
@@ -100,26 +105,48 @@ class JUnitXML(object):
             collection[key].append((Verdict.SKIPPED, each_test, reason))
 
 
-    def _convert_suite(self, name, suite):
+    def _convert_suite(self, results, name, suite):
         xml_suite = Element(JUnitDialect.TEST_SUITE)
         xml_suite.set(JUnitDialect.NAME, name)
         for each_test in suite:
-            xml_test = self._convert_test(*each_test)
+            xml_test = self._convert_test(results, *each_test)
             xml_suite.append(xml_test)
         return xml_suite
 
 
-    def _convert_test(self, verdict, test, *details):
+    def _convert_test(self, results, verdict, test, *details):
         xml_test = Element(JUnitDialect.TEST_CASE)
         xml_test.set(JUnitDialect.NAME, test.method_name)
         xml_test.set(JUnitDialect.CLASS_NAME, test.class_name)
-        if verdict == Verdict.FAILED:
-            failure = SubElement(xml_test, JUnitDialect.FAILURE)
-            failure.text = str(details[0])
-        elif verdict == Verdict.ERROR:
-            error = SubElement(xml_test, JUnitDialect.ERROR)
-            error.text = str(details[0])
-        elif verdict == Verdict.SKIPPED:
-            skipped = SubElement(xml_test, JUnitDialect.SKIPPED)
-            skipped.text = str(details[0])
+
+        xml_verdict = self._convert_verdict(verdict, test, details)
+        if verdict:
+            xml_test.append(xml_verdict)
+
+        if test in results.stdout_output:
+            system_out = Element(JUnitDialect.SYSTEM_OUT)
+            system_out.text = results.stdout_output[test]
+            xml_test.append(system_out)
+
+        if test in results.stderr_errput:
+            system_err = Element(JUnitDialect.SYSTEM_ERR)
+            system_err.text = results.stderr_errput[test]
+            xml_test.append(system_err)
+
         return xml_test
+
+
+    def _convert_verdict(self, verdict, test, details):
+        if verdict == Verdict.FAILED:
+            failure = Element(JUnitDialect.FAILURE)
+            failure.text = str(details[0])
+            return failure
+        if verdict == Verdict.ERROR:
+            error = Element(JUnitDialect.ERROR)
+            error.text = str(details[0])
+            return error
+        if verdict == Verdict.SKIPPED:
+            skipped = Element(JUnitDialect.SKIPPED)
+            skipped.text = str(details[0])
+            return skipped
+        return None
