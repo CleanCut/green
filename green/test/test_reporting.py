@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from green.config import default_args
 from green.output import GreenStream
-from green.reporting import JUnitXML, JUnitDialect
+from green.reporting import JUnitXML, JUnitDialect, Verdict
 from green.result import GreenTestResult, ProtoTest, proto_error
 
 from io import StringIO
@@ -38,7 +38,7 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": "PASS"}
+                "my_method": {"verdict": Verdict.PASSED}
             }
         })
 
@@ -54,7 +54,35 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": "FAILED"}
+                "my_method": {"verdict": Verdict.FAILED}
+            }
+        })
+
+
+    def test_when_the_results_contain_only_one_erroneous_test(self):
+        try:
+            raise Exception
+        except:
+            error = proto_error(exc_info())
+        self._test_results.addError(self._test, error)
+
+        self._adapter.save_as(self._test_results, self._destination)
+
+        self._assert_report_is({
+            "my_module.MyClass": {
+                "my_method": {"verdict": Verdict.ERROR}
+            }
+        })
+
+
+    def test_when_the_results_contain_only_one_skipped_test(self):
+        self._test_results.addSkip(self._test, "reason for skipping")
+
+        self._adapter.save_as(self._test_results, self._destination)
+
+        self._assert_report_is({
+            "my_module.MyClass": {
+                "my_method": {"verdict": Verdict.SKIPPED}
             }
         })
 
@@ -98,14 +126,14 @@ class JUnitXMLReportIsGenerated(TestCase):
         test_passed = True
         for each_node in test:
             if each_node.tag == JUnitDialect.FAILURE:
-                self.assertEqual("FAILED", expected_test["verdict"])
+                self.assertEqual(Verdict.FAILED, expected_test["verdict"])
                 test_passed = False
             elif each_node.tag == JUnitDialect.ERROR:
-                self.assertEqual("ERROR", expected_test["verdict"])
+                self.assertEqual(Verdict.ERROR, expected_test["verdict"])
                 test_passed = False
             elif each_node.tag == JUnitDialect.SKIPPED:
-                self.assertEqual("SKIPPED", expected_test["verdict"])
+                self.assertEqual(Verdict.SKIPPED, expected_test["verdict"])
                 test_passed = False
 
         if test_passed:
-            self.assertEqual("PASS", expected_test["verdict"])
+            self.assertEqual(Verdict.PASSED, expected_test["verdict"])
