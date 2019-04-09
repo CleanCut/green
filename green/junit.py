@@ -10,12 +10,16 @@ class JUnitDialect(object):
     """
     CLASS_NAME = "classname"
     ERROR = "error"
+    ERROR_COUNT = "errors"
     FAILURE = "failure"
+    FAILURE_COUNT = "failures"
     NAME = "name"
     SKIPPED = "skipped"
+    SKIPPED_COUNT = "skipped"
     SYSTEM_ERR = "system-err"
     SYSTEM_OUT= "system-out"
     TEST_CASE = "testcase"
+    TEST_COUNT = "tests"
     TEST_SUITE = "testsuite"
     TEST_SUITES = "testsuites"
 
@@ -108,10 +112,23 @@ class JUnitXML(object):
     def _convert_suite(self, results, name, suite):
         xml_suite = Element(JUnitDialect.TEST_SUITE)
         xml_suite.set(JUnitDialect.NAME, name)
+        xml_suite.set(JUnitDialect.TEST_COUNT,
+                      str(len(suite)))
+        xml_suite.set(JUnitDialect.FAILURE_COUNT,
+                      str(self._count_test_with_verdict(Verdict.FAILED, suite)))
+        xml_suite.set(JUnitDialect.ERROR_COUNT,
+                      str(self._count_test_with_verdict(Verdict.ERROR, suite)))
+        xml_suite.set(JUnitDialect.SKIPPED_COUNT,
+                      str(self._count_test_with_verdict(Verdict.SKIPPED, suite)))
         for each_test in suite:
             xml_test = self._convert_test(results, *each_test)
             xml_suite.append(xml_test)
         return xml_suite
+
+
+    @staticmethod
+    def _count_test_with_verdict(verdict, suite):
+        return sum(1 for entry in suite if entry[0] == verdict)
 
 
     def _convert_test(self, results, verdict, test, *details):

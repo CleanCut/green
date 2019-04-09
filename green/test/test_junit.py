@@ -15,6 +15,15 @@ from xml.etree.ElementTree import fromstring as from_xml, tostring as to_xml
 
 
 
+def test(module, class_name, method_name):
+    test = ProtoTest()
+    test.module      = module
+    test.class_name  = class_name
+    test.method_name = method_name
+    return test
+
+
+
 class JUnitXMLReportIsGenerated(TestCase):
 
 
@@ -38,9 +47,63 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": Verdict.PASSED}
+                "tests": {
+                    "my_method": {"verdict": Verdict.PASSED}
+                }
             }
         })
+
+
+    def test_when_the_results_contain_tests_with_various_verdict(self):
+        self._test_results.addSuccess(
+            test("my.module", "MyClass", "test_method1"))
+        self._test_results.addSuccess(
+            test("my.module", "MyClass", "test_method2"))
+        self._record_failure(
+            test("my.module", "MyClass", "test_method3"))
+        self._record_failure(
+            test("my.module", "MyClass", "test_method4"))
+        self._record_error(
+            test("my.module", "MyClass", "test_method5"))
+        self._test_results.addSkip(
+            test("my.module", "MyClass", "test_method6"),
+            "Take too long")
+
+        self._adapter.save_as(self._test_results, self._destination)
+
+        self._assert_report_is({
+            "my.module.MyClass": {
+                "#tests": "6",
+                "#failures": "2",
+                "#errors": "1",
+                "#skipped": "1",
+                "tests": {
+                    "test_method1": { "verdict": Verdict.PASSED },
+                    "test_method2": { "verdict": Verdict.PASSED },
+                    "test_method3": { "verdict": Verdict.FAILED },
+                    "test_method4": { "verdict": Verdict.FAILED },
+                    "test_method5": { "verdict": Verdict.ERROR },
+                    "test_method6": { "verdict": Verdict.SKIPPED }
+                }
+            },
+        })
+
+
+    def _record_failure(self, test):
+        try:
+            raise ValueError("Wrong value")
+        except:
+            error = proto_error(exc_info())
+        self._test_results.addFailure(test, error)
+
+
+    def _record_error(self, test):
+        try:
+            raise ValueError("Wrong value")
+        except:
+            error = proto_error(exc_info())
+        self._test_results.addError(test, error)
+
 
 
     def test_when_the_results_contain_only_one_test_with_output(self):
@@ -52,9 +115,11 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {
-                    "verdict": Verdict.PASSED,
-                    "stdout": output
+                "tests": {
+                    "my_method": {
+                        "verdict": Verdict.PASSED,
+                        "stdout": output
+                    }
                 }
             }
         })
@@ -69,9 +134,11 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {
-                    "verdict": Verdict.PASSED,
-                    "stderr": errput
+                "tests": {
+                    "my_method": {
+                        "verdict": Verdict.PASSED,
+                        "stderr": errput
+                    }
                 }
             }
         })
@@ -79,33 +146,31 @@ class JUnitXMLReportIsGenerated(TestCase):
 
 
     def test_when_the_results_contain_only_one_failed_test(self):
-        try:
-            raise Exception
-        except:
-            error = proto_error(exc_info())
-        self._test_results.addFailure(self._test, error)
+        self._record_failure(
+            test("my_module", "MyClass", "my_method"))
 
         self._adapter.save_as(self._test_results, self._destination)
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": Verdict.FAILED}
+                "tests" : {
+                    "my_method": {"verdict": Verdict.FAILED}
+                }
             }
         })
 
 
     def test_when_the_results_contain_only_one_erroneous_test(self):
-        try:
-            raise Exception
-        except:
-            error = proto_error(exc_info())
-        self._test_results.addError(self._test, error)
+        self._record_error(
+            test("my_module", "MyClass", "my_method"))
 
         self._adapter.save_as(self._test_results, self._destination)
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": Verdict.ERROR}
+                "tests": {
+                    "my_method": {"verdict": Verdict.ERROR}
+                }
             }
         })
 
@@ -117,10 +182,11 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self._assert_report_is({
             "my_module.MyClass": {
-                "my_method": {"verdict": Verdict.SKIPPED}
+                "tests": {
+                    "my_method": {"verdict": Verdict.SKIPPED}
+                }
             }
         })
-
 
 
     def _assert_report_is(self, report):
@@ -143,9 +209,31 @@ class JUnitXMLReportIsGenerated(TestCase):
         self.assertIsNotNone(name)
         self.assertIn(name, expected_report)
         expected_suite = expected_report[name]
-        self.assertEqual(len(expected_suite), len(suite))
+
+        # Check the count of tests
+        if "#tests" in expected_suite:
+            self.assertEqual(expected_suite["#tests"],
+                             suite.get(JUnitDialect.TEST_COUNT))
+
+        # Check the count of failures
+        if "#failures" in expected_suite:
+            self.assertEqual(expected_suite["#failures"],
+                             suite.get(JUnitDialect.FAILURE_COUNT))
+
+        # Check the count of errors
+        if "#errors" in expected_suite:
+            self.assertEqual(expected_suite["#errors"],
+                             suite.get(JUnitDialect.ERROR_COUNT))
+
+        # Check the count of skipped tests
+        if "#skipped" in expected_suite:
+            self.assertEqual(expected_suite["#skipped"],
+                             suite.get(JUnitDialect.SKIPPED_COUNT))
+
+        # Check individual test reports
+        self.assertEqual(len(expected_suite["tests"]), len(suite))
         for each_test in suite:
-            self._assert_test(expected_suite, each_test)
+            self._assert_test(expected_suite["tests"], each_test)
 
 
     def _assert_test(self, expected_suite, test):
@@ -189,7 +277,6 @@ class JUnitXMLReportIsGenerated(TestCase):
             self.assertIsNone(failure)
             self.assertIsNotNone(error)
             self.assertIsNone(skipped)
-
 
         elif expected_verdict == Verdict.SKIPPED:
             self.assertIsNone(failure)
