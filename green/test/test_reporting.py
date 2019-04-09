@@ -128,7 +128,6 @@ class JUnitXMLReportIsGenerated(TestCase):
         Verify the structure of the generated XML text against the given
         'report' structure.
         """
-        print(self._destination.getvalue())
         root = from_xml(self._destination.getvalue())
         test_suites = root.findall(JUnitDialect.TEST_SUITE)
         self.assertEqual(len(report), len(test_suites))
