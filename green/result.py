@@ -152,7 +152,7 @@ class BaseTestResult(object):  # Breaks subclasses in 2.7 not inheriting object
                     self.colors.yellow('Captured stdout'),
                     self.colors.bold(test.dotted_name),
                     self.stdout_output[test]))
-            #del(self.stdout_output[test])
+            del(self.stdout_output[test])
 
     def displayStderr(self, test):
         """
@@ -167,7 +167,7 @@ class BaseTestResult(object):  # Breaks subclasses in 2.7 not inheriting object
                     self.colors.yellow('Captured stderr'),
                     self.colors.bold(test.dotted_name),
                     self.stderr_errput[test]))
-            #del(self.stderr_errput[test])
+            del(self.stderr_errput[test])
 
 
 class ProtoTestResult(BaseTestResult):
