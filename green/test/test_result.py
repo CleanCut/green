@@ -188,7 +188,6 @@ class TestProtoTestResult(unittest.TestCase):
         ptr.addSubTest(test, subtest, err)
         mock_addFailure.assert_called_with(subtest, err)
 
-
     @patch('green.result.ProtoTestResult.addError')
     @patch('green.result.ProtoTestResult.addFailure')
     def test_addSubTest_error(self, mock_addFailure, mock_addError):
