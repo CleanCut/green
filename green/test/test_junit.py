@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from green.config import default_args
 from green.output import GreenStream
-from green.reporting import JUnitXML, JUnitDialect, Verdict
+from green.junit import JUnitXML, JUnitDialect, Verdict
 from green.result import GreenTestResult, BaseTestResult, ProtoTest, proto_error
 
 from io import StringIO
