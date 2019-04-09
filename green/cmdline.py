@@ -5,8 +5,6 @@ import sys
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
 
-from green.reporting import JUnitXML
-
 
 
 def main(argv=None, testing=False):
@@ -73,8 +71,9 @@ def main(argv=None, testing=False):
 
     # Generate a test report if required
     if args.junit_report:
+        from green.junit import JUnitXML
         adapter = JUnitXML()
-        with open("test_report.xml", "w") as report_file:
+        with open(args.junit_report, "w") as report_file:
             adapter.save_as(result, report_file)
 
     return(int(not result.wasSuccessful()))

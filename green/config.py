@@ -252,9 +252,11 @@ def parseArguments(argv=None):  # pragma: no cover
         metavar='PATTERN', help="Pattern to match test method names after "
         "'test'.  Default is '*', meaning match methods named 'test*'.",
         default=argparse.SUPPRESS))
-    store_opt(other_args.add_argument('-j', '--junit-report', action='store_true',
-        help=("Generate a JUnit XML report."),
-        default=argparse.SUPPRESS))
+    store_opt(other_args.add_argument('-j', '--junit-report',
+                                      action='store',
+                                      metavar="FILENAME",
+                                      help=("Generate a JUnit XML report."),
+                                      default=argparse.SUPPRESS))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
