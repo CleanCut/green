@@ -6,6 +6,7 @@ import sys
 import green.config as config
 
 
+
 def main(argv=None, testing=False):
     args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
@@ -67,6 +68,13 @@ def main(argv=None, testing=False):
 
     # Actually run the test_suite
     result = run(test_suite, stream, args, testing)
+
+    # Generate a test report if required
+    if args.junit_report:
+        from green.junit import JUnitXML
+        adapter = JUnitXML()
+        with open(args.junit_report, "w") as report_file:
+            adapter.save_as(result, report_file)
 
     return(int(not result.wasSuccessful()))
 

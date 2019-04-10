@@ -46,6 +46,7 @@ default_args              = argparse.Namespace(  # pragma: no cover
         config            = None,  # Not in configs
         file_pattern      = 'test*.py',
         test_pattern      = '*',
+        junit_report      = False,
         run_coverage      = False,
         quiet_coverage    = False,
         clear_omit        = False,
@@ -251,6 +252,11 @@ def parseArguments(argv=None):  # pragma: no cover
         metavar='PATTERN', help="Pattern to match test method names after "
         "'test'.  Default is '*', meaning match methods named 'test*'.",
         default=argparse.SUPPRESS))
+    store_opt(other_args.add_argument('-j', '--junit-report',
+                                      action='store',
+                                      metavar="FILENAME",
+                                      help=("Generate a JUnit XML report."),
+                                      default=argparse.SUPPRESS))
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version))
@@ -422,7 +428,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
                     'help', 'logging', 'version', 'disable_unidecode', 'failfast',
                     'run_coverage', 'options', 'completions', 'completion_file',
                     'clear_omit', 'no_skip_report', 'no_tracebacks',
-                    'disable_windows', 'quiet_coverage']:
+                    'disable_windows', 'quiet_coverage', 'junit_report']:
             config_getter = config.getboolean
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint

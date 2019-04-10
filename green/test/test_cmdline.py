@@ -15,6 +15,8 @@ try:
 except:
     from StringIO import StringIO
 
+from os.path import isfile, join
+
 try:
     from unittest.mock import MagicMock
 except:
@@ -148,3 +150,18 @@ class TestMain(unittest.TestCase):
         except:
             pass  # Python 2.7's reload is builtin
         reload(cmdline)
+
+
+    def test_generate_junit_test_report(self):
+        """
+        Test that a report is generated when we use the '--junit-report' option.
+        """
+        tmpdir = tempfile.mkdtemp()
+        report = join(tmpdir, "test_report.xml")
+        self.assertFalse(isfile(report))
+
+        argv = ["--junit-report", report, "example/proj" ]
+        cmdline.main(argv)
+
+        self.assertTrue(isfile(report))
+        shutil.rmtree(tmpdir)
