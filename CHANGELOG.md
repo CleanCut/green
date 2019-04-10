@@ -1,3 +1,8 @@
+# Version 2.15.0
+
+- Added `-j/--junit-report` to generate an JUnit/XML test report.
+  Contributed by @fchauvel in #204. Resolves #104.
+
 # Version 2.14.2
 ## 4 Apr 2019
 
