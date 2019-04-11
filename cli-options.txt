@@ -89,7 +89,7 @@ Other Options:
   -j FILENAME, --junit-report FILENAME
                         Generate a JUnit XML report.
 
-Coverage Options (Coverage 4.5.2):
+Coverage Options (Coverage 4.4.2):
   -r, --run-coverage    Produce coverage output.
   -R, --quiet-coverage  Do not print coverage report to stdout (coverage files
                         will still be created). Implies --run-coverage
