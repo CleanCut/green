@@ -160,8 +160,8 @@ class TestMain(unittest.TestCase):
         report = join(tmpdir, "test_report.xml")
         self.assertFalse(isfile(report))
 
-        argv = ["--junit-report", report, "example/proj" ]
-        cmdline.main(argv)
+        argv = ["--junit-report", report]
+        cmdline.main(argv, testing=True)
 
         self.assertTrue(isfile(report))
         shutil.rmtree(tmpdir)
