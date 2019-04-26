@@ -91,6 +91,12 @@ Other Options:
 
 Coverage Options (Coverage 4.4.2):
   -r, --run-coverage    Produce coverage output.
+  -g FILE, --cov-config-file FILE
+                        Specify a coverage config file. Implies --run-coverage
+                        See the coverage documentation at
+                        https://coverage.readthedocs.io/en/v4.5.x/config.html
+                        for coverage config file syntax. The [run] and
+                        [report] sections are most relevant.
   -R, --quiet-coverage  Do not print coverage report to stdout (coverage files
                         will still be created). Implies --run-coverage
   -O, --clear-omit      Green tries really hard to set up a good list of
@@ -110,6 +116,10 @@ Coverage Options (Coverage 4.4.2):
                         For example, if coverage reported a file
                         mypackage/foo/bar you could omit it from coverage with
                         'mypackage*', '*/foo/*', or '*bar'
+  -m X, --minimum-coverage X
+                        Integer. A minimum coverage value. If not met, then we
+                        will print a message and exit with a nonzero status.
+                        Implies --run-coverage
 
 Integration Options:
   --completion-file     Location of the bash- and zsh-completion file. To
