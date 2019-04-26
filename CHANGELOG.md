@@ -1,4 +1,15 @@
+# Version 2.16.0
+# 25 Apr 2019
+
+- Added `-m/--minimum-coverage` to print a message and exit nonzero if a
+  certain coverage percentage isn't met. Resolves #135.
+- Added `-g/--cov-config-file` to pass through a custom coverage config file
+  location.  Note that if you do not specify this option, coverage already
+  looks for its config files in the standard locations, this just adds the
+  option to specify a specific, custom config file. Resolves #168.
+
 # Version 2.15.0
+## 11 Apr 2019
 
 - Added `-j/--junit-report` to generate an JUnit/XML test report.
   Contributed by @fchauvel in #204. Resolves #104.
