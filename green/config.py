@@ -48,6 +48,7 @@ default_args              = argparse.Namespace(  # pragma: no cover
         test_pattern      = '*',
         junit_report      = False,
         run_coverage      = False,
+        cov_config_file   = True,  # A string with a special boolean default
         quiet_coverage    = False,
         clear_omit        = False,
         omit_patterns     = None,
@@ -262,6 +263,13 @@ def parseArguments(argv=None):  # pragma: no cover
         "Coverage Options ({})".format(coverage_version))
     store_opt(cov_args.add_argument('-r', '--run-coverage', action='store_true',
         help=("Produce coverage output."), default=argparse.SUPPRESS))
+    store_opt(cov_args.add_argument('-g', '--cov-config-file',
+        action='store', metavar='FILE', help=("Specify a coverage config file. "
+            "Implies --run-coverage See the coverage documentation "
+            "at https://coverage.readthedocs.io/en/v4.5.x/config.html "
+            "for coverage config file syntax. The [run] and [report] sections "
+            "are most relevant."),
+        default=argparse.SUPPRESS)),
     store_opt(cov_args.add_argument('-R', '--quiet-coverage', action='store_true',
         help=("Do not print coverage report to stdout (coverage files will "
             "still be created). Implies --run-coverage"),
@@ -433,8 +441,8 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         elif name in ['processes', 'debug', 'verbose']:
             config_getter = config.getint
         elif name in ['file_pattern', 'finalizer', 'initializer',
-                      'include_patterns', 'omit_patterns', 'warnings',
-                      'test_pattern']:
+                      'cov_config_file', 'include_patterns', 'omit_patterns',
+                      'warnings', 'test_pattern']:
             config_getter = config.get
         elif name in ['targets', 'help', 'config']:
             pass  # Some options only make sense coming on the command-line.
@@ -521,14 +529,14 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         new_args.include_patterns = new_args.include_patterns.split(',')
     else:
         new_args.include_patterns = []
-
-    if new_args.quiet_coverage:
+    if new_args.quiet_coverage or (type(new_args.cov_config_file) == str):
         new_args.run_coverage = True
 
     if new_args.run_coverage:
         if not testing:
             cov = coverage.coverage(data_file='.coverage', omit=omit_patterns,
-                                    include=new_args.include_patterns)
+                                    include=new_args.include_patterns,
+                                    config_file = new_args.cov_config_file)
             cov.start()
         new_args.cov = cov
 

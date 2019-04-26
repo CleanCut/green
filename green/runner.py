@@ -96,7 +96,7 @@ def run(suite, stream, args, testing=False):
                 debug("Sending {} to runner {}".format(target, poolRunner))
                 pool.apply_async(
                     poolRunner,
-                    (target, queue, coverage_number, args.omit_patterns))
+                    (target, queue, coverage_number, args.omit_patterns, args.cov_config_file))
             pool.close()
             for target, queue in targets:
                 abort = False

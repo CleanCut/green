@@ -238,9 +238,13 @@ multiprocessing.pool.worker = worker
 # -----------------------------------------------------------------------------
 
 
-def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma: no cover
+def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config_file=True):  # pragma: no cover
     """
     I am the function that pool worker processes run.  I run one unit test.
+
+    coverage_config_file is a special option that is either a string specifying
+    the custom coverage config file or the special default value True (which
+    causes coverage to search for it's standard config files).
     """
     # Each pool worker gets his own temp directory, to avoid having tests that
     # are used to taking turns using the same temp file name from interfering
@@ -266,7 +270,8 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[]):  # pragma
         cov = coverage.coverage(
                 data_file='.coverage.{}_{}'.format(
                     coverage_number, random.randint(0, 10000)),
-                omit=omit_patterns)
+                omit=omit_patterns,
+                config_file=cov_config_file)
         cov._warn_no_data = False
         cov.start()
 
