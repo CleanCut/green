@@ -2,15 +2,12 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import copy
+from io import StringIO
 import os
 import tempfile
 from textwrap import dedent
 import unittest
 
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
 
 try:
     from unittest.mock import MagicMock

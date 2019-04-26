@@ -1,10 +1,7 @@
 from __future__ import unicode_literals
 from argparse import Namespace
 from argparse import ArgumentParser
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
+from io import StringIO
 import sys
 import unittest
 try:

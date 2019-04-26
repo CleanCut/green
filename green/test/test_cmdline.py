@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
+from io import StringIO
 import logging
 import os
+from os.path import isfile, join
 import shutil
 import sys
 import tempfile
@@ -9,13 +11,6 @@ import unittest
 from green import cmdline
 from green import config
 from green.output import GreenStream
-
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
-
-from os.path import isfile, join
 
 try:
     from unittest.mock import MagicMock

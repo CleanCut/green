@@ -63,9 +63,13 @@ test-versions:
 	@echo "\n(test-versions) completed\n"
 
 sanity-checks:
-	@if ! ./g $(PYTHON_VERSION) -r green | grep TOTAL | grep "0   100%" ; then echo 'Coverage needs to be at 100% for a release!' && exit 1; fi
+	@# We should have 100% coverage before a release
+	@./g $(PYTHON_VERSION) -m 100 green
+	@# If there's already a tag for this version, then we forgot to bump the version.
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
+	@# We should be on the master branch
 	@if [[ $(shell git rev-parse --abbrev-ref HEAD) != "master" ]] ; then echo "\nYou need to be on the master branch to release.\n" && exit 1 ; fi
+	@# All our help options should be up-to-date
 	@COLUMNS=80 ./g $(PYTHON_VERSION) -h > cli-options.txt
 	@printf "\n== SANITY CHECK: GIT STATUS ==\n"
 	@git status

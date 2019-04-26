@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import copy
+from io import StringIO
 import os
 import platform
 import shutil
@@ -21,11 +22,6 @@ try:
     from unittest.mock import MagicMock
 except:
     from mock import MagicMock
-
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
 
 
 global skip_testtools

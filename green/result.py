@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from collections import OrderedDict
+from io import StringIO
 from math import ceil
 import sys
 import time
@@ -332,6 +333,8 @@ class GreenTestResult(BaseTestResult):
         self.unexpectedSuccesses = []
         # Combination of all errors and failures
         self.all_errors = []
+        # For exiting non-zero if we don't reach a certain level of coverage
+        self.coverage_percent = None
 
     def stop(self):
         self.shouldStop = True
@@ -387,9 +390,12 @@ class GreenTestResult(BaseTestResult):
                 self.args.cov.combine()
                 self.args.cov.save()
                 if not self.args.quiet_coverage:
+                    self.stream.coverage_percent = None
                     self.args.cov.report(file=self.stream,
                                          omit=self.args.omit_patterns,
                                          show_missing=True)
+                    self.coverage_percent = self.stream.coverage_percent
+
             except CoverageException as ce:
                 if (len(ce.args) == 1) and ("No data to report" not in ce.args[0]):
                     raise ce
@@ -624,6 +630,13 @@ class GreenTestResult(BaseTestResult):
         """
         Tells whether or not the overall run was successful
         """
+        if self.args.minimum_coverage != None:
+            if self.coverage_percent < self.args.minimum_coverage:
+                self.stream.writeln(self.colors.red(
+                    "Coverage of {}% is below minimum level of {}%"
+                    .format(self.coverage_percent, self.args.minimum_coverage)))
+                return False
+
         # fail if no tests are run.
         if sum(len(x) for x in [
                 self.errors,

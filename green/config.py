@@ -53,6 +53,7 @@ default_args              = argparse.Namespace(  # pragma: no cover
         clear_omit        = False,
         omit_patterns     = None,
         include_patterns  = None,
+        minimum_coverage  = None,
         completion_file   = False,
         completions       = False,
         options           = False,
@@ -295,6 +296,11 @@ def parseArguments(argv=None):  # pragma: no cover
             "example, if coverage reported a file mypackage/foo/bar you could "
             "omit it from coverage with 'mypackage*', '*/foo/*', or '*bar'"),
         default=argparse.SUPPRESS))
+    store_opt(cov_args.add_argument('-m', '--minimum-coverage', action='store',
+        metavar='X', type=int, help=("Integer. A minimum coverage value.  If "
+            "not met, then we will print a message and exit with a nonzero "
+            "status. Implies --run-coverage"),
+        default=argparse.SUPPRESS))
 
     integration_args = parser.add_argument_group("Integration Options")
     store_opt(integration_args.add_argument('--completion-file',
@@ -438,7 +444,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
                     'clear_omit', 'no_skip_report', 'no_tracebacks',
                     'disable_windows', 'quiet_coverage', 'junit_report']:
             config_getter = config.getboolean
-        elif name in ['processes', 'debug', 'verbose']:
+        elif name in ['processes', 'debug', 'verbose', 'minimum_coverage']:
             config_getter = config.getint
         elif name in ['file_pattern', 'finalizer', 'initializer',
                       'cov_config_file', 'include_patterns', 'omit_patterns',
@@ -521,6 +527,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
     ]
     if new_args.clear_omit:
         omit_patterns = []
+
     if new_args.omit_patterns:
         omit_patterns.extend(new_args.omit_patterns.split(','))
     new_args.omit_patterns = omit_patterns
@@ -529,7 +536,11 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         new_args.include_patterns = new_args.include_patterns.split(',')
     else:
         new_args.include_patterns = []
+
     if new_args.quiet_coverage or (type(new_args.cov_config_file) == str):
+        new_args.run_coverage = True
+
+    if new_args.minimum_coverage != None:
         new_args.run_coverage = True
 
     if new_args.run_coverage:

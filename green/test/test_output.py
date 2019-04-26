@@ -1,12 +1,9 @@
 from __future__ import unicode_literals
+from io import StringIO
 import platform
 import sys
 import unittest
 
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
 
 try:
     from unittest.mock import MagicMock, patch
@@ -165,6 +162,15 @@ class TestGreenStream(unittest.TestCase):
         gs.write = MagicMock()
         gs.writelines(["one", "two", "three"])
         self.assertEqual(len(gs.write.mock_calls), 3)
+
+    def testCoverageDetection(self):
+        """
+        write() detects a coverage percentage flying by
+        """
+        s = StringIO()
+        gs = GreenStream(s)
+        gs.write('\n---------------------------------------------------\nTOTAL                   896    367    59%\nRan')
+        self.assertEqual(gs.coverage_percent, 59)
 
     def testEncodingMirrors(self):
         """

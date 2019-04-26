@@ -5,6 +5,7 @@ from colorama.initialise import wrap_stream
 import logging
 import os
 import platform
+import re
 import sys
 from unidecode import unidecode
 
@@ -116,6 +117,7 @@ class GreenStream(object):
 
     indent_spaces = 2
     _ascii_only_output = False  # default to printing output in unicode
+    coverage_pattern = re.compile(r'TOTAL\s+\d+\s+\d+\s+(?P<percent>\d+)%')
 
     def __init__(self, stream, override_appveyor=False, disable_windows=False,
             disable_unidecode=False):
@@ -138,6 +140,10 @@ class GreenStream(object):
             self.encoding = stream.encoding
         except:
             self.encoding = 'UTF-8'
+        # Susceptible to false-positives if other matching lines are output,
+        # so set this to None immediately before running a coverage report to
+        # guarantee accuracy.
+        self.coverage_percent = None
 
     def flush(self):
         self.stream.flush()
@@ -153,6 +159,15 @@ class GreenStream(object):
             # Windows doesn't actually want unicode, so we get
             # the closest ASCII equivalent
             text = text_type(unidecode(text))
+        # Since coverage doesn't like us switching out it's stream to run extra
+        # reports to look for percent covered. We should replace this with
+        # grabbing the percentage directly from coverage if we can figure out
+        # how.
+        match = self.coverage_pattern.search(text)
+        if match:
+            percent_str = match.groupdict().get('percent')
+            if percent_str:
+                self.coverage_percent = int(percent_str)
         self.stream.write(text)
 
     def writelines(self, lines):

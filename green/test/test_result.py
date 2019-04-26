@@ -1,6 +1,7 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 import copy
+from io import StringIO
 import sys
 import os
 import unittest
@@ -10,11 +11,6 @@ from green.config import default_args
 from green.output import Colors, GreenStream
 from green.result import GreenTestResult, proto_test, \
         ProtoTest, proto_error, ProtoTestResult, BaseTestResult
-
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 try:
     from unittest.mock import MagicMock, patch
@@ -912,6 +908,25 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.unexpectedSuccesses.append('anything')
+        self.assertEqual(gtr.wasSuccessful(), True)
+
+    def test_wasSuccessful_coverageFails(self):
+        """
+        wasSuccessful fails if minimum coverage is not met
+        """
+        self.args.minimum_coverage = 50
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.coverage_percent = 49
+        self.assertEqual(gtr.wasSuccessful(), False)
+
+    def test_wasSuccessful_coverageSucceeds(self):
+        """
+        wasSuccessful succeds if minimum coverage is met
+        """
+        self.args.minimum_coverage = 50
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.passing.append('anything')
+        gtr.coverage_percent = 60
         self.assertEqual(gtr.wasSuccessful(), True)
 
 

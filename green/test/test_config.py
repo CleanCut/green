@@ -3,10 +3,7 @@ try:
 except:
     import ConfigParser as configparser
 import copy
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
+from io import StringIO
 import os
 import shutil
 import tempfile
