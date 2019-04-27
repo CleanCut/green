@@ -159,7 +159,9 @@ class GreenTestLoader(unittest.TestLoader):
                     if module_suite:
                         suite.addTest(module_suite)
 
-        except PermissionError as e:
+        except OSError:
+            # Can't use PermissionError on 2
+            # Maybe should log the exception just in case?
             debug("Couldn't read subdirectory: {}".format(current_path))
 
         return flattenTestSuite(suite) if suite.countTestCases() else None
