@@ -126,37 +126,43 @@ class GreenTestLoader(unittest.TestLoader):
             raise ImportError(
                     "'{}' is not a directory".format(str(current_path)))
         suite = GreenTestSuite()
-        for file_or_dir_name in sorted(os.listdir(current_abspath)):
-            path = os.path.join(current_abspath, file_or_dir_name)
-            # Recurse into directories, attempting to skip virtual environments
-            bin_activate = os.path.join(path, 'bin', 'activate')
-            if os.path.isdir(path) and not os.path.isfile(bin_activate):
-                # Don't follow symlinks
-                if os.path.islink(path):
-                    continue
-                # Don't recurse into directories that couldn't be a package name
-                if not python_dir_pattern.match(file_or_dir_name):
-                    continue
+        try:
+            for file_or_dir_name in sorted(os.listdir(current_abspath)):
+                path = os.path.join(current_abspath, file_or_dir_name)
+                # Recurse into directories, attempting to skip virtual environments
+                bin_activate = os.path.join(path, 'bin', 'activate')
+                if os.path.isdir(path) and not os.path.isfile(bin_activate):
+                    # Don't follow symlinks
+                    if os.path.islink(path):
+                        continue
+                    # Don't recurse into directories that couldn't be a package name
+                    if not python_dir_pattern.match(file_or_dir_name):
+                        continue
 
-                subdir_suite = self.discover(
-                    path, file_pattern=file_pattern,
-                    top_level_dir=top_level_dir or current_path
-                )
+                    subdir_suite = self.discover(
+                        path, file_pattern=file_pattern,
+                        top_level_dir=top_level_dir or current_path
+                    )
 
-                if subdir_suite:
-                    suite.addTest(subdir_suite)
+                    if subdir_suite:
+                        suite.addTest(subdir_suite)
 
-            elif os.path.isfile(path):
-                # Skip irrelevant files
-                if not python_file_pattern.match(file_or_dir_name):
-                    continue
-                if not fnmatch(file_or_dir_name, file_pattern):
-                    continue
+                elif os.path.isfile(path):
+                    # Skip irrelevant files
+                    if not python_file_pattern.match(file_or_dir_name):
+                        continue
+                    if not fnmatch(file_or_dir_name, file_pattern):
+                        continue
 
-                # Try loading the file as a module
-                module_suite = self.loadFromModuleFilename(path)
-                if module_suite:
-                    suite.addTest(module_suite)
+                    # Try loading the file as a module
+                    module_suite = self.loadFromModuleFilename(path)
+                    if module_suite:
+                        suite.addTest(module_suite)
+
+        except OSError:
+            # Can't use PermissionError on 2
+            # Maybe should log the exception just in case?
+            debug("Couldn't read subdirectory: {}".format(current_path))
 
         return flattenTestSuite(suite) if suite.countTestCases() else None
 
