@@ -1,5 +1,11 @@
+# Version 2.16.1
+## 29 Apr 2019
+
+- Fixed a crash that could occur when attempting to load tests from files that
+  Green lacks permissions to access.  Contributed by @jrabbit in #205.
+
 # Version 2.16.0
-# 25 Apr 2019
+## 25 Apr 2019
 
 - Added `-m/--minimum-coverage` to print a message and exit nonzero if a
   certain coverage percentage isn't met. Resolves #135.
