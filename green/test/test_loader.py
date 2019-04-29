@@ -411,7 +411,7 @@ class TestDiscover(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
         self.loader.discover(os.path.join(tmpdir, 'garbage_in'))
-        mock_debug.assert_called_once()
+        self.assertEqual(len(mock_debug.mock_calls), 1)
 
     def test_bad_input(self):
         """
