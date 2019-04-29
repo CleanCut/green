@@ -8,9 +8,9 @@ import tempfile
 from textwrap import dedent
 import unittest
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 except:
-    from mock import MagicMock
+    from mock import MagicMock, patch
 
 from green import loader
 from green.loader import GreenTestLoader
@@ -398,6 +398,20 @@ class TestDiscover(unittest.TestCase):
 
     def setUp(self):
         self.loader = GreenTestLoader()
+
+    @patch('green.loader.os.path.isdir')
+    @patch('green.loader.debug')
+    @patch('green.loader.os.listdir')
+    def test_oserror(self, mock_listdir, mock_debug, mock_isdir):
+        """
+        discover() prints a debug message and moves on when ecountering an OSError
+        """
+        mock_isdir.return_value = True
+        mock_listdir.side_effect = OSError()
+        tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmpdir)
+        self.loader.discover(os.path.join(tmpdir, 'garbage_in'))
+        mock_debug.assert_called_once()
 
     def test_bad_input(self):
         """

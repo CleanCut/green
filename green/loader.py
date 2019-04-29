@@ -158,11 +158,8 @@ class GreenTestLoader(unittest.TestLoader):
                     module_suite = self.loadFromModuleFilename(path)
                     if module_suite:
                         suite.addTest(module_suite)
-
         except OSError:
-            # Can't use PermissionError on 2
-            # Maybe should log the exception just in case?
-            debug("Couldn't read subdirectory: {}".format(current_path))
+            debug("WARNING: Test discovery failed at path {}".format(current_path))
 
         return flattenTestSuite(suite) if suite.countTestCases() else None
 
