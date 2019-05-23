@@ -33,12 +33,11 @@ Community
   with a bug fix or new feature.
 - Do you need someone else to implement a feature?  [Contact me](mailto:nathan.stocks@gmail.com) to sponsor features you need.
 
-Training Course -- Python Testing with Green
+Training Course
 --------
 
-Advance your learning and support Green by subscribing to
+There is a training course available:
 [Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB).
-You can [choose your own price!](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md)
 
 <a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB" rel="Python Testing with Green"> ![Python Testing with Green](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)</a>
 
