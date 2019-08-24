@@ -73,19 +73,19 @@ try:
 
     class DjangoRunner(DiscoverRunner):
 
-        def __init__(self, verbosity=-1, **kwargs):
+        def __init__(self, verbose=-1, **kwargs):
 
             super(DjangoRunner, self).__init__(**kwargs)
-            self.verbosity = verbosity
+            self.verbose = verbose
             self.loader = GreenTestLoader()
 
         @classmethod
         def add_arguments(cls, parser):
             parser.add_argument (
                     '--green-verbosity',
-                    action='store', dest='verbosity', default=-1, type=int,
+                    action='store', dest='verbose', default=-1, type=int,
                     help="""
-                    Green verbosity level for tests.  Value should be an integer
+                    Green 'verbose' level for tests.  Value should be an integer
                     that green supports.  For example: --green-verbosity 3""")
             super(DjangoRunner, cls).add_arguments(parser)
 
@@ -114,8 +114,8 @@ try:
                 test_labels = ['.']
 
             args = mergeConfig(Namespace())
-            if self.verbosity != -1:
-                args.verbosity = self.verbosity
+            if self.verbose != -1:
+                args.verbose = self.verbose
             args.targets = test_labels
             stream = GreenStream(sys.stdout)
             suite = self.loader.loadTargets(args.targets)

@@ -135,7 +135,7 @@ class TestDjangoRunner(unittest.TestCase):
         parser = ArgumentParser()
         test_command.add_arguments(parser)
         args = parser.parse_args()
-        self.assertIn('verbosity', args)
+        self.assertIn('verbose', args)
 
     def test_check_default_verbosity(self):
         """
@@ -152,7 +152,7 @@ class TestDjangoRunner(unittest.TestCase):
         parser = ArgumentParser()
         test_command.add_arguments(parser)
         args = parser.parse_args()
-        self.assertEqual(args.verbosity,-1)
+        self.assertEqual(args.verbose,-1)
 
     def test_run_with_verbosity_flag(self):
         """
@@ -164,7 +164,7 @@ class TestDjangoRunner(unittest.TestCase):
         dr.setup_databases           = MagicMock()
         dr.teardown_databases        = MagicMock()
         dr.teardown_test_environment = MagicMock()
-        dr.verbosity = 2
+        dr.verbose = 2
         saved_loadTargets = dr.loader.loadTargets
         dr.loader.loadTargets = MagicMock()
         self.addCleanup(setattr, dr.loader, 'loadTargets',
