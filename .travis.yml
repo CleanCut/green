@@ -23,10 +23,10 @@ matrix:
               - sleep 1
               - pip3 install virtualenv
               - sleep 1
-              - pip_pypy3 install .
-              - sleep 1
-              - pip_pypy3 install virtualenv
-              - sleep 1
+              #- pip_pypy3 install .
+              #- sleep 1
+              #- pip_pypy3 install virtualenv
+              #- sleep 1
           install:
             - "pip install --user $USER ."
             - "pip install --user $USER virtualenv"
@@ -43,10 +43,10 @@ matrix:
               - sleep 1
               - pip3 install virtualenv
               - sleep 1
-              - pip_pypy3 install .
-              - sleep 1
-              - pip_pypy3 install virtualenv
-              - sleep 1
+              #- pip_pypy3 install .
+              #- sleep 1
+              #- pip_pypy3 install virtualenv
+              #- sleep 1
           install:
             - "pip install --user $USER ."
             - "pip install --user $USER virtualenv"
