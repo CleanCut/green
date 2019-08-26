@@ -1,3 +1,13 @@
+# Version 3.0.0
+
+- Dropped support for Python 2.7.  Green might still continue working on 2.7,
+  and I'll accept patches to keep it working if anyone submits them, but I'm
+  removing 2.7 from the test matrix.  Ten years ago I thought this day would
+  never come...but it finally has!
+
+- Fixed handling of green 'verbose' Django args. Contributed by @mammadori
+  in #209.
+
 # Version 2.16.1
 ## 29 Apr 2019
 

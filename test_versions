@@ -3,7 +3,7 @@
 if [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
     PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION}"
 else
-    PYTHON_VERSIONS="$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(2.7|3.[3-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )"
+    PYTHON_VERSIONS="$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(3.[5-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )"
 fi
 # This fancy line makes it so we test each module individually, and then all of green.
 #TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
@@ -32,7 +32,7 @@ echo "Identified python versions: `echo ${PYTHON_VERSIONS} | tr '\n' ' '`"
 # Make sure each of the pythons has the necessary requirements installed
 for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     if [ "${PYTHON_VERSION}" == "default" ] ; then
-        PYTHON_VERSION=""
+        PYTHON_VERSION="3"
     fi
     if [ "${PYTHON_VERSION}" == "nightly" ] ; then
         PYTHON_VERSION=""
@@ -47,6 +47,9 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         PYTHON=pypy
         shift
     elif [ "${PYTHON_VERSION}" == "pypy3.5-6.0" ] ; then
+        PYTHON=pypy3
+        shift
+    elif [ "${PYTHON_VERSION}" == "pypy3.6-7.0" ] ; then
         PYTHON=pypy3
         shift
     else

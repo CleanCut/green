@@ -1,9 +1,9 @@
 dist: xenial
 sudo: false
 install:
-  - "pip install ."
-  - "pip install virtualenv"
-  - "pip install coveralls"
+  - "pip3 install ."
+  - "pip3 install virtualenv"
+  - "pip3 install coveralls"
 script:
   - "make test"
 after_success: "if [ $TRAVIS_OS_NAME == linux ] ; then coveralls ; fi"
@@ -17,15 +17,15 @@ matrix:
           before_install:
               - brew update
               - sleep 1
-              - brew install pypy
+              - brew install pypy3
               - sleep 1
               - pip3 install .
               - sleep 1
               - pip3 install virtualenv
               - sleep 1
-              - pip_pypy install .
+              - pip_pypy3 install .
               - sleep 1
-              - pip_pypy install virtualenv
+              - pip_pypy3 install virtualenv
               - sleep 1
           install:
             - "pip install --user $USER ."
@@ -37,23 +37,20 @@ matrix:
           before_install:
               - brew update
               - sleep 1
-              - brew install pypy
+              - brew install pypy3
               - sleep 1
               - pip3 install .
               - sleep 1
               - pip3 install virtualenv
               - sleep 1
-              - pip_pypy install .
+              - pip_pypy3 install .
               - sleep 1
-              - pip_pypy install virtualenv
+              - pip_pypy3 install virtualenv
               - sleep 1
           install:
             - "pip install --user $USER ."
             - "pip install --user $USER virtualenv"
             - "pip install --user $USER coveralls"
-        - os: linux
-          python: 2.7
-          language: python
         - os: linux
           python: 3.5
           language: python
@@ -67,13 +64,13 @@ matrix:
           python: nightly
           language: python
         - os: linux
-          python: pypy2.7-6.0
+          python: pypy3.5-6.0
           language: python
         - os: linux
-          python: pypy3.5-6.0
+          python: pypy3.6-7.0
           language: python
 
     allow_failures:
         - python: nightly
-        - python: pypy2.7-6.0
         - python: pypy3.5-6.0
+        - python: pypy3.6-7.0
