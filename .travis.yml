@@ -67,10 +67,10 @@ matrix:
           python: pypy3.5-6.0
           language: python
         - os: linux
-          python: pypy3.6-7.0
+          python: pypy3.6-7.1.1
           language: python
 
     allow_failures:
         - python: nightly
         - python: pypy3.5-6.0
-        - python: pypy3.6-7.0
+        - python: pypy3.6-7.1.1
