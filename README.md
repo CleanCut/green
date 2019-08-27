@@ -53,7 +53,7 @@ Quick Start
 -----------
 
 ```bash
-pip install green    # To upgrade: "pip install --upgrade green"
+pip3 install green    # To upgrade: "pip3 install --upgrade green"
 ```
 
 Now run green...
