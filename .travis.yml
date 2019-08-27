@@ -17,8 +17,8 @@ matrix:
           before_install:
               - brew update
               - sleep 1
-              - brew install pypy3
-              - sleep 1
+              #- brew install pypy3
+              #- sleep 1
               - pip3 install .
               - sleep 1
               - pip3 install virtualenv
@@ -37,8 +37,8 @@ matrix:
           before_install:
               - brew update
               - sleep 1
-              - brew install pypy3
-              - sleep 1
+              #- brew install pypy3
+              #- sleep 1
               - pip3 install .
               - sleep 1
               - pip3 install virtualenv
