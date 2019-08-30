@@ -396,8 +396,9 @@ To run the unittests, we would change to the parent directory of the project
 
     $ green proj
     ....
-    Ran 4 tests in 0.000s
-
+    
+    Ran 4 tests in 0.125s using 8 processes
+    
     OK (passes=4)
 
 Okay, so that's the classic short-form output for unit tests.  Green really
@@ -405,17 +406,19 @@ shines when you start getting more verbose:
 
 **In a real terminal, this output is syntax highlighted**
 
-    $ green -vv proj
-    proj.test.test_foo
+    $ green -vvv proj
+    Green 3.0.0, Coverage 4.5.2, Python 3.7.4
+    
+    test_foo
       TestAnswer
     .   answer() returns 42
     .   answer() returns an integer
       TestSchool
     .   test_age
     .   test_food
-
-    Ran 4 tests in 0.001s
-
+    
+    Ran 4 tests in 0.123s using 8 processes
+    
     OK (passes=4)
 
 Notes:

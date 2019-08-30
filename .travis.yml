@@ -28,9 +28,9 @@ matrix:
               #- pip_pypy3 install virtualenv
               #- sleep 1
           install:
-            - "pip install --user $USER ."
-            - "pip install --user $USER virtualenv"
-            - "pip install --user $USER coveralls"
+            - "pip3 install --user $USER ."
+            - "pip3 install --user $USER virtualenv"
+            - "pip3 install --user $USER coveralls"
         - os: osx
           osx_image: xcode9.4
           language: generic
@@ -48,9 +48,9 @@ matrix:
               #- pip_pypy3 install virtualenv
               #- sleep 1
           install:
-            - "pip install --user $USER ."
-            - "pip install --user $USER virtualenv"
-            - "pip install --user $USER coveralls"
+            - "pip3 install --user $USER ."
+            - "pip3 install --user $USER virtualenv"
+            - "pip3 install --user $USER coveralls"
         - os: linux
           python: 3.5
           language: python
