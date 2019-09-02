@@ -67,7 +67,7 @@ matrix:
           python: pypy3.5-6.0
           language: python
         - os: linux
-          python: pypy3.6-7.1.1
+          python: pypy3.6-7.1.0
           language: python
 
     allow_failures:
