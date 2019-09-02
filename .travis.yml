@@ -73,4 +73,4 @@ matrix:
     allow_failures:
         - python: nightly
         - python: pypy3.5-6.0
-        - python: pypy3.6-7.1.1
+        - python: pypy3.6-7.1.0
