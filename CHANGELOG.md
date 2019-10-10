@@ -1,4 +1,5 @@
 # Version 3.0.0
+## 26 Aug 2019
 
 - Dropped support for Python 2.7.  Green might still continue working on 2.7,
   and I'll accept patches to keep it working if anyone submits them, but I'm
