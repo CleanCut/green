@@ -31,7 +31,7 @@ Community
 - Submit a [pull
   request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
   with a bug fix or new feature.
-- [Sponsor](https://github.com/sponsors/CleanCut) the maintainer to financially support this project
+- :sparkling_heart: [Sponsor](https://github.com/sponsors/CleanCut) the maintainer to financially support this project
 
 Training Course
 --------
