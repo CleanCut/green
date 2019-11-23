@@ -253,6 +253,19 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
     saved_tempdir = tempfile.tempdir
     tempfile.tempdir = tempfile.mkdtemp()
 
+    def raise_internal_failure(msg):
+        err = sys.exc_info()
+        t             = ProtoTest()
+        t.module      = 'green.loader'
+        t.class_name  = 'N/A'
+        t.description = msg
+        t.method_name = 'poolRunner'
+        result.startTest(t)
+        result.addError(t, err)
+        result.stopTest(t)
+        queue.put(result)
+        cleanup()
+
     def cleanup():
         # Restore the state of the temp directory
         # TODO: Make this not necessary on macOS+Python3 (see #173)
@@ -295,17 +308,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
         loader = GreenTestLoader()
         test = loader.loadTargets(target)
     except:
-        err = sys.exc_info()
-        t             = ProtoTest()
-        t.module      = 'green.loader'
-        t.class_name  = 'N/A'
-        t.description = 'Green encountered an error loading the unit test.'
-        t.method_name = 'poolRunner'
-        result.startTest(t)
-        result.addError(t, err)
-        result.stopTest(t)
-        queue.put(result)
-        cleanup()
+        raise_internal_failure('Green encountered an error loading the unit test.')
         return
 
     if getattr(test, 'run', False):
@@ -327,11 +330,15 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
             if result.errors:
                 queue.put(result)
             else:
-                err = sys.exc_info()
-                result.startTest(test)
-                result.addError(test, err)
-                result.stopTest(test)
-                queue.put(result)
+                try:
+                    err = sys.exc_info()
+                    result.startTest(test)
+                    result.addError(test, err)
+                    result.stopTest(test)
+                    queue.put(result)
+                except:
+                    raise_internal_failure('Green encoundered an error when running the test.')
+                    return
     else:
         # loadTargets() returned an object without a run() method, probably
         # None
