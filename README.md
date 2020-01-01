@@ -463,7 +463,7 @@ trial.
 
 **trial**
 
-Honestly, I really like Twisted's trial, though I don't really have any need
+I really like Twisted's trial test runner, though I don't really have any need
 for the rest of the Twisted event-driven networking engine library.  I started
 professionally developing in Python when version 2.3 was the latest, greatest
 version and none of us in my small shop had ever even heard of unit testing
@@ -471,16 +471,15 @@ version and none of us in my small shop had ever even heard of unit testing
 the test running.  If most of my projects at my day job hadn't moved to Python
 3,  I probably would have just stuck with trial, but at the time I wrote green
 [trial didn't run on Python 3](http://twistedmatrix.com/trac/ticket/5965)
-(but since 15.4.0 it does). Trial was and is the foundation for my
-inspiration for having better-than-unittest output in the first place.  It's a
-great example of reducing redundancy (report module/class once, not on every
-line), lining up status vertically, and using color.  I feel like Green trumps
-trial in two important ways: 1) It's not part of an immense event-driven
-networking engine (probably not ever going to change), and 2) it is not stuck
-in Python 2 (which will hopefully be fixed someday).  Green will never replace
-trial, as trial has features necessary to run asynchronous unit tests on
-Twisted code.  But I couldn't use it for my increasing amount of Python 3 code.
-Which led me to...
+(but since 15.4.0 it does). Trial was and is the foundation for my inspiration
+for having better-than-unittest output in the first place.  It is a great
+example of reducing redundancy (report module/class once, not on every line),
+lining up status vertically, and using color.  I feel like Green trumped trial
+in two important ways: 1) It wasn't a part of an immense event-driven
+networking engine, and 2) it was not stuck in Python 2 as trial was at the
+time.  Green will obviously never replace trial, as trial has features
+necessary to run asynchronous unit tests on Twisted code.  After discovering
+that I couldn't run trial under Python 3, I next tried...
 
 **nose**
 
@@ -494,7 +493,7 @@ on the positive aspect of testing (everything passes!), and 3) It made a nice
 counterpoint to several nose plugins that had "Red" in the name.  I made steady
 progress on my plugin until I hit a serious problem in the nose plugin API.
 That's when I discovered that [nose is in maintenance
-mode](https://github.com/nose-devs/nose/issues/45#issuecomment-40827502) --
+mode](https://github.com/nose-devs/nose/issues/45#issuecomment-40816427) --
 abandoned by the original developers, handed off to someone who won't fix
 anything if it changes the existing behavior.  What a downer.  Despite the huge
 user base, I already consider nose dead and gone.  A project which will not
@@ -513,11 +512,10 @@ release early and often and work to fix things you run into.  I submitted a
 3-line pull request to [fix some
 problems](https://github.com/nose-devs/nose2/pull/171) where the behavior did
 not conform to the already-written documentation which broke my plugin.  The
-pull request wasn't accepted because I (ironically) didn't write unit tests for
-it.  While reading code for nose and nose2 I kept thinking, "I can write a
-better test runner than *this*".  I got tired of battering on a seemingly
-closed door with the nose/nose2 devs and decided to see what it would take to
-write my own test runner.  That brought be to...
+pull request wasn't initially accepted because I (ironically) didn't write unit
+tests for it.  This got me thinking "I can write a better test runner than
+*this*".  I got tired of the friction dealing with the nose/nose2 and decided
+to see what it would take to write my own test runner.  That brought be to...
 
 **unittest**
 
@@ -534,27 +532,23 @@ unittest to provide exactly the output (and other feature creep) that I wanted.
 I had three initial goals for Green:
 
 1. Colorful, clean output (at least as good as trial's)
-
 2. Run on Python 3
-
 3. Try to avoid making it a huge bundle of tightly-coupled, hard-to-read code.
 
 
 I contend that I nailed **1.** and **2.**, and ended up implementing a bunch of
-other useful features as well.  Whether I succeeded with **3.** is debatable.
-I continue to try to refactor and simplify whenever I touch the code.  I'm not
-sure that I'm convinced that [community acceptance of my
-project](https://github.com/kennethreitz/python-guide/pull/459#issuecomment-46914167)
-really hinges on full internal adherence to the PEP-8 and PEP-257 coding
-styles, but I'm willing to get 98% of the way there just to see. (Hey, I *like*
-vertically aligning equal signs!)  :-)
+other useful features as well (like very high performance via running tests in
+parallel in multiple processes).  Whether I succeeded with **3.** is debatable.
+I continue to try to refactor and simplify, but adding features on top of a
+complicated bunch of built-in code doesn't lend itself to the flexibility
+needed for clear refactors.
 
 Wait!  What about the other test runners?
 
 - **pytest** -- Somehow I never realized pytest existed until a few weeks
-  before I released Green 1.0.  All I know is that apparently many people
-  appear to like and use it.  Hey, don't give me that look!  I'm not
-  omniscient!
+  before I released Green 1.0.  Nowadays it seems to be pretty popular.  If I
+  had discovered it earlier, maybe I wouldn't have made Green!  Hey, don't give
+  me that look!  I'm not omniscient!
 
 - **tox** -- I think I first ran across tox only a few weeks before I heard of
   pytest.  It's homepage didn't mention anything about color, so I didn't try
