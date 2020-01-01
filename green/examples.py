@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import sys
 import unittest
 
+doctest_modules = ['green.examples']
+
 
 class TestStates(unittest.TestCase):
 
@@ -44,3 +46,21 @@ class TestStates(unittest.TestCase):
         This test will pass, but we expected it to fail!
         """
         pass
+
+def some_function():
+    """
+    This will fail because some_function() does not, in fact, return 100.
+    >>> some_function()
+    100
+    """
+    return 99
+
+class MyClass:
+    def my_method(self):
+        """
+        This will pass.
+        >>> s = MyClass()
+        >>> s.my_method()
+        'happy'
+        """
+        return "happy"

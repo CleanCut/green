@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
+from doctest import DocTestCase, DocTestSuite
 from fnmatch import fnmatch
 import functools
 import glob
@@ -98,17 +99,17 @@ class GreenTestLoader(unittest.TestLoader):
         def loadTestsFromModule(self, module, pattern=None):
             tests = super(GreenTestLoader, self).loadTestsFromModule(
                 module, pattern=pattern)
-            return flattenTestSuite(tests)
+            return flattenTestSuite(tests, module)
 
     else: # pragma: no cover
 
         def loadTestsFromModule(self, module):
             tests = super(GreenTestLoader, self).loadTestsFromModule(module)
-            return flattenTestSuite(tests)
+            return flattenTestSuite(tests, module)
 
     def loadTestsFromName(self, name, module=None):
         tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
-        return flattenTestSuite(tests)
+        return flattenTestSuite(tests, module)
 
     def discover(self, current_path, file_pattern='test*.py',
                  top_level_dir=None):
@@ -320,7 +321,7 @@ def toProtoTestList(suite, test_list=None, doing_completions=False):
         exception_method = str(suite).split()[0]
         getattr(suite, exception_method)()
     # On to the real stuff
-    if issubclass(type(suite), unittest.TestCase):
+    if isinstance(suite, unittest.TestCase):
         # Skip actual blank TestCase objects that twisted inserts
         if str(type(suite)) != "<class 'twisted.trial.unittest.TestCase'>":
             test_list.append(proto_test(suite))
@@ -356,7 +357,7 @@ def toParallelTargets(suite, targets):
         found = False
         for target in non_module_targets:
             # target is a dotted name of either a test case or test method
-            # here test.dotted name is always a dotted name of a method
+            # here test.dotted_name is always a dotted name of a method
             if (target in test.dotted_name):
                 if target not in parallel_targets:
                     # Explicitly specified targets get their own entry to
@@ -464,11 +465,32 @@ def isTestCaseDisabled(test_case_class, method_name):
     return getattr(test_method, "__test__", 'not nose') is False
 
 
-def flattenTestSuite(test_suite):
+def flattenTestSuite(test_suite, module=None):
+    # Look for a `doctest_modules` list and attempt to add doctest tests to the
+    # suite of tests that we are about to flatten.
+    # todo: rename this function to something more appropriate.
+    suites = [test_suite]
+    doctest_modules = getattr(module, 'doctest_modules', ())
+    for doctest_module in doctest_modules:
+        suite = DocTestSuite(doctest_module)
+        suite.injected_module = module.__name__
+        suites.append(suite)
+
+    # Now extract all tests from the suite heirarchies and flatten them into a
+    # single suite with all tests.
     tests = []
-    for test in test_suite:
-        if isinstance(test, unittest.BaseTestSuite):
-            tests.extend(flattenTestSuite(test))
-        else:
-            tests.append(test)
+    for suite in suites:
+        injected_module = None
+        if getattr(suite, 'injected_module', None):
+            injected_module = suite.injected_module
+        for test in suite:
+            if injected_module:
+                # For doctests, inject the test module name so we can later
+                # grab it and use it to group the doctest output along with the
+                # test module which specified it should be run.
+                test.__module__ = injected_module
+            if isinstance(test, unittest.BaseTestSuite):
+                tests.extend(flattenTestSuite(test))
+            else:
+                tests.append(test)
     return GreenTestLoader.suiteClass(tests)

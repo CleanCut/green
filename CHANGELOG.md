@@ -1,3 +1,16 @@
+# Version 3.1.0
+## 3 Jan 2019
+
+- You can now financially support Green by sponsoring @CleanCut at
+  https://github.com/sponsors/CleanCut
+
+- Added support for DocTests.  I got interested in why @charles-l's attempt to
+  crash instead of hang when doctests were encountered didn't work, and ended
+  up just adding support as a feature.  To parse/run doctests for a particular
+  module, in a _test_ module add `doctest_modules = [ ... ]` where each item
+  is (preferably) an imported module or a dotted string representing a module
+  to be imported that contains tests in docstrings.  Resolves #88, #214.
+
 # Version 3.0.0
 ## 26 Aug 2019
 

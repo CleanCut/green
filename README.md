@@ -232,6 +232,7 @@ This tutorial covers:
 - How to import stuff from your project into your test module
 - Gotchas about naming...everything.
 - Where to run green from and what the output could look like.
+- DocTests
 
 For more in-depth online training please check out
 [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md):
@@ -386,6 +387,68 @@ Notes:
    `TestSchool` do not.  For more verbose output modes, green will use the
    method docstring to describe the test if it is present, and the name of the
    method if it is not.  Notice the difference in the output below.
+
+### DocTests ###
+
+Green can also run tests embedded in documentation via Python's built-in
+[doctest] module.  Returning to our previous example, we could add docstrings
+with example code to our `foo.py` module:
+
+[doctest]: https://docs.python.org/3.6/library/doctest.html
+
+
+```python
+def answer():
+    """
+    >>> answer()
+    42
+    """
+    return 42
+
+class School():
+
+    def food(self):
+        """
+        >>> s = School()
+        >>> s.food()
+        'awful'
+        """
+        return 'awful'
+
+    def age(self):
+        return 300
+```
+
+Then in some _test_ module you need to add a `doctest_modules = [ ... ]` list
+to the top-level of the test module.  So lets revisit `test_foo.py` and add
+that:
+
+```python
+# we could add this to the top or bottom of the existing file...
+
+doctest_modules = ['proj.foo']
+```
+
+Then running `green -vv` might include this output:
+
+```
+  DocTests via `doctest_modules = [...]`
+.   proj.foo.School.food
+.   proj.foo.answer
+```
+
+...or with one more level of verbosity (`green -vvv`)
+
+```
+  DocTests via `doctest_modules = [...]`
+.   proj.foo.School.food -> /Users/cleancut/proj/green/example/proj/foo.py:10
+.   proj.foo.answer -> /Users/cleancut/proj/green/example/proj/foo.py:1
+```
+
+Notes:
+
+1. There needs to be at least one `unittest.TestCase` subclass with a test
+   method present in the test module for `doctest_modules` to be examined.
 
 ### Running Green ###
 

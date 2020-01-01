@@ -337,7 +337,7 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
                     result.stopTest(test)
                     queue.put(result)
                 except:
-                    raise_internal_failure('Green encoundered an error when running the test.')
+                    raise_internal_failure('Green encountered an error when running the test.')
                     return
     else:
         # loadTargets() returned an object without a run() method, probably

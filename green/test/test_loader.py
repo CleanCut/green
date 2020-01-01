@@ -13,7 +13,7 @@ except:
     from mock import MagicMock, patch
 
 from green import loader
-from green.loader import GreenTestLoader
+from green.loader import GreenTestLoader, flattenTestSuite
 
 
 class TestToProtoTestList(unittest.TestCase):
@@ -71,7 +71,7 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase.__module__ = self._fake_module_name
 
         targets = loader.toParallelTargets(NormalTestCase(), [])
-        self.assertEqual(targets, ["my_test_module"])
+        self.assertEqual(targets, [self._fake_module_name])
 
     def test_methods_with_constraints(self):
         """
@@ -104,6 +104,11 @@ class TestToParallelTargets(unittest.TestCase):
 
         targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
         self.assertEqual(targets, ["my_test_module", "my_test_module2"])
+
+    def test_ignore_doctest(self):
+        """
+        toParallelTargets() ignores"""
+
 
 
 class TestCompletions(unittest.TestCase):
@@ -885,3 +890,48 @@ class TestLoadTargets(unittest.TestCase):
         pkg = os.path.basename(sub_tmpdir)
         tests = self.loader.loadTargets(pkg, file_pattern='*_tests.py')
         self.assertEqual(tests.countTestCases(), 2)
+
+
+class TestFlattenTestSuite(unittest.TestCase):
+
+    # Setup
+    @classmethod
+    def setUpClass(cls):
+        cls.startdir = os.getcwd()
+        cls.container_dir = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.getcwd() != cls.startdir:
+            os.chdir(cls.startdir)
+        cls.startdir = None
+        shutil.rmtree(cls.container_dir)
+
+    def setUp(self):
+        os.chdir(self.container_dir)
+        self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
+        self.loader = GreenTestLoader()
+
+    def tearDown(self):
+        os.chdir(self.container_dir)
+        shutil.rmtree(self.tmpdir)
+
+    @patch('green.loader.GreenTestLoader.suiteClass')
+    @patch('green.loader.DocTestSuite')
+    def test_docTests(self, mock_doc_test_suite, mock_suite_class):
+        """
+        flattenTestSuite injects the test module name into the doctest's .__module__
+        """
+        mock_test = MagicMock()
+        mock_iter = MagicMock(return_value=iter([mock_test]))
+        mock_suite = MagicMock()
+        mock_suite.__iter__ = mock_iter
+        mock_doc_test_suite.return_value = mock_suite
+        module = MagicMock()
+        test_module_name = "test.module"
+        module.__name__ = test_module_name
+        module.doctest_modules = ['real.module']
+        flattenTestSuite((), module)
+
+        self.assertEqual(mock_test.__module__, test_module_name)
+

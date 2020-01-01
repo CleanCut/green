@@ -2,12 +2,14 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from collections import OrderedDict
+from doctest import DocTestCase
 from io import StringIO
 from math import ceil
 import sys
 import time
 import traceback
 from unittest.result import failfast
+from unittest import TestCase
 
 from green.output import Colors, debug
 from green.version import pretty_version
@@ -53,16 +55,35 @@ class ProtoTest():
         self.method_name = ''
         self.docstr_part = ''
         self.subtest_part = ''
-        self.is_subtest = False
+        # We need to know that this is a doctest, because doctests are very
+        # different than regular test cases in many ways, so they get special
+        # treatment inside and outside of this class.
+        self.is_doctest = False
 
         # Is this a subtest?
         if getattr(test, '_subDescription', None):
-            self.is_subtest = True
             self.subtest_part = ' ' + test._subDescription()
             test = test.test_case
 
+        # Is this a DocTest?
+        if isinstance(test, DocTestCase):
+            self.is_doctest = True
+            self.name = test._dt_test.name
+            # We had to inject this in green/loader.py -- this is the test
+            # module that specified that we should load doctests from some
+            # other module -- so that we'll group the doctests with the test
+            # module that specified that we should load them.
+            self.module = test.__module__
+            self.class_name = "DocTests via `doctest_modules = [...]`"
+            # I'm not sure this will be the correct way to get the method name
+            # in all cases.
+            self.method_name = self.name.split('.')[1]
+            self.filename = test._dt_test.filename
+            self.lineno = test._dt_test.lineno
+
+
         # Is this a TestCase?
-        if test:
+        elif isinstance(test, TestCase):
             self.module      = test.__module__
             self.class_name  = test.__class__.__name__
             self.method_name = str(test).split()[0]
@@ -78,6 +99,8 @@ class ProtoTest():
                     doc_segments.append(line)
             self.docstr_part = ' '.join(doc_segments)
 
+
+
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
 
@@ -89,12 +112,18 @@ class ProtoTest():
 
     @property
     def dotted_name(self, ignored=None):
+        if self.is_doctest:
+            return self.name
         return self.module + '.' + self.class_name + '.' + self.method_name + self.subtest_part
 
     def getDescription(self, verbose):
         if verbose == 2:
+            if self.is_doctest:
+                return self.name
             return self.method_name + self.subtest_part
         elif verbose > 2:
+            if self.is_doctest:
+                return self.name + " -> " + self.filename + ":" + str(self.lineno)
             return (self.docstr_part + self.subtest_part) or (self.method_name + self.subtest_part)
         else:
             return ''

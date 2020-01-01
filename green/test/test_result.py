@@ -1,6 +1,11 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 import copy
+# `from doctest import DocTestCase` causes crashes, since the DocTestCase is
+# detected as a TestCase subclass and unittest.TestLoader.loadTestsFromModule()
+# called from GreenTestLoader.loadTestsFromModule() thinks it is a definition
+# of a test to actually try to run, and causes very weird crashes.
+import doctest
 from io import StringIO
 import sys
 import os
@@ -25,6 +30,7 @@ class MyProtoTest(ProtoTest):
     For quickly making a ProtoTest
     """
     def __init__(self):
+        super(MyProtoTest, self).__init__()
         self.module      = "my_module"
         self.class_name  = "MyClass"
         self.method_name = "myMethod"
@@ -302,6 +308,30 @@ class TestProtoTest(unittest.TestCase):
         test = proto_test(LongDocs('test_long'))
         self.assertIn('tricky', test.getDescription(3))
         self.assertNotIn('garbage', test.getDescription(3))
+
+    def test_doctest(self):
+        """
+        If we parse a doctest, we get all the fields we need.
+        """
+        test = """
+        >>> f()
+        42
+        """
+        def f():
+            return 42
+        parser = doctest.DocTestParser()
+        dt = parser.get_doctest(test, [f], 'doctest.name', 'somefile.py', 20)
+        dt.__module__ = 'somefile'
+        p = proto_test(doctest.DocTestCase(dt))
+        # short description
+        self.assertEqual(p.getDescription(2), "doctest.name")
+        # long description
+        description = p.getDescription(3)
+        self.assertIn("doctest.name", description)
+        self.assertIn("somefile.py", description)
+        self.assertIn("20", description)
+        # dotted name
+        self.assertEqual(p.dotted_name, "doctest.name")
 
 
 class TestGreenTestResult(unittest.TestCase):
@@ -946,7 +976,6 @@ class TestGreenTestRunCoverage(unittest.TestCase):
         self.stream = StringIO()
 
     def tearDown(self):
-        os.remove(self.args.cov.data_files.filename)
         del(self.stream)
         del(self.args)
 

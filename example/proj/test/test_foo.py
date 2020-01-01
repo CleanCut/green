@@ -36,3 +36,14 @@ class TestSchool(unittest.TestCase):
     def test_age(self):
         school = School()
         self.assertEqual(school.age(), 300)
+
+# If there are doctests you would like to run, add a `doctest_modules` list to
+# the top level of any of your test modules.  Items in the list are modules to
+# discover doctests within.  Each item in the list can be either the name of a
+# module as a dotted string or the actual module that has been imported.  In
+# this case, we haven't actually imported proj.foo itself, so we use the string
+# form of "proj.foo", but if we had done `import proj.foo` then we could have
+# put the variable form proj.foo.  The module form is preferred as it results
+# in both better performance and eliminates the chance that the discovery will
+# encounter an error searching for the module.
+doctest_modules = ["proj.foo"]
