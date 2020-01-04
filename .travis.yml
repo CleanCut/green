@@ -12,7 +12,7 @@ matrix:
     fast_finish: true
     include:
         - os: osx
-          osx_image: xcode10.1
+          osx_image: xcode11.3
           language: generic
           before_install:
               - brew update
@@ -32,7 +32,27 @@ matrix:
             - "pip3 install --user $USER virtualenv"
             - "pip3 install --user $USER coveralls"
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.3
+          language: generic
+          before_install:
+              - brew update
+              - sleep 1
+              #- brew install pypy3
+              #- sleep 1
+              - pip3 install .
+              - sleep 1
+              - pip3 install virtualenv
+              - sleep 1
+              #- pip_pypy3 install .
+              #- sleep 1
+              #- pip_pypy3 install virtualenv
+              #- sleep 1
+          install:
+            - "pip3 install --user $USER ."
+            - "pip3 install --user $USER virtualenv"
+            - "pip3 install --user $USER coveralls"
+        - os: osx
+          osx_image: xcode9.4.1
           language: generic
           before_install:
               - brew update
@@ -59,6 +79,9 @@ matrix:
           language: python
         - os: linux
           python: 3.7
+          language: python
+        - os: linux
+          python: 3.8
           language: python
         - os: linux
           python: nightly

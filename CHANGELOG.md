@@ -11,6 +11,10 @@
   is (preferably) an imported module or a dotted string representing a module
   to be imported that contains tests in docstrings.  Resolves #88, #214.
 
+- Fixed a crash and a test failure that could occur with Coverage 5.x
+
+- Updated TravisCI builds with Python 3.8 on Linux and Xcode 11.3 on macOS.
+
 # Version 3.0.0
 ## 26 Aug 2019
 
