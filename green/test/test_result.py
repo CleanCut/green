@@ -970,8 +970,7 @@ class TestGreenTestRunCoverage(unittest.TestCase):
 
         self.args.cov = coverage(data_file=cov_file.name,
                                  omit=self.args.omit_patterns,
-                                 include=self.args.include_patterns,
-                                 timid=True)
+                                 include=self.args.include_patterns)
         self.args.cov.start()
         self.stream = StringIO()
 
@@ -996,6 +995,7 @@ class TestGreenTestRunCoverage(unittest.TestCase):
         self.assertIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
 
     def test_quiet_coverage(self):
+        self.args.run_coverage = True
         self.args.quiet_coverage = True
         output = self._outputFromTest(self.args)
         self.assertNotIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
