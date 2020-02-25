@@ -78,7 +78,7 @@ class ConfigBase(unittest.TestCase):
         self.tmpd = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmpd)
         # Set CWD to known empty directory so we don't pick up some other .green
-        # file from the CWD tests are actual run from.
+        # file from the CWD tests are actually run from.
         save_cwd = os.getcwd()
         self.addCleanup(os.chdir, save_cwd)
         cwd_dir = os.path.join(self.tmpd, 'cwd')
