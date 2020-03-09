@@ -81,7 +81,7 @@ class GreenTestSuite(TestSuite):
                 cases += test.countTestCases()
         return cases
 
-    def _handleClassSetUp(self, test, result):
+    def _handleClassSetUpFIXED(self, test, result):
         previousClass = getattr(result, '_previousTestClass', None)
         currentClass = test.__class__
         if currentClass == previousClass:
@@ -103,7 +103,7 @@ class GreenTestSuite(TestSuite):
             _call_if_exists(result, '_setupStdout')
             try:
                 setUpClass()
-            # THIS is the part Python forgot to implement -- so Green will
+            # THIS is the part Python didn't fix until 3.8 -- so Green will backport a fix
             except unittest.case.SkipTest as e:
                 currentClass.__unittest_skip__ = True
                 currentClass.__unittest_skip_why__ = str(e)
@@ -117,6 +117,8 @@ class GreenTestSuite(TestSuite):
                 self._addClassOrModuleLevelException(result, e, errorName)
             finally:
                 _call_if_exists(result, '_restoreStdout')
+    if sys.version_info < (3,8): # pragma: no cover
+        _handleClassSetUp = _handleClassSetUpFIXED
 
 
     def run(self, result):
