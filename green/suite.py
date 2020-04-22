@@ -118,7 +118,7 @@ class GreenTestSuite(TestSuite):
             finally:
                 _call_if_exists(result, '_restoreStdout')
 
-    def _handleClassSetUpPost38(self, test, result):
+    def _handleClassSetUpPost38(self, test, result): # pragma: no cover -- because it's just like *Pre38
         previousClass = getattr(result, '_previousTestClass', None)
         currentClass = test.__class__
         if currentClass == previousClass:
@@ -165,7 +165,7 @@ class GreenTestSuite(TestSuite):
 
     if sys.version_info < (3,8): # pragma: no cover
         _handleClassSetUp = _handleClassSetUpPre38
-    else:
+    else: # pragma: no cover
         _handleClassSetUp = _handleClassSetUpPost38
 
 
