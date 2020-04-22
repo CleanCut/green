@@ -1,3 +1,8 @@
+# Version 3.1.1
+## 22 April 2019
+
+- Fixed behavior of raising SkipTest in a setUpClass class method on Python >= 3.8
+
 # Version 3.1.0
 ## 3 Jan 2019
 

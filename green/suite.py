@@ -103,7 +103,7 @@ class GreenTestSuite(TestSuite):
             _call_if_exists(result, '_setupStdout')
             try:
                 setUpClass()
-            # THIS is the part Python didn't fix until 3.8 -- so Green will backport a fix
+            # Upstream Python forgets to take SkipTest into account
             except unittest.case.SkipTest as e:
                 currentClass.__unittest_skip__ = True
                 currentClass.__unittest_skip_why__ = str(e)
@@ -140,7 +140,7 @@ class GreenTestSuite(TestSuite):
             _call_if_exists(result, '_setupStdout')
             try:
                 setUpClass()
-            # THIS is the part Python doesn't get right
+            # Upstream Python forgets to take SkipTest into account
             except unittest.case.SkipTest as e:
                 currentClass.__unittest_skip__ = True
                 currentClass.__unittest_skip_why__ = str(e)
