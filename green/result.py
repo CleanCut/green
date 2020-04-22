@@ -365,6 +365,16 @@ class GreenTestResult(BaseTestResult):
         # For exiting non-zero if we don't reach a certain level of coverage
         self.coverage_percent = None
 
+    def __str__(self):  # pragma: no cover
+        return (
+            "tests run: {}".format(self.testsRun) + ', ' +
+            "errors" + str(self.errors) + ', ' +
+            "expectedFailures" + str(self.expectedFailures) + ', ' +
+            "failures" + str(self.failures) + ', ' +
+            "passing" + str(self.passing) + ', ' +
+            "skipped" + str(self.skipped) + ', ' +
+            "unexpectedSuccesses" + str(self.unexpectedSuccesses))
+
     def stop(self):
         self.shouldStop = True
 

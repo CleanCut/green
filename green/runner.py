@@ -93,7 +93,7 @@ def run(suite, stream, args, testing=False):
                     coverage_number = index + 1
                 else:
                     coverage_number = None
-                debug("Sending {} to runner {}".format(target, poolRunner))
+                debug("Sending {} to poolRunner {}".format(target, poolRunner))
                 pool.apply_async(
                     poolRunner,
                     (target, queue, coverage_number, args.omit_patterns, args.cov_config_file))
@@ -106,16 +106,20 @@ def run(suite, stream, args, testing=False):
 
                     # Sentinel value, we're done
                     if not msg:
+                        debug("runner.run(): received sentinal, breaking.", 3)
                         break
                     else:
+                        debug("runner.run(): start test: {}".format(msg))
                         # Result guaranteed after this message, we're
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output
                         result.startTest(msg)
                         proto_test_result = queue.get()
+                        debug("runner.run(): received proto test result: {}".format(str(proto_test_result)), 3)
                         result.addProtoTestResult(proto_test_result)
 
                     if result.shouldStop:
+                        debug("runner.run(): shouldStop encountered, breaking", 3)
                         abort = True
                         break
 
