@@ -104,11 +104,8 @@ class TestGreenTestSuite(unittest.TestCase):
 
         gts._handleClassSetUp(mock_test, mock_result)
 
-        skipped = getattr(mock_class, '__unittest_skip__', None)
-        if skipped is None: # Python >= 3.8
-            skipped = getattr(mock_class, '_classSetupFailed')
-        self.assertTrue(skipped)
-        mock_result.addSkip.assert_called()
+        self.assertTrue(mock_class.__unittest_skip__)
+        self.assertEqual(mock_class.__unittest_skip_why__, "kaboom")
 
 
 class TestFunctional(unittest.TestCase):
