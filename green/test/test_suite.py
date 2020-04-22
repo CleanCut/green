@@ -144,14 +144,13 @@ class TestFunctional(unittest.TestCase):
             import unittest
             class Skipper(unittest.TestCase):
                 @classmethod
-                def setUpClass(self):
+                def setUpClass(cls):
                     raise unittest.SkipTest("the skip reason")
                 def test_one(self):
                     pass
                 def test_two(self):
                     pass
-                import unittest
-            """.format(os.getpid())))
+            """))
         fh.close()
         os.chdir(sub_tmpdir)
 
