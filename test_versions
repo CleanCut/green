@@ -52,6 +52,9 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     elif [ "${PYTHON_VERSION}" == "pypy3.6-7.0" ] ; then
         PYTHON=pypy3
         shift
+    elif [ "${PYTHON_VERSION}" == "pypy3.6-7.1.1" ] ; then
+        PYTHON=pypy3
+        shift
     else
         echo "Failed to determine python binary for python version '${PYTHON_VERSION}'"
         exit 4
