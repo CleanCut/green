@@ -1,6 +1,10 @@
 # Version 3.1.1
 ## 22 April 2019
 
+- Fixed a hang that sometimes occurs in Python 3.8.0-3.8.2 due to a bug in upstream Python
+  - Upstream bug report: https://bugs.python.org/issue39360
+  - Upstream fix in master: https://github.com/python/cpython/pull/19009
+  - Upstream fix in 3.8 branch (Maybe gets included in 3.8.3?): https://github.com/python/cpython/pull/19023
 - Fixed behavior of raising SkipTest in a setUpClass class method on Python >= 3.8
 
 # Version 3.1.0

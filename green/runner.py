@@ -81,13 +81,14 @@ def run(suite, stream, args, testing=False):
 
         result.startTestRun()
 
-        pool = LoggingDaemonlessPool(processes=args.processes or None,
-                                     initializer=InitializerOrFinalizer(args.initializer),
-                                     finalizer=InitializerOrFinalizer(args.finalizer))
         manager = multiprocessing.Manager()
         targets = [(target, manager.Queue())
                    for target in toParallelTargets(suite, args.targets)]
         if targets:
+            pool = LoggingDaemonlessPool(
+                processes=args.processes or None,
+                initializer=InitializerOrFinalizer(args.initializer),
+                finalizer=InitializerOrFinalizer(args.finalizer))
             for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:
                     coverage_number = index + 1
@@ -126,8 +127,8 @@ def run(suite, stream, args, testing=False):
                 if abort:
                     break
 
-        pool.close()
-        pool.join()
+            pool.close()
+            pool.join()
 
         result.stopTestRun()
 
