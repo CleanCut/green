@@ -43,10 +43,10 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
     elif [[ -e `which ${PYTHON_VERSION}` ]] ; then
         PYTHON=${PYTHON_VERSION}
         shift
-    elif [[ ${PYTHON_VERSION} == "^pypy2.*$" ]] ; then
+    elif [[ ${PYTHON_VERSION} =~ ^pypy2.*$ ]] ; then
         PYTHON=pypy
         shift
-    elif [[ ${PYTHON_VERSION} =~ "^pypy3.*$" ]] ; then
+    elif [[ ${PYTHON_VERSION} =~ ^pypy3.*$ ]] ; then
         PYTHON=pypy3
         shift
     else
