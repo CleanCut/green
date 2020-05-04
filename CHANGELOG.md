@@ -1,3 +1,10 @@
+# Version 3.1.2
+# 4 May 2019
+
+- Fix a crash that could occur during cleanup on unusual filesystems on
+  Python 2. Note that Python 2 is still not supported...but might as well fix
+  stuff if it is easy to fix. :-) Resolves #221.
+
 # Version 3.1.1
 ## 22 April 2019
 
