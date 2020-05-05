@@ -24,7 +24,7 @@ class TestToProtoTestList(unittest.TestCase):
         """
         suite = MagicMock()
         suite.__class__.__name__ = str('ModuleImportFailure')
-        suite.__str__.return_value = "exception_method other_stuff"
+        suite.__str__.return_value = "exception_method (other_stuff)"
         suite.exception_method.side_effect = AttributeError
         self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
 
