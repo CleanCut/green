@@ -318,8 +318,8 @@ def toProtoTestList(suite, test_list=None, doing_completions=False):
     if suite.__class__.__name__ == 'ModuleImportFailure':
         if doing_completions:
             return test_list
-        exception_method = str(suite).split()[0]
-        getattr(suite, exception_method)()
+        exception_method = str(suite).split('(')[0]
+        getattr(suite, exception_method.strip())()
     # On to the real stuff
     if isinstance(suite, unittest.TestCase):
         # Skip actual blank TestCase objects that twisted inserts
