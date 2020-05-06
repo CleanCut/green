@@ -1,3 +1,9 @@
+# Version 3.1.3
+# 5 May 2019
+
+- Fix crash that could occur when whitespace is in the path on Windows.
+  Contributed by @bkmd11 in #222.
+
 # Version 3.1.2
 # 4 May 2019
 
