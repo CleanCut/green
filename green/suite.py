@@ -10,6 +10,7 @@ from io import StringIO
 
 from green.config import default_args
 from green.output import GreenStream
+from green.result import ProtoTest
 
 
 class GreenTestSuite(TestSuite):
@@ -219,8 +220,32 @@ class GreenTestSuite(TestSuite):
 
             self._removeTestAtIndex(index)
 
+        # Green's subprocesses have handled all actual tests and sent up the
+        # result, but unittest expects to be able to add teardown errors to
+        # the result still, so we'll need to watch for that ourself.
+        errors_before = len(result.errors)
+
         if topLevel:
             self._tearDownPreviousClass(None, result)
             self._handleModuleTearDown(result)
             result._testRunEntered = False
+
+        # Special handling for class/module tear-down errors. startTest() and
+        # finalize() both trigger communication between the subprocess and
+        # the runner process. addError()
+        if errors_before != len(result.errors):
+            difference = len(result.errors) - errors_before
+            result.errors, new_errors = result.errors[:-difference], result.errors[-difference:]
+            for (test, err) in new_errors:
+                # test = ProtoTest()
+                test.module = result._previousTestClass.__module__
+                test.class_name = result._previousTestClass.__name__
+                # test.method_name = 'some method name'
+                test.is_class_or_module_teardown_error = True
+                test.name = "Error in class or module teardown"
+                # test.docstr_part = 'docstr part' # error_holder.description
+                result.startTest(test)
+                result.addError(test, err)
+                result.stopTest(test)
+                result.finalize()
         return result

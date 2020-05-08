@@ -333,6 +333,17 @@ class TestProtoTest(unittest.TestCase):
         # dotted name
         self.assertEqual(p.dotted_name, "doctest.name")
 
+    def test_class_or_module_failure(self):
+        """
+        If we parse an error from a class or module failure, we get the correct result.
+        """
+        p = ProtoTest()
+        p.is_class_or_module_teardown_error = True
+        p.name = "the thing"
+        self.assertEqual(p.getDescription(1), "the thing")
+        self.assertEqual(p.getDescription(2), "the thing")
+        self.assertEqual(p.getDescription(3), "the thing")
+
 
 class TestGreenTestResult(unittest.TestCase):
 

@@ -59,6 +59,25 @@ class TestGreenTestSuite(unittest.TestCase):
         mock_result.shouldStop = False
         gts.run(mock_result)
 
+    def test_failedModuleTeardown(self):
+        """
+        When module teardown fails, we report an error.
+        """
+        mock_module = MagicMock()
+        mock_test = MagicMock()
+        mock_err = MagicMock()
+        args = copy.deepcopy(default_args)
+        gts = GreenTestSuite(args=args)
+        gts._get_previous_module = mock_module
+        mock_result = MagicMock()
+        mock_result.errors.__len__.side_effect = [0, 1, 1]
+        mock_result.errors.__getitem__.side_effect = [[], [(mock_test, mock_err)]]
+        mock_result._previousTestClass.__name__ = 'mockClass'
+        gts.run(mock_result)
+        self.assertTrue(mock_test.is_class_or_module_teardown_error)
+
+
+
     def test_addTest_testPattern(self):
         """
         Setting test_pattern will cause a test to be filtered.
@@ -156,3 +175,51 @@ class TestFunctional(unittest.TestCase):
         os.chdir(self.startdir)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(self.stream.getvalue().count("the skip reason"), 2)
+
+
+class TestModuleTeardown(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.startdir = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.getcwd() != cls.startdir:
+            os.chdir(cls.startdir)
+        cls.startdir = None
+
+    def setUp(self):
+        self.args = copy.deepcopy(default_args)
+        self.stream = StringIO()
+        self.tmpdir = tempfile.mkdtemp()
+        self.loader = GreenTestLoader()
+
+    def tearDown(self):
+        del(self.tmpdir)
+        del(self.stream)
+
+
+    def test_failedModuleTeardown(self):
+        """
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, 'test_moduleteardownfailed.py'), 'w')
+        fh.write(dedent(
+            """
+            import unittest
+            def tearDownModule():
+                syntaxerror
+            class TestRedHerring(unittest.TestCase):
+                def test(self):
+                    pass
+            """))
+        fh.close()
+        os.chdir(sub_tmpdir)
+
+        tests = self.loader.loadTargets('test_moduleteardownfailed')
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(len(result.passing), 1)
+        self.assertEqual(len(result.errors), 1)
+
