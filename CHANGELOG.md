@@ -1,18 +1,24 @@
+# Version 3.1.4
+#### 7 May 2020
+
+- Fix class/module teardowns being ignored. They are now reported as errors as they should be. Resolves #223.
+- Fix dates in this changelog--I was still using last year! 😆
+
 # Version 3.1.3
-#### 5 May 2019
+#### 5 May 2020
 
 - Fix crash that could occur when whitespace is in the path on Windows.
   Contributed by @bkmd11 in #222.
 
 # Version 3.1.2
-#### 4 May 2019
+#### 4 May 2020
 
 - Fix a crash that could occur during cleanup on unusual filesystems on
   Python 2. Note that Python 2 is still not supported...but might as well fix
   stuff if it is easy to fix. :-) Resolves #221.
 
 # Version 3.1.1
-#### 22 April 2019
+#### 22 April 2020
 
 - Fixed a hang that sometimes occurs in Python 3.8.0-3.8.2 due to a bug in upstream Python
   - Upstream bug report: https://bugs.python.org/issue39360
@@ -21,7 +27,7 @@
 - Fixed behavior of raising SkipTest in a setUpClass class method on Python >= 3.8
 
 # Version 3.1.0
-#### 3 Jan 2019
+#### 3 Jan 2020
 
 - You can now financially support Green by sponsoring @CleanCut at
   https://github.com/sponsors/CleanCut
