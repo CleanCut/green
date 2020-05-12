@@ -566,18 +566,20 @@ class GreenTestResult(BaseTestResult):
         self._reportOutcome(test, '.', self.colors.passing)
 
     @failfast
-    def addError(self, test, err):
+    def addError(self, test, err, test_time=None):
         """
         Called when a test raises an exception
         """
         test = proto_test(test)
+        if test_time:
+            test.test_time = str(test_time)
         err = proto_error(err)
         self.errors.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Error', err))
         self._reportOutcome(test, 'E', self.colors.error, err)
 
     @failfast
-    def addFailure(self, test, err):
+    def addFailure(self, test, err, test_time=None):
         """
         Called when a test fails a unittest assertion
         """
@@ -590,34 +592,42 @@ class GreenTestResult(BaseTestResult):
                 return
 
         test = proto_test(test)
+        if test_time:
+            test.test_time = str(test_time)
         err = proto_error(err)
         self.failures.append((test, err))
         self.all_errors.append((test, self.colors.error, 'Failure', err))
         self._reportOutcome(test, 'F', self.colors.failing, err)
 
-    def addSkip(self, test, reason):
+    def addSkip(self, test, reason, test_time=None):
         """
         Called when a test is skipped
         """
         test = proto_test(test)
+        if test_time:
+            test.test_time = str(test_time)
         self.skipped.append((test, reason))
         self._reportOutcome(
                 test, 's', self.colors.skipped, reason=reason)
 
-    def addExpectedFailure(self, test, err):
+    def addExpectedFailure(self, test, err, test_time=None):
         """
         Called when a test fails, and we expeced the failure
         """
         test = proto_test(test)
+        if test_time:
+            test.test_time = str(test_time)
         err = proto_error(err)
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, 'x', self.colors.expectedFailure, err)
 
-    def addUnexpectedSuccess(self, test):
+    def addUnexpectedSuccess(self, test, test_time=None):
         """
         Called when a test passed, but we expected a failure
         """
         test = proto_test(test)
+        if test_time:
+            test.test_time = str(test_time)
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, 'u', self.colors.unexpectedSuccess)
 
