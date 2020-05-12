@@ -61,8 +61,6 @@ class ProtoTest():
         # treatment inside and outside of this class.
         self.is_doctest = False
 
-        if test is ProtoTestResult:
-            print(type(test))
         if getattr(test, 'test_time', None):
             self.test_time = test.test_time
 
@@ -396,24 +394,23 @@ class GreenTestResult(BaseTestResult):
             self.recordStderr(test, proto_test_result.stderr_errput[test])
 
     def addProtoTestResult(self, proto_test_result):
-        print(proto_test_result)
         for test, err in proto_test_result.errors:
-            self.addError(test, err)
+            self.addError(test, err, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, err in proto_test_result.expectedFailures:
-            self.addExpectedFailure(test, err)
+            self.addExpectedFailure(test, err, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, err in proto_test_result.failures:
-            self.addFailure(test, err)
+            self.addFailure(test, err, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
         for test in proto_test_result.passing:
             self.addSuccess(test, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
         for test, reason in proto_test_result.skipped:
-            self.addSkip(test, reason)
+            self.addSkip(test, reason, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
         for test in proto_test_result.unexpectedSuccesses:
-            self.addUnexpectedSuccess(test)
+            self.addUnexpectedSuccess(test, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
 
     def startTestRun(self):
