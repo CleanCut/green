@@ -70,11 +70,11 @@ def main(argv=None, testing=False):
     result = run(test_suite, stream, args, testing)
 
     # Generate a test report if required
-   # if args.junit_report:
-    from green.junit import JUnitXML
-    adapter = JUnitXML()
-    with open(r'C:\Users\Brian Kendall\Desktop\bkmd_green\green\green\example\spam.xml', "w") as report_file:
-        adapter.save_as(result, report_file)
+    if args.junit_report:
+        from green.junit import JUnitXML
+        adapter = JUnitXML()
+        with open(r'C:\Users\Brian Kendall\Desktop\bkmd_green\green\green\example\spam.xml', "w") as report_file:
+            adapter.save_as(result, report_file)
 
     return(int(not result.wasSuccessful()))
 
