@@ -246,7 +246,9 @@ def parseArguments(argv=None):  # pragma: no cover
             action="store_true",
             help=(
                 "Instead of capturing the stdout and stderr and presenting it "
-                "in the summary of results, let it come through."
+                "in the summary of results, let it come through. Note that "
+                "output from sources other than tests (like module/class setup "
+                "or teardown) is never captured."
             ),
             default=argparse.SUPPRESS,
         )
