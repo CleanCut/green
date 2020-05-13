@@ -61,9 +61,6 @@ class ProtoTest():
         # treatment inside and outside of this class.
         self.is_doctest = False
 
-        if getattr(test, 'test_time', None):
-            self.test_time = test.test_time
-
         # Is this a subtest?
         if getattr(test, '_subDescription', None):
             self.subtest_part = ' ' + test._subDescription()
@@ -272,10 +269,10 @@ class ProtoTestResult(BaseTestResult):
         Called before each test runs
         """
         test = proto_test(test)
+        self.start_time = time.time()
         self.reinitialize()
         if self.start_callback:
             self.start_callback(test)
-        self.start_time = time.time()
 
     def stopTest(self, test):
         """
