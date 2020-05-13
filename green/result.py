@@ -278,7 +278,7 @@ class ProtoTestResult(BaseTestResult):
         """
         Called after each test runs
         """
-        self.test_time = time.time() - self.start_time
+        self.test_time = str(time.time() - self.start_time)
 
     def finalize(self):
         """
