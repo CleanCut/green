@@ -53,6 +53,7 @@ class JUnitXML(object):
         for name, suite in tests_by_class.items():
             xml_suite = self._convert_suite(test_results, name, suite)
             xml_root.append(xml_suite)
+
         xml_root.set(JUnitDialect.TOTAL_TEST_TIME, str(test_results.timeTaken))
 
         xml = to_xml(xml_root,

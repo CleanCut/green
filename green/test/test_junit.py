@@ -31,12 +31,14 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._destination = StringIO()
         self._test_results = GreenTestResult(default_args,
                                              GreenStream(StringIO()))
+        self._test_results.timeTaken = 4.06
         self._adapter = JUnitXML()
 
         self._test = ProtoTest()
         self._test.module      = "my_module"
         self._test.class_name  = "MyClass"
         self._test.method_name = "my_method"
+        self._test.test_time = "0.005"
 
 
 
@@ -188,6 +190,11 @@ class JUnitXMLReportIsGenerated(TestCase):
             }
         })
 
+    def test_convert_test_will_record_time_for_test(self):
+        xml_test_result = self._adapter._convert_test(self._test_results, Verdict.PASSED, self._test)
+
+        self.assertEqual(xml_test_result.attrib, {'name': 'my_method', 'classname': 'MyClass', 'testtime': '0.005'})
+
 
     def _assert_report_is(self, report):
         """
@@ -229,6 +236,16 @@ class JUnitXMLReportIsGenerated(TestCase):
         if "#skipped" in expected_suite:
             self.assertEqual(expected_suite["#skipped"],
                              suite.get(JUnitDialect.SKIPPED_COUNT))
+
+        # Check the time of each test
+        if "testtime" in expected_suite:
+            self.assertEqual(expected_suite["testtime"],
+                             suite.get(JUnitDialect.TEST_TIME))
+
+        # Check the time of total test run
+        if "totaltesttime" in expected_suite:
+            self.assertEqual(expected_suite["totaltesttime"],
+                             suite.get(JUnitDialect.TEST_TIME))
 
         # Check individual test reports
         self.assertEqual(len(expected_suite["tests"]), len(suite))
