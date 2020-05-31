@@ -32,7 +32,7 @@ except ImportError:
 from coverage import coverage, CoverageException
 
 
-class MyProtoTest(ProtoTest):
+class MyProtoTest(ProtoTest, object):
     """
     For quickly making a ProtoTest
     """
@@ -333,7 +333,7 @@ class TestProtoTest(unittest.TestCase):
             return 42
 
         parser = doctest.DocTestParser()
-        dt = parser.get_doctest(test, [f], "doctest.name", "somefile.py", 20)
+        dt = parser.get_doctest(test, {"f": f}, "doctest.name", "somefile.py", 20)
         dt.__module__ = "somefile"
         p = proto_test(doctest.DocTestCase(dt))
         # short description
@@ -1031,4 +1031,3 @@ class TestGreenTestRunCoverage(unittest.TestCase):
         self.args.quiet_coverage = True
         output = self._outputFromTest(self.args)
         self.assertNotIn("Stmts   Miss  Cover   Missing", "\n".join(output))
-

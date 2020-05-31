@@ -102,7 +102,6 @@ class ProtoTest:
                     doc_segments.append(line)
             self.docstr_part = " ".join(doc_segments)
 
-
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
 
@@ -572,6 +571,7 @@ class GreenTestResult(BaseTestResult):
         Supposed to be called after each test, but as far as I can tell that's a
         lie and this is simply never called.
         """
+
     def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=""):
         self.testsRun += 1
         test = proto_test(test)
