@@ -37,7 +37,6 @@ docs/_build/
 
 # Editor files
 tags
-.idea/
 
 # virtualenvs
 venv*
