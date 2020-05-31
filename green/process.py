@@ -23,11 +23,12 @@ def ddebug(msg, err=None):  # pragma: no cover
     info
     """
     import os
+
     if err:
-        err = ''.join(traceback.format_exception(*err))
+        err = "".join(traceback.format_exception(*err))
     else:
-        err = ''
-    sys.__stdout__.write("({}) {} {}".format(os.getpid(), msg, err)+'\n')
+        err = ""
+    sys.__stdout__.write("({}) {} {}".format(os.getpid(), msg, err) + "\n")
     sys.__stdout__.flush()
 
 
@@ -83,8 +84,7 @@ class LoggingDaemonlessPool(Pool):
     Process = DaemonlessProcess
 
     def apply_async(self, func, args=(), kwds={}, callback=None):
-        return Pool.apply_async(
-                self, ProcessLogger(func), args, kwds, callback)
+        return Pool.apply_async(self, ProcessLogger(func), args, kwds, callback)
 
     # -------------------------------------------------------------------------
     # START of Worker Finalization Monkey Patching
@@ -94,13 +94,21 @@ class LoggingDaemonlessPool(Pool):
     # on 2.7+ and added the finalizer/finalargs parameter handling.
     _wrap_exception = True
 
-    def __init__(self, processes=None, initializer=None, initargs=(),
-                 maxtasksperchild=None, context=None, finalizer=None,
-                 finalargs=()):
+    def __init__(
+        self,
+        processes=None,
+        initializer=None,
+        initargs=(),
+        maxtasksperchild=None,
+        context=None,
+        finalizer=None,
+        finalargs=(),
+    ):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        super(LoggingDaemonlessPool, self).__init__(processes, initializer,
-                                                    initargs, maxtasksperchild)
+        super(LoggingDaemonlessPool, self).__init__(
+            processes, initializer, initargs, maxtasksperchild
+        )
 
     def _repopulate_pool(self):
         """
@@ -108,24 +116,30 @@ class LoggingDaemonlessPool(Pool):
         after reaping workers which have exited.
         """
         for i in range(self._processes - len(self._pool)):
-            w = self.Process(target=worker,
-                             args=(self._inqueue, self._outqueue,
-                                   self._initializer,
-                                   self._initargs, self._maxtasksperchild,
-                                   self._wrap_exception,
-                                   self._finalizer,
-                                   self._finalargs)
-                             )
+            w = self.Process(
+                target=worker,
+                args=(
+                    self._inqueue,
+                    self._outqueue,
+                    self._initializer,
+                    self._initargs,
+                    self._maxtasksperchild,
+                    self._wrap_exception,
+                    self._finalizer,
+                    self._finalargs,
+                ),
+            )
             self._pool.append(w)
-            w.name = w.name.replace('Process', 'PoolWorker')
+            w.name = w.name.replace("Process", "PoolWorker")
             w.daemon = True
             w.start()
-            util.debug('added worker')
+            util.debug("added worker")
 
 
 import platform
 import multiprocessing.pool
 from multiprocessing import util
+
 try:
     from multiprocessing.pool import MaybeEncodingError
 except:  # pragma: no cover
@@ -141,26 +155,33 @@ except:  # pragma: no cover
             super(MaybeEncodingError, self).__init__(self.exc, self.value)
 
         def __str__(self):
-            return "Error sending result: '%s'. Reason: '%s'" % (self.value,
-                                                                 self.exc)
+            return "Error sending result: '%s'. Reason: '%s'" % (self.value, self.exc)
 
         def __repr__(self):
             return "<MaybeEncodingError: %s>" % str(self)
 
 
 # Python 2 and 3 raise a different error when they exit
-if platform.python_version_tuple()[0] == '2':  # pragma: no cover
+if platform.python_version_tuple()[0] == "2":  # pragma: no cover
     PortableOSError = IOError
 else:  # pragma: no cover
     PortableOSError = OSError
 
 
-def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
-           wrap_exception=False, finalizer=None, finalargs=()):  # pragma: no cover
+def worker(
+    inqueue,
+    outqueue,
+    initializer=None,
+    initargs=(),
+    maxtasks=None,
+    wrap_exception=False,
+    finalizer=None,
+    finalargs=(),
+):  # pragma: no cover
     assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
-    if hasattr(inqueue, '_writer'):
+    if hasattr(inqueue, "_writer"):
         inqueue._writer.close()
         outqueue._reader.close()
 
@@ -175,11 +196,11 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         try:
             task = get()
         except (EOFError, PortableOSError):
-            util.debug('worker got EOFError or OSError -- exiting')
+            util.debug("worker got EOFError or OSError -- exiting")
             break
 
         if task is None:
-            util.debug('worker got sentinel -- exiting')
+            util.debug("worker got sentinel -- exiting")
             break
 
         job, i, func, args, kwds = task
@@ -193,8 +214,7 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
             put((job, i, result))
         except Exception as e:
             wrapped = MaybeEncodingError(e, result[1])
-            util.debug("Possible encoding error while sending result: %s" % (
-                wrapped))
+            util.debug("Possible encoding error while sending result: %s" % (wrapped))
             put((job, i, (False, wrapped)))
         completed += 1
 
@@ -204,7 +224,7 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
         except InitializerOrFinalizerError as e:
             print(str(e))
 
-    util.debug('worker exiting after %d tasks' % completed)
+    util.debug("worker exiting after %d tasks" % completed)
 
 
 # Unmodified (see above)
@@ -220,7 +240,7 @@ class RemoteTraceback(Exception):  # pragma: no cover
 class ExceptionWithTraceback:  # pragma: no cover
     def __init__(self, exc, tb):
         tb = traceback.format_exception(type(exc), exc, tb)
-        tb = ''.join(tb)
+        tb = "".join(tb)
         self.exc = exc
         self.tb = '\n"""\n%s"""' % tb
 
@@ -233,12 +253,15 @@ def rebuild_exc(exc, tb):  # pragma: no cover
     exc.__cause__ = RemoteTraceback(tb)
     return exc
 
+
 multiprocessing.pool.worker = worker
 # END of Worker Finalization Monkey Patching
 # -----------------------------------------------------------------------------
 
 
-def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config_file=True):  # pragma: no cover
+def poolRunner(
+    target, queue, coverage_number=None, omit_patterns=[], cov_config_file=True
+):  # pragma: no cover
     """
     I am the function that pool worker processes run.  I run one unit test.
 
@@ -255,11 +278,11 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
 
     def raise_internal_failure(msg):
         err = sys.exc_info()
-        t             = ProtoTest()
-        t.module      = 'green.loader'
-        t.class_name  = 'N/A'
+        t = ProtoTest()
+        t.module = "green.loader"
+        t.class_name = "N/A"
         t.description = msg
-        t.method_name = 'poolRunner'
+        t.method_name = "poolRunner"
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)
@@ -284,10 +307,12 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
     # Each pool starts its own coverage, later combined by the main process.
     if coverage_number:
         cov = coverage.coverage(
-                data_file='.coverage.{}_{}'.format(
-                    coverage_number, random.randint(0, 10000)),
-                omit=omit_patterns,
-                config_file=cov_config_file)
+            data_file=".coverage.{}_{}".format(
+                coverage_number, random.randint(0, 10000)
+            ),
+            omit=omit_patterns,
+            config_file=cov_config_file,
+        )
         cov._warn_no_data = False
         cov.start()
 
@@ -311,10 +336,10 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
         loader = GreenTestLoader()
         test = loader.loadTargets(target)
     except:
-        raise_internal_failure('Green encountered an error loading the unit test.')
+        raise_internal_failure("Green encountered an error loading the unit test.")
         return
 
-    if getattr(test, 'run', False):
+    if getattr(test, "run", False):
         # Loading was successful, lets do this
         try:
             test.run(result)
@@ -322,7 +347,11 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
             # raise an exception, but it does add an entry to errors.  Some
             # other things add entries to errors as well, but they all call the
             # finalize callback.
-            if result and (not result.finalize_callback_called) and getattr(result, 'errors', False):
+            if (
+                result
+                and (not result.finalize_callback_called)
+                and getattr(result, "errors", False)
+            ):
                 queue.put(test)
                 queue.put(result)
         except:
@@ -340,24 +369,30 @@ def poolRunner(target, queue, coverage_number=None, omit_patterns=[], cov_config
                     result.stopTest(test)
                     queue.put(result)
                 except:
-                    raise_internal_failure('Green encountered an error when running the test.')
+                    raise_internal_failure(
+                        "Green encountered an error when running the test."
+                    )
                     return
     else:
         # loadTargets() returned an object without a run() method, probably
         # None
-        description = ('Test loader returned an un-runnable object.  Is "{}" '
-                       'importable from your current location?  Maybe you '
-                       'forgot an __init__.py in your directory?  Unrunnable '
-                       'object looks like: {} of type {} with dir {}'
-                       .format(target, str(test), type(test), dir(test))
-                       )
+        description = (
+            'Test loader returned an un-runnable object.  Is "{}" '
+            "importable from your current location?  Maybe you "
+            "forgot an __init__.py in your directory?  Unrunnable "
+            "object looks like: {} of type {} with dir {}".format(
+                target, str(test), type(test), dir(test)
+            )
+        )
         err = (TypeError, TypeError(description), None)
-        t             = ProtoTest()
-        target_list = target.split('.')
-        t.module      = '.'.join(target_list[:-2]) if len(target_list) > 1 else target
-        t.class_name  = target.split('.')[-2] if len(target_list) > 1 else 'UnknownClass'
+        t = ProtoTest()
+        target_list = target.split(".")
+        t.module = ".".join(target_list[:-2]) if len(target_list) > 1 else target
+        t.class_name = target.split(".")[-2] if len(target_list) > 1 else "UnknownClass"
         t.description = description
-        t.method_name = target.split('.')[-1] if len(target_list) > 1 else 'unknown_method'
+        t.method_name = (
+            target.split(".")[-1] if len(target_list) > 1 else "unknown_method"
+        )
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)

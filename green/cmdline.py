@@ -6,7 +6,6 @@ import sys
 import green.config as config
 
 
-
 def main(argv=None, testing=False):
     args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
@@ -25,6 +24,7 @@ def main(argv=None, testing=False):
     from green.output import GreenStream, debug
     import green.output
     from green.suite import GreenTestSuite
+
     GreenTestSuite.args = args
 
     if args.debug:
@@ -34,7 +34,7 @@ def main(argv=None, testing=False):
 
     # Location of shell completion file
     if args.completion_file:
-        print(os.path.join(os.path.dirname(__file__), 'shell_completion.sh'))
+        print(os.path.join(os.path.dirname(__file__), "shell_completion.sh"))
         return 0
 
     # Argument-completion for bash and zsh (for test-target completion)
@@ -44,26 +44,23 @@ def main(argv=None, testing=False):
 
     # Option-completion for bash and zsh
     if args.options:
-        print('\n'.join(sorted(args.store_opt.options)))
+        print("\n".join(sorted(args.store_opt.options)))
         return 0
 
     # Add debug logging for stuff that happened before this point here
     if config.files_loaded:
-        debug("Loaded config file(s): {}".format(
-            ', '.join(config.files_loaded)))
+        debug("Loaded config file(s): {}".format(", ".join(config.files_loaded)))
 
     # Discover/Load the test suite
     if testing:
         test_suite = None
     else:  # pragma: no cover
         loader = GreenTestLoader()
-        test_suite = loader.loadTargets(args.targets,
-                                        file_pattern=args.file_pattern)
+        test_suite = loader.loadTargets(args.targets, file_pattern=args.file_pattern)
 
     # We didn't even load 0 tests...
     if not test_suite:
-        debug(
-            "No test loading attempts succeeded.  Created an empty test suite.")
+        debug("No test loading attempts succeeded.  Created an empty test suite.")
         test_suite = GreenTestSuite()
 
     # Actually run the test_suite
@@ -72,12 +69,13 @@ def main(argv=None, testing=False):
     # Generate a test report if required
     if args.junit_report:
         from green.junit import JUnitXML
+
         adapter = JUnitXML()
         with open(args.junit_report, "w") as report_file:
             adapter.save_as(result, report_file)
 
-    return(int(not result.wasSuccessful()))
+    return int(not result.wasSuccessful())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())

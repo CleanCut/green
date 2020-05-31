@@ -6,12 +6,11 @@ import green.version
 
 
 class TestVersion(unittest.TestCase):
-
     def test_versionType(self):
         """
         __version__ is a unicode string
         """
-        self.assertEqual(type(__version__), type(''))
+        self.assertEqual(type(__version__), type(""))
 
     def test_versionSet(self):
         """
@@ -24,6 +23,6 @@ class TestVersion(unittest.TestCase):
         pretty_version() has the content we expect
         """
         pv = pretty_version()
-        self.assertTrue('Green' in pv)
-        self.assertTrue('Python' in pv)
-        self.assertTrue('Coverage' in pv)
+        self.assertTrue("Green" in pv)
+        self.assertTrue("Python" in pv)
+        self.assertTrue("Coverage" in pv)
