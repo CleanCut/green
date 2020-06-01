@@ -22,8 +22,7 @@ class JUnitDialect(object):
     TEST_COUNT = "tests"
     TEST_SUITE = "testsuite"
     TEST_SUITES = "testsuites"
-    TEST_TIME = "testtime"
-    TOTAL_TEST_TIME = "totaltesttime"
+    TEST_TIME = "time"
 
 
 
@@ -54,7 +53,7 @@ class JUnitXML(object):
             xml_suite = self._convert_suite(test_results, name, suite)
             xml_root.append(xml_suite)
 
-        xml_root.set(JUnitDialect.TOTAL_TEST_TIME, str(test_results.timeTaken))
+        xml_root.set(JUnitDialect.TEST_TIME, str(test_results.timeTaken))
 
         xml = to_xml(xml_root,
                      xml_declaration=True,

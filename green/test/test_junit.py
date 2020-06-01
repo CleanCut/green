@@ -193,7 +193,7 @@ class JUnitXMLReportIsGenerated(TestCase):
     def test_convert_test_will_record_time_for_test(self):
         xml_test_result = self._adapter._convert_test(self._test_results, Verdict.PASSED, self._test)
 
-        self.assertEqual(xml_test_result.attrib, {'name': 'my_method', 'classname': 'MyClass', 'testtime': '0.005'})
+        self.assertEqual(xml_test_result.attrib, {'name': 'my_method', 'classname': 'MyClass', 'time': '0.005'})
 
 
     def _assert_report_is(self, report):
