@@ -124,6 +124,7 @@ class JUnitXML(object):
                       str(self._count_test_with_verdict(Verdict.ERROR, suite)))
         xml_suite.set(JUnitDialect.SKIPPED_COUNT,
                       str(self._count_test_with_verdict(Verdict.SKIPPED, suite)))
+        xml_suite.set(JUnitDialect.TEST_TIME, self._suite_time(suite))
         for each_test in suite:
             xml_test = self._convert_test(results, *each_test)
             xml_suite.append(xml_test)
@@ -173,3 +174,10 @@ class JUnitXML(object):
             skipped.text = str(details[0])
             return skipped
         return None
+
+    def _suite_time(self, suite):
+        suite_time = 0.0
+        for each_test in suite:
+            suite_time += float(each_test[1].test_time)
+
+        return str(suite_time)

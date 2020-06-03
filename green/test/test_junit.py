@@ -238,8 +238,8 @@ class JUnitXMLReportIsGenerated(TestCase):
                              suite.get(JUnitDialect.SKIPPED_COUNT))
 
         # Check the time of each test
-        if "testtime" in expected_suite:
-            self.assertEqual(expected_suite["testtime"],
+        if "time" in expected_suite:
+            self.assertEqual(expected_suite["time"],
                              suite.get(JUnitDialect.TEST_TIME))
 
         # Check the time of total test run

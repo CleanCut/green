@@ -55,7 +55,7 @@ class ProtoTest():
         self.method_name = ''
         self.docstr_part = ''
         self.subtest_part = ''
-        self.test_time = ''
+        self.test_time = '0.0'
         # We need to know that this is a doctest, because doctests are very
         # different than regular test cases in many ways, so they get special
         # treatment inside and outside of this class.
