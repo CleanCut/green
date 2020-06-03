@@ -195,6 +195,18 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         self.assertEqual(xml_test_result.attrib, {'name': 'my_method', 'classname': 'MyClass', 'time': '0.005'})
 
+    def test_suite_time(self):
+        test1 = test("my.module", "MyClass", "test_method1")
+        test1.test_time = "0.01"
+        test2 = test("my.module", "MyClass", "test_method2")
+        test2.test_time = "0.5"
+        test3 = test("my.module", "MyClass", "test_method3")
+        test3.test_time = "1.0"
+
+        suite_time = self._adapter._suite_time([(2, test1), (0, test2), (0, test3)])
+
+        self.assertEqual(suite_time, "1.51")
+
 
     def _assert_report_is(self, report):
         """
