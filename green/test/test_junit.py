@@ -205,7 +205,7 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         suite_time = self._adapter._suite_time([(2, test1), (0, test2), (0, test3)])
 
-        self.assertEqual(suite_time, "1.51")
+        self.assertEqual(suite_time, 1.51)
 
 
     def _assert_report_is(self, report):
