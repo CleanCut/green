@@ -836,6 +836,18 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr.addSuccess(test)
         self.gtr._reportOutcome.assert_called_with(test, ".", self.gtr.colors.passing)
 
+    def test_addSuccess_with_test_time(self):
+        """
+        addSuccess() sets test time to correct value
+        """
+        test = MagicMock()
+        test.shortDescription.return_value = 'a'
+        test.__str__.return_value = 'b'
+        test = proto_test(test)
+        self.gtr.addSuccess(test, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
+
     def test_addError(self):
         """
         addError() makes the correct calls to other functions.
@@ -850,6 +862,20 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
             test, "E", self.gtr.colors.error, err
         )
+
+    def test_addError_with_test_time(self):
+        """
+        addError() sets test time to correct value
+        """
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addError(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addFailure(self):
         """
@@ -866,6 +892,21 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
             test, "F", self.gtr.colors.failing, err
         )
+
+    def test_addFailure_with_test_time(self):
+        """
+        addFailure() makes test time the correct value
+        """
+        err = None
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addFailure(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addFailureTwistedSkip(self):
         """
@@ -897,6 +938,16 @@ class TestGreenTestResultAdds(unittest.TestCase):
             test, "s", self.gtr.colors.skipped, reason=reason
         )
 
+    def test_addSkip_with_test_time(self):
+        """
+        addSkip() makes test time the correct value
+        """
+        test = proto_test(MagicMock())
+        reason = 'skip reason'
+        self.gtr.addSkip(test, reason, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
+
     def test_addExpectedFailure(self):
         """
         addExpectedFailure() makes the correct calls to other functions.
@@ -912,6 +963,20 @@ class TestGreenTestResultAdds(unittest.TestCase):
             test, "x", self.gtr.colors.expectedFailure, err
         )
 
+    def test_addExcepectedFailure_with_test_time(self):
+        """
+        addExpectedFailure() makes test time correct value
+        """
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addExpectedFailure(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
+
     def test_addUnexpectedSuccess(self):
         """
         addUnexpectedSuccess() makes the correct calls to other functions.
@@ -921,6 +986,15 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome.assert_called_with(
             test, "u", self.gtr.colors.unexpectedSuccess
         )
+
+    def test_addUnexpectedSuccess_with_test_time(self):
+        """
+        addUnexpectedSuccess() makes test time with correct value
+        """
+        test = proto_test(MagicMock())
+        self.gtr.addUnexpectedSuccess(test, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_wasSuccessful(self):
         """

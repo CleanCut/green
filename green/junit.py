@@ -22,6 +22,7 @@ class JUnitDialect(object):
     TEST_COUNT = "tests"
     TEST_SUITE = "testsuite"
     TEST_SUITES = "testsuites"
+    TEST_TIME = "time"
 
 
 class Verdict(object):
@@ -50,6 +51,9 @@ class JUnitXML(object):
         for name, suite in tests_by_class.items():
             xml_suite = self._convert_suite(test_results, name, suite)
             xml_root.append(xml_suite)
+
+        xml_root.set(JUnitDialect.TEST_TIME, str(test_results.timeTaken))
+
         xml = to_xml(
             xml_root,
             xml_declaration=True,
@@ -119,9 +123,14 @@ class JUnitXML(object):
             JUnitDialect.SKIPPED_COUNT,
             str(self._count_test_with_verdict(Verdict.SKIPPED, suite)),
         )
+        xml_suite.set(
+            JUnitDialect.TEST_TIME,
+            str(self._suite_time(suite))
+        )
         for each_test in suite:
             xml_test = self._convert_test(results, *each_test)
             xml_suite.append(xml_test)
+
         return xml_suite
 
     @staticmethod
@@ -132,6 +141,7 @@ class JUnitXML(object):
         xml_test = Element(JUnitDialect.TEST_CASE)
         xml_test.set(JUnitDialect.NAME, test.method_name)
         xml_test.set(JUnitDialect.CLASS_NAME, test.class_name)
+        xml_test.set(JUnitDialect.TEST_TIME, test.test_time)
 
         xml_verdict = self._convert_verdict(verdict, test, details)
         if verdict:
@@ -163,3 +173,7 @@ class JUnitXML(object):
             skipped.text = str(details[0])
             return skipped
         return None
+
+    @staticmethod
+    def _suite_time(suite):
+        return sum(float(each_test.test_time) for verdict, each_test, *details in suite)
