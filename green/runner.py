@@ -89,17 +89,17 @@ def run(suite, stream, args, testing=False):
 
         result.startTestRun()
 
+        # The call to toParallelTargets needs to happen before pool stuff so we can crash if there
+        # are, for example, syntax errors in the code to be loaded.
+        parallel_targets = toParallelTargets(suite, args.targets)
+        pool = LoggingDaemonlessPool(
+            processes=args.processes or None,
+            initializer=InitializerOrFinalizer(args.initializer),
+            finalizer=InitializerOrFinalizer(args.finalizer),
+        )
         manager = multiprocessing.Manager()
-        targets = [
-            (target, manager.Queue())
-            for target in toParallelTargets(suite, args.targets)
-        ]
+        targets = [(target, manager.Queue()) for target in parallel_targets]
         if targets:
-            pool = LoggingDaemonlessPool(
-                processes=args.processes or None,
-                initializer=InitializerOrFinalizer(args.initializer),
-                finalizer=InitializerOrFinalizer(args.finalizer),
-            )
             for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:
                     coverage_number = index + 1
@@ -150,8 +150,8 @@ def run(suite, stream, args, testing=False):
                 if abort:
                     break
 
-            pool.close()
-            pool.join()
+        pool.close()
+        pool.join()
 
         result.stopTestRun()
 

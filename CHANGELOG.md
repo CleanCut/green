@@ -1,29 +1,30 @@
 # Version 3.2.0
 #### 6 June 2020
 
+- Fix crashes and hangs that could occur when using >1 subprocess due to a regression introduced in 3.1.1.
 - Add 'time' attributes to the `<testsuites>`, `<testsuite>`, and `<testcase>` fields in the Junit
   output for the `-j/--junit-report` output.  Contributed by @bkmd11 in #225. Resolves #208.
 
-# Version 3.1.4
+# Version 3.1.4 - Buggy! Please upgrade to >= 3.2.0!
 #### 7 May 2020
 
 - Fix class/module teardowns being ignored. They are now reported as errors as they should be. Resolves #223.
 - Fix dates in this changelog--I was still using last year! 😆
 
-# Version 3.1.3
+# Version 3.1.3 - Buggy! Please upgrade to >= 3.2.0!
 #### 5 May 2020
 
 - Fix crash that could occur when whitespace is in the path on Windows.
   Contributed by @bkmd11 in #222.
 
-# Version 3.1.2
+# Version 3.1.2 - Buggy! Please upgrade to >= 3.2.0!
 #### 4 May 2020
 
 - Fix a crash that could occur during cleanup on unusual filesystems on
   Python 2. Note that Python 2 is still not supported...but might as well fix
   stuff if it is easy to fix. :-) Resolves #221.
 
-# Version 3.1.1
+# Version 3.1.1 - Buggy! Please upgrade to >= 3.2.0!
 #### 22 April 2020
 
 - Fixed a hang that sometimes occurs in Python 3.8.0-3.8.2 due to a bug in upstream Python
