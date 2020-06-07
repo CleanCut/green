@@ -21,7 +21,6 @@ from green.suite import GreenTestSuite
 
 
 class TestGreenTestSuite(unittest.TestCase):
-
     def test_empty(self):
         """
         An empty suite can be instantiated.
@@ -59,16 +58,33 @@ class TestGreenTestSuite(unittest.TestCase):
         mock_result.shouldStop = False
         gts.run(mock_result)
 
+    def test_failedModuleTeardown(self):
+        """
+        When module teardown fails, we report an error.
+        """
+        mock_module = MagicMock()
+        mock_test = MagicMock()
+        mock_err = MagicMock()
+        args = copy.deepcopy(default_args)
+        gts = GreenTestSuite(args=args)
+        gts._get_previous_module = mock_module
+        mock_result = MagicMock()
+        mock_result.errors.__len__.side_effect = [0, 1, 1]
+        mock_result.errors.__getitem__.side_effect = [[], [(mock_test, mock_err)]]
+        mock_result._previousTestClass.__name__ = "mockClass"
+        gts.run(mock_result)
+        self.assertTrue(mock_test.is_class_or_module_teardown_error)
+
     def test_addTest_testPattern(self):
         """
         Setting test_pattern will cause a test to be filtered.
         """
         mock_test = MagicMock()
-        mock_test._testMethodName = 'test_hello'
+        mock_test._testMethodName = "test_hello"
         mock_test2 = MagicMock()
-        mock_test2._testMethodName = 'test_goodbye'
+        mock_test2._testMethodName = "test_goodbye"
         args = copy.deepcopy(default_args)
-        args.test_pattern = '_good*'
+        args.test_pattern = "_good*"
         gts = GreenTestSuite(args=args)
         gts.addTest(mock_test)
         self.assertEqual(gts._tests, [])
@@ -79,23 +95,24 @@ class TestGreenTestSuite(unittest.TestCase):
         """
         The allow_stdout setting should not get ignored.
         """
+
         class Object(object):
             pass
+
         args = Object()
         args.allow_stdout = True
         gts = GreenTestSuite(args=args)
         self.assertEqual(gts.allow_stdout, True)
 
-
     def test_skip_in_setUpClass(self):
         """
         If SkipTest is raised in setUpClass, then the test gets skipped
         """
-        gts =  GreenTestSuite(args=default_args)
+        gts = GreenTestSuite(args=default_args)
         mock_test = MagicMock()
         mock_result = MagicMock()
         mock_class = MagicMock()
-        mock_class.__qualname__ = 'qualname'
+        mock_class.__qualname__ = "qualname"
         mock_result._previousTestClass = None
         mock_result._moduleSetUpFailed = None
         mock_result.__unittest_skip__ = None
@@ -109,7 +126,6 @@ class TestGreenTestSuite(unittest.TestCase):
 
 
 class TestFunctional(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.startdir = os.getcwd()
@@ -127,17 +143,18 @@ class TestFunctional(unittest.TestCase):
         self.loader = GreenTestLoader()
 
     def tearDown(self):
-        del(self.tmpdir)
-        del(self.stream)
+        del self.tmpdir
+        del self.stream
 
     def test_skip_in_setUpClass(self):
         """
         If SkipTest is raised in setUpClass, then the test gets skipped
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, 'test_skipped.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test_skipped.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class Skipper(unittest.TestCase):
                 @classmethod
@@ -147,12 +164,62 @@ class TestFunctional(unittest.TestCase):
                     pass
                 def test_two(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         os.chdir(sub_tmpdir)
 
-        tests = self.loader.loadTargets('test_skipped')
+        tests = self.loader.loadTargets("test_skipped")
         result = run(tests, self.stream, self.args)
         os.chdir(self.startdir)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(self.stream.getvalue().count("the skip reason"), 2)
+
+
+class TestModuleTeardown(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.startdir = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.getcwd() != cls.startdir:
+            os.chdir(cls.startdir)
+        cls.startdir = None
+
+    def setUp(self):
+        self.args = copy.deepcopy(default_args)
+        self.stream = StringIO()
+        self.tmpdir = tempfile.mkdtemp()
+        self.loader = GreenTestLoader()
+
+    def tearDown(self):
+        del self.tmpdir
+        del self.stream
+
+    def test_failedModuleTeardown(self):
+        """
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, "test_moduleteardownfailed.py"), "w")
+        fh.write(
+            dedent(
+                """
+            import unittest
+            def tearDownModule():
+                syntaxerror
+            class TestRedHerring(unittest.TestCase):
+                def test(self):
+                    pass
+            """
+            )
+        )
+        fh.close()
+        os.chdir(sub_tmpdir)
+
+        tests = self.loader.loadTargets("test_moduleteardownfailed")
+        result = run(tests, self.stream, self.args)
+        os.chdir(self.startdir)
+        self.assertEqual(len(result.passing), 1)
+        self.assertEqual(len(result.errors), 1)

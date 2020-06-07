@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 """
 To try running Django tests using green you can run:
 
@@ -20,44 +21,44 @@ from green.runner import run
 from green.suite import GreenTestSuite
 
 # If we're not being run from an actual django project, set up django config
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'green.djangorunner')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "green.djangorunner")
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-SECRET_KEY = ')9^_e(=cisybdt4m4+fs+_wb%d$!9mpcoy0um^alvx%gexj#jv'
+SECRET_KEY = ")9^_e(=cisybdt4m4+fs+_wb%d$!9mpcoy0um^alvx%gexj#jv"
 DEBUG = True
 TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'myapp',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "myapp",
 )
 MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 )
-ROOT_URLCONF = 'myproj.urls'
-WSGI_APPLICATION = 'myproj.wsgi.application'
+ROOT_URLCONF = "myproj.urls"
+WSGI_APPLICATION = "myproj.wsgi.application"
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 # End of django fake config stuff
 
 
@@ -67,12 +68,12 @@ def django_missing():
 
 try:
     import django
+
     if django.VERSION[:2] < (1, 6):  # pragma: no cover
         raise ImportError("Green integration supports Django 1.6+")
     from django.test.runner import DiscoverRunner
 
     class DjangoRunner(DiscoverRunner):
-
         def __init__(self, verbose=-1, **kwargs):
 
             super(DjangoRunner, self).__init__(**kwargs)
@@ -81,12 +82,16 @@ try:
 
         @classmethod
         def add_arguments(cls, parser):
-            parser.add_argument (
-                    '--green-verbosity',
-                    action='store', dest='verbose', default=-1, type=int,
-                    help="""
+            parser.add_argument(
+                "--green-verbosity",
+                action="store",
+                dest="verbose",
+                default=-1,
+                type=int,
+                help="""
                     Green 'verbose' level for tests.  Value should be an integer
-                    that green supports.  For example: --green-verbosity 3""")
+                    that green supports.  For example: --green-verbosity 3""",
+            )
             super(DjangoRunner, cls).add_arguments(parser)
 
         def run_tests(self, test_labels, extra_tests=None, **kwargs):
@@ -111,7 +116,7 @@ try:
             else:
                 raise ValueError("test_labels should be a tuple of strings")
             if not test_labels:
-                test_labels = ['.']
+                test_labels = ["."]
 
             args = mergeConfig(Namespace())
             if self.verbose != -1:

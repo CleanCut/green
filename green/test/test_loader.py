@@ -7,6 +7,7 @@ import sys
 import tempfile
 from textwrap import dedent
 import unittest
+
 try:
     from unittest.mock import MagicMock, patch
 except:
@@ -17,13 +18,12 @@ from green.loader import GreenTestLoader, flattenTestSuite
 
 
 class TestToProtoTestList(unittest.TestCase):
-
     def test_moduleImportFailure(self):
         """
         toProtoTestList() raises import errors normally
         """
         suite = MagicMock()
-        suite.__class__.__name__ = str('ModuleImportFailure')
+        suite.__class__.__name__ = str("ModuleImportFailure")
         suite.__str__.return_value = "exception_method (other_stuff)"
         suite.exception_method.side_effect = AttributeError
         self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
@@ -33,14 +33,13 @@ class TestToProtoTestList(unittest.TestCase):
         toProtoTestList() does not raise errors when doing completions
         """
         suite = MagicMock()
-        suite.__class__.__name__ = str('ModuleImportFailure')
+        suite.__class__.__name__ = str("ModuleImportFailure")
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
         self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
 
 
 class TestToParallelTargets(unittest.TestCase):
-
     def setUp(self):
         super(TestToParallelTargets, self).setUp()
 
@@ -64,6 +63,7 @@ class TestToParallelTargets(unittest.TestCase):
         """
         toParallelTargets() returns only module names.
         """
+
         class NormalTestCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -77,6 +77,7 @@ class TestToParallelTargets(unittest.TestCase):
         """
         toParallelTargets() returns test names when constrained.
         """
+
         class NormalTestCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -91,6 +92,7 @@ class TestToParallelTargets(unittest.TestCase):
         """
         toParallelTargets() correctly returns modules when '.' is in target list
         """
+
         class NormalTestCase(unittest.TestCase):
             def runTest(self):
                 pass
@@ -102,7 +104,7 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase.__module__ = self._fake_module_name
         NormalTestCase2.__module__ = self._fake_module_name2
 
-        targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ['.'])
+        targets = loader.toParallelTargets([NormalTestCase(), NormalTestCase2()], ["."])
         self.assertEqual(targets, ["my_test_module", "my_test_module2"])
 
     def test_ignore_doctest(self):
@@ -110,26 +112,23 @@ class TestToParallelTargets(unittest.TestCase):
         toParallelTargets() ignores"""
 
 
-
 class TestCompletions(unittest.TestCase):
-
     def test_completionBad(self):
         """
         Bad match generates no completions
         """
-        self.assertEqual('', loader.getCompletions('garbage.in'))
+        self.assertEqual("", loader.getCompletions("garbage.in"))
 
     def test_completionExact(self):
         """
         Correct completions are generated for an exact match.
         """
-        c = set(loader.getCompletions('green').split('\n'))
-        self.assertIn('green', c)
-        self.assertIn('green.test', c)
-        self.assertIn('green.test.test_loader', c)
-        self.assertIn('green.test.test_loader.TestCompletions', c)
-        self.assertIn(
-                'green.test.test_loader.TestCompletions.test_completionExact', c)
+        c = set(loader.getCompletions("green").split("\n"))
+        self.assertIn("green", c)
+        self.assertIn("green.test", c)
+        self.assertIn("green.test.test_loader", c)
+        self.assertIn("green.test.test_loader.TestCompletions", c)
+        self.assertIn("green.test.test_loader.TestCompletions.test_completionExact", c)
 
     def test_completionPartialShort(self):
         """
@@ -139,25 +138,27 @@ class TestCompletions(unittest.TestCase):
         green_parent = dirname(dirname(dirname(os.path.abspath(__file__))))
         os.chdir(green_parent)
         self.addCleanup(os.chdir, cwd)
-        c = set(loader.getCompletions('gre').split('\n'))
-        self.assertIn('green', c)
-        self.assertIn('green.test', c)
-        self.assertIn('green.test.test_loader', c)
-        self.assertIn('green.test.test_loader.TestCompletions', c)
+        c = set(loader.getCompletions("gre").split("\n"))
+        self.assertIn("green", c)
+        self.assertIn("green.test", c)
+        self.assertIn("green.test.test_loader", c)
+        self.assertIn("green.test.test_loader.TestCompletions", c)
         self.assertIn(
-            'green.test.test_loader.TestCompletions.test_completionPartialShort', c)
+            "green.test.test_loader.TestCompletions.test_completionPartialShort", c
+        )
 
     def test_completionPartial(self):
         """
         Correct completions generated for partial match.  2nd target ignored.
         """
-        c = set(loader.getCompletions(['green.te', 'green']).split('\n'))
-        self.assertIn('green.test', c)
-        self.assertIn('green.test.test_loader', c)
-        self.assertIn('green.test.test_loader.TestCompletions', c)
+        c = set(loader.getCompletions(["green.te", "green"]).split("\n"))
+        self.assertIn("green.test", c)
+        self.assertIn("green.test.test_loader", c)
+        self.assertIn("green.test.test_loader.TestCompletions", c)
         self.assertIn(
-            'green.test.test_loader.TestCompletions.test_completionPartial', c)
-        self.assertNotIn('green', c)
+            "green.test.test_loader.TestCompletions.test_completionPartial", c
+        )
+        self.assertNotIn("green", c)
 
     def test_completionEmpty(self):
         """
@@ -168,13 +169,14 @@ class TestCompletions(unittest.TestCase):
         self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
         self.addCleanup(os.chdir, cwd)
-        os.mkdir('the_pkg')
-        fh = open(os.path.join('the_pkg', '__init__.py'), 'w')
-        fh.write('')
+        os.mkdir("the_pkg")
+        fh = open(os.path.join("the_pkg", "__init__.py"), "w")
+        fh.write("")
         fh.close()
-        fh = open(os.path.join('the_pkg', 'test_things.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join("the_pkg", "test_things.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
 
             class A(unittest.TestCase):
@@ -182,13 +184,15 @@ class TestCompletions(unittest.TestCase):
                     pass
                 def testTwo(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
-        c = set(loader.getCompletions('').split('\n'))
-        self.assertIn('the_pkg', c)
-        self.assertIn('the_pkg.test_things', c)
-        self.assertIn('the_pkg.test_things.A.testOne', c)
-        self.assertIn('the_pkg.test_things.A.testTwo', c)
+        c = set(loader.getCompletions("").split("\n"))
+        self.assertIn("the_pkg", c)
+        self.assertIn("the_pkg.test_things", c)
+        self.assertIn("the_pkg.test_things.A.testOne", c)
+        self.assertIn("the_pkg.test_things.A.testTwo", c)
 
     def test_completionDot(self):
         """
@@ -199,13 +203,14 @@ class TestCompletions(unittest.TestCase):
         self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
         self.addCleanup(os.chdir, cwd)
-        os.mkdir('my_pkg')
-        fh = open(os.path.join('my_pkg', '__init__.py'), 'w')
-        fh.write('')
+        os.mkdir("my_pkg")
+        fh = open(os.path.join("my_pkg", "__init__.py"), "w")
+        fh.write("")
         fh.close()
-        fh = open(os.path.join('my_pkg', 'test_things.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join("my_pkg", "test_things.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
 
             class A(unittest.TestCase):
@@ -213,13 +218,15 @@ class TestCompletions(unittest.TestCase):
                     pass
                 def testTwo(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
-        c = set(loader.getCompletions('.').split('\n'))
-        self.assertIn('my_pkg', c)
-        self.assertIn('my_pkg.test_things', c)
-        self.assertIn('my_pkg.test_things.A.testOne', c)
-        self.assertIn('my_pkg.test_things.A.testTwo', c)
+        c = set(loader.getCompletions(".").split("\n"))
+        self.assertIn("my_pkg", c)
+        self.assertIn("my_pkg.test_things", c)
+        self.assertIn("my_pkg.test_things.A.testOne", c)
+        self.assertIn("my_pkg.test_things.A.testTwo", c)
 
     def test_completionIgnoresErrors(self):
         """
@@ -230,11 +237,11 @@ class TestCompletions(unittest.TestCase):
         self.addCleanup(shutil.rmtree, tmpdir)
         os.chdir(tmpdir)
         self.addCleanup(os.chdir, cwd)
-        os.mkdir('my_pkg2')
-        fh = open(os.path.join('my_pkg2', '__init__.py'), 'w')
-        fh.write('')
+        os.mkdir("my_pkg2")
+        fh = open(os.path.join("my_pkg2", "__init__.py"), "w")
+        fh.write("")
         fh.close()
-        fh = open(os.path.join('my_pkg2', 'test_crash01.py'), 'w')
+        fh = open(os.path.join("my_pkg2", "test_crash01.py"), "w")
         contents = dedent(
             """
             import unittest
@@ -244,35 +251,35 @@ class TestCompletions(unittest.TestCase):
                     pass
                 def testTwo(self):
                     pass
-            """)
+            """
+        )
         fh.write(contents)
         fh.close()
-        fh = open(os.path.join('my_pkg2', 'test_crash02.py'), 'w')
+        fh = open(os.path.join("my_pkg2", "test_crash02.py"), "w")
         fh.write("import moocow")
         fh.close()
-        fh = open(os.path.join('my_pkg2', 'test_crash03.py'), 'w')
+        fh = open(os.path.join("my_pkg2", "test_crash03.py"), "w")
         fh.write(contents)
         fh.close()
-        c = set(loader.getCompletions('.').split('\n'))
-        self.assertIn('my_pkg2', c)
-        self.assertIn('my_pkg2.test_crash01', c)
-        self.assertIn('my_pkg2.test_crash01.A.testOne', c)
-        self.assertIn('my_pkg2.test_crash01.A.testTwo', c)
-        self.assertIn('my_pkg2.test_crash03', c)
-        self.assertIn('my_pkg2.test_crash03.A.testOne', c)
-        self.assertIn('my_pkg2.test_crash03.A.testTwo', c)
+        c = set(loader.getCompletions(".").split("\n"))
+        self.assertIn("my_pkg2", c)
+        self.assertIn("my_pkg2.test_crash01", c)
+        self.assertIn("my_pkg2.test_crash01.A.testOne", c)
+        self.assertIn("my_pkg2.test_crash01.A.testTwo", c)
+        self.assertIn("my_pkg2.test_crash03", c)
+        self.assertIn("my_pkg2.test_crash03.A.testOne", c)
+        self.assertIn("my_pkg2.test_crash03.A.testTwo", c)
 
 
 class TestIsPackage(unittest.TestCase):
-
     def test_yes(self):
         """
         A package is identified.
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        fh = open(os.path.join(tmpdir, '__init__.py'), 'w')
-        fh.write('pass\n')
+        fh = open(os.path.join(tmpdir, "__init__.py"), "w")
+        fh.write("pass\n")
         fh.close()
         self.assertTrue(loader.isPackage(tmpdir))
 
@@ -286,36 +293,35 @@ class TestIsPackage(unittest.TestCase):
 
 
 class TestDottedModule(unittest.TestCase):
-
     def test_bad_path(self):
         """
         A bad path causes an exception
         """
         self.assertRaises(
-                ValueError,
-                loader.findDottedModuleAndParentDir,
-                tempfile.tempdir)
+            ValueError, loader.findDottedModuleAndParentDir, tempfile.tempdir
+        )
 
     def test_good_path(self):
         """
         A good path gets (dotted_module, parent) properly returned
         """
         tmpdir = tempfile.mkdtemp()
-        os.makedirs(os.path.join(tmpdir, 'a', 'b', 'c', 'd'))
-        package_init = os.path.join(tmpdir, 'a', 'b', 'c', '__init__.py')
-        subpkg_init = os.path.join(tmpdir, 'a', 'b', 'c', 'd', '__init__.py')
-        module_name = 'stuff.py'
-        module = os.path.join(tmpdir, 'a', 'b', 'c', 'd', module_name)
+        os.makedirs(os.path.join(tmpdir, "a", "b", "c", "d"))
+        package_init = os.path.join(tmpdir, "a", "b", "c", "__init__.py")
+        subpkg_init = os.path.join(tmpdir, "a", "b", "c", "d", "__init__.py")
+        module_name = "stuff.py"
+        module = os.path.join(tmpdir, "a", "b", "c", "d", module_name)
         for filename in [package_init, subpkg_init, module]:
-            fh = open(filename, 'w')
-            fh.write('pass\n')
+            fh = open(filename, "w")
+            fh.write("pass\n")
             fh.close()
-        self.assertEqual(loader.findDottedModuleAndParentDir(module),
-                         ('c.d.stuff', os.path.join(tmpdir, 'a', 'b')))
+        self.assertEqual(
+            loader.findDottedModuleAndParentDir(module),
+            ("c.d.stuff", os.path.join(tmpdir, "a", "b")),
+        )
 
 
 class TestLoadTestsFromTestCase(unittest.TestCase):
-
     def setUp(self):
         self.loader = GreenTestLoader()
 
@@ -324,6 +330,7 @@ class TestLoadTestsFromTestCase(unittest.TestCase):
         When a testcase has no matching method names, but does have a runTest,
         use that instead.
         """
+
         class MyTestCase(unittest.TestCase):
             def helper1(self):
                 pass
@@ -336,12 +343,13 @@ class TestLoadTestsFromTestCase(unittest.TestCase):
 
         suite = self.loader.loadTestsFromTestCase(MyTestCase)
         self.assertEqual(suite.countTestCases(), 1)
-        self.assertEqual(suite._tests[0]._testMethodName, 'runTest')
+        self.assertEqual(suite._tests[0]._testMethodName, "runTest")
 
     def test_normal(self):
         """
         Normal test methods get loaded
         """
+
         class Normal(unittest.TestCase):
             def test_method1(self):
                 pass
@@ -351,13 +359,16 @@ class TestLoadTestsFromTestCase(unittest.TestCase):
 
         suite = self.loader.loadTestsFromTestCase(Normal)
         self.assertEqual(suite.countTestCases(), 2)
-        self.assertEqual(set([x._testMethodName for x in suite._tests]),
-                         set(['test_method1', 'test_method2']))
+        self.assertEqual(
+            set([x._testMethodName for x in suite._tests]),
+            set(["test_method1", "test_method2"]),
+        )
 
     def test_isTestCaseDisabled(self):
         """
         TestCases disabled by nose generators don't get loaded
         """
+
         class HasDisabled(unittest.TestCase):
             def test_method(self):
                 pass
@@ -369,7 +380,6 @@ class TestLoadTestsFromTestCase(unittest.TestCase):
 
 
 class TestLoadFromModuleFilename(unittest.TestCase):
-
     def setUp(self):
         self.loader = GreenTestLoader()
 
@@ -379,10 +389,11 @@ class TestLoadFromModuleFilename(unittest.TestCase):
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        filename = os.path.join(tmpdir, 'skipped_module.py')
-        fh = open(filename, 'w')
-        fh.write(dedent(
-            """
+        filename = os.path.join(tmpdir, "skipped_module.py")
+        fh = open(filename, "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             raise unittest.case.SkipTest
             class NotReached(unittest.TestCase):
@@ -390,23 +401,25 @@ class TestLoadFromModuleFilename(unittest.TestCase):
                     pass
                 def test_two(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         suite = self.loader.loadFromModuleFilename(filename)
         self.assertEqual(suite.countTestCases(), 1)
-        self.assertRaises(unittest.case.SkipTest,
-                          getattr(suite._tests[0],
-                                  suite._tests[0]._testMethodName))
+        self.assertRaises(
+            unittest.case.SkipTest,
+            getattr(suite._tests[0], suite._tests[0]._testMethodName),
+        )
 
 
 class TestDiscover(unittest.TestCase):
-
     def setUp(self):
         self.loader = GreenTestLoader()
 
-    @patch('green.loader.os.path.isdir')
-    @patch('green.loader.debug')
-    @patch('green.loader.os.listdir')
+    @patch("green.loader.os.path.isdir")
+    @patch("green.loader.debug")
+    @patch("green.loader.os.listdir")
     def test_oserror(self, mock_listdir, mock_debug, mock_isdir):
         """
         discover() prints a debug message and moves on when ecountering an OSError
@@ -415,7 +428,7 @@ class TestDiscover(unittest.TestCase):
         mock_listdir.side_effect = OSError()
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        self.loader.discover(os.path.join(tmpdir, 'garbage_in'))
+        self.loader.discover(os.path.join(tmpdir, "garbage_in"))
         self.assertEqual(len(mock_debug.mock_calls), 1)
 
     def test_bad_input(self):
@@ -424,11 +437,12 @@ class TestDiscover(unittest.TestCase):
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        self.assertRaises(ImportError, self.loader.discover,
-                          os.path.join(tmpdir, 'garbage_in'))
-        filename = os.path.join(tmpdir, 'some_file.py')
-        fh = open(filename, 'w')
-        fh.write('pass\n')
+        self.assertRaises(
+            ImportError, self.loader.discover, os.path.join(tmpdir, "garbage_in")
+        )
+        filename = os.path.join(tmpdir, "some_file.py")
+        fh = open(filename, "w")
+        fh.write("pass\n")
         fh.close()
         self.assertRaises(ImportError, self.loader.discover, filename)
 
@@ -442,22 +456,24 @@ class TestDiscover(unittest.TestCase):
         startdir = os.getcwd()
         os.chdir(tmpdir)
         self.addCleanup(os.chdir, startdir)
-        bad_pkg_name = '1badname'
+        bad_pkg_name = "1badname"
         os.mkdir(bad_pkg_name)
         tmp_subdir = os.path.join(tmpdir, bad_pkg_name)
-        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(tmp_subdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        named_module = os.path.join(os.path.basename(tmp_subdir),
-                                    'named_module.py')
-        fh = open(named_module, 'w')
-        fh.write(dedent(
-            """
+        named_module = os.path.join(os.path.basename(tmp_subdir), "named_module.py")
+        fh = open(named_module, "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         self.assertEqual(self.loader.discover(tmpdir), None)
 
@@ -465,31 +481,33 @@ class TestDiscover(unittest.TestCase):
         """
         If the directory is a symlink, it should be skipped.
         """
-        if platform.system() == 'Windows':  # pragma: no cover
-            self.skipTest('This test is for posix-specific behavior')
-        tmpdir  = tempfile.mkdtemp()
+        if platform.system() == "Windows":  # pragma: no cover
+            self.skipTest("This test is for posix-specific behavior")
+        tmpdir = tempfile.mkdtemp()
         tmpdir2 = tempfile.mkdtemp()
-        os.symlink(tmpdir, os.path.join(tmpdir2, 'link'))
+        os.symlink(tmpdir, os.path.join(tmpdir2, "link"))
         self.addCleanup(shutil.rmtree, tmpdir)
         startdir = os.getcwd()
         os.chdir(tmpdir)
         self.addCleanup(os.chdir, startdir)
-        pkg_name = 'realpkg'
+        pkg_name = "realpkg"
         os.mkdir(pkg_name)
         tmp_subdir = os.path.join(tmpdir, pkg_name)
-        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(tmp_subdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        named_module = os.path.join(os.path.basename(tmp_subdir),
-                                    'test_module.py')
-        fh = open(named_module, 'w')
-        fh.write(dedent(
-            """
+        named_module = os.path.join(os.path.basename(tmp_subdir), "test_module.py")
+        fh = open(named_module, "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         self.assertEqual(self.loader.discover(tmpdir2), None)
 
@@ -527,20 +545,22 @@ class TestLoadTargets(unittest.TestCase):
         """
         tests_dir = tempfile.mkdtemp(dir=self.tmpdir)
         # No __init__.py in the directory!
-        fh = open(os.path.join(tests_dir, 'test_not_in_pkg.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(tests_dir, "test_not_in_pkg.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
             """
-            ))
+            )
+        )
         fh.close()
         # Discover stuff
-        suite = self.loader.loadTargets('.')
+        suite = self.loader.loadTargets(".")
         # This should resolve it to the module that's not importable from here
-        test =loader.toParallelTargets(suite, [])[0]
+        test = loader.toParallelTargets(suite, [])[0]
         self.loader.loadTargets(test)
 
     def test_emptyDirAbsolute(self):
@@ -555,7 +575,7 @@ class TestLoadTargets(unittest.TestCase):
         Relative path to empty directory returns None
         """
         os.chdir(self.tmpdir)
-        os.chdir('..')
+        os.chdir("..")
         tests = self.loader.loadTargets(os.path.dirname(self.tmpdir))
         self.assertEqual(tests, None)
 
@@ -564,7 +584,7 @@ class TestLoadTargets(unittest.TestCase):
         '.' while in an empty directory returns None
         """
         os.chdir(self.tmpdir)
-        tests = self.loader.loadTargets('.')
+        tests = self.loader.loadTargets(".")
         self.assertTrue(tests is None)
 
     def test_relativeDotDir(self):
@@ -572,8 +592,8 @@ class TestLoadTargets(unittest.TestCase):
         Dotted relative path to empty directory returns None
         """
         os.chdir(self.tmpdir)
-        os.chdir('..')
-        target = os.path.join('.', os.path.basename(self.tmpdir))
+        os.chdir("..")
+        target = os.path.join(".", os.path.basename(self.tmpdir))
         tests = self.loader.loadTargets(target)
         self.assertTrue(tests is None)
 
@@ -585,28 +605,33 @@ class TestLoadTargets(unittest.TestCase):
         pkg_name = os.path.basename(sub_tmpdir)
         # Child setup
         # pkg/__init__.py
-        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(sub_tmpdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
         # pkg/target_module.py
-        fh = open(os.path.join(sub_tmpdir, 'target_module.py'), 'w')
-        fh.write('a = 1\n')
+        fh = open(os.path.join(sub_tmpdir, "target_module.py"), "w")
+        fh.write("a = 1\n")
         fh.close()
         # pkg/test/__init__.py
-        os.mkdir(os.path.join(sub_tmpdir, 'test'))
-        fh = open(os.path.join(sub_tmpdir, 'test', '__init__.py'), 'w')
-        fh.write('\n')
+        os.mkdir(os.path.join(sub_tmpdir, "test"))
+        fh = open(os.path.join(sub_tmpdir, "test", "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
         # pkg/test/test_target_module.py
-        fh = open(os.path.join(sub_tmpdir, 'test', 'test_target_module.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test", "test_target_module.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             import {}.target_module
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """.format(pkg_name)))
+            """.format(
+                    pkg_name
+                )
+            )
+        )
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
@@ -614,8 +639,9 @@ class TestLoadTargets(unittest.TestCase):
         self.assertEqual(test_suite.countTestCases(), 1)
         # Dotted name should start with the package!
         self.assertEqual(
-                pkg_name + '.test.test_target_module.A.testPass',
-                loader.toProtoTestList(test_suite)[0].dotted_name)
+            pkg_name + ".test.test_target_module.A.testPass",
+            loader.toProtoTestList(test_suite)[0].dotted_name,
+        )
 
     def test_DirWithInit(self):
         """
@@ -623,20 +649,23 @@ class TestLoadTargets(unittest.TestCase):
         """
         # Parent directory setup
         os.chdir(self.tmpdir)
-        os.chdir('..')
+        os.chdir("..")
         # Child setup
-        target = os.path.join(self.tmpdir, '__init__.py')
-        fh = open(target, 'w')
-        fh.write('\n')
+        target = os.path.join(self.tmpdir, "__init__.py")
+        fh = open(target, "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(self.tmpdir, 'test_module_with_init.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(self.tmpdir, "test_module_with_init.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         module_name = os.path.basename(self.tmpdir)
@@ -652,17 +681,20 @@ class TestLoadTargets(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'test_module_dotted_name.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(basename, "test_module_dotted_name.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         module_name = basename + ".test_module_dotted_name"
@@ -676,17 +708,20 @@ class TestLoadTargets(unittest.TestCase):
         # Child setup
 
         tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(tmp_subdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(tmp_subdir, 'test_module.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(tmp_subdir, "test_module.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Go somewhere else, but setup the path
         os.chdir(self.startdir)
@@ -702,19 +737,21 @@ class TestLoadTargets(unittest.TestCase):
         """
         os.chdir(self.tmpdir)
         tmp_subdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(tmp_subdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(tmp_subdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        named_module = os.path.join(os.path.basename(tmp_subdir),
-                                    'named_module.py')
-        fh = open(named_module, 'w')
-        fh.write(dedent(
-            """
+        named_module = os.path.join(os.path.basename(tmp_subdir), "named_module.py")
+        fh = open(named_module, "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         tests = self.loader.loadTargets(named_module)
@@ -730,12 +767,13 @@ class TestLoadTargets(unittest.TestCase):
         Importing malformed module by name creates test that raises
         ImportError.
         """
-        fh = open(os.path.join(self.tmpdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(self.tmpdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        malformed_module = os.path.join(os.path.basename(self.tmpdir),
-                                        'malformed_module.py')
-        fh = open(malformed_module, 'w')
+        malformed_module = os.path.join(
+            os.path.basename(self.tmpdir), "malformed_module.py"
+        )
+        fh = open(malformed_module, "w")
         fh.write("This is a malformed module.")
         fh.close()
         # Load the tests
@@ -754,17 +792,20 @@ class TestLoadTargets(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'existing_module.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(basename, "existing_module.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         module_name = basename + ".existing_module.nonexistant_object"
@@ -777,34 +818,41 @@ class TestLoadTargets(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
-        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(sub_tmpdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
         # pkg/test/test_target1.py
-        fh = open(os.path.join(sub_tmpdir, 'test_target1.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test_target1.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # pkg/test/test_target2.py
-        fh = open(os.path.join(sub_tmpdir, 'test_target2.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test_target2.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = self.loader.loadTargets([pkg + '.' + 'test_target1',
-                                         pkg + '.' + 'test_target2'])
+        tests = self.loader.loadTargets(
+            [pkg + "." + "test_target1", pkg + "." + "test_target2"]
+        )
         self.assertEqual(tests.countTestCases(), 2)
 
     def test_duplicate_targets(self):
@@ -812,24 +860,31 @@ class TestLoadTargets(unittest.TestCase):
         Specifying duplicate targets does not cause duplicate loading.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(sub_tmpdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(sub_tmpdir, 'test_dupe_target.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test_dupe_target.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
 
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = self.loader.loadTargets([pkg + '.' + 'test_dupe_target',
-                                         pkg + '.' + 'test_dupe_target',
-                                         pkg + '.' + 'test_dupe_target'])
+        tests = self.loader.loadTargets(
+            [
+                pkg + "." + "test_dupe_target",
+                pkg + "." + "test_dupe_target",
+                pkg + "." + "test_dupe_target",
+            ]
+        )
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_explicit_filename_error(self):
@@ -838,12 +893,12 @@ class TestLoadTargets(unittest.TestCase):
         silent absence of its tests.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
-        fh = open(os.path.join(sub_tmpdir, 'mod_with_import_error.py'), 'w')
-        fh.write('this is a syntax error')
+        fh = open(os.path.join(sub_tmpdir, "mod_with_import_error.py"), "w")
+        fh.write("this is a syntax error")
         fh.close()
 
         os.chdir(sub_tmpdir)
-        tests = self.loader.loadTargets('mod_with_import_error.py')
+        tests = self.loader.loadTargets("mod_with_import_error.py")
         self.assertEqual(tests.countTestCases(), 1)
 
     def test_file_pattern(self):
@@ -852,43 +907,52 @@ class TestLoadTargets(unittest.TestCase):
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         # pkg/__init__.py
-        fh = open(os.path.join(sub_tmpdir, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(sub_tmpdir, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
         # pkg/test/target1_tests.py
-        fh = open(os.path.join(sub_tmpdir, 'target1_tests.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "target1_tests.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # pkg/test/target2_tests.py
-        fh = open(os.path.join(sub_tmpdir, 'target2_tests.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "target2_tests.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # pkg/test/test_target999.py: NOT a match.
-        fh = open(os.path.join(sub_tmpdir, 'test_target999.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(sub_tmpdir, "test_target999.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPasses(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = self.loader.loadTargets(pkg, file_pattern='*_tests.py')
+        tests = self.loader.loadTargets(pkg, file_pattern="*_tests.py")
         self.assertEqual(tests.countTestCases(), 2)
 
 
@@ -916,8 +980,8 @@ class TestFlattenTestSuite(unittest.TestCase):
         os.chdir(self.container_dir)
         shutil.rmtree(self.tmpdir)
 
-    @patch('green.loader.GreenTestLoader.suiteClass')
-    @patch('green.loader.DocTestSuite')
+    @patch("green.loader.GreenTestLoader.suiteClass")
+    @patch("green.loader.DocTestSuite")
     def test_docTests(self, mock_doc_test_suite, mock_suite_class):
         """
         flattenTestSuite injects the test module name into the doctest's .__module__
@@ -930,8 +994,7 @@ class TestFlattenTestSuite(unittest.TestCase):
         module = MagicMock()
         test_module_name = "test.module"
         module.__name__ = test_module_name
-        module.doctest_modules = ['real.module']
+        module.doctest_modules = ["real.module"]
         flattenTestSuite((), module)
 
         self.assertEqual(mock_test.__module__, test_module_name)
-

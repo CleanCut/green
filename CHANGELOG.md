@@ -1,18 +1,24 @@
+# Version 3.1.4
+#### 7 May 2020
+
+- Fix class/module teardowns being ignored. They are now reported as errors as they should be. Resolves #223.
+- Fix dates in this changelog--I was still using last year! 😆
+
 # Version 3.1.3
-# 5 May 2019
+#### 5 May 2020
 
 - Fix crash that could occur when whitespace is in the path on Windows.
   Contributed by @bkmd11 in #222.
 
 # Version 3.1.2
-# 4 May 2019
+#### 4 May 2020
 
 - Fix a crash that could occur during cleanup on unusual filesystems on
   Python 2. Note that Python 2 is still not supported...but might as well fix
   stuff if it is easy to fix. :-) Resolves #221.
 
 # Version 3.1.1
-## 22 April 2019
+#### 22 April 2020
 
 - Fixed a hang that sometimes occurs in Python 3.8.0-3.8.2 due to a bug in upstream Python
   - Upstream bug report: https://bugs.python.org/issue39360
@@ -21,7 +27,7 @@
 - Fixed behavior of raising SkipTest in a setUpClass class method on Python >= 3.8
 
 # Version 3.1.0
-## 3 Jan 2019
+#### 3 Jan 2020
 
 - You can now financially support Green by sponsoring @CleanCut at
   https://github.com/sponsors/CleanCut
@@ -38,7 +44,7 @@
 - Updated TravisCI builds with Python 3.8 on Linux and Xcode 11.3 on macOS.
 
 # Version 3.0.0
-## 26 Aug 2019
+#### 26 Aug 2019
 
 - Dropped support for Python 2.7.  Green might still continue working on 2.7,
   and I'll accept patches to keep it working if anyone submits them, but I'm
@@ -49,13 +55,13 @@
   in #209.
 
 # Version 2.16.1
-## 29 Apr 2019
+#### 29 Apr 2019
 
 - Fixed a crash that could occur when attempting to load tests from files that
   Green lacks permissions to access.  Contributed by @jrabbit in #205.
 
 # Version 2.16.0
-## 25 Apr 2019
+#### 25 Apr 2019
 
 - Added `-m/--minimum-coverage` to print a message and exit nonzero if a
   certain coverage percentage isn't met. Resolves #135.
@@ -65,26 +71,26 @@
   option to specify a specific, custom config file. Resolves #168.
 
 # Version 2.15.0
-## 11 Apr 2019
+#### 11 Apr 2019
 
 - Added `-j/--junit-report` to generate an JUnit/XML test report.
   Contributed by @fchauvel in #204. Resolves #104.
 
 # Version 2.14.2
-## 4 Apr 2019
+#### 4 Apr 2019
 
 - Add an .encoding attribute to the wrapped sys.stdout so that things like
   z3 which expect it to be present don't crash. Resolves #203.
 
 # Version 2.14.1
-## 21 Mar 2019
+#### 21 Mar 2019
 
 - Removed a redundant optional dependency that was already a required
   dependency.  Thanks to @AndreGuerra123, @GjjvdBurg, and @yelectric for
   researching this.  Resolves #202.
 
 # Version 2.14.0
-## 15 Mar 2019
+#### 15 Mar 2019
 
 - Added `-U/--disable-unidecode` to disable using unidecode to convert test
   output from unicode to ascii on Windows. Note that this conversion was
@@ -92,7 +98,7 @@
   this option has a possibility of re-introducing those crashes. Resolves #201.
 
 # Version 2.13.1
-## 11 Feb 2019
+#### 11 Feb 2019
 
 - Tested Green with Django 2.1.5 -- it seems to work just fine. Something
   must have changed between Django 2.0.0 and 2.1.5 that eliminated the
@@ -118,7 +124,7 @@
 - Some typo fixes in README.md and help output
 
 # Version 2.13.0
-## 5 Oct 2018
+#### 5 Oct 2018
 
 - Add `-e/--no-tracebacks` to omit traceback output for failures and errors.
   Resolves feature request #191.
@@ -133,7 +139,7 @@
 - Tooling fixes, including using python3, twine and keyring to do releases.
 
 # Version 2.12.1
-## 25 Feb 2018
+#### 25 Feb 2018
 
 - Switch from python-termstyle (apparently abandoned) to termstyle.  We should
   drop termstyle altogether in favor of colorama (see also #186). Contributed
@@ -149,7 +155,7 @@
   macOS VM builds.
 
 # Version 2.12.0
-## 7 Dec 2017
+#### 7 Dec 2017
 
 - Coverage is now required!  Python packages do not support the idea of an
   optional dependency, and having a de-facto optional dependencies was causing
@@ -160,19 +166,19 @@
   example.  It uses the one it finds first in the $PATH.
 
 # Version 2.11.2
-## 15 Nov 2017
+#### 15 Nov 2017
 
 - Fixed temp files not getting properly cleaned up on Windows and Linux in
   Python 3 (problem persists for macOS). Contributed by Martin Larralde in #173.
 
 # Version 2.11.1
-##### 25 Oct 2017
+#### 25 Oct 2017
 
 - Fixed bug causing several django testing options to be unavailable when using
   green as the test runner for django.  Resolves #172.
 
 # Version 2.11.0
-##### 10 Aug 2017
+#### 10 Aug 2017
 
 - SubTest context manager support introduced in Python 3.4 is now explicitly
   supported.  In previous versions of Green the SubTests would run correctly,
@@ -180,7 +186,7 @@
   VladV in #167.  Resolves #111.
 
 # Version 2.10.0
-##### 8 July 2017
+#### 8 July 2017
 
 - Green can now be used as a `setup.py` test runner.  See `green --help` or the
   main readme for details.  Contributed by Martin Larralde in #165.  Resolves
@@ -189,7 +195,7 @@
 - Lower prices on training course.  Choose your own price.
 
 # Version 2.9.0
-##### 23 June 2017
+#### 23 June 2017
 
 - Green now supports unittest's `load_test` protocol. Contributed by Martin
   Larralde in #160.  Resolves #87.
@@ -202,7 +208,7 @@
 - Minor grammar/spelling fixes.
 
 # Version 2.8.2
-##### 7 May 2017
+#### 7 May 2017
 
 - Work around Python's failure to skip tests in a consistent way -- in
   particular, if SkipTest was raised in setUpClass(), then different versions
@@ -218,14 +224,14 @@
 
 
 # Version 2.8.1
-##### 29 April 2017
+#### 29 April 2017
 
 - An unexpectedSuccess does not count as a failure for the test run as a whole,
   so `-f, --failfast` has been updated so that an unexpectedSuccess no longer
   triggers early termination. Using @expectedFailure is discouraged.
 
 # Version 2.8.0
-##### 27 April 2017
+#### 27 April 2017
 
 - Green now also searches the current working directory for a .green config
   file.  This can be used as per-project configuration -- just place the .green
@@ -234,7 +240,7 @@
   resolution order of the various config files.  Resolves #116.
 
 # Version 2.7.4
-##### 26 April 2017
+#### 26 April 2017
 
 - Added a page about the Udemy course
   [Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md),
@@ -253,13 +259,13 @@
 - Improved the help message for `-l, --logging`
 
 # Version 2.7.3
-##### 24 March 2017
+#### 24 March 2017
 
 - Fixed a green crash that could occur when dealing with unicode literals in
   raised exceptions under Python 2.
 
 # Version 2.7.2
-##### 22 March 2017
+#### 22 March 2017
 
 - Fixed a corner-case where targets wouldn't be parallelized if you ran green
   inside a directory containing only test modules (files) with no packages
@@ -267,7 +273,7 @@
   testing while the other worker processes sat idle.
 
 # Version 2.7.1
-##### 19 March 2017
+#### 19 March 2017
 
 - Stop cleaning up the temporary directory on versions of Python other than 2,
   since some things like multiprocess.Value in versions > 2 trigger an
@@ -278,20 +284,20 @@
   towards global pass/fail.
 
 # Version 2.7.0
-##### 2 March 2017
+#### 2 March 2017
 
 - When used as a Django test runner, we now inject a `--green-verbosity`
   command-line argument that can be used to control green's verbosity level
   from Django.  Contributed by Anomitra Saha.  Resolves #37 and #153.
 
 # Version 2.6.3
-##### 20 February 2017
+#### 20 February 2017
 
 - Switched the release process to use python2 for everything, because python3
   isn't installed in all TravisCI environments.
 
 # Version 2.6.2
-##### 20 February 2017
+#### 20 February 2017
 
 - Fix some minor issues in help strings that I discovered while working on
   "Python Testing with Green"
@@ -299,14 +305,14 @@
   python2 and python3 to test and release, we just use python3.
 
 # Version 2.6.1
-##### 14 February 2017
+#### 14 February 2017
 
 - Fixed a bug that caused a strange extra test result to be output when your
   test tried to access a member of an object that didn't exist. Fixes #150.
 
 
 # Version 2.6.0
-##### 22 January 2017
+#### 22 January 2017
 
 - The `-R, --quiet-coverage` flag can be used to run coverage without printing
   the coverage report to stdout.  Contributed by Martin Larralde. PR #149.
@@ -314,7 +320,7 @@
 
 
 # Version 2.5.3
-##### 20 December 2016
+#### 20 December 2016
 
 - Improved file object compatibility of GreenStream.  Code that now tries to
   access the writelines() function on sys.stdout or sys.stderr should no longer
@@ -325,7 +331,7 @@
 
 
 # Version 2.5.2
-##### 20 October 2016
+#### 20 October 2016
 
 - Fix crash that would occur on Python 2.7.0, 2.7.1, 2.7.2, and 2.7.3.
   Reported by Christopher Gurnee.  Fixes #137.
@@ -345,7 +351,7 @@
 
 
 # Version 2.5.1
-##### 30 June 2016
+#### 30 June 2016
 
 - Expose `green.version.__version__` as `green.__version__`. Reported by Bryant
   Mairs. Fixes #128.
@@ -358,7 +364,7 @@
 
 
 # Version 2.5.0
-##### 31 May 2016
+#### 31 May 2016
 
 - No tests being loaded is now reported as an error, rather than a pass.  This
   should help people more quickly discover when they have a typo in their
@@ -367,7 +373,7 @@
 
 
 # Version 2.4.2
-##### 26 May 2016
+#### 26 May 2016
 
 - On Windows we now mangle non-ascii output into ascii output,
   because...Windows.  Contributed by MinchinWeb.  Fixes #119.
@@ -378,7 +384,7 @@
 
 
 # Version 2.4.1
-##### 19 May 2016
+#### 19 May 2016
 
 - The built-in unittest module (stupidly) reports crashes in setUpClass() in a
   completely different way than any other failure or crash in unittest.  Now we
@@ -386,7 +392,7 @@
 
 
 # Version 2.4.0
-##### 1 April 2016
+#### 1 April 2016
 
 - Added `-W/--disable-windows` to disable converting colors to windows format.
   Useful for fake windows terminal environments that want the normal posix
@@ -399,7 +405,7 @@
 
 
 # Version 2.3.0
-##### 13 February 2016
+#### 13 February 2016
 
 - Added `-q/--quiet-stdout` output option.  Instead of capturing the stdout and
   stderr and presenting it in the summary of results, discard it completly for
@@ -411,7 +417,7 @@
 
 
 # Version 2.2.0
-##### 26 October 2015
+#### 26 October 2015
 
 - Python 3.5 support is now real, including automated builds for every commit.
   We now compensate for Python 3.5's new behavior of creating a dummy TestCase
@@ -427,14 +433,14 @@
 
 
 # Version 2.1.2
-##### 20 October 2015
+#### 20 October 2015
 
 - Intercept and handle coverage 4.x's new exception that occurs if there is no
   coverage to report.
 
 
 # Version 2.1.1
-##### 19 October 2015
+#### 19 October 2015
 
 - Fixed the new `-u/--include-patterns` to actually break apart the
   comma-separated list into separate entries.  It was already working fine if
@@ -442,7 +448,7 @@
 
 
 # Version 2.1.0
-##### 19 October 2015
+#### 19 October 2015
 
 - Removed official Python 3.4+ support on Windows, due to AppVeyor's
   aggravating fail-4-times-out-of-5 behavior which I can't replicate at all on
@@ -466,21 +472,21 @@
 
 
 # Version 2.0.7
-##### 18 September 2015
+#### 18 September 2015
 
 - Fixed help documentation for `-s/--processes` to account for changes made in
   the 2.0.0 overhaul.  Fixes #83.
 
 
 # Version 2.0.6
-##### 14 September 2015
+#### 14 September 2015
 
 - Green no longer follows symlinks during discovery, to avoid infinite
   discovering.
 
 
 # Version 2.0.5
-##### 14 September 2015
+#### 14 September 2015
 
 - Green no longer ignores config files when run as through django.  Fixes #79
   and #82.
@@ -498,14 +504,14 @@
 
 
 # Version 2.0.4
-##### 27 August 2015
+#### 27 August 2015
 
 - Fixed a bug that was causing crashes when subclassing Twisted's version of
   TestCase.
 
 
 # Version 2.0.3
-##### 23 August 2015
+#### 23 August 2015
 
 - When you use Python 2.7 and your failing test has a traceback that refers to
   a line that has unicode literals in it, green will now catch the resulting
@@ -515,7 +521,7 @@
 
 
 # Version 2.0.2
-##### 20 August 2015
+#### 20 August 2015
 
 - Captured stdout and stderr is reported properly once again.  Regression in
   2.0.0.  Resolves issue #76.
@@ -536,7 +542,7 @@
 
 
 # Version 2.0.1
-##### 30 July 2015
+#### 30 July 2015
 
 - Handled the case where a module could be discovered by directory searching by
   the main process but not by module name by the subprocess.  Instead of
@@ -549,7 +555,7 @@
 
 
 # Version 2.0.0
-##### 24 July 2015
+#### 24 July 2015
 
 - BREAKING CHANGE: Major overhaul of the multiprocessing system.  Tests always
   run in a separate worker process, even when only one process is specified.
@@ -617,7 +623,7 @@
 
 
 # Version 1.11.0
-##### 18 June 2015
+#### 18 June 2015
 
 - Added support for pypy3.  Fiixes issue #63.
 
@@ -626,7 +632,7 @@
 
 
 # Version 1.10.0
-##### 17 June 2015
+#### 17 June 2015
 
 - Virtualenv directories are now skipped during test discovery, so you can now
   use discovery on projects that contain one or more virtualenv directories
@@ -650,7 +656,7 @@
 
 
 # Version 1.9.4
-##### 15 June 2015
+#### 15 June 2015
 
 - Added a deprecation warning for the `-m/--html` option.  Unless I get some
   credible requests to leave the functionality, then I am going to proceed with
@@ -666,7 +672,7 @@
 
 
 # Version 1.9.3
-##### 7 June 2015
+#### 7 June 2015
 
 - Switched to cyan instead of blue on Windows only.
 
@@ -676,14 +682,14 @@
 
 
 # Version 1.9.2
-##### 8 May 2015
+#### 8 May 2015
 
 - Fixed a regression that caused the `-a/--allow-stdout` cli option and
   corresponding config option to be ignored.  Fixes issue #58.
 
 
 # Version 1.9.1
-##### 13 April 2015
+#### 13 April 2015
 
 - Don't do the interactive print/reprint a test line behavior when we're not
   connected to a terminal.  Contributed by Sam Spilsbury.  Issue #52.  Pull
@@ -712,7 +718,7 @@
 
 
 # Version 1.9.0
-##### 8 April 2015
+#### 8 April 2015
 
 - BREAKING CHANGE: `--omit` was renamed to `--omit-patterns` for consistency
   with how other pattern-related options are named.
@@ -728,7 +734,7 @@
 
 
 # Version 1.8.1
-##### 1 April 2015 (Not a joke!)
+#### 1 April 2015 (Not a joke!)
 
 - Fixed issue where command-line arguments could not override config
 arguments to set options back to default values.  Reported by Monty Hindman.
@@ -738,7 +744,7 @@ Issue #47.
 
 
 # Version 1.8.0
-##### 30 March 2015
+#### 30 March 2015
 
 - The tag to use for questions on StackOverflow was changed to python-green to
   avoid being too generic.  The tag has a nice wiki entry and an initial
@@ -760,7 +766,7 @@ Issue #47.
 
 
 # Version 1.7.1
-##### 25 November 2014
+#### 25 November 2014
 
 - When run in completions mode (`green --completions`), import errors in
   potential modules are ignored, so that the completions list is still
@@ -768,14 +774,14 @@ Issue #47.
 
 
 # Version 1.7.0
-##### 21 September 2014
+#### 21 September 2014
 
 - Output sent to stdout is now captured and then presented along with the list
   of tracebacks.  This can be disabled with `-a/--allow-stdout`.  Issue #29.
 
 
 # Version 1.6.0
-##### 10 September 2014
+#### 10 September 2014
 
 - Added `-f/--failfast` to stop executing tests after the first error, failure,
   or unexpected successes.
@@ -784,7 +790,7 @@ Issue #47.
 
 
 # Version 1.5.0
-##### 31 August 2014
+#### 31 August 2014
 
 - You can press Ctrl-C once while tests are running to cleanly terminate the
   test run.
@@ -798,14 +804,14 @@ Issue #47.
 
 
 # Version 1.4.4
-##### 26 August 2014
+#### 26 August 2014
 
 - File handles are now explicitly closed in setup.py.  Contributed by Simeon
   Visser.
 
 
 # Version 1.4.3
-##### 26 August 2014
+#### 26 August 2014
 
 - Trying to import a module by name that raises an exception during import now
   manufactures a test that reports an ImportError instead of just silently
@@ -813,7 +819,7 @@ Issue #47.
 
 
 # Version 1.4.2
-##### 14 August 2014
+#### 14 August 2014
 
 - Automated generation of the CLI documentation.
 - Improved the suggest command for Bash-/Zsh-completion integration.
@@ -828,7 +834,7 @@ Issue #47.
 
 
 # Version 1.4.1
-##### 30 July 2014
+#### 30 July 2014
 
 - We now use the fully-dotted test name at the start of each traceback in the
   error listing.  Issue #28.
@@ -837,7 +843,7 @@ Issue #47.
 
 
 # Version 1.4.0
-##### 30 July 2014
+#### 30 July 2014
 
 ### User Stuff
 
@@ -876,7 +882,7 @@ Issue #47.
 
 
 # Version 1.3.1
-##### 23 July 2014
+#### 23 July 2014
 
 - Fixed the new tests that failed if you ran them in-place on an installed
   version of green.  Forgot to check the build status before I did the last
@@ -884,14 +890,14 @@ Issue #47.
 
 
 # Version 1.3.0
-##### 23 July 2014
+#### 23 July 2014
 
 - Bash-completion and ZSH-completion support for options and test targets.
   Issue #7.
 
 
 # Version 1.2.1
-##### 20 July 2014
+#### 20 July 2014
 
 - Multiline docstrings (with -vv or -vvv) on test methods are now handled
   correctly.  Initial whitespace is first stripped.  Then lines are combined
@@ -899,7 +905,7 @@ Issue #47.
 
 
 # Version 1.2.0
-##### 20 July 2014
+#### 20 July 2014
 
 - Implemented custom test discovery code instead of relying on built-in
   unittest.discover(). So far, the new implementation  mimics the built-in
@@ -923,14 +929,14 @@ Issue #47.
 
 
 # Version 1.1.0
-##### 17 July 2014
+#### 17 July 2014
 
 - Configuration file support, originally contributed by Tom Barron - Issues
   #20, #23, #24
 
 
 # Version 1.0.2
-##### 6 July 2014
+#### 6 July 2014
 
 - Color works on Windows - Issues #18, #19
 
@@ -948,13 +954,13 @@ Issue #47.
 
 
 # Version 1.0.1
-##### 23 June 2014
+#### 23 June 2014
 
 - Fixed MANIFEST so that installation didn't crash
 
 
 # Version 1.0
-##### 22 June 2014
+#### 22 June 2014
 
 ### Features
 

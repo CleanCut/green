@@ -17,7 +17,6 @@ from green import process
 
 
 class TestLoadTests(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.startdir = os.getcwd()
@@ -26,7 +25,7 @@ class TestLoadTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         os.chdir(cls.startdir)
-        #shutil.rmtree(cls.container_dir)
+        # shutil.rmtree(cls.container_dir)
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
@@ -34,8 +33,8 @@ class TestLoadTests(unittest.TestCase):
         self.basename = os.path.basename(self.sub_tmpdir)
         os.chdir(self.tmpdir)
 
-        with open(os.path.join(self.basename, '__init__.py'), 'w') as f:
-            f.write('\n')
+        with open(os.path.join(self.basename, "__init__.py"), "w") as f:
+            f.write("\n")
 
     def tearDown(self):
         os.chdir(self.container_dir)
@@ -47,9 +46,12 @@ class TestLoadTests(unittest.TestCase):
         actually changes the referenced class.
         """
 
-        with open(os.path.join(self.basename, 'test_load_tests_monkeypatch.py'), 'w') as f:
-            f.write(textwrap.dedent(
-                """
+        with open(
+            os.path.join(self.basename, "test_load_tests_monkeypatch.py"), "w"
+        ) as f:
+            f.write(
+                textwrap.dedent(
+                    """
                 import unittest
                 class A(unittest.TestCase):
                     passing = False
@@ -59,9 +61,11 @@ class TestLoadTests(unittest.TestCase):
                 def load_tests(loader, tests, pattern):
                     A.passing = True
                     return tests
-                """))
+                """
+                )
+            )
 
-        module_name = self.basename + '.test_load_tests_monkeypatch'
+        module_name = self.basename + ".test_load_tests_monkeypatch"
         result = Queue()
         poolRunner(module_name, result, 0)
         result.get()
@@ -70,7 +74,7 @@ class TestLoadTests(unittest.TestCase):
         self.assertEqual(len(proto_test_result.passing), 1)
         self.assertEqual(len(proto_test_result.failures), 0)
         self.assertEqual(len(proto_test_result.errors), 0)
-        self.assertEqual(proto_test_result.passing[0].class_name, 'A')
+        self.assertEqual(proto_test_result.passing[0].class_name, "A")
 
     def test_foreign_suite(self):
         """
@@ -78,9 +82,12 @@ class TestLoadTests(unittest.TestCase):
         another TestSuite (or maybe not even a unittest.TestSuite).
         """
 
-        with open(os.path.join(self.basename, 'test_load_keys_foreign_suite.py'), 'w') as f:
-            f.write(textwrap.dedent(
-                """
+        with open(
+            os.path.join(self.basename, "test_load_keys_foreign_suite.py"), "w"
+        ) as f:
+            f.write(
+                textwrap.dedent(
+                    """
                 import unittest
                 class A(unittest.TestCase):
                     def test_that_will_fail(self):
@@ -93,9 +100,11 @@ class TestLoadTests(unittest.TestCase):
                     suite = unittest.TestSuite()
                     suite.addTests(loader.loadTestsFromTestCase(B))
                     return suite
-                """))
+                """
+                )
+            )
 
-        module_name = self.basename + '.test_load_keys_foreign_suite'
+        module_name = self.basename + ".test_load_keys_foreign_suite"
         result = Queue()
         poolRunner(module_name, result, 0)
         result.get()
@@ -104,15 +113,18 @@ class TestLoadTests(unittest.TestCase):
         self.assertEqual(len(proto_test_result.passing), 1)
         self.assertEqual(len(proto_test_result.errors), 0)
         self.assertEqual(len(proto_test_result.failures), 0)
-        self.assertEqual(proto_test_result.passing[0].class_name, 'B')
+        self.assertEqual(proto_test_result.passing[0].class_name, "B")
 
     def test_none_cancels(self):
         """
         Check that if load_tests returns None, no tests are run.
         """
-        with open(os.path.join(self.basename, 'test_load_keys_none_cancels.py'), 'w') as fh:
-            fh.write(textwrap.dedent(
-                """
+        with open(
+            os.path.join(self.basename, "test_load_keys_none_cancels.py"), "w"
+        ) as fh:
+            fh.write(
+                textwrap.dedent(
+                    """
                 import unittest
                 class A(unittest.TestCase):
                     def test_that_will_fail(self):
@@ -120,9 +132,11 @@ class TestLoadTests(unittest.TestCase):
 
                 def load_tests(loader, tests, pattern):
                     return None
-                """))
+                """
+                )
+            )
 
-        module_name = self.basename + '.test_load_keys_none_cancels'
+        module_name = self.basename + ".test_load_keys_none_cancels"
         result = Queue()
         poolRunner(module_name, result, 0)
         result.get()
@@ -138,9 +152,10 @@ class TestLoadTests(unittest.TestCase):
         function add more tests to be run.
         """
 
-        with open(os.path.join(self.basename, 'test_load_keys_additive.py'), 'w') as fh:
-            fh.write(textwrap.dedent(
-                """
+        with open(os.path.join(self.basename, "test_load_keys_additive.py"), "w") as fh:
+            fh.write(
+                textwrap.dedent(
+                    """
                 import unittest
                 class A(unittest.TestCase):
                     def test_that_will_succeed(self):
@@ -157,8 +172,10 @@ class TestLoadTests(unittest.TestCase):
                     setattr(B, 'test_that_will_succeed', B._hidden_test)
                     tests.addTests(loader.loadTestsFromTestCase(B))
                     return tests
-                """))
+                """
+                )
+            )
 
         loader = GreenTestLoader()
-        test_suite = loader.loadTargets(self.basename+'.'+'test_load_keys_additive')
-        self.assertEqual(len(test_suite._tests), 4) # a + b1 + b1 + b2
+        test_suite = loader.loadTargets(self.basename + "." + "test_load_keys_additive")
+        self.assertEqual(len(test_suite._tests), 4)  # a + b1 + b1 + b2
