@@ -1,3 +1,9 @@
+# Version 3.2.0
+#### 6 June 2020
+
+- Add 'time' attributes to the `<testsuites>`, `<testsuite>`, and `<testcase>` fields in the Junit
+  output for the `-j/--junit-report` output.  Contributed by @bkmd11 in #225. Resolves #208.
+
 # Version 3.1.4
 #### 7 May 2020
 
