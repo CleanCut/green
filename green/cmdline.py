@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 import os
 import sys
+import tempfile
+
 
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
 
 
-
-def main(argv=None, testing=False):
+def _main(argv, testing):
     args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
 
@@ -77,6 +78,13 @@ def main(argv=None, testing=False):
             adapter.save_as(result, report_file)
 
     return(int(not result.wasSuccessful()))
+
+
+def main(argv=None, testing=False):
+    with tempfile.TemporaryDirectory() as temp_dir_for_tests:
+        os.environ['TMPDIR'] = temp_dir_for_tests
+        tempfile.tempdir = temp_dir_for_tests
+        return _main(argv, testing)
 
 
 if __name__ == '__main__':  # pragma: no cover
