@@ -290,11 +290,13 @@ def poolRunner(
         cleanup()
 
     def cleanup():
-        # Restore the state of the temp directory. NOTE: Known to fail on macOS+Python3 or Python2
-        try:
-            shutil.rmtree(tempfile.tempdir, ignore_errors=True)
-        except:
-            pass
+        # Restore the state of the temp directory
+        # TODO: Make this not necessary on macOS+Python3 (see #173)
+        if sys.version_info[0] == 2:
+            try:
+                shutil.rmtree(tempfile.tempdir, ignore_errors=True)
+            except:
+                pass
         tempfile.tempdir = saved_tempdir
         queue.put(None)
         # Finish coverage
