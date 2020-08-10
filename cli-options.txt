@@ -49,7 +49,9 @@ Format Options:
 Output Options:
   -a, --allow-stdout    Instead of capturing the stdout and stderr and
                         presenting it in the summary of results, let it come
-                        through.
+                        through. Note that output from sources other than
+                        tests (like module/class setup or teardown) is never
+                        captured.
   -q, --quiet-stdout    Instead of capturing the stdout and stderr and
                         presenting it in the summary of results, discard it
                         completly for successful tests. --allow-stdout option
@@ -89,7 +91,7 @@ Other Options:
   -j FILENAME, --junit-report FILENAME
                         Generate a JUnit XML report.
 
-Coverage Options (Coverage 4.5.2):
+Coverage Options (Coverage 5.1):
   -r, --run-coverage    Produce coverage output.
   -g FILE, --cov-config-file FILE
                         Specify a coverage config file. Implies --run-coverage

@@ -21,7 +21,6 @@ except:
 
 
 class TestProcessLogger(unittest.TestCase):
-
     def test_callThrough(self):
         """
         Calls are passed through to the wrapped callable
@@ -49,8 +48,9 @@ class TestProcessLogger(unittest.TestCase):
         mock_get_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
         process.multiprocessing.get_logger = mock_get_logger
-        self.addCleanup(setattr, process.multiprocessing, 'get_logger',
-                        saved_get_logger)
+        self.addCleanup(
+            setattr, process.multiprocessing, "get_logger", saved_get_logger
+        )
 
         def func():
             raise AttributeError
@@ -61,7 +61,6 @@ class TestProcessLogger(unittest.TestCase):
 
 
 class TestDaemonlessProcess(unittest.TestCase):
-
     def test_daemonIsFalse(self):
         """
         No matter what daemon is set to, it returns False
@@ -72,7 +71,7 @@ class TestDaemonlessProcess(unittest.TestCase):
         self.assertEqual(dp.daemon, False)
         dp.daemon = 5
         self.assertEqual(dp.daemon, False)
-        dp.daemon = ['something']
+        dp.daemon = ["something"]
         self.assertEqual(dp.daemon, False)
         dp.daemon = []
         self.assertEqual(dp.daemon, False)
@@ -108,25 +107,28 @@ class TestPoolRunner(unittest.TestCase):
         """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
-        self.addCleanup(setattr, process, 'coverage', saved_coverage)
+        self.addCleanup(setattr, process, "coverage", saved_coverage)
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'test_pool_runner_dotted.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(basename, "test_pool_runner_dotted.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testPass(self):
                     pass
-            """))
+            """
+            )
+        )
         fh.close()
-        module_name = basename + '.test_pool_runner_dotted.A.testPass'
+        module_name = basename + ".test_pool_runner_dotted.A.testPass"
         result = Queue()
         poolRunner(module_name, result, 1)
         result.get()
@@ -138,16 +140,16 @@ class TestPoolRunner(unittest.TestCase):
         """
         saved_coverage = process.coverage
         process.coverage = MagicMock()
-        self.addCleanup(setattr, process, 'coverage', saved_coverage)
+        self.addCleanup(setattr, process, "coverage", saved_coverage)
         # Parent directory setup
         os.chdir(self.tmpdir)
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'test_pool_syntax_error.py'), 'w')
+        fh = open(os.path.join(basename, "test_pool_syntax_error.py"), "w")
         fh.write("aoeu")
         fh.close()
         result = Queue()
@@ -164,24 +166,26 @@ class TestPoolRunner(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'test_pool_runner_dotted_fail.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(basename, "test_pool_runner_dotted_fail.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testError(self):
                     raise AttributeError
-            """))
+            """
+            )
+        )
         fh.close()
-        module_name = basename + '.test_pool_runner_dotted_fail.A.testError'
+        module_name = basename + ".test_pool_runner_dotted_fail.A.testError"
         result = Queue()
         poolRunner(module_name, result)
         result.get()
         self.assertEqual(len(result.get().errors), 1)
-
 
     def test_bad_attr(self):
         """
@@ -192,24 +196,27 @@ class TestPoolRunner(unittest.TestCase):
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         basename = os.path.basename(sub_tmpdir)
         # Child setup
-        fh = open(os.path.join(basename, '__init__.py'), 'w')
-        fh.write('\n')
+        fh = open(os.path.join(basename, "__init__.py"), "w")
+        fh.write("\n")
         fh.close()
-        fh = open(os.path.join(basename, 'test_pool_runner_bad_attr.py'), 'w')
-        fh.write(dedent(
-            """
+        fh = open(os.path.join(basename, "test_pool_runner_bad_attr.py"), "w")
+        fh.write(
+            dedent(
+                """
             import unittest
             class A(unittest.TestCase):
                 def testBadAttr(self):
                     "".garbage
-            """))
+            """
+            )
+        )
         fh.close()
-        module_name = basename + '.test_pool_runner_bad_attr.A.testBadAttr'
+        module_name = basename + ".test_pool_runner_bad_attr.A.testBadAttr"
         result = Queue()
         poolRunner(module_name, result)
-        result.get_nowait() # should get the target name
-        result.get_nowait() # should get the result
-        result.get_nowait() # should get None
+        result.get_nowait()  # should get the target name
+        result.get_nowait()  # should get the result
+        result.get_nowait()  # should get None
         # should raise Empty unless the extra result bug is present
         self.assertRaises(Empty, result.get_nowait)
 

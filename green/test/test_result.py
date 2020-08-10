@@ -1,6 +1,7 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 import copy
+
 # `from doctest import DocTestCase` causes crashes, since the DocTestCase is
 # detected as a TestCase subclass and unittest.TestLoader.loadTestsFromModule()
 # called from GreenTestLoader.loadTestsFromModule() thinks it is a definition
@@ -14,8 +15,14 @@ import tempfile
 
 from green.config import default_args
 from green.output import Colors, GreenStream
-from green.result import GreenTestResult, proto_test, \
-        ProtoTest, proto_error, ProtoTestResult, BaseTestResult
+from green.result import (
+    GreenTestResult,
+    proto_test,
+    ProtoTest,
+    proto_error,
+    ProtoTestResult,
+    BaseTestResult,
+)
 
 try:
     from unittest.mock import MagicMock, patch
@@ -25,21 +32,21 @@ except ImportError:
 from coverage import coverage, CoverageException
 
 
-class MyProtoTest(ProtoTest):
+class MyProtoTest(ProtoTest, object):
     """
     For quickly making a ProtoTest
     """
+
     def __init__(self):
         super(MyProtoTest, self).__init__()
-        self.module      = "my_module"
-        self.class_name  = "MyClass"
+        self.module = "my_module"
+        self.class_name = "MyClass"
         self.method_name = "myMethod"
         self.docstr_part = "My docstring"
         self.subtest_part = ""
 
 
 class TestBaseTestResult(unittest.TestCase):
-
     def test_stdoutOutput(self):
         """
         recordStdout records output.
@@ -56,7 +63,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         btr = BaseTestResult(None, None)
         pt = ProtoTest()
-        btr.recordStdout(pt, '')
+        btr.recordStdout(pt, "")
         self.assertEqual(btr.stdout_output, {})
 
     def test_displayStdout(self):
@@ -87,7 +94,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         btr = BaseTestResult(None, None)
         pt = ProtoTest()
-        btr.recordStderr(pt, '')
+        btr.recordStderr(pt, "")
         self.assertEqual(btr.stderr_errput, {})
 
     def test_displayStderr(self):
@@ -104,7 +111,6 @@ class TestBaseTestResult(unittest.TestCase):
 
 
 class TestProtoTestResult(unittest.TestCase):
-
     def test_addSuccess(self):
         """
         addSuccess adds a test correctly
@@ -176,8 +182,8 @@ class TestProtoTestResult(unittest.TestCase):
         ptr.addUnexpectedSuccess(test)
         self.assertEqual(test, ptr.unexpectedSuccesses[0])
 
-    @patch('green.result.ProtoTestResult.addError')
-    @patch('green.result.ProtoTestResult.addFailure')
+    @patch("green.result.ProtoTestResult.addError")
+    @patch("green.result.ProtoTestResult.addFailure")
     def test_addSubTest_failure(self, mock_addFailure, mock_addError):
         """
         addSubTest calls over to addFailure for failures
@@ -190,8 +196,8 @@ class TestProtoTestResult(unittest.TestCase):
         ptr.addSubTest(test, subtest, err)
         mock_addFailure.assert_called_with(subtest, err)
 
-    @patch('green.result.ProtoTestResult.addError')
-    @patch('green.result.ProtoTestResult.addFailure')
+    @patch("green.result.ProtoTestResult.addError")
+    @patch("green.result.ProtoTestResult.addFailure")
     def test_addSubTest_error(self, mock_addFailure, mock_addError):
         """
         addSubTest calls over to addError for errors
@@ -206,12 +212,11 @@ class TestProtoTestResult(unittest.TestCase):
 
 
 class TestProtoError(unittest.TestCase):
-
     def test_str(self):
         """
         Running a ProtoError through str() should result in a traceback string
         """
-        test_str = 'noetuaoe'
+        test_str = "noetuaoe"
         try:
             raise Exception(test_str)
         except:
@@ -221,38 +226,38 @@ class TestProtoError(unittest.TestCase):
 
 
 class TestProtoTest(unittest.TestCase):
-
     def test_ProtoTestBlank(self):
         """
         ProtoTest can be instantiated empty
         """
         pt = ProtoTest()
-        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
-            self.assertEqual('', getattr(pt, i, None))
+        for i in ["module", "class_name", "docstr_part", "method_name"]:
+            self.assertEqual("", getattr(pt, i, None))
 
     def test_str(self):
         """
         Running a ProtoTest through str() is the same as getting .dotted_name
         """
         pt = ProtoTest()
-        pt.module = 'aoeusnth'
+        pt.module = "aoeusnth"
         self.assertEqual(str(pt), pt.dotted_name)
 
     def test_ProtoTestFromTest(self):
         """
         Passing a test into ProtoTest copies out the relevant info.
         """
-        module      = 'green.test.test_result'
-        class_name  = 'Small'
-        docstr_part = 'stuff'
-        method_name = 'test_method'
+        module = "green.test.test_result"
+        class_name = "Small"
+        docstr_part = "stuff"
+        method_name = "test_method"
 
         class Small(unittest.TestCase):
             def test_method(self):
                 "stuff"
-        pt = ProtoTest(Small('test_method'))
 
-        for i in ['module', 'class_name', 'docstr_part', 'method_name']:
+        pt = ProtoTest(Small("test_method"))
+
+        for i in ["module", "class_name", "docstr_part", "method_name"]:
             self.assertEqual(locals()[i], getattr(pt, i, None))
 
     def test_getDescription(self):
@@ -262,41 +267,46 @@ class TestProtoTest(unittest.TestCase):
         # With a docstring
         class Fruit(unittest.TestCase):
             def test_stuff(self):
-                'apple'
+                "apple"
                 pass
-        t = proto_test(Fruit('test_stuff'))
-        self.assertEqual(t.getDescription(1), '')
-        self.assertEqual(t.getDescription(2), 'test_stuff')
-        self.assertEqual(t.getDescription(3), 'apple')
-        self.assertEqual(t.getDescription(4), 'apple')
+
+        t = proto_test(Fruit("test_stuff"))
+        self.assertEqual(t.getDescription(1), "")
+        self.assertEqual(t.getDescription(2), "test_stuff")
+        self.assertEqual(t.getDescription(3), "apple")
+        self.assertEqual(t.getDescription(4), "apple")
 
         # Without a docstring
         class Vegetable(unittest.TestCase):
             def test_stuff(self):
                 pass
-        t = proto_test(Vegetable('test_stuff'))
-        self.assertEqual(t.getDescription(1), '')
-        self.assertEqual(t.getDescription(2), 'test_stuff')
-        self.assertEqual(t.getDescription(3), 'test_stuff')
-        self.assertEqual(t.getDescription(4), 'test_stuff')
+
+        t = proto_test(Vegetable("test_stuff"))
+        self.assertEqual(t.getDescription(1), "")
+        self.assertEqual(t.getDescription(2), "test_stuff")
+        self.assertEqual(t.getDescription(3), "test_stuff")
+        self.assertEqual(t.getDescription(4), "test_stuff")
 
     def test_newlineDocstring(self):
         """
         Docstrings starting with a newline are properly handled.
         """
+
         class MyTests(unittest.TestCase):
             def test_stuff(self):
                 """
                 tricky
                 """
                 pass
-        test = proto_test(MyTests('test_stuff'))
-        self.assertIn('tricky', test.getDescription(3))
+
+        test = proto_test(MyTests("test_stuff"))
+        self.assertIn("tricky", test.getDescription(3))
 
     def test_multilineDocstring(self):
         """
         The description includes all of docstring until the first blank line.
         """
+
         class LongDocs(unittest.TestCase):
             def test_long(self):
                 """First line is
@@ -305,9 +315,10 @@ class TestProtoTest(unittest.TestCase):
                 garbage
                 """
                 pass
-        test = proto_test(LongDocs('test_long'))
-        self.assertIn('tricky', test.getDescription(3))
-        self.assertNotIn('garbage', test.getDescription(3))
+
+        test = proto_test(LongDocs("test_long"))
+        self.assertIn("tricky", test.getDescription(3))
+        self.assertNotIn("garbage", test.getDescription(3))
 
     def test_doctest(self):
         """
@@ -317,11 +328,13 @@ class TestProtoTest(unittest.TestCase):
         >>> f()
         42
         """
+
         def f():
             return 42
+
         parser = doctest.DocTestParser()
-        dt = parser.get_doctest(test, [f], 'doctest.name', 'somefile.py', 20)
-        dt.__module__ = 'somefile'
+        dt = parser.get_doctest(test, {"f": f}, "doctest.name", "somefile.py", 20)
+        dt.__module__ = "somefile"
         p = proto_test(doctest.DocTestCase(dt))
         # short description
         self.assertEqual(p.getDescription(2), "doctest.name")
@@ -333,32 +346,44 @@ class TestProtoTest(unittest.TestCase):
         # dotted name
         self.assertEqual(p.dotted_name, "doctest.name")
 
+    def test_class_or_module_failure(self):
+        """
+        If we parse an error from a class or module failure, we get the correct result.
+        """
+        p = ProtoTest()
+        p.is_class_or_module_teardown_error = True
+        p.name = "the thing"
+        self.assertEqual(p.getDescription(1), "the thing")
+        self.assertEqual(p.getDescription(2), "the thing")
+        self.assertEqual(p.getDescription(3), "the thing")
+
 
 class TestGreenTestResult(unittest.TestCase):
-
     def setUp(self):
         self.args = copy.deepcopy(default_args)
         self.stream = StringIO()
 
     def tearDown(self):
-        del(self.stream)
-        del(self.args)
+        del self.stream
+        del self.args
 
-    @patch('green.result.GreenTestResult.printErrors')
+    @patch("green.result.GreenTestResult.printErrors")
     def test_stopTestRun(self, mock_printErrors):
         """
         We ignore coverage's error about not having anything to cover.
         """
         self.args.cov = MagicMock()
         self.args.cov.stop = MagicMock(
-                side_effect=CoverageException('Different Exception'))
+            side_effect=CoverageException("Different Exception")
+        )
         self.args.run_coverage = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.startTestRun()
         self.assertRaises(CoverageException, gtr.stopTestRun)
 
         self.args.cov.stop = MagicMock(
-                side_effect=CoverageException('No data to report'))
+            side_effect=CoverageException("No data to report")
+        )
 
     def test_tryRecordingStdoutStderr(self):
         """
@@ -368,13 +393,13 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.recordStdout = MagicMock()
         gtr.recordStderr = MagicMock()
 
-        output = 'apple'
+        output = "apple"
         test1 = MagicMock()
         ptr1 = MagicMock()
         ptr1.stdout_output = {test1: output}
         ptr1.stderr_errput = {}
 
-        errput = 'banana'
+        errput = "banana"
         test2 = MagicMock()
         ptr2 = MagicMock()
         ptr2.stdout_output = {}
@@ -430,15 +455,17 @@ class TestGreenTestResult(unittest.TestCase):
         """
         Start a test with verbose = 2 and get its output.
         """
+
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
+
         self.args.verbose = 2
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         tc = FakeCase()
         gtr.startTest(tc)
         output = self.stream.getvalue()
-        return output.split('\n')
+        return output.split("\n")
 
     def test_startTestVerboseTerminal(self):
         """
@@ -452,9 +479,9 @@ class TestGreenTestResult(unittest.TestCase):
         #   FakeCase
         #     test_it
         self.assertEqual(len(output_lines), 3)
-        self.assertNotIn(' ', output_lines[0])
-        self.assertIn('  ', output_lines[1])
-        self.assertIn('    ', output_lines[2])
+        self.assertNotIn(" ", output_lines[0])
+        self.assertIn("  ", output_lines[1])
+        self.assertIn("    ", output_lines[2])
 
     def test_startTestVerbosePipe(self):
         """
@@ -468,10 +495,10 @@ class TestGreenTestResult(unittest.TestCase):
         #   FakeCase
         #     test_it
         self.assertEqual(len(output_lines), 3)
-        self.assertNotIn(' ', output_lines[0])
-        self.assertIn('  ', output_lines[1])
+        self.assertNotIn(" ", output_lines[0])
+        self.assertIn("  ", output_lines[1])
         # No carriage return or extra lines printed
-        self.assertIn('', output_lines[2])
+        self.assertIn("", output_lines[2])
 
     def test_reportOutcome(self):
         """
@@ -479,16 +506,16 @@ class TestGreenTestResult(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr._reportOutcome(None, '.', lambda x: x)
-        self.assertIn('.', self.stream.getvalue())
+        gtr._reportOutcome(None, ".", lambda x: x)
+        self.assertIn(".", self.stream.getvalue())
 
-    @patch('green.result.proto_test')
+    @patch("green.result.proto_test")
     def test_reportOutcomeCursorUp(self, mock_proto_test):
         """
         _reportOutcome moves the cursor up when it needs to.
         """
         mockProtoTest = MagicMock()
-        mockProtoTest.getDescription.return_value = 'a description'
+        mockProtoTest.getDescription.return_value = "a description"
         mock_proto_test.return_value = mockProtoTest
         self.args.verbose = 2
 
@@ -498,20 +525,20 @@ class TestGreenTestResult(unittest.TestCase):
         gs = GreenStream(self.stream)
         gs.isatty = isatty
         gtr = GreenTestResult(self.args, gs)
-        r = 'a fake reason'
+        r = "a fake reason"
         t = MagicMock()
-        t.__str__.return_value = 'x' * 1000
-        gtr._reportOutcome(t, '.', lambda x: x, None, r)
+        t.__str__.return_value = "x" * 1000
+        gtr._reportOutcome(t, ".", lambda x: x, None, r)
         self.assertIn(r, self.stream.getvalue())
         self.assertLess(len(self.stream.getvalue()), 2000)
 
-    @patch('green.result.proto_test')
+    @patch("green.result.proto_test")
     def test_reportOutcomeVerbose(self, mock_proto_test):
         """
         _reportOutcome contains output we expect in verbose mode.
         """
         mockProtoTest = MagicMock()
-        mockProtoTest.getDescription.return_value = 'a description'
+        mockProtoTest.getDescription.return_value = "a description"
         mock_proto_test.return_value = mockProtoTest
         self.args.verbose = 2
 
@@ -521,10 +548,10 @@ class TestGreenTestResult(unittest.TestCase):
         gs = GreenStream(self.stream)
         gs.isatty = isatty
         gtr = GreenTestResult(self.args, gs)
-        r = 'a fake reason'
+        r = "a fake reason"
         t = MagicMock()
-        t.__str__.return_value = 'junk'
-        gtr._reportOutcome(t, '.', lambda x: x, None, r)
+        t.__str__.return_value = "junk"
+        gtr._reportOutcome(t, ".", lambda x: x, None, r)
         self.assertIn(r, self.stream.getvalue())
 
     def test_printErrorsSkipreport(self):
@@ -547,7 +574,7 @@ class TestGreenTestResult(unittest.TestCase):
         self.args.termcolor = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         pt = MyProtoTest()
-        output = 'this is what the test spit out to stdout'
+        output = "this is what the test spit out to stdout"
         gtr.recordStdout(pt, output)
         gtr.addSuccess(pt)
         gtr.printErrors()
@@ -562,7 +589,7 @@ class TestGreenTestResult(unittest.TestCase):
         self.args.quiet_stdout = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         pt = MyProtoTest()
-        output = 'this is what the test should not spit out to stdout'
+        output = "this is what the test should not spit out to stdout"
         gtr.recordStdout(pt, output)
         gtr.addSuccess(pt)
         gtr.printErrors()
@@ -582,7 +609,7 @@ class TestGreenTestResult(unittest.TestCase):
             err = sys.exc_info()
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         pt = MyProtoTest()
-        output = 'this is what the test should spit out to stdout'
+        output = "this is what the test should spit out to stdout"
         gtr.recordStdout(pt, output)
         gtr.addError(pt, proto_error(err))
         gtr.printErrors()
@@ -597,7 +624,7 @@ class TestGreenTestResult(unittest.TestCase):
         self.args.quiet_stdout = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         pt = MyProtoTest()
-        output = 'this is what the test should not spit out to stdout'
+        output = "this is what the test should not spit out to stdout"
         gtr.recordStderr(pt, output)
         gtr.addSuccess(pt)
         gtr.printErrors()
@@ -632,11 +659,11 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
-        self.assertIn('test_printErrorsDots', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn("\n\n", self.stream.getvalue())
+        self.assertIn("my_module.MyClass.myMethod", self.stream.getvalue())
+        self.assertIn("test_printErrorsDots", self.stream.getvalue())
+        self.assertIn("raise Exception", self.stream.getvalue())
+        self.assertIn("Error", self.stream.getvalue())
 
     def test_printErrorsVerbose2(self):
         """
@@ -651,11 +678,11 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
-        self.assertIn('test_printErrorsVerbose2', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn("\n\n", self.stream.getvalue())
+        self.assertIn("my_module.MyClass.myMethod", self.stream.getvalue())
+        self.assertIn("test_printErrorsVerbose2", self.stream.getvalue())
+        self.assertIn("raise Exception", self.stream.getvalue())
+        self.assertIn("Error", self.stream.getvalue())
 
     def test_printErrorsVerbose3(self):
         """
@@ -670,11 +697,11 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
         gtr.printErrors()
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
-        self.assertIn('test_printErrorsVerbose3', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn("\n\n", self.stream.getvalue())
+        self.assertIn("my_module.MyClass.myMethod", self.stream.getvalue())
+        self.assertIn("test_printErrorsVerbose3", self.stream.getvalue())
+        self.assertIn("raise Exception", self.stream.getvalue())
+        self.assertIn("Error", self.stream.getvalue())
 
     def test_printErrorsVerbose4(self):
         """
@@ -689,31 +716,31 @@ class TestGreenTestResult(unittest.TestCase):
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), err)
         gtr.printErrors()
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('(most recent call last)', self.stream.getvalue())
-        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
-        self.assertIn('test_printErrorsVerbose4', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
+        self.assertIn("\n\n", self.stream.getvalue())
+        self.assertIn("(most recent call last)", self.stream.getvalue())
+        self.assertIn("my_module.MyClass.myMethod", self.stream.getvalue())
+        self.assertIn("test_printErrorsVerbose4", self.stream.getvalue())
+        self.assertIn("raise Exception", self.stream.getvalue())
+        self.assertIn("Error", self.stream.getvalue())
 
     def test_printErrors_Py2Unicode(self):
         """
         printErrors() doesn't crash in Python 2 when tracebacks contain unicode
         """
         try:
-            raise Exception(u'Das Böse ist immer und überall')
+            raise Exception("Das Böse ist immer und überall")
         except:
             err = sys.exc_info()
         self.args.verbose = 1
         self.args.termcolor = False
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.addError(MyProtoTest(), proto_error(err))
-        gtr.printErrors() # We shouldn't hit an exception here
-        self.assertIn('\n\n', self.stream.getvalue())
-        self.assertIn('my_module.MyClass.myMethod', self.stream.getvalue())
-        self.assertIn('raise Exception', self.stream.getvalue())
-        self.assertIn('Error', self.stream.getvalue())
-        self.assertIn('Böse', self.stream.getvalue())
+        gtr.printErrors()  # We shouldn't hit an exception here
+        self.assertIn("\n\n", self.stream.getvalue())
+        self.assertIn("my_module.MyClass.myMethod", self.stream.getvalue())
+        self.assertIn("raise Exception", self.stream.getvalue())
+        self.assertIn("Error", self.stream.getvalue())
+        self.assertIn("Böse", self.stream.getvalue())
 
     def test_addProtoTestResult(self):
         """
@@ -787,7 +814,6 @@ class TestGreenTestResult(unittest.TestCase):
 
 
 class TestGreenTestResultAdds(unittest.TestCase):
-
     def setUp(self):
         self.stream = StringIO()
         self.args = copy.deepcopy(default_args)
@@ -796,20 +822,31 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.gtr._reportOutcome = MagicMock()
 
     def tearDown(self):
-        del(self.stream)
-        del(self.gtr)
+        del self.stream
+        del self.gtr
 
     def test_addSuccess(self):
         """
         addSuccess() makes the correct calls to other functions.
         """
         test = MagicMock()
+        test.shortDescription.return_value = "a"
+        test.__str__.return_value = "b"
+        test = proto_test(test)
+        self.gtr.addSuccess(test)
+        self.gtr._reportOutcome.assert_called_with(test, ".", self.gtr.colors.passing)
+
+    def test_addSuccess_with_test_time(self):
+        """
+        addSuccess() sets test time to correct value
+        """
+        test = MagicMock()
         test.shortDescription.return_value = 'a'
         test.__str__.return_value = 'b'
         test = proto_test(test)
-        self.gtr.addSuccess(test)
-        self.gtr._reportOutcome.assert_called_with(
-                test, '.', self.gtr.colors.passing)
+        self.gtr.addSuccess(test, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addError(self):
         """
@@ -823,7 +860,22 @@ class TestGreenTestResultAdds(unittest.TestCase):
         err = proto_error(err)
         self.gtr.addError(test, err)
         self.gtr._reportOutcome.assert_called_with(
-                test, 'E', self.gtr.colors.error, err)
+            test, "E", self.gtr.colors.error, err
+        )
+
+    def test_addError_with_test_time(self):
+        """
+        addError() sets test time to correct value
+        """
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addError(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addFailure(self):
         """
@@ -838,7 +890,23 @@ class TestGreenTestResultAdds(unittest.TestCase):
         err = proto_error(err)
         self.gtr.addFailure(test, err)
         self.gtr._reportOutcome.assert_called_with(
-                test, 'F', self.gtr.colors.failing, err)
+            test, "F", self.gtr.colors.failing, err
+        )
+
+    def test_addFailure_with_test_time(self):
+        """
+        addFailure() makes test time the correct value
+        """
+        err = None
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addFailure(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addFailureTwistedSkip(self):
         """
@@ -853,21 +921,32 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         reason = "Twisted is odd"
         err = proto_error(err)
-        err.traceback_lines = ["UnsupportedTrialFeature: ('skip', '{}')"
-                               .format(reason)]
+        err.traceback_lines = ["UnsupportedTrialFeature: ('skip', '{}')".format(reason)]
         self.gtr.addFailure(test, err)
         self.gtr._reportOutcome.assert_called_with(
-                test, 's', self.gtr.colors.skipped, reason=reason)
+            test, "s", self.gtr.colors.skipped, reason=reason
+        )
 
     def test_addSkip(self):
         """
         addSkip() makes the correct calls to other functions.
         """
         test = proto_test(MagicMock())
-        reason = 'skip reason'
+        reason = "skip reason"
         self.gtr.addSkip(test, reason)
         self.gtr._reportOutcome.assert_called_with(
-                test, 's', self.gtr.colors.skipped, reason=reason)
+            test, "s", self.gtr.colors.skipped, reason=reason
+        )
+
+    def test_addSkip_with_test_time(self):
+        """
+        addSkip() makes test time the correct value
+        """
+        test = proto_test(MagicMock())
+        reason = 'skip reason'
+        self.gtr.addSkip(test, reason, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addExpectedFailure(self):
         """
@@ -881,7 +960,22 @@ class TestGreenTestResultAdds(unittest.TestCase):
         err = proto_error(err)
         self.gtr.addExpectedFailure(test, err)
         self.gtr._reportOutcome.assert_called_with(
-                test, 'x', self.gtr.colors.expectedFailure, err)
+            test, "x", self.gtr.colors.expectedFailure, err
+        )
+
+    def test_addExcepectedFailure_with_test_time(self):
+        """
+        addExpectedFailure() makes test time correct value
+        """
+        try:
+            raise Exception
+        except:
+            err = sys.exc_info()
+        test = proto_test(MagicMock())
+        err = proto_error(err)
+        self.gtr.addExpectedFailure(test, err, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_addUnexpectedSuccess(self):
         """
@@ -890,7 +984,17 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         self.gtr.addUnexpectedSuccess(test)
         self.gtr._reportOutcome.assert_called_with(
-                test, 'u', self.gtr.colors.unexpectedSuccess)
+            test, "u", self.gtr.colors.unexpectedSuccess
+        )
+
+    def test_addUnexpectedSuccess_with_test_time(self):
+        """
+        addUnexpectedSuccess() makes test time with correct value
+        """
+        test = proto_test(MagicMock())
+        self.gtr.addUnexpectedSuccess(test, '0.42')
+
+        self.assertEqual(test.test_time, '0.42')
 
     def test_wasSuccessful(self):
         """
@@ -899,9 +1003,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.assertEqual(gtr.wasSuccessful(), False)
-        gtr.passing.append('anything')
+        gtr.passing.append("anything")
         self.assertEqual(gtr.wasSuccessful(), True)
-        gtr.all_errors.append('anything')
+        gtr.all_errors.append("anything")
         self.assertEqual(gtr.wasSuccessful(), False)
 
     def test_wasSuccessful_expectedFailures(self):
@@ -910,7 +1014,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.expectedFailures.append('anything')
+        gtr.expectedFailures.append("anything")
         self.assertEqual(gtr.wasSuccessful(), True)
 
     def test_wasSuccessful_passing(self):
@@ -919,7 +1023,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.passing.append('anything')
+        gtr.passing.append("anything")
         self.assertEqual(gtr.wasSuccessful(), True)
 
     def test_wasSuccessful_skipped(self):
@@ -928,7 +1032,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.skipped.append('anything')
+        gtr.skipped.append("anything")
         self.assertEqual(gtr.wasSuccessful(), True)
 
     def test_wasSuccessful_unexpectedSuccesses(self):
@@ -937,7 +1041,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.unexpectedSuccesses.append('anything')
+        gtr.unexpectedSuccesses.append("anything")
         self.assertEqual(gtr.wasSuccessful(), True)
 
     def test_wasSuccessful_coverageFails(self):
@@ -955,47 +1059,49 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         self.args.minimum_coverage = 50
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
-        gtr.passing.append('anything')
+        gtr.passing.append("anything")
         gtr.coverage_percent = 60
         self.assertEqual(gtr.wasSuccessful(), True)
 
 
 class TestGreenTestRunCoverage(unittest.TestCase):
-
     def setUp(self):
         self.args = copy.deepcopy(default_args)
 
         cov_file = tempfile.NamedTemporaryFile(delete=False)
         cov_file.close()
 
-        self.args.cov = coverage(data_file=cov_file.name,
-                                 omit=self.args.omit_patterns,
-                                 include=self.args.include_patterns)
+        self.args.cov = coverage(
+            data_file=cov_file.name,
+            omit=self.args.omit_patterns,
+            include=self.args.include_patterns,
+        )
         self.args.cov.start()
         self.stream = StringIO()
 
     def tearDown(self):
-        del(self.stream)
-        del(self.args)
+        del self.stream
+        del self.args
 
     def _outputFromTest(self, args):
         class FakeCase(unittest.TestCase):
             def runTest(self):
                 pass
+
         gtr = GreenTestResult(args, GreenStream(self.stream))
         gtr.startTestRun()
         gtr.startTest(FakeCase())
         gtr.stopTestRun()
         output = self.stream.getvalue()
-        return output.split('\n')
+        return output.split("\n")
 
     def test_coverage(self):
         self.args.run_coverage = True
         output = self._outputFromTest(self.args)
-        self.assertIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
+        self.assertIn("Stmts   Miss  Cover   Missing", "\n".join(output))
 
     def test_quiet_coverage(self):
         self.args.run_coverage = True
         self.args.quiet_coverage = True
         output = self._outputFromTest(self.args)
-        self.assertNotIn('Stmts   Miss  Cover   Missing', '\n'.join(output))
+        self.assertNotIn("Stmts   Miss  Cover   Missing", "\n".join(output))

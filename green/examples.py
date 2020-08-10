@@ -2,11 +2,10 @@ from __future__ import unicode_literals
 import sys
 import unittest
 
-doctest_modules = ['green.examples']
+doctest_modules = ["green.examples"]
 
 
 class TestStates(unittest.TestCase):
-
     def test0Pass(self):
         """
         This test will print output to stdout, and then pass.
@@ -47,6 +46,7 @@ class TestStates(unittest.TestCase):
         """
         pass
 
+
 def some_function():
     """
     This will fail because some_function() does not, in fact, return 100.
@@ -54,6 +54,7 @@ def some_function():
     100
     """
     return 99
+
 
 class MyClass:
     def my_method(self):
