@@ -82,8 +82,12 @@ def _main(argv, testing):
 def main(argv=None, testing=False):
     with tempfile.TemporaryDirectory() as temp_dir_for_tests:
         # os.environ['TMPDIR'] = temp_dir_for_tests
-        tempfile.tempdir = temp_dir_for_tests
-        return _main(argv, testing)
+        prev_tempdir = tempfile.tempdir
+        try:
+            tempfile.tempdir = temp_dir_for_tests
+            return _main(argv, testing)
+        finally:
+            tempfile.tempdir = prev_tempdir
 
 
 if __name__ == "__main__":  # pragma: no cover
