@@ -240,7 +240,7 @@ class ProtoTestResult(BaseTestResult):
             "stderr_errput",
             "stdout_output",
             "unexpectedSuccesses",
-            "test_time"
+            "test_time",
         ]
         self.failfast = False  # Because unittest inspects the attribute
         self.reinitialize()
@@ -253,8 +253,7 @@ class ProtoTestResult(BaseTestResult):
         self.passing = []
         self.skipped = []
         self.unexpectedSuccesses = []
-        self.test_time = ''
-
+        self.test_time = ""
 
     def __repr__(self):  # pragma: no cover
         return (
@@ -704,7 +703,7 @@ class GreenTestResult(BaseTestResult):
         # Captured output for non-failing tests
         if not self.args.quiet_stdout:
             failing_tests = set([x[0] for x in self.all_errors])
-            for test in list(self.stdout_output):
+            for test in list(self.stdout_output) + list(self.stderr_errput):
                 if test not in failing_tests:
                     self.displayStdout(test)
                     self.displayStderr(test)

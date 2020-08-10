@@ -1,3 +1,9 @@
+# Version 3.2.1
+#### 9 Aug 2020
+
+- Fix passing tests not displaying captured stderr output unless stdout output was also present.
+  Resolves #226.
+
 # Version 3.2.0
 #### 6 June 2020
 
