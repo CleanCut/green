@@ -81,14 +81,15 @@ def _main(argv, testing):
 
 def main(argv=None, testing=False):
     with tempfile.TemporaryDirectory() as temp_dir_for_tests:
-        prev_tmpdir_var = os.environ['TMPDIR']
+        prev_tmpdir_var = os.environ.get('TMPDIR')
         prev_tempdir = tempfile.tempdir
         try:
             os.environ['TMPDIR'] = temp_dir_for_tests
             tempfile.tempdir = temp_dir_for_tests
             return _main(argv, testing)
         finally:
-            os.environ['TMPDIR'] = prev_tmpdir_var
+            if prev_tmpdir_var is not None:
+                os.environ['TMPDIR'] = prev_tmpdir_var
             tempfile.tempdir = prev_tempdir
 
 
