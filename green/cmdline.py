@@ -82,7 +82,7 @@ def _main(argv, testing):
 def main(argv=None, testing=False):
     with tempfile.TemporaryDirectory() as temp_dir_for_tests:
         # os.environ['TMPDIR'] = temp_dir_for_tests
-        # tempfile.tempdir = temp_dir_for_tests
+        tempfile.tempdir = temp_dir_for_tests
         return _main(argv, testing)
 
 
