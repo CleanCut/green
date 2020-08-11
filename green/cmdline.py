@@ -83,7 +83,7 @@ def _main(argv, testing):
 def main(argv=None, testing=False):
     # create the temp dir only once (i.e., not while in the recursed call)
     if green.process.TESTS_TEMP_DIR is None:
-        temp_dir_for_tests = tempdir.mkdtemp()
+        temp_dir_for_tests = tempfile.mkdtemp()
         try:
             green.process.TESTS_TEMP_DIR = temp_dir_for_tests
             return _main(argv, testing)
