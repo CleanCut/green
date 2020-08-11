@@ -85,7 +85,7 @@ def main(argv=None, testing=False):
     if green.process.TESTS_TEMP_DIR is None:
         with tempfile.TemporaryDirectory() as temp_dir_for_tests:
             try:
-                green.process.TESTS_TEMP_DIR = temp_dir_for_tests
+                # green.process.TESTS_TEMP_DIR = temp_dir_for_tests
                 return _main(argv, testing)
             finally:
                 green.process.TESTS_TEMP_DIR = None
