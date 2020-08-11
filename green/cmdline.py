@@ -86,6 +86,7 @@ def main(argv=None, testing=False):
         temp_dir_for_tests = tempfile.mkdtemp()
         try:
             green.process.TESTS_TEMP_DIR = temp_dir_for_tests
+            os.chmod(temp_dir_for_tests, 0o777)
             return _main(argv, testing)
         finally:
             green.process.TESTS_TEMP_DIR = None
