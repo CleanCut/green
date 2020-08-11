@@ -6,6 +6,7 @@ import tempfile
 
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
+import green.process
 
 
 def _main(argv, testing):
@@ -81,13 +82,13 @@ def _main(argv, testing):
 
 def main(argv=None, testing=False):
     # create the temp dir only once (i.e., not while in the recursed call)
-    if tempfile.tempdir is None:
+    if green.process.TESTS_TEMP_DIR is None:
         with tempfile.TemporaryDirectory() as temp_dir_for_tests:
             try:
-                tempfile.tempdir = temp_dir_for_tests
+                green.process.TESTS_TEMP_DIR = temp_dir_for_tests
                 return _main(argv, testing)
             finally:
-                tempfile.tempdir = None
+                green.process.TESTS_TEMP_DIR = None
     else:
         return _main(argv, testing)
 

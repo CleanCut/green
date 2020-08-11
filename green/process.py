@@ -15,6 +15,9 @@ from green.loader import GreenTestLoader
 from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
+TESTS_TEMP_DIR = None
+
+
 # Super-useful debug function for finding problems in the subprocesses, and it
 # even works on windows
 def ddebug(msg, err=None):  # pragma: no cover
@@ -274,7 +277,7 @@ def poolRunner(
     # with eachother.  So long as the test doesn't use a hard-coded temp
     # directory, anyway.
     saved_tempdir = tempfile.tempdir
-    tempfile.tempdir = tempfile.mkdtemp()
+    tempfile.tempdir = tempfile.mkdtemp(dir=TESTS_TEMP_DIR)
 
     def raise_internal_failure(msg):
         err = sys.exc_info()
