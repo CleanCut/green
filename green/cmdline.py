@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import tempfile
-
+from pathlib import Path
 
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
@@ -83,7 +83,9 @@ def _main(argv, testing):
 def main(argv=None, testing=False):
     # create the temp dir only once (i.e., not while in the recursed call)
     if green.process.TESTS_TEMP_DIR is None:
-        temp_dir_for_tests = tempfile.mkdtemp()
+#         temp_dir_for_tests = tempfile.mkdtemp()
+        temp_dir_for_tests = str(Path(tempfile.gettempdir()) / 'tests_temp_dir')
+        os.mkdir(temp_dir_for_tests)
         try:
             green.process.TESTS_TEMP_DIR = temp_dir_for_tests
 #             os.chmod(temp_dir_for_tests, 0o777)
