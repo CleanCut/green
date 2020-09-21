@@ -458,9 +458,9 @@ def parseArguments(argv=None):  # pragma: no cover
                 "files to omit from coverage reports.  If the default list "
                 "catches files that you DO want to cover you can specify this "
                 "flag to leave the default list empty to start with.  You can "
-                "then add patterns back in with --omit-add. The default list is "
-                "something like '*/test*,*/mock*,*(temp dir)*,*(python system "
-                "packages)*' -- only longer."
+                "then add patterns back in with --omit-patterns. The default "
+                "list is something like '*/test*,*/mock*,*(temp dir)*,*(python "
+                "system packages)*' -- only longer."
             ),
             default=argparse.SUPPRESS,
         )
