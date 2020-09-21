@@ -1,3 +1,8 @@
+# Version 3.2.2
+#### 21 Sep 2020
+
+- Fix help string for the `-O/--clear-omit` option. Resolves #231.
+
 # Version 3.2.1
 #### 9 Aug 2020
 
