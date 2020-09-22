@@ -20,7 +20,6 @@ python_file_pattern = re.compile(r"^[_a-z]\w*?\.py$", re.IGNORECASE)
 python_dir_pattern = re.compile(r"^[_a-z]\w*?$", re.IGNORECASE)
 
 
-
 class GreenTestLoader(unittest.TestLoader):
 
     suiteClass = GreenTestSuite
@@ -425,7 +424,7 @@ def getCompletions(target):
                 dotted_name = dotted_name[:idx]
                 if dotted_name.startswith(target):
                     dotted_names.add(dotted_name)
-                else:
+                else:  # pragma: nocover -- occurs in Python <= 3.7, but can't find a reasonable way to cover this line when it doesn't in Python > 3.7
                     break
     return "\n".join(sorted(list(dotted_names)))
 
