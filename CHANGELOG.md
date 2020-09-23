@@ -1,7 +1,8 @@
 # Version 3.2.2
-#### 21 Sep 2020
+#### 22 Sep 2020
 
 - Fix help string for the `-O/--clear-omit` option. Resolves #231.
+- Tweak a bit of green's self-coverage to adjust for making releases in Python 3.8
 
 # Version 3.2.1
 #### 9 Aug 2020
