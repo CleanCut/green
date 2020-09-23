@@ -84,7 +84,7 @@ class GreenTestSuite(TestSuite):
                 cases += test.countTestCases()
         return cases
 
-    def _handleClassSetUpPre38(self, test, result):
+    def _handleClassSetUpPre38(self, test, result):  # pragma: nocover
         previousClass = getattr(result, "_previousTestClass", None)
         currentClass = test.__class__
         if currentClass == previousClass:
@@ -170,7 +170,7 @@ class GreenTestSuite(TestSuite):
 
     if sys.version_info < (3, 8):  # pragma: no cover
         _handleClassSetUp = _handleClassSetUpPre38
-    else:  # pragma: no cover
+    else:
         _handleClassSetUp = _handleClassSetUpPost38
 
     def run(self, result):
