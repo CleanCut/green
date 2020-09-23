@@ -91,7 +91,7 @@ Other Options:
   -j FILENAME, --junit-report FILENAME
                         Generate a JUnit XML report.
 
-Coverage Options (Coverage 5.1):
+Coverage Options (Coverage 5.2.1):
   -r, --run-coverage    Produce coverage output.
   -g FILE, --cov-config-file FILE
                         Specify a coverage config file. Implies --run-coverage
@@ -106,9 +106,9 @@ Coverage Options (Coverage 5.1):
                         the default list catches files that you DO want to
                         cover you can specify this flag to leave the default
                         list empty to start with. You can then add patterns
-                        back in with --omit-add. The default list is something
-                        like '*/test*,*/mock*,*(temp dir)*,*(python system
-                        packages)*' -- only longer.
+                        back in with --omit-patterns. The default list is
+                        something like '*/test*,*/mock*,*(temp dir)*,*(python
+                        system packages)*' -- only longer.
   -u PATTERN, --include-patterns PATTERN
                         Comma-separated file-patterns to include in coverage.
                         This implies that anything that does not match the
