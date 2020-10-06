@@ -84,24 +84,14 @@ def _main(argv, testing):
 def main(argv=None, testing=False):
     # create the temp dir only once (i.e., not while in the recursed call)
     if os.environ.get('TMPDIR') is None:
-        temp_dir_for_tests = tempfile.mkdtemp()
-        # temp_dir_for_tests = str(Path(tempfile.gettempdir()) / 'tests_temp_dir')
-        # os.mkdir(temp_dir_for_tests)
-        try:
-            os.environ['TMPDIR'] = temp_dir_for_tests
-            tempfile.tempdir = temp_dir_for_tests
-#             green.process.TESTS_TEMP_DIR = temp_dir_for_tests
-#             os.chmod(temp_dir_for_tests, 0o777)
-            return _main(argv, testing)
-        finally:
-#             green.process.TESTS_TEMP_DIR = None
-            del os.environ['TMPDIR']
-            tempfile.tempdir = None
+        with tempfile.TemporaryDirectory() as temp_dir_for_tests:
             try:
-                shutil.rmtree(temp_dir_for_tests, ignore_errors=True)
-            except:
-                pass
-
+                os.environ['TMPDIR'] = temp_dir_for_tests
+                tempfile.tempdir = temp_dir_for_tests
+                return _main(argv, testing)
+            finally:
+                del os.environ['TMPDIR']
+                tempfile.tempdir = None
     else:
         return _main(argv, testing)
 
