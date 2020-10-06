@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 import os
-import shutil
 import sys
 import tempfile
-from pathlib import Path
 
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
-import green.process
 
 
 def _main(argv, testing):
