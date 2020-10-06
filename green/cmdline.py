@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -94,7 +95,13 @@ def main(argv=None, testing=False):
             return _main(argv, testing)
         finally:
 #             green.process.TESTS_TEMP_DIR = None
-            pass
+            del os.environ['TMPDIR']
+            tempfile.tempdir = None
+            try:
+                shutil.rmtree(temp_dir_for_tests, ignore_errors=True)
+            except:
+                pass
+
     else:
         return _main(argv, testing)
 
