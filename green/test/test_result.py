@@ -841,12 +841,12 @@ class TestGreenTestResultAdds(unittest.TestCase):
         addSuccess() sets test time to correct value
         """
         test = MagicMock()
-        test.shortDescription.return_value = 'a'
-        test.__str__.return_value = 'b'
+        test.shortDescription.return_value = "a"
+        test.__str__.return_value = "b"
         test = proto_test(test)
-        self.gtr.addSuccess(test, '0.42')
+        self.gtr.addSuccess(test, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_addError(self):
         """
@@ -873,9 +873,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = proto_test(MagicMock())
         err = proto_error(err)
-        self.gtr.addError(test, err, '0.42')
+        self.gtr.addError(test, err, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_addFailure(self):
         """
@@ -904,9 +904,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = proto_test(MagicMock())
         err = proto_error(err)
-        self.gtr.addFailure(test, err, '0.42')
+        self.gtr.addFailure(test, err, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_addFailureTwistedSkip(self):
         """
@@ -943,10 +943,10 @@ class TestGreenTestResultAdds(unittest.TestCase):
         addSkip() makes test time the correct value
         """
         test = proto_test(MagicMock())
-        reason = 'skip reason'
-        self.gtr.addSkip(test, reason, '0.42')
+        reason = "skip reason"
+        self.gtr.addSkip(test, reason, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_addExpectedFailure(self):
         """
@@ -973,9 +973,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
             err = sys.exc_info()
         test = proto_test(MagicMock())
         err = proto_error(err)
-        self.gtr.addExpectedFailure(test, err, '0.42')
+        self.gtr.addExpectedFailure(test, err, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_addUnexpectedSuccess(self):
         """
@@ -992,9 +992,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         addUnexpectedSuccess() makes test time with correct value
         """
         test = proto_test(MagicMock())
-        self.gtr.addUnexpectedSuccess(test, '0.42')
+        self.gtr.addUnexpectedSuccess(test, "0.42")
 
-        self.assertEqual(test.test_time, '0.42')
+        self.assertEqual(test.test_time, "0.42")
 
     def test_wasSuccessful(self):
         """

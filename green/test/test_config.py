@@ -452,7 +452,6 @@ class TestConfig(ConfigBase):
             ar(configparser.NoOptionError, cfg.get, "green", "version")
 
 
-
 class TestMergeConfig(ConfigBase):
     """
     Merging config files and command-line arguments works as expected.
@@ -538,4 +537,3 @@ class TestMergeConfig(ConfigBase):
         self.assertRaises(
             NotImplementedError, config.mergeConfig, new_args, testing=True
         )
-

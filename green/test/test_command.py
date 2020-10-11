@@ -20,7 +20,6 @@ from green.config import StoreOpt
 
 
 class TestCommand(unittest.TestCase):
-
     @contextlib.contextmanager
     def environ(self, setup_cfg=None, *args, **variables):
 

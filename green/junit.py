@@ -123,10 +123,7 @@ class JUnitXML(object):
             JUnitDialect.SKIPPED_COUNT,
             str(self._count_test_with_verdict(Verdict.SKIPPED, suite)),
         )
-        xml_suite.set(
-            JUnitDialect.TEST_TIME,
-            str(self._suite_time(suite))
-        )
+        xml_suite.set(JUnitDialect.TEST_TIME, str(self._suite_time(suite)))
         for each_test in suite:
             xml_test = self._convert_test(results, *each_test)
             xml_suite.append(xml_test)

@@ -23,7 +23,6 @@ def test(module, class_name, method_name):
 
 
 class JUnitXMLReportIsGenerated(TestCase):
-
     def setUp(self):
         self._destination = StringIO()
         self._test_results = GreenTestResult(default_args, GreenStream(StringIO()))
@@ -35,7 +34,6 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._test.class_name = "MyClass"
         self._test.method_name = "my_method"
         self._test.test_time = "0.005"
-
 
     def test_when_the_results_contain_only_one_successful_test(self):
         self._test_results.addSuccess(self._test)
@@ -125,7 +123,6 @@ class JUnitXMLReportIsGenerated(TestCase):
             }
         )
 
-
     def test_when_the_results_contain_only_one_failed_test(self):
         self._record_failure(test("my_module", "MyClass", "my_method"))
 
@@ -158,9 +155,14 @@ class JUnitXMLReportIsGenerated(TestCase):
         )
 
     def test_convert_test_will_record_time_for_test(self):
-        xml_test_result = self._adapter._convert_test(self._test_results, Verdict.PASSED, self._test)
+        xml_test_result = self._adapter._convert_test(
+            self._test_results, Verdict.PASSED, self._test
+        )
 
-        self.assertEqual(xml_test_result.attrib, {'name': 'my_method', 'classname': 'MyClass', 'time': '0.005'})
+        self.assertEqual(
+            xml_test_result.attrib,
+            {"name": "my_method", "classname": "MyClass", "time": "0.005"},
+        )
 
     def test_suite_time(self):
         test1 = test("my.module", "MyClass", "test_method1")
@@ -220,13 +222,13 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         # Check the time of each test
         if "time" in expected_suite:
-            self.assertEqual(expected_suite["time"],
-                             suite.get(JUnitDialect.TEST_TIME))
+            self.assertEqual(expected_suite["time"], suite.get(JUnitDialect.TEST_TIME))
 
         # Check the time of total test run
         if "totaltesttime" in expected_suite:
-            self.assertEqual(expected_suite["totaltesttime"],
-                             suite.get(JUnitDialect.TEST_TIME))
+            self.assertEqual(
+                expected_suite["totaltesttime"], suite.get(JUnitDialect.TEST_TIME)
+            )
 
         # Check individual test reports
         self.assertEqual(len(expected_suite["tests"]), len(suite))

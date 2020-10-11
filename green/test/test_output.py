@@ -204,4 +204,3 @@ class TestGreenStream(unittest.TestCase):
         s = MagicMock(spec=1)
         gs = GreenStream(s)
         self.assertEqual(gs.encoding, "UTF-8")
-
