@@ -590,7 +590,7 @@ class GreenTestResult(BaseTestResult):
             second_text_output = self.stream.formatLine(
                 test.getDescription(self.verbose), indent=2, outcome_char=outcome_char
             )
-            if terminal_width:  # pragma: no cover
+            if self.stream.isatty() and terminal_width:  # pragma: no cover
                 cursor_rewind = (
                     int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
                 )
