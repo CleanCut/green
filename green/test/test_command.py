@@ -139,5 +139,8 @@ class TestCommand(unittest.TestCase):
         cmd.run()
 
         d.fetch_build_eggs.assert_has_calls(
-            [call(["six"]), call(["mock", "unittest2"]),]
+            [
+                call(["six"]),
+                call(["mock", "unittest2"]),
+            ]
         )

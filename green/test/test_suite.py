@@ -199,8 +199,7 @@ class TestModuleTeardown(unittest.TestCase):
         del self.stream
 
     def test_failedModuleTeardown(self):
-        """
-        """
+        """"""
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, "test_moduleteardownfailed.py"), "w")
         fh.write(

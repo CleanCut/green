@@ -222,20 +222,20 @@ class TestPoolRunner(unittest.TestCase):
 
     def test_process(self):
         """
-        Avoid FileNotFoundError when using a multiprocessing.Value, fixes #154.
-        This test never fails, we have to watch the outer stderr to see if we get output like this:
+                Avoid FileNotFoundError when using a multiprocessing.Value, fixes #154.
+                This test never fails, we have to watch the outer stderr to see if we get output like this:
 
-  File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/multiprocessing/util.py", line 254, in _run_finalizers
-    finalizer()
-  File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/multiprocessing/util.py", line 186, in __call__
-    res = self._callback(*self._args, **self._kwargs)
-  File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/shutil.py", line 465, in rmtree
-    onerror(os.lstat, path, sys.exc_info())
-  File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/shutil.py", line 463, in rmtree
-    orig_st = os.lstat(path)
-FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/8y/cgqfhxyn2fz3r8n627_6dm_m0000gn/T/tmpp3fobx6i/pymp-8hpbali9'
+          File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/multiprocessing/util.py", line 254, in _run_finalizers
+            finalizer()
+          File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/multiprocessing/util.py", line 186, in __call__
+            res = self._callback(*self._args, **self._kwargs)
+          File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/shutil.py", line 465, in rmtree
+            onerror(os.lstat, path, sys.exc_info())
+          File "/usr/local/Cellar/python3/3.5.2_3/Frameworks/Python.framework/Versions/3.5/lib/python3.5/shutil.py", line 463, in rmtree
+            orig_st = os.lstat(path)
+        FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/8y/cgqfhxyn2fz3r8n627_6dm_m0000gn/T/tmpp3fobx6i/pymp-8hpbali9'
 
-        Newer versions of Python want to do their own cleanup, so let them.
+                Newer versions of Python want to do their own cleanup, so let them.
         """
         val = multiprocessing.Value(c_double, 0)
         # The error happens when something tries to clean up a sub-temporary
