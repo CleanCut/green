@@ -30,7 +30,7 @@ jobs:
           pip install black virtualenv coveralls
 
       - name: Lint with black
-        run: black --check green
+        run: black --check --diff green
 
       - name: Test
         run: ./g -tvvv green
