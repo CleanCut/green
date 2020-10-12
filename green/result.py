@@ -587,19 +587,15 @@ class GreenTestResult(BaseTestResult):
                 self.stream.write(self.colors.start_of_line())
             # Can end up being different from the first time due to subtest
             # information only being available after a test result comes in.
-            print(1)
             second_text_output = self.stream.formatLine(
                 test.getDescription(self.verbose), indent=2, outcome_char=outcome_char
             )
-            print(2)
-            if terminal_width:  # pragma: no cover
+            if self.stream.isatty() and terminal_width:  # pragma: no cover
                 cursor_rewind = (
                     int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
                 )
                 if cursor_rewind:
-                    print("terminal width {}".format(terminal_width))
                     self.stream.write(self.colors.up(cursor_rewind))
-            print(4)
             self.stream.write(color_func(second_text_output))
             if reason:
                 self.stream.write(color_func(" -- " + reason))
