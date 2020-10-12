@@ -80,7 +80,7 @@ def _main(argv, testing):
 
 def main(argv=None, testing=False):
     # create the temp dir only once (i.e., not while in the recursed call)
-    if os.environ.get("TMPDIR") is None:
+    if os.environ.get("TMPDIR") is None:  # pragma: nocover
         with tempfile.TemporaryDirectory() as temp_dir_for_tests:
             try:
                 os.environ["TMPDIR"] = temp_dir_for_tests
