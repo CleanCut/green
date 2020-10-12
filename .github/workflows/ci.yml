@@ -30,7 +30,7 @@ jobs:
           pip install black virtualenv coveralls
 
       - name: Lint with black
-        run: black --check
+        run: black --check green
 
       - name: Test
         run: ./g -tvvv green
@@ -40,7 +40,7 @@ jobs:
         if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest'
 
       - name: Coveralls
-        uses: coverallsapp/github-action@master
+        run: coveralls
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
         if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest'
