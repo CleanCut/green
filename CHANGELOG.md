@@ -3,6 +3,8 @@
 
 - Properly clean up temporary files in some versions/platforms. Contributed by @Icerman in #232.
   Resolves #228.
+- Fix an unwanted "1A" appearing at the beginning of test result lines in CI such as GitHub Actions
+  and AppVeyor.
 
 # Version 3.2.2
 #### 22 Sep 2020
