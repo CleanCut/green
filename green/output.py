@@ -51,7 +51,7 @@ class Colors:
 
     # Movement
     def start_of_line(self):
-        return "\r"
+        return "TESTING"
 
     def up(self, lines=1):
         return Cursor.UP(lines)
