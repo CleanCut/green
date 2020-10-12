@@ -597,7 +597,7 @@ class GreenTestResult(BaseTestResult):
                     int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
                 )
                 if cursor_rewind:
-                    print(3)
+                    print("terminal width {}".format(terminal_width))
                     self.stream.write(self.colors.up(cursor_rewind))
             print(4)
             self.stream.write(color_func(second_text_output))
