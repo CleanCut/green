@@ -41,6 +41,6 @@ jobs:
 
       - name: Coveralls
         run: coveralls
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest'
