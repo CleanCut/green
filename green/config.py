@@ -683,8 +683,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "no_skip_report",
             "no_tracebacks",
             "disable_windows",
-            "quiet_coverage",
-            "junit_report",
+            "quiet_coverage"
         ]:
             config_getter = config.getboolean
         elif name in ["processes", "debug", "verbose", "minimum_coverage"]:
@@ -698,6 +697,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "omit_patterns",
             "warnings",
             "test_pattern",
+            "junit_report",
         ]:
             config_getter = config.get
         elif name in ["targets", "help", "config"]:
