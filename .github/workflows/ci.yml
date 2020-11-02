@@ -1,4 +1,4 @@
-name: Posix CI
+name: CI
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest] # Windows is handled in ci-windows.yml
         python-version: [3.6, 3.7, 3.8]
 
     steps:

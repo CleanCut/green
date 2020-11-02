@@ -24,9 +24,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          %PYTHON%/python.exe -m pip install --upgrade pip
-          %PYTHON%/Scripts/pip.exe install -r requirements-optional.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements-optional.txt
 
       - name: Test
-        run: |
-          %PYTHON%/python.exe -m green.cmdline -vvv -t green -s 1
+        run: python -m green.cmdline -vvv -t green -s 1
