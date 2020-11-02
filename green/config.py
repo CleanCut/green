@@ -49,7 +49,7 @@ default_args = argparse.Namespace(  # pragma: no cover
     config=None,  # Not in configs
     file_pattern="test*.py",
     test_pattern="*",
-    junit_report=False,
+    junit_report="",
     run_coverage=False,
     cov_config_file=True,  # A string with a special boolean default
     quiet_coverage=False,
@@ -683,7 +683,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "no_skip_report",
             "no_tracebacks",
             "disable_windows",
-            "quiet_coverage"
+            "quiet_coverage",
         ]:
             config_getter = config.getboolean
         elif name in ["processes", "debug", "verbose", "minimum_coverage"]:
