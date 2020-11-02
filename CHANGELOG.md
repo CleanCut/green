@@ -1,3 +1,9 @@
+# Version 3.2.4
+#### 1 Nov 2020
+
+- Fix `-j/--junit-report` so that it writes to the properly-named file when specified from a config file. Contributed by @jwaschkau in #236.
+- Fix Windows CI by dropping a broken Python 2 test.
+
 # Version 3.2.3
 #### 11 Oct 2020
 
