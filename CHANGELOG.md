@@ -1,3 +1,8 @@
+# Version 3.2.5
+#### 23 Nov 2020
+
+- Fix failing/erroring SubTests not properly reporting output to stdout/stderr. Resolves #238.
+
 # Version 3.2.4
 #### 1 Nov 2020
 

@@ -410,6 +410,39 @@ class TestGreenTestResult(unittest.TestCase):
         gtr.tryRecordingStdoutStderr(test2, ptr2)
         gtr.recordStderr.assert_called_with(test2, errput)
 
+    def test_tryRecordingStdoutStderr_SubTest(self):
+        """
+        Recording stdout and stderr works correctly for failed/errored SubTests.
+        """
+        gtr = GreenTestResult(self.args, GreenStream(self.stream))
+        gtr.recordStdout = MagicMock()
+        gtr.recordStderr = MagicMock()
+
+        output = "apple"
+        test1 = MagicMock()
+        test1.dotted_name = "test 1"
+        subtest1 = MagicMock()
+        subtest1.dotted_name = "test 1: the subtest"
+        subtest1.class_name = "SubTest"
+        ptr1 = MagicMock()
+        ptr1.stdout_output = {test1: output}
+        ptr1.stderr_errput = {}
+
+        errput = "banana"
+        test2 = MagicMock()
+        test2.dotted_name = "test 2"
+        subtest2 = MagicMock()
+        subtest2.dotted_name = "test 2: subtests are annoying"
+        subtest2.class_name = "SubTest"
+        ptr2 = MagicMock()
+        ptr2.stdout_output = {}
+        ptr2.stderr_errput = {test2: errput}
+
+        gtr.tryRecordingStdoutStderr(subtest1, ptr1, err=True)
+        gtr.recordStdout.assert_called_with(subtest1, output)
+        gtr.tryRecordingStdoutStderr(subtest2, ptr2, err=True)
+        gtr.recordStderr.assert_called_with(subtest2, errput)
+
     def test_failfastAddError(self):
         """
         addError triggers failfast when it is set

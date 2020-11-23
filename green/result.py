@@ -363,7 +363,7 @@ class ProtoTestResult(BaseTestResult):
         """
         Called at the end of a subtest no matter its result.
 
-        The test that runs the subtests is calls the other test methods to
+        The test that runs the subtests calls the other test methods to
         record its own result.  We use this method to record each subtest as a
         separate test result.  It's very meta.
         """
@@ -429,22 +429,34 @@ class GreenTestResult(BaseTestResult):
     def stop(self):
         self.shouldStop = True
 
-    def tryRecordingStdoutStderr(self, test, proto_test_result):
+    def tryRecordingStdoutStderr(self, test, proto_test_result, err=None):
         if proto_test_result.stdout_output.get(test, False):
             self.recordStdout(test, proto_test_result.stdout_output[test])
         if proto_test_result.stderr_errput.get(test, False):
             self.recordStderr(test, proto_test_result.stderr_errput[test])
 
+        # SubTest errors/failures (but not successes) generate a different err object, so we have to
+        # do some inspection to figure out which object has the output/errput
+        if (test.class_name == "SubTest") and err:
+            for t in proto_test_result.stdout_output.keys():
+                if test.dotted_name.startswith(t.dotted_name):
+                    self.recordStdout(test, proto_test_result.stdout_output[t])
+                    break
+            for t in proto_test_result.stderr_errput.keys():
+                if test.dotted_name.startswith(t.dotted_name):
+                    self.recordStderr(test, proto_test_result.stderr_errput[t])
+                    break
+
     def addProtoTestResult(self, proto_test_result):
         for test, err in proto_test_result.errors:
             self.addError(test, err, proto_test_result.test_time)
-            self.tryRecordingStdoutStderr(test, proto_test_result)
+            self.tryRecordingStdoutStderr(test, proto_test_result, err)
         for test, err in proto_test_result.expectedFailures:
             self.addExpectedFailure(test, err, proto_test_result.test_time)
-            self.tryRecordingStdoutStderr(test, proto_test_result)
+            self.tryRecordingStdoutStderr(test, proto_test_result, err)
         for test, err in proto_test_result.failures:
             self.addFailure(test, err, proto_test_result.test_time)
-            self.tryRecordingStdoutStderr(test, proto_test_result)
+            self.tryRecordingStdoutStderr(test, proto_test_result, err)
         for test in proto_test_result.passing:
             self.addSuccess(test, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
