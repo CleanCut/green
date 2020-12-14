@@ -620,8 +620,5 @@ Wait!  What about the other test runners?
 - **the ones I missed** -- Er, haven't heard of them yet either.
 
 I'd love to hear **your** feedback regarding Green.  Like it?  Hate it?  Have
-some awesome suggestions?  Whatever the case, go submit it as an
-[Issue](https://github.com/CleanCut/green/issues?state=open).  I'm
-not picky about what goes into the Issue tracker.  Questions, comments, bugs,
-feature requests, just letting me know that I should go look at some other cool
-tool.  Go for it.
+some awesome suggestions?  Whatever the case, go 
+[open a discussion](https://github.com/CleanCut/green/discussions)
