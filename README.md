@@ -24,18 +24,19 @@ Features
 Community
 ---------
 
-- For **questions**, **comments**, **feature requests**, and **bug reports**
+- For **questions**, **comments**, or **feature requests**, please [open a discussion](https://github.com/CleanCut/green/discussions)
+- For **bug reports**, please
   [submit an issue](https://github.com/CleanCut/green/issues/new) to the GitHub
-  issue tracker for Green.  Communication with real users improves the project.
+  issue tracker for Green.
 - Submit a [pull
   request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
   with a bug fix or new feature.
-- :sparkling_heart: [Sponsor](https://github.com/sponsors/CleanCut) the maintainer to financially support this project
+- :sparkling_heart: [Sponsor](https://github.com/sponsors/CleanCut) the maintainer to support this project
 
 Training Course
 --------
 
-There is a training course available:
+There is a training course available if you would like professional training:
 [Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB).
 
 <a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB" rel="Python Testing with Green"> ![Python Testing with Green](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)</a>
