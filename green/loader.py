@@ -191,7 +191,6 @@ class GreenTestLoader(unittest.TestLoader):
         return flattenTestSuite(suites) if suites else None
 
     def loadTarget(self, target, file_pattern="test*.py"):
-        """"""
         debug(
             "Attempting to load target '{}' with file_pattern '{}'".format(
                 target, file_pattern
