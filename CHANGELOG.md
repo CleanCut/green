@@ -1,3 +1,10 @@
+# Version 3.2.6
+#### 25 April 2021
+
+- Color is now properly emitted on Windows runners in GitHub Actions. See #245.
+- Unexpected successes now count as failures like they do in unittest. Resolves #241.
+- Fix internal coverage not reporting in CI + other internal CI improvements
+
 # Version 3.2.5
 #### 23 Nov 2020
 
