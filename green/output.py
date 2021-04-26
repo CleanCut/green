@@ -133,6 +133,9 @@ class GreenStream(object):
         on_windows = platform.system() == "Windows"
         on_appveyor = os.environ.get("APPVEYOR", False)
 
+        print(
+            f"override_appveyor: {override_appveyor}, on_windows: {on_windows}, on_appveyor: {on_appveyor}, disable_windows: {disable_windows}, disable_unidecode: {disable_unidecode}"
+        )
         if override_appveyor or (
             (on_windows and not on_appveyor) and not disable_windows
         ):  # pragma: no cover
