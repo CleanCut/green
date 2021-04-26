@@ -39,7 +39,7 @@ jobs:
         if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-latest'
 
       - name: Coveralls
-        run: coveralls
+        run: coveralls --service=github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
