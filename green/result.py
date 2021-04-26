@@ -544,7 +544,7 @@ class GreenTestResult(BaseTestResult):
             self.stream.writeln(self.colors.failing("No Tests Found"))
         else:
             grade = self.colors.passing("OK")
-            if self.errors or self.failures:
+            if not self.wasSuccessful():
                 grade = self.colors.failing("FAILED")
             self.stream.writeln("{} ({})".format(grade, ", ".join(stats)))
 
@@ -791,4 +791,4 @@ class GreenTestResult(BaseTestResult):
         ):
             return False
         else:
-            return len(self.all_errors) == 0
+            return len(self.all_errors) + len(self.unexpectedSuccesses) == 0

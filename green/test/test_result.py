@@ -1056,7 +1056,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         self.args.verbose = 1
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.unexpectedSuccesses.append("anything")
-        self.assertEqual(gtr.wasSuccessful(), True)
+        self.assertEqual(gtr.wasSuccessful(), False)
 
     def test_wasSuccessful_coverageFails(self):
         """
