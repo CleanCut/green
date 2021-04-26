@@ -128,13 +128,16 @@ class GreenStream(object):
     ):
         self.disable_unidecode = disable_unidecode
         self.stream = stream
-        # Ironically, AppVeyor doesn't support windows win32 system calls for
-        # colors, but it WILL interpret posix ansi escape codes!
+        # Ironically, Windows CI platforms such as GitHub Actions and AppVeyor don't support windows
+        # win32 system calls for colors, but it WILL interpret posix ansi escape codes! (The
+        # opposite of an actual windows command prompt)
         on_windows = platform.system() == "Windows"
-        on_appveyor = os.environ.get("APPVEYOR", False)
+        on_windows_ci = os.environ.get("GITHUB_ACTIONS", False) or os.environ.get(
+            "APPVEYOR", False
+        )
 
         if override_appveyor or (
-            (on_windows and not on_appveyor) and not disable_windows
+            (on_windows and not on_windows_ci) and not disable_windows
         ):  # pragma: no cover
             self.stream = wrap_stream(self.stream, None, None, None, True)
             # set output is ascii-only
