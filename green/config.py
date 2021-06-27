@@ -50,6 +50,7 @@ default_args = argparse.Namespace(  # pragma: no cover
     file_pattern="test*.py",
     test_pattern="*",
     junit_report="",
+    watch=False,
     run_coverage=False,
     cov_config_file=True,  # A string with a special boolean default
     quiet_coverage=False,
@@ -407,6 +408,15 @@ def parseArguments(argv=None):  # pragma: no cover
             default=argparse.SUPPRESS,
         )
     )
+    store_opt(
+        other_args.add_argument(
+            "-w",
+            "--watch",
+            action="store_true",
+            help=("Watch for file changes and re-run tests."),
+            default=argparse.SUPPRESS,
+        )
+    )
 
     cov_args = parser.add_argument_group(
         "Coverage Options ({})".format(coverage_version)
@@ -675,6 +685,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "version",
             "disable_unidecode",
             "failfast",
+            "watch",
             "run_coverage",
             "options",
             "completions",

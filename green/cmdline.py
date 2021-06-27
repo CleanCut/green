@@ -25,6 +25,7 @@ def _main(argv, testing):
     from green.output import GreenStream, debug
     import green.output
     from green.suite import GreenTestSuite
+    from green.watch import watch
 
     GreenTestSuite.args = args
 
@@ -63,6 +64,9 @@ def _main(argv, testing):
     if not test_suite:
         debug("No test loading attempts succeeded.  Created an empty test suite.")
         test_suite = GreenTestSuite()
+
+    if args.watch:
+        watch(stream, args, testing)
 
     # Actually run the test_suite
     result = run(test_suite, stream, args, testing)
