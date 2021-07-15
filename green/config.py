@@ -32,6 +32,7 @@ default_args = argparse.Namespace(  # pragma: no cover
     processes=multiprocessing.cpu_count(),
     initializer="",
     finalizer="",
+    maxtasksperchild=None,
     termcolor=None,
     notermcolor=None,
     disable_windows=False,
@@ -205,6 +206,20 @@ def parseArguments(argv=None):  # pragma: no cover
             help="Same as --initializer, only run at the end of a worker "
             "process's lifetime.  Used to unprovision resources provisioned by "
             "the initializer.",
+            default=argparse.SUPPRESS,
+        )
+    )
+    store_opt(
+        concurrency_args.add_argument(
+            "-X",
+            "--maxtasksperchild",
+            action="store",
+            metavar="NUM",
+            type=int,
+            help="Passed directly as the `maxtasksperchild` argument to an internal "
+            '`multiprocessing.pool.Pool`. A "task" in this context usually corresponds to a test '
+            "suite consisting of all the tests in a single file.  This option slows down testing, "
+            "but has the benefit of guaranteeing a new Python process for each test suite.",
             default=argparse.SUPPRESS,
         )
     )
@@ -686,7 +701,13 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "quiet_coverage",
         ]:
             config_getter = config.getboolean
-        elif name in ["processes", "debug", "verbose", "minimum_coverage"]:
+        elif name in [
+            "processes",
+            "debug",
+            "verbose",
+            "minimum_coverage",
+            "maxtasksperchild",
+        ]:
             config_getter = config.getint
         elif name in [
             "file_pattern",

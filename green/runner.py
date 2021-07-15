@@ -96,6 +96,7 @@ def run(suite, stream, args, testing=False):
             processes=args.processes or None,
             initializer=InitializerOrFinalizer(args.initializer),
             finalizer=InitializerOrFinalizer(args.finalizer),
+            maxtasksperchild=args.maxtasksperchild,
         )
         manager = multiprocessing.Manager()
         targets = [(target, manager.Queue()) for target in parallel_targets]

@@ -39,6 +39,13 @@ Concurrency Options:
                         Same as --initializer, only run at the end of a worker
                         process's lifetime. Used to unprovision resources
                         provisioned by the initializer.
+  -X NUM, --maxtasksperchild NUM
+                        Passed directly as the `maxtasksperchild` argument to
+                        an internal `multiprocessing.pool.Pool`. A "task" in
+                        this context usually corresponds to a test suite
+                        consisting of all the tests in a single file. This
+                        option slows down testing, but has the benefit of
+                        guaranteeing a new Python process for each test suite.
 
 Format Options:
   -t, --termcolor       Force terminal colors on. Default is to autodetect.
