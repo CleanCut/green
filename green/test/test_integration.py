@@ -47,14 +47,13 @@ class TestFinalizer(unittest.TestCase):
             "--maxtasksperchild=1",
         ]
         pythonpath = str(PurePath(__file__).parent.parent.parent)
-        print(pythonpath)
-        print(
-            subprocess.run(
-                args,
-                cwd=sub_tmpdir,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                env={"PYTHONPATH": pythonpath},
-                timeout=10,
-            ).stdout.decode("utf-8")
-        )
+
+        output = subprocess.run(
+            args,
+            cwd=sub_tmpdir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            env={"PYTHONPATH": pythonpath},
+            timeout=10,
+        ).stdout.decode("utf-8")
+        self.assertIn("finalizer worked", output)
