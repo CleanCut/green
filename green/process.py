@@ -67,7 +67,7 @@ class ProcessLogger(object):
 # 3.5.0a4+ of the main python mercurial repository.  Then altered it to run
 # on 2.7+ and added the finalizer/finalargs parameter handling. This approach
 # worked until we hit Python 3.8, when it broke.
-class LoggingDaemonlessPool37(Pool):
+class LoggingDaemonlessPool37(Pool):  # pragma: no cover
     """
     I make a pool of workers which can get crash output to the logger, run processes not as daemons,
     and which run finalizers...in a way which works on Python 2.7 to 3.7, inclusive.
@@ -216,7 +216,7 @@ class LoggingDaemonlessPool38(Pool):
 
 
 LoggingDaemonlessPool = LoggingDaemonlessPool38
-if tuple(map(int, platform.python_version_tuple()[:2])) < (3, 8):
+if tuple(map(int, platform.python_version_tuple()[:2])) < (3, 8):  # pragma: no cover
     LoggingDaemonlessPool = LoggingDaemonlessPool37
 
 import platform
