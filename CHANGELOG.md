@@ -1,3 +1,9 @@
+# Version 3.3.0
+#### 15 July 2021
+
+- Added `-X NUM, --maxtasksperchild NUM` to force worker processes to exit and respawn after a certain number of tasks so that we could use it in integration tests to force the condition fixed below. A "task" is typically the suite of tests from a single file.
+- Fixed processes failing to respawn on Python 3.8+. In the happy path, processes never die, so there is no problem. In the sad path, if all processes got killed before all test suites had been run then Green would hang forever with a queue of tests to run without any worker processes to run them. Resolves #250.
+
 # Version 3.2.6
 #### 25 April 2021
 
