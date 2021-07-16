@@ -1,3 +1,4 @@
+import copy
 import multiprocessing
 import os
 from pathlib import PurePath
@@ -48,12 +49,15 @@ class TestFinalizer(unittest.TestCase):
         ]
         pythonpath = str(PurePath(__file__).parent.parent.parent)
 
+        env = copy.deepcopy(os.environ)
+        env["PYTHONPATH"] = pythonpath
+
         output = subprocess.run(
             args,
             cwd=sub_tmpdir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            env={"PYTHONPATH": pythonpath},
+            env=env,
             timeout=10,
         ).stdout.decode("utf-8")
         self.assertIn("finalizer worked", output)
