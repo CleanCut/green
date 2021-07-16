@@ -11,7 +11,7 @@ try:
 except:
     from mock import MagicMock
 
-from green.process import ProcessLogger, DaemonlessProcess, poolRunner
+from green.process import ProcessLogger, poolRunner
 from green import process
 
 try:
@@ -58,23 +58,6 @@ class TestProcessLogger(unittest.TestCase):
         l = ProcessLogger(func)
         self.assertRaises(AttributeError, l)
         mock_get_logger.assert_any_call()
-
-
-class TestDaemonlessProcess(unittest.TestCase):
-    def test_daemonIsFalse(self):
-        """
-        No matter what daemon is set to, it returns False
-        """
-        dp = DaemonlessProcess()
-        self.assertEqual(dp.daemon, False)
-        # dp.daemon = True
-        # self.assertEqual(dp.daemon, False)
-        # dp.daemon = 5
-        # self.assertEqual(dp.daemon, False)
-        # dp.daemon = ["something"]
-        # self.assertEqual(dp.daemon, False)
-        # dp.daemon = []
-        # self.assertEqual(dp.daemon, False)
 
 
 class TestPoolRunner(unittest.TestCase):
