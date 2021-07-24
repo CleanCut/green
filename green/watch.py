@@ -1,46 +1,62 @@
-import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import os
+import sys
 
-from green.runner import run
-from green.loader import GreenTestLoader
+def watch(original_argv, processed_args):
+    if dependenciesMissing():
+        return 1
 
-to_run = True
+    argv_watch_removed = list(filter(lambda arg: arg != '-w', original_argv))
+    new_green_argv = ' '.join(argv_watch_removed)
 
-
-class GreenEventHandler(FileSystemEventHandler):
-    def __init__(self):
-        super().__init__()
-
-    def on_any_event(self, event):
-        global to_run
-        to_run = True
+    # Add the console "clear" command before re-running green.
+    new_green_argv = 'clear; ' + new_green_argv
 
 
-def watch(stream, args, testing):
-    global to_run
-    event_handler = GreenEventHandler()
+    run_watchmedo_shell_command(new_green_argv, processed_args)
 
-    observer = Observer()
-    observer.schedule(event_handler, '.', recursive=True)
-    observer.start()
+    # Having issues with stray output
+    # run_watchmedo_auto_restart(argv_watch_removed)
 
-    last_result = None
 
+def dependenciesMissing():
     try:
-        while True:
-            if to_run:
-                loader = GreenTestLoader()
-                test_suite = loader.loadTargets(
-                    args.targets, file_pattern=args.file_pattern)
+        import watchdog
+    except ImportError:
+        print("Error: 'watchdog' library could not be detected. Please install the watchdog library to use the code watching feature.")
+        return True
 
-                last_result = run(test_suite, stream, args, testing)
-                to_run = False
+    return False
 
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
 
-    observer.join()
+def run_watchmedo_shell_command(new_green_argv, processed_args):
+    watchmedo_args = [
+        'watchmedo',
+        'shell-command',
+        '--patterns="*.py"',
+        '--ignore-directories',
+        '--recursive',
+        f'--command="{new_green_argv}"',
+        '--drop',
+        *processed_args.targets
+    ]
 
-    return last_result
+    # This didn't output to the screen... Not sure why.
+    # os.execvp(watchmedo_args[0], watchmedo_args)
+
+    os.system(new_green_argv)
+    os.system(' '.join(watchmedo_args))
+
+
+
+def run_watchmedo_auto_restart(argv_watch_removed):
+    watchmedo_auto_restart_args = [
+        'watchmedo',
+        'auto-restart',
+        '--patterns="*.py"',
+        '--ignore-directories',
+        '--recursive',
+        '--',
+        *argv_watch_removed,
+    ]
+
+    os.system(' '.join(watchmedo_auto_restart_args))

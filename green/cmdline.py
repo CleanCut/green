@@ -8,6 +8,7 @@ import green.config as config
 
 
 def _main(argv, testing):
+    original_argv = sys.argv
     args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
 
@@ -31,6 +32,9 @@ def _main(argv, testing):
 
     if args.debug:
         green.output.debug_level = args.debug
+
+    if args.watch:
+        return watch(original_argv, args)
 
     stream = GreenStream(sys.stdout, disable_windows=args.disable_windows)
 
@@ -64,9 +68,6 @@ def _main(argv, testing):
     if not test_suite:
         debug("No test loading attempts succeeded.  Created an empty test suite.")
         test_suite = GreenTestSuite()
-
-    if args.watch:
-        watch(stream, args, testing)
 
     # Actually run the test_suite
     result = run(test_suite, stream, args, testing)

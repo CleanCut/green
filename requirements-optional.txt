@@ -1,3 +1,4 @@
 django
 testtools
+watchdog
 -r requirements.txt
