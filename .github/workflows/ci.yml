@@ -35,13 +35,13 @@ jobs:
         if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
 
       - name: Test
-        run: python -m green.cmdline -tvvv green
+        run: python -m green.cmdline -tvvvv green
         if: matrix.python-version != '3.9' || matrix.os != 'ubuntu-latest'
 
       - name: Generate coverage
         run: |
           pip install --upgrade coveralls
-          ./g -tvvvr green
+          ./g -tvvvvr green
         if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
 
       - name: Coveralls
