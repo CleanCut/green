@@ -126,20 +126,27 @@ class ProtoTest:
         )
 
     def getDescription(self, verbose):
+        # Classes or module teardown errors
         if self.is_class_or_module_teardown_error:
             return self.name
-        if verbose == 2:
-            if self.is_doctest:
+        # Doctests
+        if self.is_doctest:
+            if verbose == 2:
                 return self.name
-            return self.method_name + self.subtest_part
-        elif verbose > 2:
-            if self.is_doctest:
+            elif verbose > 2:
                 return self.name + " -> " + self.filename + ":" + str(self.lineno)
-            return (self.docstr_part + self.subtest_part) or (
-                self.method_name + self.subtest_part
-            )
-        else:
             return ""
+        # Regular tests
+        if verbose == 2:
+            return self.method_name + self.subtest_part
+        elif verbose == 3:
+            return (self.docstr_part + self.subtest_part) or self.method_name
+        elif verbose > 3:
+            if self.docstr_part + self.subtest_part:
+                return self.method_name + ": " + self.docstr_part + self.subtest_part
+            else:
+                return self.method_name
+        return ""
 
 
 class ProtoError:

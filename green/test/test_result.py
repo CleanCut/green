@@ -274,18 +274,20 @@ class TestProtoTest(unittest.TestCase):
         self.assertEqual(t.getDescription(1), "")
         self.assertEqual(t.getDescription(2), "test_stuff")
         self.assertEqual(t.getDescription(3), "apple")
-        self.assertEqual(t.getDescription(4), "apple")
+        self.assertEqual(t.getDescription(4), "test_stuff: apple")
+        self.assertEqual(t.getDescription(5), "test_stuff: apple")
 
         # Without a docstring
         class Vegetable(unittest.TestCase):
-            def test_stuff(self):
+            def test_vegetable(self):
                 pass
 
-        t = proto_test(Vegetable("test_stuff"))
+        t = proto_test(Vegetable("test_vegetable"))
         self.assertEqual(t.getDescription(1), "")
-        self.assertEqual(t.getDescription(2), "test_stuff")
-        self.assertEqual(t.getDescription(3), "test_stuff")
-        self.assertEqual(t.getDescription(4), "test_stuff")
+        self.assertEqual(t.getDescription(2), "test_vegetable")
+        self.assertEqual(t.getDescription(3), "test_vegetable")
+        self.assertEqual(t.getDescription(4), "test_vegetable")
+        self.assertEqual(t.getDescription(5), "test_vegetable")
 
     def test_newlineDocstring(self):
         """
