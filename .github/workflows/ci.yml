@@ -36,7 +36,6 @@ jobs:
 
       - name: Test
         run: python -m green.cmdline -tvvvv green
-        if: matrix.python-version != '3.9' || matrix.os != 'ubuntu-latest'
 
       - name: Generate coverage
         run: |
