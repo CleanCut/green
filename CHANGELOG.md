@@ -1,3 +1,8 @@
+# Version 3.4.0
+#### 12 January 2021
+
+- Four levels of verbosity (`-vvvv` on the command line or `verbose=4` in the config) now displays the test method name _and_ the test method docstring. Resolves #252.
+
 # Version 3.3.0
 #### 15 July 2021
 
