@@ -133,6 +133,5 @@ try:
             self.teardown_test_environment()
             return self.suite_result(suite, result)
 
-
 except ImportError:  # pragma: no cover
     DjangoRunner = django_missing
