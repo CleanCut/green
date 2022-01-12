@@ -338,10 +338,18 @@ class TestProtoTest(unittest.TestCase):
         dt = parser.get_doctest(test, {"f": f}, "doctest.name", "somefile.py", 20)
         dt.__module__ = "somefile"
         p = proto_test(doctest.DocTestCase(dt))
+        # no description
+        self.assertEqual(p.getDescription(0), "")
+        self.assertEqual(p.getDescription(1), "")
         # short description
         self.assertEqual(p.getDescription(2), "doctest.name")
         # long description
         description = p.getDescription(3)
+        self.assertIn("doctest.name", description)
+        self.assertIn("somefile.py", description)
+        self.assertIn("20", description)
+        # very long == long
+        description = p.getDescription(4)
         self.assertIn("doctest.name", description)
         self.assertIn("somefile.py", description)
         self.assertIn("20", description)
