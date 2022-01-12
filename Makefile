@@ -31,7 +31,7 @@ test-local:
 test-coverage:
 	@# Generate coverage files for travis builds (don't clean after this!)
 	@make clean-silent
-	./g 3 -r -vvv green
+	./g 3 -r -vvvv green
 	@echo "\n(test-coverage) completed\n"
 
 test-installed:
@@ -44,7 +44,7 @@ test-installed:
 	source venv-installed/bin/activate; python3 setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
 	source venv-installed/bin/activate; cd green-$(VERSION) && python3 setup.py install
-	source venv-installed/bin/activate; green -vvv green
+	source venv-installed/bin/activate; green -vvvv green
 	@rm -rf venv-installed
 	@make clean-silent
 	@echo "\n(test-installed) completed\n"
