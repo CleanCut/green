@@ -29,4 +29,4 @@ Features
 .. _Python Testing with Green: https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_ANGEL
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _PyPy: http://pypy.org
-.. _changelog: https://github.com/CleanCut/green/blob/master/CHANGELOG.md
+.. _changelog: https://github.com/CleanCut/green/blob/main/CHANGELOG.md

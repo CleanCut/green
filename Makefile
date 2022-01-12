@@ -61,8 +61,8 @@ sanity-checks:
 	@./g 3 -m 100 green
 	@# If there's already a tag for this version, then we forgot to bump the version.
 	@if git show-ref --verify --quiet refs/tags/$(VERSION) ; then printf "\nVersion $(VERSION) has already been tagged.\nIf the make process died after tagging, but before actually releasing, you can try 'make release-unsafe'\n\n" ; exit 1 ; fi
-	@# We should be on the master branch
-	@if [[ $(shell git rev-parse --abbrev-ref HEAD) != "master" ]] ; then echo "\nYou need to be on the master branch to release.\n" && exit 1 ; fi
+	@# We should be on the main branch
+	@if [[ $(shell git rev-parse --abbrev-ref HEAD) != "main" ]] ; then echo "\nYou need to be on the main branch to release.\n" && exit 1 ; fi
 	@# All our help options should be up-to-date
 	@COLUMNS=80 ./g 3 -h > cli-options.txt
 	@printf "\n== SANITY CHECK: GIT STATUS ==\n"

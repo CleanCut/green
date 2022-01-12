@@ -1,6 +1,6 @@
 [![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
 [![CI Status](https://github.com/CleanCut/green/workflows/CI/badge.svg)](https://github.com/CleanCut/green/actions)
-[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=main)
 
 # Green -- A clean, colorful, fast python test runner.
 
@@ -19,7 +19,7 @@ Features
 - **Modern** - Supports Python 3.5+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the
-  [changelog](https://github.com/CleanCut/green/blob/master/CHANGELOG.md)
+  [changelog](https://github.com/CleanCut/green/blob/main/CHANGELOG.md)
 
 Community
 ---------
@@ -39,14 +39,14 @@ Training Course
 There is a training course available if you would like professional training:
 [Python Testing with Green](https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB).
 
-<a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB" rel="Python Testing with Green"> ![Python Testing with Green](https://raw.githubusercontent.com/CleanCut/green/master/img/GreenCourseImagePromoStripe.png)</a>
+<a href="https://www.udemy.com/python-testing-with-green/?couponCode=GREEN_GITHUB" rel="Python Testing with Green"> ![Python Testing with Green](https://raw.githubusercontent.com/CleanCut/green/main/img/GreenCourseImagePromoStripe.png)</a>
 
 Screenshots
 -----------
 
 #### Top: With Green!  Bottom: Without Green :-(
 
-![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/master/img/screenshot.png)
+![Python Unit Test Output](https://raw.githubusercontent.com/CleanCut/green/main/img/screenshot.png)
 
 
 Quick Start
@@ -83,7 +83,7 @@ green green
 ```
 
 For more help, see the [complete command-line
-options](https://github.com/CleanCut/green/blob/master/cli-options.txt) or run
+options](https://github.com/CleanCut/green/blob/main/cli-options.txt) or run
 `green --help`.
 
 Config Files
@@ -97,12 +97,12 @@ in the resolution chain overwriting earlier settings (last setting wins).
 3) `setup.cfg` in the current working directory of test run
 4) `.green` in the current working directory of the test run
 5) A config file specified by the command-line argument `--config FILE`
-6) [Command-line arguments](https://github.com/CleanCut/green/blob/master/cli-options.txt)
+6) [Command-line arguments](https://github.com/CleanCut/green/blob/main/cli-options.txt)
 
 Any arguments specified in more than one place will be overwritten by the
 value of the LAST place the setting is seen.  So, for example, if a setting
 is turned on in `~/.green` and turned off by a
-[command-line argument](https://github.com/CleanCut/green/blob/master/cli-options.txt),
+[command-line argument](https://github.com/CleanCut/green/blob/main/cli-options.txt),
 then the setting will be turned off.
 
 Config file format syntax is `option = value` on separate lines.  `option` is
@@ -235,7 +235,7 @@ This tutorial covers:
 - DocTests
 
 For more in-depth online training please check out
-[Python Testing with Green](https://github.com/CleanCut/green/blob/master/PythonTestingWithGreen.md):
+[Python Testing with Green](https://github.com/CleanCut/green/blob/main/PythonTestingWithGreen.md):
 
 - Layout your test packages and modules correctly
 - Organize your tests effectively
