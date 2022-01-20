@@ -246,7 +246,7 @@ class GreenTestLoader(unittest.TestLoader):
                         del tests._tests[index]
 
             except Exception as e:
-                debug("IGNORED exception: {}".format(e))
+                raise Exception("Exception while loading {}: {}".format(target, e))
             if tests and tests.countTestCases():
                 debug("Load method: DOTTED OBJECT - {}".format(target))
                 return flattenTestSuite(tests)
