@@ -1,3 +1,13 @@
+# Unreleased
+#### Date TBD
+
+
+
+# Version 3.4.1
+#### 20 January 2021
+
+- Fixed a situation where syntax errors in a test file were being silently ignored, resulting in the entire test file being omitted from the test. This would happen if the module with a syntax error was loaded via specifying a "dot name" such as `mymodule.MyClass.mytest` as the target to test. Now green reliably crashes in this situation. Note that this changes the behavior for syntax errors when initiated with a filename target. Previously specifying the test target as a filename such as `mymodule.py` that had a syntax error in it would result in converting the loading exception into a single test failure representing the inability to load a test file. Now, we simply crash on the syntax error. In practice, I believe this is an improvement...as syntax errors are easy to fix, and folks are used to hitting the crash and fixing them, while obscuring them behind a custom test failure is not only unusual, it's also a lot of work to make it happen inside green.
+
 # Version 3.4.0
 #### 12 January 2021
 
