@@ -887,10 +887,9 @@ class TestLoadTargets(unittest.TestCase):
         )
         self.assertEqual(tests.countTestCases(), 1)
 
-    def test_explicit_filename_error(self):
+    def test_syntax_error_by_filename(self):
         """
-        Loading a module by name with a syntax error produces a failure, not a
-        silent absence of its tests.
+        Loading a module by file name with a syntax error produces a crash.
         """
         sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
         fh = open(os.path.join(sub_tmpdir, "mod_with_import_error.py"), "w")
@@ -898,8 +897,46 @@ class TestLoadTargets(unittest.TestCase):
         fh.close()
 
         os.chdir(sub_tmpdir)
-        tests = self.loader.loadTargets("mod_with_import_error.py")
-        self.assertEqual(tests.countTestCases(), 1)
+        hit_exception = False
+        try:
+            self.loader.loadTargets("mod_with_import_error.py")
+        except Exception as e:
+            self.assertIn("invalid syntax", str(e))
+            self.assertIn("mod_with_import_error.py", str(e))
+            hit_exception = True
+        if not hit_exception:
+            self.fail("An exception should have been raised. :-(")
+
+    def test_syntax_error_by_dotname(self):
+        """
+        Loading a module by dotname with a syntax error produces a crash.
+        """
+        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        fh = open(os.path.join(sub_tmpdir, "mod_with_syntax_error.py"), "w")
+        fh.write(
+            dedent(
+                """
+            import unittest
+            class TestSyntax(unittest.TestCase):
+                def test_syntax(self):
+                    syntax error
+            """
+            )
+        )
+        fh.close()
+
+        os.chdir(sub_tmpdir)
+        hit_exception = False
+        try:
+            self.loader.loadTargets("mod_with_syntax_error.TestSyntax.test_syntax")
+        except Exception as e:
+            self.assertIn("invalid syntax", str(e))
+            self.assertIn("mod_with_syntax_error.TestSyntax.test_syntax", str(e))
+            hit_exception = True
+        if not hit_exception:
+            self.fail(
+                "An exception should have been raised about the syntax error. :-("
+            )
 
     def test_file_pattern(self):
         """
