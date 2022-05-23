@@ -796,6 +796,7 @@ def mergeConfig(args, testing=False):  # pragma: no cover
         "*/unittest2*",  # pulled in by testtools
         "*Python.framework*",  # OS X system python
         "*site-packages*",  # System python for other OS's
+        "*/dist-packages*",  # Resolves issue #259
         tempfile.gettempdir() + "*",
     ]
     if new_args.clear_omit:

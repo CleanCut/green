@@ -1,7 +1,11 @@
 # Unreleased
 #### Date TBD
 
+# Version 3.4.2
+#### 23 May 2022
 
+- Added `*/dist-packages*` to the default
+- The development script, `./g`, now defaults to looking for `python3`
 
 # Version 3.4.1
 #### 20 January 2021
