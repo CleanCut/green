@@ -84,9 +84,7 @@ done
 for TEST in ${TESTS} ; do
     for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         if [ "${PYTHON_VERSION}" == "default" ] ; then
-            PYTHON="python"
-        elif [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
-            PYTHON="python"
+            PYTHON="python3"
         else
             VENV_DIR="venv${PYTHON_VERSION}"
             PYTHON=${VENV_DIR}/bin/python
