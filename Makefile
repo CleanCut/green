@@ -43,7 +43,7 @@ test-installed:
 	source venv-installed/bin/activate; pip3 install -r requirements-optional.txt
 	source venv-installed/bin/activate; python3 setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	source venv-installed/bin/activate; cd green-$(VERSION) && python3 setup.py install
+	source venv-installed/bin/activate; cd green-$(VERSION) && pip3 install .
 	source venv-installed/bin/activate; green -vvvv green
 	@rm -rf venv-installed
 	@make clean-silent
