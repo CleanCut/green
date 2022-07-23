@@ -356,7 +356,7 @@ class ProtoTestResult(BaseTestResult):
 
     def addExpectedFailure(self, test, err):
         """
-        Called when a test fails, and we expeced the failure
+        Called when a test fails, and we expected the failure
         """
         self.expectedFailures.append((proto_test(test), proto_error(err)))
 
