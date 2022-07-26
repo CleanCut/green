@@ -37,7 +37,7 @@ class GreenTestLoader(unittest.TestLoader):
         test_case_names = list(filter(filter_test_methods, dir(testCaseClass)))
         debug("Test case names: {}".format(test_case_names))
 
-        # Use default unittest.TestSuite sorting method if not overriden
+        # Use default unittest.TestSuite sorting method if not overridden
         test_case_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
 
         if not test_case_names and hasattr(testCaseClass, "runTest"):
@@ -479,7 +479,7 @@ def flattenTestSuite(test_suite, module=None):
         suite.injected_module = module.__name__
         suites.append(suite)
 
-    # Now extract all tests from the suite heirarchies and flatten them into a
+    # Now extract all tests from the suite hierarchies and flatten them into a
     # single suite with all tests.
     tests = []
     for suite in suites:

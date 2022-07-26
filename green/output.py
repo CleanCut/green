@@ -104,7 +104,7 @@ class Colors:
 
 class GreenStream(object):
     """
-    Wraps a stream-like object with the following additonal features:
+    Wraps a stream-like object with the following additional features:
 
     1) A handy writeln() method (which calls write() under-the-hood)
     2) Handy formatLine() and formatText() methods, which support indent
