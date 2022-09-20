@@ -3,7 +3,7 @@
 if [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
     PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION}"
 else
-    PYTHON_VERSIONS="$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(3.[5-9])|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )"
+    PYTHON_VERSIONS="$(find -E `echo $PATH | tr : ' '` -depth 1 -regex '.*/python(3.[0-9]+)|.*/pypy|.*/pypy3' 2>/dev/null | sed -E -e 's/.*python//' -e 's/.*pypy/pypy/' )"
 fi
 # This fancy line makes it so we test each module individually, and then all of green.
 #TESTS="`find green -name test_*.py | sed -e s/.py$// | tr / .` green"
