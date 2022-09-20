@@ -98,7 +98,7 @@ Other Options:
   -j FILENAME, --junit-report FILENAME
                         Generate a JUnit XML report.
 
-Coverage Options (Coverage 6.4):
+Coverage Options (Coverage 6.4.4):
   -r, --run-coverage    Produce coverage output.
   -g FILE, --cov-config-file FILE
                         Specify a coverage config file. Implies --run-coverage
