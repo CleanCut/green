@@ -1,6 +1,11 @@
 # Unreleased
 #### Date TBD
 
+# Version 3.4.3
+#### 20 Sep 2022
+
+- If green creates a temp directory for tests, but is unable to clean it up, emit a warning instead of crashing. Some tests don't behave well in the temp directory. Resolves #264.
+
 # Version 3.4.2
 #### 23 May 2022
 
