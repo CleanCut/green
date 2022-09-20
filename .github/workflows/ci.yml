@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.8, 3.9, 3.10]
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -32,7 +32,7 @@ jobs:
         run: |
           pip install --upgrade black
           black --check --diff green
-        if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
+        if: matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'
 
       - name: Test
         run: python -m green.cmdline -tvvvv green
@@ -41,10 +41,10 @@ jobs:
         run: |
           pip install --upgrade coveralls
           ./g -tvvvvr green
-        if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
+        if: matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'
 
       - name: Coveralls
         run: coveralls --service=github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
+        if: matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'
