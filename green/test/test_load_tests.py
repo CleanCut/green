@@ -1,15 +1,9 @@
-from __future__ import unicode_literals
-
 import os
+from queue import Queue, Empty
 import shutil
 import tempfile
 import unittest
 import textwrap
-
-try:
-    from Queue import Queue, Empty
-except ImportError:
-    from queue import Queue, Empty
 
 from green.loader import GreenTestLoader
 from green.process import poolRunner

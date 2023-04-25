@@ -1,23 +1,16 @@
 from ctypes import c_double
 import os
 import multiprocessing
+from queue import Queue, Empty
 import shutil
 import tempfile
 from textwrap import dedent
 import unittest
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
+from unittest.mock import MagicMock
 
 from green.process import ProcessLogger, poolRunner
 from green import process
 
-try:
-    from Queue import Queue, Empty
-except:
-    from queue import Queue, Empty
 
 
 class TestProcessLogger(unittest.TestCase):

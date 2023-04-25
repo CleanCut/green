@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 import multiprocessing
 from sys import modules
 from unittest.signals import registerResult, installHandler, removeResult

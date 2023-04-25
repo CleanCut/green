@@ -1,10 +1,8 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 from collections import OrderedDict
 from doctest import DocTestCase
 from io import StringIO
 from math import ceil
+from shutil import get_terminal_size
 import sys
 import time
 import traceback
@@ -14,11 +12,6 @@ from unittest import TestCase
 from green.output import Colors, debug
 from green.version import pretty_version
 
-# introduced in Python 3
-try:
-    from shutil import get_terminal_size
-except ImportError:  # pragma: no cover
-    from backports.shutil_get_terminal_size import get_terminal_size
 
 terminal_width, _ignored = get_terminal_size()
 

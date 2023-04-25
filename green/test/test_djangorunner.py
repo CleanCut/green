@@ -1,14 +1,9 @@
-from __future__ import unicode_literals
 from argparse import Namespace
 from argparse import ArgumentParser
 from io import StringIO
 import sys
 import unittest
-
-try:
-    from unittest.mock import MagicMock, patch
-except:
-    from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from green import djangorunner
 from green.config import mergeConfig

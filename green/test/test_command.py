@@ -1,19 +1,14 @@
-from __future__ import unicode_literals
-
 import argparse
 import contextlib
 import sys
 import unittest
+from unittest.mock import patch, MagicMock, call
 
 try:
     from setuptools.dist import Distribution
 except ImportError:
     from distutil.dist import Distribution
 
-try:
-    from mock import patch, MagicMock, call
-except:
-    from unittest.mock import patch, MagicMock, call
 
 from green import command
 from green.config import StoreOpt

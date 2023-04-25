@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 """
 To try running Django tests using green you can run:
 

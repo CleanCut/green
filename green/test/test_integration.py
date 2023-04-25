@@ -7,11 +7,7 @@ import sys
 import tempfile
 from textwrap import dedent
 import unittest
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
+from unittest.mock import MagicMock
 
 from green import cmdline
 

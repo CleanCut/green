@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from green.config import default_args
 from green.output import GreenStream
 from green.junit import JUnitXML, JUnitDialect, Verdict

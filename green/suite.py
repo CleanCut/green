@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 from fnmatch import fnmatch
 import sys
 from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite

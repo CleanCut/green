@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from collections import OrderedDict
 from doctest import DocTestCase, DocTestSuite
 from fnmatch import fnmatch

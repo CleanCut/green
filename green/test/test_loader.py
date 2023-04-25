@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import os
 from os.path import dirname
 import platform
@@ -7,11 +6,7 @@ import sys
 import tempfile
 from textwrap import dedent
 import unittest
-
-try:
-    from unittest.mock import MagicMock, patch
-except:
-    from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from green import loader
 from green.loader import GreenTestLoader, flattenTestSuite
