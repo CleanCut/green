@@ -1,0 +1,10 @@
+#
+# pyproject.toml file for cleancut/green
+#
+# For now mostly empty as the project metadata remains in setup.cfg to provide
+# backward compatibility with setup.py.
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

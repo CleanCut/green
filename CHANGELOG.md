@@ -3,6 +3,8 @@
 
 - Drop Python 2 support.
 - Add Python 3.11 to the CI Action.
+- Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
+- Minimum Python version supported is now 3.6.
 
 # Version 3.4.3
 #### 20 Sep 2022
