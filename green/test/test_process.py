@@ -12,7 +12,6 @@ from green.process import ProcessLogger, poolRunner
 from green import process
 
 
-
 class TestProcessLogger(unittest.TestCase):
     def test_callThrough(self):
         """
