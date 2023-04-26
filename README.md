@@ -16,7 +16,7 @@ Features
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in integration with [coverage](http://nedbatchelder.com/code/coverage/).
 - **Embedded** - Can be run with a setup command without in-site installation.
-- **Modern** - Supports Python 3.5+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis. Python 2 is no longer supported.  
+- **Modern** - Supports Python 3.5+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/main/CHANGELOG.md)
