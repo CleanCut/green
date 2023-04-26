@@ -4,7 +4,9 @@ import sys  # pragma nocover
 import coverage  # pragma: no cover
 
 
-__version__ = (pathlib.Path(__file__).parent / "VERSION").read_text(encoding='utf-8').strip()
+__version__ = (
+    (pathlib.Path(__file__).parent / "VERSION").read_text(encoding="utf-8").strip()
+)
 
 
 def pretty_version():  # pragma nocover

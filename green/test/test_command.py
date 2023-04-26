@@ -27,7 +27,9 @@ class TestCommand(unittest.TestCase):
             with open("setup.cfg", "w") as f:
                 parser.write(f)
 
-        yield Distribution({"script_name": "setup.py", "script_args": args or ["green"]})
+        yield Distribution(
+            {"script_name": "setup.py", "script_args": args or ["green"]}
+        )
 
         # finally:
         if os.path.isfile("setup.cfg"):
@@ -66,7 +68,9 @@ class TestCommand(unittest.TestCase):
         argparser = argparse.ArgumentParser()
         store_opt(argparser.add_argument("-s", "--something", help="Something"))
         store_opt(argparser.add_argument("--else", help="Else"))
-        store_opt(argparser.add_argument("-a", "--again", action="store_true", help="Again"))
+        store_opt(
+            argparser.add_argument("-a", "--again", action="store_true", help="Again")
+        )
 
         args = argparser.parse_args([])
         args.parser = argparser

@@ -13,7 +13,7 @@ class School:
         >>> s.food()
         'awful'
         """
-        return 'awful'
+        return "awful"
 
     def age(self):
         return 300

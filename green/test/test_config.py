@@ -531,4 +531,6 @@ class TestMergeConfig(ConfigBase):
 
         new_args = copy.deepcopy(config.default_args)
 
-        self.assertRaises(NotImplementedError, config.mergeConfig, new_args, testing=True)
+        self.assertRaises(
+            NotImplementedError, config.mergeConfig, new_args, testing=True
+        )

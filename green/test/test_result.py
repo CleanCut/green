@@ -379,13 +379,17 @@ class TestGreenTestResult(unittest.TestCase):
         We ignore coverage's error about not having anything to cover.
         """
         self.args.cov = MagicMock()
-        self.args.cov.stop = MagicMock(side_effect=CoverageException("Different Exception"))
+        self.args.cov.stop = MagicMock(
+            side_effect=CoverageException("Different Exception")
+        )
         self.args.run_coverage = True
         gtr = GreenTestResult(self.args, GreenStream(self.stream))
         gtr.startTestRun()
         self.assertRaises(CoverageException, gtr.stopTestRun)
 
-        self.args.cov.stop = MagicMock(side_effect=CoverageException("No data to report"))
+        self.args.cov.stop = MagicMock(
+            side_effect=CoverageException("No data to report")
+        )
 
     def test_tryRecordingStdoutStderr(self):
         """
@@ -875,7 +879,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         err = proto_error(err)
         self.gtr.addError(test, err)
-        self.gtr._reportOutcome.assert_called_with(test, "E", self.gtr.colors.error, err)
+        self.gtr._reportOutcome.assert_called_with(
+            test, "E", self.gtr.colors.error, err
+        )
 
     def test_addError_with_test_time(self):
         """
@@ -903,7 +909,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         err = proto_error(err)
         self.gtr.addFailure(test, err)
-        self.gtr._reportOutcome.assert_called_with(test, "F", self.gtr.colors.failing, err)
+        self.gtr._reportOutcome.assert_called_with(
+            test, "F", self.gtr.colors.failing, err
+        )
 
     def test_addFailure_with_test_time(self):
         """
@@ -971,7 +979,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         err = proto_error(err)
         self.gtr.addExpectedFailure(test, err)
-        self.gtr._reportOutcome.assert_called_with(test, "x", self.gtr.colors.expectedFailure, err)
+        self.gtr._reportOutcome.assert_called_with(
+            test, "x", self.gtr.colors.expectedFailure, err
+        )
 
     def test_addExcepectedFailure_with_test_time(self):
         """
@@ -993,7 +1003,9 @@ class TestGreenTestResultAdds(unittest.TestCase):
         """
         test = proto_test(MagicMock())
         self.gtr.addUnexpectedSuccess(test)
-        self.gtr._reportOutcome.assert_called_with(test, "u", self.gtr.colors.unexpectedSuccess)
+        self.gtr._reportOutcome.assert_called_with(
+            test, "u", self.gtr.colors.unexpectedSuccess
+        )
 
     def test_addUnexpectedSuccess_with_test_time(self):
         """

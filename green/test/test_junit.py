@@ -48,7 +48,9 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._record_failure(test("my.module", "MyClass", "test_method3"))
         self._record_failure(test("my.module", "MyClass", "test_method4"))
         self._record_error(test("my.module", "MyClass", "test_method5"))
-        self._test_results.addSkip(test("my.module", "MyClass", "test_method6"), "Take too long")
+        self._test_results.addSkip(
+            test("my.module", "MyClass", "test_method6"), "Take too long"
+        )
 
         self._adapter.save_as(self._test_results, self._destination)
 
@@ -95,7 +97,9 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._assert_report_is(
             {
                 "my_module.MyClass": {
-                    "tests": {"my_method": {"verdict": Verdict.PASSED, "stdout": output}}
+                    "tests": {
+                        "my_method": {"verdict": Verdict.PASSED, "stdout": output}
+                    }
                 }
             }
         )
@@ -110,7 +114,9 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._assert_report_is(
             {
                 "my_module.MyClass": {
-                    "tests": {"my_method": {"verdict": Verdict.PASSED, "stderr": errput}}
+                    "tests": {
+                        "my_method": {"verdict": Verdict.PASSED, "stderr": errput}
+                    }
                 }
             }
         )
@@ -139,7 +145,11 @@ class JUnitXMLReportIsGenerated(TestCase):
         self._adapter.save_as(self._test_results, self._destination)
 
         self._assert_report_is(
-            {"my_module.MyClass": {"tests": {"my_method": {"verdict": Verdict.SKIPPED}}}}
+            {
+                "my_module.MyClass": {
+                    "tests": {"my_method": {"verdict": Verdict.SKIPPED}}
+                }
+            }
         )
 
     def test_convert_test_will_record_time_for_test(self):
@@ -186,19 +196,27 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         # Check the count of tests
         if "#tests" in expected_suite:
-            self.assertEqual(expected_suite["#tests"], suite.get(JUnitDialect.TEST_COUNT))
+            self.assertEqual(
+                expected_suite["#tests"], suite.get(JUnitDialect.TEST_COUNT)
+            )
 
         # Check the count of failures
         if "#failures" in expected_suite:
-            self.assertEqual(expected_suite["#failures"], suite.get(JUnitDialect.FAILURE_COUNT))
+            self.assertEqual(
+                expected_suite["#failures"], suite.get(JUnitDialect.FAILURE_COUNT)
+            )
 
         # Check the count of errors
         if "#errors" in expected_suite:
-            self.assertEqual(expected_suite["#errors"], suite.get(JUnitDialect.ERROR_COUNT))
+            self.assertEqual(
+                expected_suite["#errors"], suite.get(JUnitDialect.ERROR_COUNT)
+            )
 
         # Check the count of skipped tests
         if "#skipped" in expected_suite:
-            self.assertEqual(expected_suite["#skipped"], suite.get(JUnitDialect.SKIPPED_COUNT))
+            self.assertEqual(
+                expected_suite["#skipped"], suite.get(JUnitDialect.SKIPPED_COUNT)
+            )
 
         # Check the time of each test
         if "time" in expected_suite:
@@ -206,7 +224,9 @@ class JUnitXMLReportIsGenerated(TestCase):
 
         # Check the time of total test run
         if "totaltesttime" in expected_suite:
-            self.assertEqual(expected_suite["totaltesttime"], suite.get(JUnitDialect.TEST_TIME))
+            self.assertEqual(
+                expected_suite["totaltesttime"], suite.get(JUnitDialect.TEST_TIME)
+            )
 
         # Check individual test reports
         self.assertEqual(len(expected_suite["tests"]), len(suite))

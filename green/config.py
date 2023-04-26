@@ -420,7 +420,9 @@ def parseArguments(argv=None):  # pragma: no cover
         )
     )
 
-    cov_args = parser.add_argument_group("Coverage Options ({})".format(coverage_version))
+    cov_args = parser.add_argument_group(
+        "Coverage Options ({})".format(coverage_version)
+    )
     store_opt(
         cov_args.add_argument(
             "-r",

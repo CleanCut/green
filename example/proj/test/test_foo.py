@@ -31,7 +31,7 @@ class TestAnswer(unittest.TestCase):
 class TestSchool(unittest.TestCase):
     def test_food(self):
         school = School()
-        self.assertEqual(school.food(), 'awful')
+        self.assertEqual(school.food(), "awful")
 
     def test_age(self):
         school = School()

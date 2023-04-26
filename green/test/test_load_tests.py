@@ -40,7 +40,9 @@ class TestLoadTests(unittest.TestCase):
         actually changes the referenced class.
         """
 
-        with open(os.path.join(self.basename, "test_load_tests_monkeypatch.py"), "w") as f:
+        with open(
+            os.path.join(self.basename, "test_load_tests_monkeypatch.py"), "w"
+        ) as f:
             f.write(
                 textwrap.dedent(
                     """
@@ -74,7 +76,9 @@ class TestLoadTests(unittest.TestCase):
         another TestSuite (or maybe not even a unittest.TestSuite).
         """
 
-        with open(os.path.join(self.basename, "test_load_keys_foreign_suite.py"), "w") as f:
+        with open(
+            os.path.join(self.basename, "test_load_keys_foreign_suite.py"), "w"
+        ) as f:
             f.write(
                 textwrap.dedent(
                     """
@@ -109,7 +113,9 @@ class TestLoadTests(unittest.TestCase):
         """
         Check that if load_tests returns None, no tests are run.
         """
-        with open(os.path.join(self.basename, "test_load_keys_none_cancels.py"), "w") as fh:
+        with open(
+            os.path.join(self.basename, "test_load_keys_none_cancels.py"), "w"
+        ) as fh:
             fh.write(
                 textwrap.dedent(
                     """

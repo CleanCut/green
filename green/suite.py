@@ -152,7 +152,9 @@ class GreenTestSuite(TestSuite):
                     raise
                 currentClass._classSetupFailed = True
                 className = util.strclass(currentClass)
-                self._createClassOrModuleLevelException(result, e, "setUpClass", className)
+                self._createClassOrModuleLevelException(
+                    result, e, "setUpClass", className
+                )
             finally:
                 _call_if_exists(result, "_restoreStdout")
                 if currentClass._classSetupFailed is True:

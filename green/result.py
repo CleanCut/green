@@ -109,7 +109,14 @@ class ProtoTest:
     def dotted_name(self, ignored=None):
         if self.is_doctest or self.is_class_or_module_teardown_error:
             return self.name
-        return self.module + "." + self.class_name + "." + self.method_name + self.subtest_part
+        return (
+            self.module
+            + "."
+            + self.class_name
+            + "."
+            + self.method_name
+            + self.subtest_part
+        )
 
     def getDescription(self, verbose):
         # Classes or module teardown errors
@@ -502,7 +509,9 @@ class GreenTestResult(BaseTestResult):
             self.stream.writeln()
         if self.shouldStop:
             self.stream.writeln()
-            self.stream.writeln(self.colors.yellow("Warning: Some tests may not have been run."))
+            self.stream.writeln(
+                self.colors.yellow("Warning: Some tests may not have been run.")
+            )
             self.stream.writeln()
         self.stream.writeln(
             "Ran %s test%s in %ss using %s process%s"
@@ -556,7 +565,9 @@ class GreenTestResult(BaseTestResult):
             # Class...if it changed.
             if current_class != self.last_class:
                 self.stream.writeln(
-                    self.colors.className(self.stream.formatText(current_class, indent=1))
+                    self.colors.className(
+                        self.stream.formatText(current_class, indent=1)
+                    )
                 )
             if self.stream.isatty():
                 # In the terminal, we will write a placeholder, and then
@@ -592,7 +603,9 @@ class GreenTestResult(BaseTestResult):
                 test.getDescription(self.verbose), indent=2, outcome_char=outcome_char
             )
             if self.stream.isatty() and terminal_width:  # pragma: no cover
-                cursor_rewind = int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
+                cursor_rewind = (
+                    int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
+                )
                 if cursor_rewind:
                     self.stream.write(self.colors.up(cursor_rewind))
             self.stream.write(color_func(second_text_output))
