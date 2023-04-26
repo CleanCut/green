@@ -2,7 +2,6 @@
 #### Date TBD
 
 - Drop Python 2 support.
-- Run black 23.1.2 on the code to apply the newest style.
 - Add Python 3.11 to the CI Action.
 
 # Version 3.4.3
