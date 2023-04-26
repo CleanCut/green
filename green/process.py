@@ -136,9 +136,7 @@ class LoggingDaemonlessPool38(Pool):
         return process
 
     def apply_async(self, func, args=(), kwds={}, callback=None, error_callback=None):
-        return Pool.apply_async(
-            self, ProcessLogger(func), args, kwds, callback, error_callback
-        )
+        return Pool.apply_async(self, ProcessLogger(func), args, kwds, callback, error_callback)
 
     _wrap_exception = True
 
@@ -356,9 +354,7 @@ def poolRunner(
     # Each pool starts its own coverage, later combined by the main process.
     if coverage_number:
         cov = coverage.coverage(
-            data_file=".coverage.{}_{}".format(
-                coverage_number, random.randint(0, 10000)
-            ),
+            data_file=".coverage.{}_{}".format(coverage_number, random.randint(0, 10000)),
             omit=omit_patterns,
             config_file=cov_config_file,
         )
@@ -418,9 +414,7 @@ def poolRunner(
                     result.stopTest(test)
                     queue.put(result)
                 except:
-                    raise_internal_failure(
-                        "Green encountered an error when running the test."
-                    )
+                    raise_internal_failure("Green encountered an error when running the test.")
                     return
     else:
         # loadTargets() returned an object without a run() method, probably
@@ -439,9 +433,7 @@ def poolRunner(
         t.module = ".".join(target_list[:-2]) if len(target_list) > 1 else target
         t.class_name = target.split(".")[-2] if len(target_list) > 1 else "UnknownClass"
         t.description = description
-        t.method_name = (
-            target.split(".")[-1] if len(target_list) > 1 else "unknown_method"
-        )
+        t.method_name = target.split(".")[-1] if len(target_list) > 1 else "unknown_method"
         result.startTest(t)
         result.addError(t, err)
         result.stopTest(t)

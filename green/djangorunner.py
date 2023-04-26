@@ -73,7 +73,6 @@ try:
 
     class DjangoRunner(DiscoverRunner):
         def __init__(self, verbose=-1, **kwargs):
-
             super(DjangoRunner, self).__init__(**kwargs)
             self.verbose = verbose
             self.loader = GreenTestLoader()

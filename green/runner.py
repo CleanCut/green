@@ -28,9 +28,7 @@ class InitializerOrFinalizer:
             return
         try:
             __import__(self.module_part)
-            loaded_function = getattr(
-                modules[self.module_part], self.function_part, None
-            )
+            loaded_function = getattr(modules[self.module_part], self.function_part, None)
         except Exception as e:
             raise InitializerOrFinalizerError(
                 "Couldn't load '{}' - got: {}".format(self.function_part, str(e))

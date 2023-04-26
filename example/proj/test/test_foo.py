@@ -17,8 +17,8 @@ from proj.foo import answer, School
 
 # Then write your tests
 
-class TestAnswer(unittest.TestCase):
 
+class TestAnswer(unittest.TestCase):
     def test_type(self):
         "answer() returns an integer"
         self.assertEqual(type(answer()), int)
@@ -27,8 +27,8 @@ class TestAnswer(unittest.TestCase):
         "answer() returns 42"
         self.assertEqual(answer(), 42)
 
-class TestSchool(unittest.TestCase):
 
+class TestSchool(unittest.TestCase):
     def test_food(self):
         school = School()
         self.assertEqual(school.food(), 'awful')
@@ -36,6 +36,7 @@ class TestSchool(unittest.TestCase):
     def test_age(self):
         school = School()
         self.assertEqual(school.age(), 300)
+
 
 # If there are doctests you would like to run, add a `doctest_modules` list to
 # the top level of any of your test modules.  Items in the list are modules to

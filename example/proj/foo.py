@@ -5,8 +5,8 @@ def answer():
     """
     return 42
 
-class School():
 
+class School:
     def food(self):
         """
         >>> s = School()

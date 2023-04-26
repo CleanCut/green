@@ -283,7 +283,6 @@ class TestRun(unittest.TestCase):
 
 
 class TestProcesses(unittest.TestCase):
-
     # Setup
     @classmethod
     def setUpClass(cls):

@@ -12,7 +12,6 @@ from green.process import ProcessLogger, poolRunner
 from green import process
 
 
-
 class TestProcessLogger(unittest.TestCase):
     def test_callThrough(self):
         """
@@ -41,9 +40,7 @@ class TestProcessLogger(unittest.TestCase):
         mock_get_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
         process.multiprocessing.get_logger = mock_get_logger
-        self.addCleanup(
-            setattr, process.multiprocessing, "get_logger", saved_get_logger
-        )
+        self.addCleanup(setattr, process.multiprocessing, "get_logger", saved_get_logger)
 
         def func():
             raise AttributeError
@@ -54,7 +51,6 @@ class TestProcessLogger(unittest.TestCase):
 
 
 class TestPoolRunner(unittest.TestCase):
-
     # Setup
     @classmethod
     def setUpClass(cls):

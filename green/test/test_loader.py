@@ -138,9 +138,7 @@ class TestCompletions(unittest.TestCase):
         self.assertIn("green.test", c)
         self.assertIn("green.test.test_loader", c)
         self.assertIn("green.test.test_loader.TestCompletions", c)
-        self.assertIn(
-            "green.test.test_loader.TestCompletions.test_completionPartialShort", c
-        )
+        self.assertIn("green.test.test_loader.TestCompletions.test_completionPartialShort", c)
 
     def test_completionPartial(self):
         """
@@ -150,9 +148,7 @@ class TestCompletions(unittest.TestCase):
         self.assertIn("green.test", c)
         self.assertIn("green.test.test_loader", c)
         self.assertIn("green.test.test_loader.TestCompletions", c)
-        self.assertIn(
-            "green.test.test_loader.TestCompletions.test_completionPartial", c
-        )
+        self.assertIn("green.test.test_loader.TestCompletions.test_completionPartial", c)
         self.assertNotIn("green", c)
 
     def test_completionEmpty(self):
@@ -292,9 +288,7 @@ class TestDottedModule(unittest.TestCase):
         """
         A bad path causes an exception
         """
-        self.assertRaises(
-            ValueError, loader.findDottedModuleAndParentDir, tempfile.tempdir
-        )
+        self.assertRaises(ValueError, loader.findDottedModuleAndParentDir, tempfile.tempdir)
 
     def test_good_path(self):
         """
@@ -432,9 +426,7 @@ class TestDiscover(unittest.TestCase):
         """
         tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, tmpdir)
-        self.assertRaises(
-            ImportError, self.loader.discover, os.path.join(tmpdir, "garbage_in")
-        )
+        self.assertRaises(ImportError, self.loader.discover, os.path.join(tmpdir, "garbage_in"))
         filename = os.path.join(tmpdir, "some_file.py")
         fh = open(filename, "w")
         fh.write("pass\n")
@@ -508,7 +500,6 @@ class TestDiscover(unittest.TestCase):
 
 
 class TestLoadTargets(unittest.TestCase):
-
     # Setup
     @classmethod
     def setUpClass(cls):
@@ -765,9 +756,7 @@ class TestLoadTargets(unittest.TestCase):
         fh = open(os.path.join(self.tmpdir, "__init__.py"), "w")
         fh.write("\n")
         fh.close()
-        malformed_module = os.path.join(
-            os.path.basename(self.tmpdir), "malformed_module.py"
-        )
+        malformed_module = os.path.join(os.path.basename(self.tmpdir), "malformed_module.py")
         fh = open(malformed_module, "w")
         fh.write("This is a malformed module.")
         fh.close()
@@ -845,9 +834,7 @@ class TestLoadTargets(unittest.TestCase):
         # Load the tests
         os.chdir(self.tmpdir)
         pkg = os.path.basename(sub_tmpdir)
-        tests = self.loader.loadTargets(
-            [pkg + "." + "test_target1", pkg + "." + "test_target2"]
-        )
+        tests = self.loader.loadTargets([pkg + "." + "test_target1", pkg + "." + "test_target2"])
         self.assertEqual(tests.countTestCases(), 2)
 
     def test_duplicate_targets(self):
@@ -929,9 +916,7 @@ class TestLoadTargets(unittest.TestCase):
             self.assertIn("mod_with_syntax_error.TestSyntax.test_syntax", str(e))
             hit_exception = True
         if not hit_exception:
-            self.fail(
-                "An exception should have been raised about the syntax error. :-("
-            )
+            self.fail("An exception should have been raised about the syntax error. :-(")
 
     def test_file_pattern(self):
         """
@@ -989,7 +974,6 @@ class TestLoadTargets(unittest.TestCase):
 
 
 class TestFlattenTestSuite(unittest.TestCase):
-
     # Setup
     @classmethod
     def setUpClass(cls):

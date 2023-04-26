@@ -152,9 +152,7 @@ class GreenTestSuite(TestSuite):
                     raise
                 currentClass._classSetupFailed = True
                 className = util.strclass(currentClass)
-                self._createClassOrModuleLevelException(
-                    result, e, "setUpClass", className
-                )
+                self._createClassOrModuleLevelException(result, e, "setUpClass", className)
             finally:
                 _call_if_exists(result, "_restoreStdout")
                 if currentClass._classSetupFailed is True:
@@ -240,7 +238,7 @@ class GreenTestSuite(TestSuite):
                 result.errors[:-difference],
                 result.errors[-difference:],
             )
-            for (test, err) in new_errors:
+            for test, err in new_errors:
                 # test = ProtoTest()
                 test.module = result._previousTestClass.__module__
                 test.class_name = result._previousTestClass.__name__

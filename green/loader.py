@@ -20,7 +20,6 @@ python_dir_pattern = re.compile(r"^[_a-z]\w*?$", re.IGNORECASE)
 
 
 class GreenTestLoader(unittest.TestLoader):
-
     suiteClass = GreenTestSuite
 
     def loadTestsFromTestCase(self, testCaseClass):
@@ -95,9 +94,7 @@ class GreenTestLoader(unittest.TestLoader):
     if sys.version_info >= (3, 5):  # pragma: no cover
 
         def loadTestsFromModule(self, module, pattern=None):
-            tests = super(GreenTestLoader, self).loadTestsFromModule(
-                module, pattern=pattern
-            )
+            tests = super(GreenTestLoader, self).loadTestsFromModule(module, pattern=pattern)
             return flattenTestSuite(tests, module)
 
     else:  # pragma: no cover
@@ -190,11 +187,7 @@ class GreenTestLoader(unittest.TestLoader):
         return flattenTestSuite(suites) if suites else None
 
     def loadTarget(self, target, file_pattern="test*.py"):
-        debug(
-            "Attempting to load target '{}' with file_pattern '{}'".format(
-                target, file_pattern
-            )
-        )
+        debug("Attempting to load target '{}' with file_pattern '{}'".format(target, file_pattern))
 
         # For a test loader, we want to always the current working directory to
         # be the first item in sys.path, just like when a python interpreter is
@@ -430,9 +423,7 @@ def isPackage(file_path):
     """
     Determine whether or not a given path is a (sub)package or not.
     """
-    return os.path.isdir(file_path) and os.path.isfile(
-        os.path.join(file_path, "__init__.py")
-    )
+    return os.path.isdir(file_path) and os.path.isfile(os.path.join(file_path, "__init__.py"))
 
 
 def findDottedModuleAndParentDir(file_path):
