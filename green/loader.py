@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from collections import OrderedDict
 from doctest import DocTestCase, DocTestSuite
 from fnmatch import fnmatch
@@ -21,7 +20,6 @@ python_dir_pattern = re.compile(r"^[_a-z]\w*?$", re.IGNORECASE)
 
 
 class GreenTestLoader(unittest.TestLoader):
-
     suiteClass = GreenTestSuite
 
     def loadTestsFromTestCase(self, testCaseClass):

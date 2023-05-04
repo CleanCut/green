@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 """
 To try running Django tests using green you can run:
 
@@ -75,7 +73,6 @@ try:
 
     class DjangoRunner(DiscoverRunner):
         def __init__(self, verbose=-1, **kwargs):
-
             super(DjangoRunner, self).__init__(**kwargs)
             self.verbose = verbose
             self.loader = GreenTestLoader()

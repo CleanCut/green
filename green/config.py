@@ -1,6 +1,3 @@
-from __future__ import unicode_literals  # pragma: no cover
-from __future__ import print_function  # pragma: no cover
-
 # We have to use this entire file before we can turn coverage on, so we exclude
 # it from coverage.  We still have tests, though!
 

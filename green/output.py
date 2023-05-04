@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from colorama import init, deinit, Fore, Style
 from colorama.ansi import Cursor
 from colorama.initialise import wrap_stream
@@ -12,11 +11,8 @@ from unidecode import unidecode
 global debug_level
 debug_level = 0
 
-if sys.version_info[0] == 3:  # pragma: no cover
-    text_type = str
-    unicode = None  # so pyflakes stops complaining
-else:  # pragma: no cover
-    text_type = unicode
+text_type = str
+unicode = None  # so pyflakes stops complaining
 
 
 def debug(message, level=1):

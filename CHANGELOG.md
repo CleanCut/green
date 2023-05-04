@@ -1,6 +1,9 @@
 # Unreleased
 #### Date TBD
 
+- Drop Python 2 support.
+- Add Python 3.11 to the CI Action.
+
 # Version 3.4.3
 #### 20 Sep 2022
 

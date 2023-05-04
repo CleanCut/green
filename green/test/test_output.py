@@ -1,14 +1,8 @@
-from __future__ import unicode_literals
 from io import StringIO
 import platform
 import sys
 import unittest
-
-
-try:
-    from unittest.mock import MagicMock, patch
-except:
-    from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from green.output import Colors, GreenStream, debug
 import green.output

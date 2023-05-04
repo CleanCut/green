@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool, RUN, TERMINATE
@@ -219,36 +218,9 @@ LoggingDaemonlessPool = LoggingDaemonlessPool38
 if tuple(map(int, platform.python_version_tuple()[:2])) < (3, 8):  # pragma: no cover
     LoggingDaemonlessPool = LoggingDaemonlessPool37
 
-import platform
 import multiprocessing.pool
 from multiprocessing import util
-
-try:
-    from multiprocessing.pool import MaybeEncodingError
-except:  # pragma: no cover
-    # Python 2.7.4 introduced this class.  If we're on Python 2.7.0 to 2.7.3
-    # then we'll have to define it ourselves. :-/
-    class MaybeEncodingError(Exception):
-        """Wraps possible unpickleable errors, so they can be
-        safely sent through the socket."""
-
-        def __init__(self, exc, value):
-            self.exc = repr(exc)
-            self.value = repr(value)
-            super(MaybeEncodingError, self).__init__(self.exc, self.value)
-
-        def __str__(self):
-            return "Error sending result: '%s'. Reason: '%s'" % (self.value, self.exc)
-
-        def __repr__(self):
-            return "<MaybeEncodingError: %s>" % str(self)
-
-
-# Python 2 and 3 raise a different error when they exit
-if platform.python_version_tuple()[0] == "2":  # pragma: no cover
-    PortableOSError = IOError
-else:  # pragma: no cover
-    PortableOSError = OSError
+from multiprocessing.pool import MaybeEncodingError
 
 
 def worker(
@@ -278,7 +250,7 @@ def worker(
     while maxtasks is None or (maxtasks and completed < maxtasks):
         try:
             task = get()
-        except (EOFError, PortableOSError):
+        except (EOFError, OSError):
             util.debug("worker got EOFError or OSError -- exiting")
             break
 

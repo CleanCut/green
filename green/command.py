@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 import sys
 
 try:
@@ -13,7 +10,6 @@ from green.cmdline import main
 
 
 def get_user_options():
-
     # When running "python setup.py --help-commands", setup.py will call this
     # function -- but green isn't actually being called.
     if "--help-commands" in sys.argv:
@@ -34,7 +30,6 @@ def get_user_options():
 
 
 class green(Command):
-
     command_name = "green"
     description = "Run unit tests using green"
     user_options = get_user_options()

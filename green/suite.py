@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 from fnmatch import fnmatch
 import sys
 from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite
@@ -243,7 +240,7 @@ class GreenTestSuite(TestSuite):
                 result.errors[:-difference],
                 result.errors[-difference:],
             )
-            for (test, err) in new_errors:
+            for test, err in new_errors:
                 # test = ProtoTest()
                 test.module = result._previousTestClass.__module__
                 test.class_name = result._previousTestClass.__name__

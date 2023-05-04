@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from io import StringIO
 import logging
 import os
@@ -7,15 +6,11 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import MagicMock
 
 from green import cmdline
 from green import config
 from green.output import GreenStream
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
 
 
 class TestMain(unittest.TestCase):

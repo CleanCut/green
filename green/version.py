@@ -1,17 +1,12 @@
-from __future__ import unicode_literals  # pragma: no cover
-import os.path  # pragma nocover
+import pathlib  # pragma nocover
 import sys  # pragma nocover
 
 import coverage  # pragma: no cover
 
-with open(
-    os.path.join(os.path.dirname(__file__), "VERSION")
-) as vfile:  # pragma nocover
-    __version__ = vfile.read().strip()
-if sys.version_info[0] == 2:  # pragma nocover
-    from __builtin__ import unicode  # just so the linter stops complaining
 
-    __version__ = unicode(__version__)
+__version__ = (
+    (pathlib.Path(__file__).parent / "VERSION").read_text(encoding="utf-8").strip()
+)
 
 
 def pretty_version():  # pragma nocover

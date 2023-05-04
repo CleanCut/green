@@ -1,7 +1,4 @@
-try:
-    import configparser
-except:
-    import ConfigParser as configparser
+import configparser
 import copy
 from io import StringIO
 import os

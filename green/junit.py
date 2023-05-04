@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from lxml.etree import Element, SubElement, tostring as to_xml
 
 

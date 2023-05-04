@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import copy
 from io import StringIO
 import os
@@ -9,6 +8,7 @@ import sys
 import tempfile
 from textwrap import dedent
 import unittest
+from unittest.mock import MagicMock
 import weakref
 
 from green.config import default_args
@@ -17,11 +17,6 @@ from green.loader import GreenTestLoader
 from green.output import GreenStream
 from green.runner import InitializerOrFinalizer, run
 from green.suite import GreenTestSuite
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
 
 
 global skip_testtools
@@ -288,7 +283,6 @@ class TestRun(unittest.TestCase):
 
 
 class TestProcesses(unittest.TestCase):
-
     # Setup
     @classmethod
     def setUpClass(cls):

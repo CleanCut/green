@@ -1,5 +1,4 @@
 # encoding: utf-8
-from __future__ import unicode_literals
 import copy
 
 # `from doctest import DocTestCase` causes crashes, since the DocTestCase is
@@ -11,6 +10,7 @@ from io import StringIO
 import sys
 import os
 import unittest
+from unittest.mock import MagicMock, patch
 import tempfile
 
 from green.config import default_args
@@ -23,11 +23,6 @@ from green.result import (
     ProtoTestResult,
     BaseTestResult,
 )
-
-try:
-    from unittest.mock import MagicMock, patch
-except ImportError:
-    from mock import MagicMock, patch
 
 from coverage import coverage, CoverageException
 
@@ -264,6 +259,7 @@ class TestProtoTest(unittest.TestCase):
         """
         getDescription() returns what we expect for all verbose levels
         """
+
         # With a docstring
         class Fruit(unittest.TestCase):
             def test_stuff(self):

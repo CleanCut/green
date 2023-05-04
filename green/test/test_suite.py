@@ -1,18 +1,10 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-
 import copy
 from io import StringIO
 import os
 import tempfile
 from textwrap import dedent
 import unittest
-
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
+from unittest.mock import MagicMock
 
 from green.config import default_args
 from green.loader import GreenTestLoader
