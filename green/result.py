@@ -498,6 +498,7 @@ class GreenTestResult(BaseTestResult):
                         file=self.stream,
                         omit=self.args.omit_patterns,
                         show_missing=True,
+                        ignore_errors=True,
                     )
                     self.coverage_percent = self.stream.coverage_percent
 

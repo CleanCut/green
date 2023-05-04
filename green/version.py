@@ -1,12 +1,12 @@
-import pathlib  # pragma nocover
-import sys  # pragma nocover
+import pathlib  # pragma: no cover
+import sys  # pragma: no cover
 
 import coverage  # pragma: no cover
 
 
 __version__ = (
     (pathlib.Path(__file__).parent / "VERSION").read_text(encoding="utf-8").strip()
-)
+)  # pragma: no cover
 
 
 def pretty_version():  # pragma nocover
