@@ -730,8 +730,7 @@ class GreenTestResult(BaseTestResult):
                             frame = frame.decode("utf-8")
                     debug(
                         "\n"
-                        f"{'*' * 30}Frame {i}:{'*' * 30}\n"
-                        + self.colors.yellow(frame),
+                        f"{'*' * 30}Frame {i}:{'*' * 30}\n" + self.colors.yellow(frame),
                         level=3,
                     )
                     # Ignore useless frames

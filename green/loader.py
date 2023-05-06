@@ -91,13 +91,9 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
-
     def loadTestsFromModule(self, module, pattern=None):
-        tests = super().loadTestsFromModule(
-            module, pattern=pattern
-        )
+        tests = super().loadTestsFromModule(module, pattern=pattern)
         return flattenTestSuite(tests, module)
-
 
     def loadTestsFromName(self, name, module=None):
         tests = super().loadTestsFromName(name, module)

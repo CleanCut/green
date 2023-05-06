@@ -94,9 +94,7 @@ class LoggingDaemonlessPool37(Pool):  # pragma: no cover
     ):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        super().__init__(
-            processes, initializer, initargs, maxtasksperchild
-        )
+        super().__init__(processes, initializer, initargs, maxtasksperchild)
 
     def _repopulate_pool(self):
         """
@@ -154,9 +152,7 @@ class LoggingDaemonlessPool38(Pool):
     ):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        super().__init__(
-            processes, initializer, initargs, maxtasksperchild, context
-        )
+        super().__init__(processes, initializer, initargs, maxtasksperchild, context)
 
     def _repopulate_pool(self):
         return self._repopulate_pool_static(
