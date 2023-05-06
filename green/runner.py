@@ -33,7 +33,7 @@ class InitializerOrFinalizer:
             )
         except Exception as e:
             raise InitializerOrFinalizerError(
-                "Couldn't load '{}' - got: {}".format(self.function_part, str(e))
+                f"Couldn't load '{self.function_part}' - got: {str(e)}"
             )
         if not loaded_function:
             raise InitializerOrFinalizerError(
@@ -45,7 +45,7 @@ class InitializerOrFinalizer:
             loaded_function()
         except Exception as e:
             raise InitializerOrFinalizerError(
-                "Error running '{}' - got: {}".format(self.function_part, str(e))
+                f"Error running '{self.function_part}' - got: {str(e)}"
             )
 
 
@@ -81,7 +81,7 @@ def run(suite, stream, args, testing=False):
                 warnings.filterwarnings(
                     "module",
                     category=DeprecationWarning,
-                    message="Please use assert\w+ instead.",
+                    message=r"Please use assert\w+ instead.",
                 )
 
         result.startTestRun()
@@ -103,7 +103,7 @@ def run(suite, stream, args, testing=False):
                     coverage_number = index + 1
                 else:
                     coverage_number = None
-                debug("Sending {} to poolRunner {}".format(target, poolRunner))
+                debug(f"Sending {target} to poolRunner {poolRunner}")
                 pool.apply_async(
                     poolRunner,
                     (
@@ -126,7 +126,7 @@ def run(suite, stream, args, testing=False):
                         debug("runner.run(): received sentinal, breaking.", 3)
                         break
                     else:
-                        debug("runner.run(): start test: {}".format(msg))
+                        debug(f"runner.run(): start test: {msg}")
                         # Result guaranteed after this message, we're
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output

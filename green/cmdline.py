@@ -92,7 +92,7 @@ def main(argv=None, testing=False):
         except OSError as os_error:
             if os_error.errno == 39:
                 # "Directory not empty" when trying to delete the temp dir can just be a warning
-                print("warning: {}".format(os_error.strerror))
+                print(f"warning: {os_error.strerror}")
             else:
                 raise (os_error)
     else:

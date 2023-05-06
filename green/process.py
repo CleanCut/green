@@ -29,11 +29,11 @@ def ddebug(msg, err=None):  # pragma: no cover
         err = "".join(traceback.format_exception(*err))
     else:
         err = ""
-    sys.__stdout__.write("({}) {} {}".format(os.getpid(), msg, err) + "\n")
+    sys.__stdout__.write(f"({os.getpid()}) {msg} {err}\n")
     sys.__stdout__.flush()
 
 
-class ProcessLogger(object):
+class ProcessLogger:
     """
     I am used by LoggingDaemonlessPool to get crash output out to the logger,
     instead of having process crashes be silent
@@ -94,7 +94,7 @@ class LoggingDaemonlessPool37(Pool):  # pragma: no cover
     ):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        super(LoggingDaemonlessPool37, self).__init__(
+        super().__init__(
             processes, initializer, initargs, maxtasksperchild
         )
 
@@ -154,7 +154,7 @@ class LoggingDaemonlessPool38(Pool):
     ):
         self._finalizer = finalizer
         self._finalargs = finalargs
-        super(LoggingDaemonlessPool38, self).__init__(
+        super().__init__(
             processes, initializer, initargs, maxtasksperchild, context
         )
 

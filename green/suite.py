@@ -27,7 +27,7 @@ class GreenTestSuite(TestSuite):
         self.allow_stdout = default_args.allow_stdout
         self.full_test_pattern = "test" + default_args.test_pattern
         self.customize(args)
-        super(GreenTestSuite, self).__init__(tests)
+        super().__init__(tests)
 
     def addTest(self, test):
         """
@@ -44,7 +44,7 @@ class GreenTestSuite(TestSuite):
         ):
             if not fnmatch(test._testMethodName, self.full_test_pattern):
                 return
-        super(GreenTestSuite, self).addTest(test)
+        super().addTest(test)
 
     def customize(self, args):
         """

@@ -88,7 +88,7 @@ class TestGreenTestSuite(unittest.TestCase):
         The allow_stdout setting should not get ignored.
         """
 
-        class Object(object):
+        class Object:
             pass
 
         args = Object()

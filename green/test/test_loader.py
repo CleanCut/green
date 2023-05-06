@@ -18,7 +18,7 @@ class TestToProtoTestList(unittest.TestCase):
         toProtoTestList() raises import errors normally
         """
         suite = MagicMock()
-        suite.__class__.__name__ = str("ModuleImportFailure")
+        suite.__class__.__name__ = "ModuleImportFailure"
         suite.__str__.return_value = "exception_method (other_stuff)"
         suite.exception_method.side_effect = AttributeError
         self.assertRaises(AttributeError, loader.toProtoTestList, (suite,))
@@ -28,7 +28,7 @@ class TestToProtoTestList(unittest.TestCase):
         toProtoTestList() does not raise errors when doing completions
         """
         suite = MagicMock()
-        suite.__class__.__name__ = str("ModuleImportFailure")
+        suite.__class__.__name__ = "ModuleImportFailure"
         suite.__str__.return_value = "exception_method other_stuff"
         suite.exception_method.side_effect = AttributeError
         self.assertEqual(loader.toProtoTestList(suite, doing_completions=True), [])
@@ -36,12 +36,12 @@ class TestToProtoTestList(unittest.TestCase):
 
 class TestToParallelTargets(unittest.TestCase):
     def setUp(self):
-        super(TestToParallelTargets, self).setUp()
+        super().setUp()
 
-        class FakeModule(object):
+        class FakeModule:
             pass
 
-        class FakeModule2(object):
+        class FakeModule2:
             pass
 
         self._fake_module_name = "my_test_module"
@@ -52,7 +52,7 @@ class TestToParallelTargets(unittest.TestCase):
     def tearDown(self):
         del sys.modules[self._fake_module_name]
         del sys.modules[self._fake_module_name2]
-        super(TestToParallelTargets, self).tearDown()
+        super().tearDown()
 
     def test_methods_with_no_constraints(self):
         """
@@ -355,8 +355,8 @@ class TestLoadTestsFromTestCase(unittest.TestCase):
         suite = self.loader.loadTestsFromTestCase(Normal)
         self.assertEqual(suite.countTestCases(), 2)
         self.assertEqual(
-            set([x._testMethodName for x in suite._tests]),
-            set(["test_method1", "test_method2"]),
+            {x._testMethodName for x in suite._tests},
+            {"test_method1", "test_method2"},
         )
 
     def test_isTestCaseDisabled(self):

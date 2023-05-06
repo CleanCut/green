@@ -23,7 +23,7 @@ class GreenTestLoader(unittest.TestLoader):
     suiteClass = GreenTestSuite
 
     def loadTestsFromTestCase(self, testCaseClass):
-        debug("Examining test case {}".format(testCaseClass.__name__), 3)
+        debug(f"Examining test case {testCaseClass.__name__}", 3)
 
         def filter_test_methods(attrname):
             return (
@@ -33,7 +33,7 @@ class GreenTestLoader(unittest.TestLoader):
             )
 
         test_case_names = list(filter(filter_test_methods, dir(testCaseClass)))
-        debug("Test case names: {}".format(test_case_names))
+        debug(f"Test case names: {test_case_names}")
 
         # Use default unittest.TestSuite sorting method if not overridden
         test_case_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
@@ -51,7 +51,7 @@ class GreenTestLoader(unittest.TestLoader):
         try:
             __import__(dotted_module)
             loaded_module = sys.modules[dotted_module]
-            debug("Imported {}".format(dotted_module), 2)
+            debug(f"Imported {dotted_module}", 2)
         except unittest.case.SkipTest as e:
             # TODO: #25 - Right now this mimics the behavior in unittest.  Lets
             # refactor it and simplify it after we make sure it works.
@@ -63,7 +63,7 @@ class GreenTestLoader(unittest.TestLoader):
                 pass  # pragma: no cover
 
             TestClass = type(
-                str("ModuleSkipped"), (unittest.case.TestCase,), {filename: testSkipped}
+                "ModuleSkipped", (unittest.case.TestCase,), {filename: testSkipped}
             )
             return self.suiteClass((TestClass(filename),))
         except:
@@ -78,7 +78,7 @@ class GreenTestLoader(unittest.TestLoader):
                 raise ImportError(message)
 
             TestClass = type(
-                str("ModuleImportFailure"),
+                "ModuleImportFailure",
                 (unittest.case.TestCase,),
                 {filename: testFailure},
             )
@@ -91,22 +91,16 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
-    if sys.version_info >= (3, 5):  # pragma: no cover
 
-        def loadTestsFromModule(self, module, pattern=None):
-            tests = super(GreenTestLoader, self).loadTestsFromModule(
-                module, pattern=pattern
-            )
-            return flattenTestSuite(tests, module)
+    def loadTestsFromModule(self, module, pattern=None):
+        tests = super().loadTestsFromModule(
+            module, pattern=pattern
+        )
+        return flattenTestSuite(tests, module)
 
-    else:  # pragma: no cover
-
-        def loadTestsFromModule(self, module):
-            tests = super(GreenTestLoader, self).loadTestsFromModule(module)
-            return flattenTestSuite(tests, module)
 
     def loadTestsFromName(self, name, module=None):
-        tests = super(GreenTestLoader, self).loadTestsFromName(name, module)
+        tests = super().loadTestsFromName(name, module)
         return flattenTestSuite(tests, module)
 
     def discover(self, current_path, file_pattern="test*.py", top_level_dir=None):
@@ -121,7 +115,7 @@ class GreenTestLoader(unittest.TestLoader):
         """
         current_abspath = os.path.abspath(current_path)
         if not os.path.isdir(current_abspath):
-            raise ImportError("'{}' is not a directory".format(str(current_path)))
+            raise ImportError(f"'{current_path}' is not a directory")
         suite = GreenTestSuite()
         try:
             for file_or_dir_name in sorted(os.listdir(current_abspath)):
@@ -157,7 +151,7 @@ class GreenTestLoader(unittest.TestLoader):
                     if module_suite:
                         suite.addTest(module_suite)
         except OSError:
-            debug("WARNING: Test discovery failed at path {}".format(current_path))
+            debug(f"WARNING: Test discovery failed at path {current_path}")
 
         return flattenTestSuite(suite) if suite.countTestCases() else None
 
@@ -176,7 +170,7 @@ class GreenTestLoader(unittest.TestLoader):
         for target in targets:
             suite = self.loadTarget(target, file_pattern)
             if not suite:
-                debug("Found 0 tests for target '{}'".format(target))
+                debug(f"Found 0 tests for target '{target}'")
                 continue
             suites.append(suite)
             num_tests = suite.countTestCases()
@@ -229,7 +223,7 @@ class GreenTestLoader(unittest.TestLoader):
                 continue
             tests = self.discover(candidate, file_pattern=file_pattern)
             if tests and tests.countTestCases():
-                debug("Load method: DISCOVER - {}".format(candidate))
+                debug(f"Load method: DISCOVER - {candidate}")
                 return flattenTestSuite(tests)
 
         # DOTTED OBJECT - These will discover a specific object if it is
@@ -244,9 +238,9 @@ class GreenTestLoader(unittest.TestLoader):
                         del tests._tests[index]
 
             except Exception as e:
-                raise Exception("Exception while loading {}: {}".format(target, e))
+                raise Exception(f"Exception while loading {target}: {e}")
             if tests and tests.countTestCases():
-                debug("Load method: DOTTED OBJECT - {}".format(target))
+                debug(f"Load method: DOTTED OBJECT - {target}")
                 return flattenTestSuite(tests)
 
         # FILE VARIATIONS - These will import a specific file and any tests
@@ -289,7 +283,7 @@ class GreenTestLoader(unittest.TestLoader):
                     raise ImportError(message)  # pragma: no cover
 
                 TestClass = type(
-                    str("ModuleImportFailure"),
+                    "ModuleImportFailure",
                     (unittest.case.TestCase,),
                     {dotted_path: testFailure},
                 )
@@ -297,7 +291,7 @@ class GreenTestLoader(unittest.TestLoader):
             if need_cleanup:
                 sys.path.remove(cwd)
             if tests and tests.countTestCases():
-                debug("Load method: FILE - {}".format(candidate))
+                debug(f"Load method: FILE - {candidate}")
                 return tests
 
         return None
@@ -345,7 +339,7 @@ def toParallelTargets(suite, targets):
     # finest-grained module it belongs to, which simplifies our job.
     proto_test_list = toProtoTestList(suite)
     # Extract a list of the modules that all of the discovered tests are in
-    modules = set([x.module for x in proto_test_list])
+    modules = {x.module for x in proto_test_list}
     # Get the list of user-specified targets that are NOT modules
     non_module_targets = []
     for target in targets:
@@ -446,13 +440,13 @@ def findDottedModuleAndParentDir(file_path):
     would be returned.
     """
     if not os.path.isfile(file_path):
-        raise ValueError("'{}' is not a file.".format(file_path))
+        raise ValueError(f"'{file_path}' is not a file.")
     parent_dir = os.path.dirname(os.path.abspath(file_path))
     dotted_module = os.path.basename(file_path).replace(".py", "")
     while isPackage(parent_dir):
         dotted_module = os.path.basename(parent_dir) + "." + dotted_module
         parent_dir = os.path.dirname(parent_dir)
-    debug("Dotted module: {} -> {}".format(parent_dir, dotted_module), 2)
+    debug(f"Dotted module: {parent_dir} -> {dotted_module}", 2)
     return (dotted_module, parent_dir)
 
 

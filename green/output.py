@@ -41,7 +41,7 @@ class Colors:
 
     def wrap(self, text, style):
         if self.termcolor:
-            return "%s%s%s" % (style, text, Style.RESET_ALL)
+            return f"{style}{text}{Style.RESET_ALL}"
         else:
             return text
 
@@ -98,7 +98,7 @@ class Colors:
         return text
 
 
-class GreenStream(object):
+class GreenStream:
     """
     Wraps a stream-like object with the following additional features:
 

@@ -9,7 +9,7 @@ class TestVersion(unittest.TestCase):
         """
         __version__ is a unicode string
         """
-        self.assertEqual(type(__version__), type(""))
+        self.assertEqual(type(__version__), str)
 
     def test_versionSet(self):
         """
