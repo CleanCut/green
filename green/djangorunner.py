@@ -73,7 +73,7 @@ try:
 
     class DjangoRunner(DiscoverRunner):
         def __init__(self, verbose=-1, **kwargs):
-            super(DjangoRunner, self).__init__(**kwargs)
+            super().__init__(**kwargs)
             self.verbose = verbose
             self.loader = GreenTestLoader()
 
@@ -89,7 +89,7 @@ try:
                     Green 'verbose' level for tests.  Value should be an integer
                     that green supports.  For example: --green-verbosity 3""",
             )
-            super(DjangoRunner, cls).add_arguments(parser)
+            super().add_arguments(parser)
 
         def run_tests(self, test_labels, extra_tests=None, **kwargs):
             """

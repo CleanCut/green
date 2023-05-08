@@ -10,7 +10,7 @@ except:  # pragma: no cover
 
 import coverage  # pragma: no cover
 
-coverage_version = "Coverage {}".format(coverage.__version__)  # pragma: no cover
+coverage_version = f"Coverage {coverage.__version__}"  # pragma: no cover
 
 import copy  # pragma: no cover
 import logging  # pragma: no cover
@@ -66,7 +66,7 @@ default_args = argparse.Namespace(  # pragma: no cover
 )
 
 
-class StoreOpt(object):  # pragma: no cover
+class StoreOpt:  # pragma: no cover
     """
     Helper class for storing lists of the options themselves to hand out to the
     shell completion scripts.
@@ -420,9 +420,7 @@ def parseArguments(argv=None):  # pragma: no cover
         )
     )
 
-    cov_args = parser.add_argument_group(
-        "Coverage Options ({})".format(coverage_version)
-    )
+    cov_args = parser.add_argument_group(f"Coverage Options ({coverage_version})")
     store_opt(
         cov_args.add_argument(
             "-r",
@@ -563,7 +561,7 @@ def parseArguments(argv=None):  # pragma: no cover
     return args
 
 
-class ConfigFile(object):  # pragma: no cover
+class ConfigFile:  # pragma: no cover
     """
     Filehandle wrapper that adds a "[green]" section to the start of a config
     file so that users don't actually have to manually add a [green] section.

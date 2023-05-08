@@ -23,7 +23,7 @@ def get_user_options():
         if len(names) == 1:
             names.insert(0, None)
         if not action.const:
-            names[1] += str("=")
+            names[1] += "="
         options.append((names[1], names[0], action.help))
 
     return options

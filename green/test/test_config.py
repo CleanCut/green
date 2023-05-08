@@ -32,7 +32,7 @@ class ParseArguments(unittest.TestCase):
         self.assertEqual(getattr(args, "file_pattern", "not there"), "not there")
 
 
-class ModifiedEnvironment(object):
+class ModifiedEnvironment:
     """
     I am a context manager that sets up environment variables for a test case.
     """
@@ -90,11 +90,11 @@ class ConfigBase(unittest.TestCase):
             self.default_filename,
             [
                 "# this is a test config file for green",
-                "logging = {}".format(str(self.default_logging)),
-                "version = {}".format(str(self.default_version)),
-                "omit-patterns = {}".format(self.default_filename),
-                "failfast = {}".format(str(self.default_failfast)),
-                "termcolor = {}".format(str(self.default_termcolor)),
+                f"logging = {str(self.default_logging)}",
+                f"version = {str(self.default_version)}",
+                f"omit-patterns = {self.default_filename}",
+                f"failfast = {str(self.default_failfast)}",
+                f"termcolor = {str(self.default_termcolor)}",
             ],
         )
         self.env_filename = os.path.join(self.tmpd, "green.env")
@@ -104,9 +104,9 @@ class ConfigBase(unittest.TestCase):
             self.env_filename,
             [
                 "# this is a test config file for green",
-                "logging = {}".format(str(self.env_logging)),
-                "omit-patterns = {}".format(self.env_filename),
-                "no-skip-report = {}".format(self.env_no_skip_report),
+                f"logging = {str(self.env_logging)}",
+                f"omit-patterns = {self.env_filename}",
+                f"no-skip-report = {self.env_no_skip_report}",
             ],
         )
         self.cmd_filename = os.path.join(self.tmpd, "green.cmd")
@@ -116,9 +116,9 @@ class ConfigBase(unittest.TestCase):
             self.cmd_filename,
             [
                 "# this is a test config file for green",
-                "logging = {}".format(str(self.cmd_logging)),
-                "omit-patterns = {}".format(self.cmd_filename),
-                "run-coverage = {}".format(self.cmd_run_coverage),
+                f"logging = {str(self.cmd_logging)}",
+                f"omit-patterns = {self.cmd_filename}",
+                f"run-coverage = {self.cmd_run_coverage}",
             ],
         )
         self.setup_filename = os.path.join(cwd_dir, "setup.cfg")
@@ -128,8 +128,8 @@ class ConfigBase(unittest.TestCase):
             self.setup_filename,
             [
                 "[green]",
-                "failfast = {}".format(str(self.setup_failfast)),
-                "verbose = {}".format(str(self.setup_verbose)),
+                f"failfast = {str(self.setup_failfast)}",
+                f"verbose = {str(self.setup_verbose)}",
             ],
         )
 

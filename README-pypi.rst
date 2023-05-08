@@ -21,7 +21,7 @@ Features
 - **Descriptive** - Multiple verbosity levels, from just dots to full docstring output.
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in integration with `coverage`_
-- **Modern** - Supports Python 3.5+.  Additionally, `PyPy` is supported on a best-effort basis.
+- **Modern** - Supports Python 3.6+.  Additionally, `PyPy` is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the `changelog`_
 

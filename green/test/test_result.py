@@ -1,4 +1,3 @@
-# encoding: utf-8
 import copy
 
 # `from doctest import DocTestCase` causes crashes, since the DocTestCase is
@@ -27,13 +26,13 @@ from green.result import (
 from coverage import coverage, CoverageException
 
 
-class MyProtoTest(ProtoTest, object):
+class MyProtoTest(ProtoTest):
     """
     For quickly making a ProtoTest
     """
 
     def __init__(self):
-        super(MyProtoTest, self).__init__()
+        super().__init__()
         self.module = "my_module"
         self.class_name = "MyClass"
         self.method_name = "myMethod"
@@ -941,7 +940,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
         test = proto_test(MagicMock())
         reason = "Twisted is odd"
         err = proto_error(err)
-        err.traceback_lines = ["UnsupportedTrialFeature: ('skip', '{}')".format(reason)]
+        err.traceback_lines = [f"UnsupportedTrialFeature: ('skip', '{reason}')"]
         self.gtr.addFailure(test, err)
         self.gtr._reportOutcome.assert_called_with(
             test, "s", self.gtr.colors.skipped, reason=reason

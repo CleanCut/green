@@ -1,7 +1,7 @@
 from lxml.etree import Element, SubElement, tostring as to_xml
 
 
-class JUnitDialect(object):
+class JUnitDialect:
     """
     Hold the name of the elements defined in the JUnit XML schema (for JUnit 4).
     """
@@ -23,7 +23,7 @@ class JUnitDialect(object):
     TEST_TIME = "time"
 
 
-class Verdict(object):
+class Verdict:
     """
     Enumeration of possible test verdicts
     """
@@ -34,7 +34,7 @@ class Verdict(object):
     SKIPPED = 3
 
 
-class JUnitXML(object):
+class JUnitXML:
     """
     Serialize a GreenTestResult object into a JUnit XML file, that can
     be read by continuous integration servers, for example.
@@ -79,7 +79,7 @@ class JUnitXML(object):
 
     @staticmethod
     def _suite_name(test):
-        return "%s.%s" % (test.module, test.class_name)
+        return f"{test.module}.{test.class_name}"
 
     @staticmethod
     def _add_failures(collection, test_results):

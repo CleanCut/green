@@ -155,7 +155,7 @@ class ProtoError:
         return "\n".join(self.traceback_lines)
 
 
-class BaseTestResult(object):  # Breaks subclasses in 2.7 not inheriting object
+class BaseTestResult:
     """
     I am inherited by ProtoTestResult and GreenTestResult.
     """
@@ -225,7 +225,7 @@ class ProtoTestResult(BaseTestResult):
     """
 
     def __init__(self, start_callback=None, finalize_callback=None):
-        super(ProtoTestResult, self).__init__(None, None)
+        super().__init__(None, None)
         self.start_callback = start_callback
         self.finalize_callback = finalize_callback
         self.finalize_callback_called = False
@@ -380,7 +380,7 @@ class GreenTestResult(BaseTestResult):
     """
 
     def __init__(self, args, stream):
-        super(GreenTestResult, self).__init__(stream, Colors(args.termcolor))
+        super().__init__(stream, Colors(args.termcolor))
         self.args = args
         self.showAll = args.verbose > 1
         self.dots = args.verbose == 1
@@ -405,25 +405,13 @@ class GreenTestResult(BaseTestResult):
 
     def __str__(self):  # pragma: no cover
         return (
-            "tests run: {}".format(self.testsRun)
-            + ", "
-            + "errors"
-            + str(self.errors)
-            + ", "
-            + "expectedFailures"
-            + str(self.expectedFailures)
-            + ", "
-            + "failures"
-            + str(self.failures)
-            + ", "
-            + "passing"
-            + str(self.passing)
-            + ", "
-            + "skipped"
-            + str(self.skipped)
-            + ", "
-            + "unexpectedSuccesses"
-            + str(self.unexpectedSuccesses)
+            f"tests run: {self.testsRun}, "
+            f"errors{self.errors}, "
+            f"expectedFailures{self.expectedFailures}, "
+            f"failures{self.failures}, "
+            f"passing{self.passing}, "
+            f"skipped{self.skipped}, "
+            f"unexpectedSuccesses{self.unexpectedSuccesses}"
         )
 
     def stop(self):
@@ -540,14 +528,14 @@ class GreenTestResult(BaseTestResult):
         stats = []
         for obj_list, name, color_func in results:
             if obj_list:
-                stats.append("{}={}".format(name, color_func(str(len(obj_list)))))
+                stats.append(f"{name}={color_func(str(len(obj_list)))}")
         if not stats:
             self.stream.writeln(self.colors.failing("No Tests Found"))
         else:
             grade = self.colors.passing("OK")
             if not self.wasSuccessful():
                 grade = self.colors.failing("FAILED")
-            self.stream.writeln("{} ({})".format(grade, ", ".join(stats)))
+            self.stream.writeln(f"{grade} ({', '.join(stats)})")
 
     def startTest(self, test):
         """
@@ -605,7 +593,7 @@ class GreenTestResult(BaseTestResult):
             )
             if self.stream.isatty() and terminal_width:  # pragma: no cover
                 cursor_rewind = (
-                    int(ceil(float(len(self.first_text_output)) / terminal_width)) - 1
+                    int(ceil(len(self.first_text_output) / terminal_width)) - 1
                 )
                 if cursor_rewind:
                     self.stream.write(self.colors.up(cursor_rewind))
@@ -715,7 +703,7 @@ class GreenTestResult(BaseTestResult):
 
         # Captured output for non-failing tests
         if not self.args.quiet_stdout:
-            failing_tests = set([x[0] for x in self.all_errors])
+            failing_tests = {x[0] for x in self.all_errors}
             for test in list(self.stdout_output) + list(self.stderr_errput):
                 if test not in failing_tests:
                     self.displayStdout(test)
@@ -725,7 +713,7 @@ class GreenTestResult(BaseTestResult):
         for test, color_func, outcome, err in self.all_errors:
             # Header Line
             self.stream.writeln(
-                "\n" + color_func(outcome) + " in " + self.colors.bold(test.dotted_name)
+                f"\n{color_func(outcome)} in {self.colors.bold(test.dotted_name)}"
             )
 
             # Traceback
@@ -742,10 +730,7 @@ class GreenTestResult(BaseTestResult):
                             frame = frame.decode("utf-8")
                     debug(
                         "\n"
-                        + "*" * 30
-                        + "Frame {}:".format(i)
-                        + "*" * 30
-                        + "\n{}".format(self.colors.yellow(frame)),
+                        f"{'*' * 30}Frame {i}:{'*' * 30}\n" + self.colors.yellow(frame),
                         level=3,
                     )
                     # Ignore useless frames
