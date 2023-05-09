@@ -8,3 +8,19 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+
+[tool.mypy]
+# Targetting supported versions of python since third party libraries will have
+# support for newer python syntax.
+python_version = "3.8"
+sqlite_cache = true
+namespace_packages = true
+ignore_missing_imports = true
+follow_imports = "silent"
+show_column_numbers = true
+# Ignore untyped defs for now.
+# check_untyped_defs = true
+show_error_codes = true
+# This might require to set `--no-pretty` in your IDE plugin.
+pretty = true

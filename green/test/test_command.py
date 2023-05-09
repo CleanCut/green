@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock, call
 try:
     from setuptools.dist import Distribution
 except ImportError:
-    from distutil.dist import Distribution
-
+    # The distutils package is deprecated as of https://peps.python.org/pep-0632/
+    from distutils.dist import Distribution  # type: ignore
 
 from green import command
 from green.config import StoreOpt

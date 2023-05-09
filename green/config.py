@@ -2,11 +2,7 @@
 # it from coverage.  We still have tests, though!
 
 import argparse  # pragma: no cover
-
-try:  # pragma: no cover
-    import configparser
-except:  # pragma: no cover
-    import ConfigParser as configparser
+import configparser  # pragma: no cover
 
 import coverage  # pragma: no cover
 

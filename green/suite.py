@@ -1,13 +1,12 @@
 from fnmatch import fnmatch
 import sys
-from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite
+from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite  # type: ignore
 from unittest import util
 import unittest
 from io import StringIO
 
 from green.config import default_args
 from green.output import GreenStream
-from green.result import ProtoTest
 
 
 class GreenTestSuite(TestSuite):

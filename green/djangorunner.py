@@ -11,6 +11,7 @@ To make the change permanent for your project, in settings.py add:
 from argparse import Namespace
 import os
 import sys
+from typing import Sequence
 
 from green.config import mergeConfig
 from green.loader import GreenTestLoader
@@ -24,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = ")9^_e(=cisybdt4m4+fs+_wb%d$!9mpcoy0um^alvx%gexj#jv"
 DEBUG = True
 TEMPLATE_DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: Sequence[str] = []
 INSTALLED_APPS = (
     "django.contrib.admin",
     "django.contrib.auth",
@@ -131,4 +132,4 @@ try:
             return self.suite_result(suite, result)
 
 except ImportError:  # pragma: no cover
-    DjangoRunner = django_missing
+    DjangoRunner = django_missing  # type: ignore
