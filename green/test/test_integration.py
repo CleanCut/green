@@ -1,29 +1,30 @@
 import copy
 import multiprocessing
 import os
-from pathlib import PurePath
+import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
 from textwrap import dedent
 import unittest
-from unittest.mock import MagicMock
-
-from green import cmdline
 
 
 class TestFinalizer(unittest.TestCase):
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
+    def setUp(self) -> None:
+        self.tmpdir = pathlib.Path(tempfile.mkdtemp())
 
-    def test_finalizer(self):
+    def tearDown(self) -> None:
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_finalizer(self) -> None:
         """
-        Test that the finalizer works on Python 3.8+
+        Test that the finalizer works on all supported versions of Python.
         """
-        sub_tmpdir = tempfile.mkdtemp(dir=self.tmpdir)
+        sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
         for i in range(multiprocessing.cpu_count() * 2):
-            fh = open(os.path.join(sub_tmpdir, f"test_finalizer{i}.py"), "w")
-            fh.write(
+            finalizer_path = sub_tmpdir / f"test_finalizer{i}.py"
+            finalizer_path.write_text(
                 dedent(
                     f"""
                 import unittest
@@ -35,7 +36,6 @@ class TestFinalizer(unittest.TestCase):
                 """
                 )
             )
-            fh.close()
         args = [
             sys.executable,
             "-m",
@@ -43,17 +43,19 @@ class TestFinalizer(unittest.TestCase):
             "--finalizer=test_finalizer0.msg",
             "--maxtasksperchild=1",
         ]
-        pythonpath = str(PurePath(__file__).parent.parent.parent)
+        pythonpath = str(pathlib.Path(__file__).parent.parent.parent)
 
         env = copy.deepcopy(os.environ)
         env["PYTHONPATH"] = pythonpath
 
         output = subprocess.run(
             args,
-            cwd=sub_tmpdir,
+            cwd=str(sub_tmpdir),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
             timeout=10,
-        ).stdout.decode("utf-8")
+            encoding="utf-8",
+            check=True,
+        ).stdout
         self.assertIn("finalizer worked", output)

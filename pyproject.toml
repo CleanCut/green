@@ -11,8 +11,8 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.mypy]
-# Targetting supported versions of python since third party libraries will have
-# support for newer python syntax.
+# Targetting versions of python officially supported by python.org since third
+# party libraries will have support for newer python syntax, throwing errors.
 python_version = "3.8"
 sqlite_cache = true
 namespace_packages = true
