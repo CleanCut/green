@@ -45,7 +45,7 @@ jobs:
       - name: Test
         run: |
           green -tvvvv green
-          cd example && python -m green.cmdline -tvvvv proj
+          cd example && green -tvvvv proj
 
       - name: Generate coverage
         run: |

@@ -19,7 +19,7 @@ class TestFinalizer(unittest.TestCase):
 
     def test_finalizer(self) -> None:
         """
-        Test that the finalizer works on all supported versions of Python.
+        Test that the finalizer works on Python 3.8+.
         """
         sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
         for i in range(multiprocessing.cpu_count() * 2):

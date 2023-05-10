@@ -1,10 +1,6 @@
 import sys
 
-try:
-    from setuptools import Command
-except ImportError:  # pragma: no cover
-    # The distutils package is deprecated as of https://peps.python.org/pep-0632/
-    from distutils.cmd import Command  # type: ignore
+from setuptools import Command
 
 from green.config import parseArguments
 from green.cmdline import main
