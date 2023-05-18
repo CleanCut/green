@@ -1,3 +1,5 @@
+black
 django
+mypy
 testtools
 -r requirements.txt

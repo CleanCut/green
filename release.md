@@ -10,7 +10,6 @@ Very First Time
 ===============
 
 1. Set up `~/.pypirc`
-
 ```
     [distutils]
     index-servers =
@@ -28,5 +27,3 @@ Very First Time
 ```
 
 2. `python setup.py register -r pypi`
-
-

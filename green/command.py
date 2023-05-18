@@ -1,9 +1,6 @@
 import sys
 
-try:
-    from setuptools import Command
-except ImportError:  # pragma: no cover
-    from distutils.cmd import Command
+from setuptools import Command
 
 from green.config import parseArguments
 from green.cmdline import main

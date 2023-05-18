@@ -150,9 +150,7 @@ class TestRun(unittest.TestCase):
             class Verbose3(unittest.TestCase):
                 def test01(self):
                     pass
-            """.format(
-                    os.getpid()
-                )
+            """
             )
         )
         fh.close()
@@ -178,9 +176,7 @@ class TestRun(unittest.TestCase):
             class Warnings(unittest.TestCase):
                 def test01(self):
                     pass
-            """.format(
-                    os.getpid()
-                )
+            """
             )
         )
         fh.close()
@@ -213,9 +209,7 @@ class TestRun(unittest.TestCase):
             class Failed(unittest.TestCase):
                 def test01(self):
                     self.assertTrue(False)
-            """.format(
-                    os.getpid()
-                )
+            """
             )
         )
         fh.close()
@@ -241,9 +235,7 @@ class TestRun(unittest.TestCase):
                     raise Exception
                 def test01(self):
                     pass
-            """.format(
-                    os.getpid()
-                )
+            """
             )
         )
         fh.close()
@@ -269,9 +261,7 @@ class TestRun(unittest.TestCase):
                     raise SystemExit(1)
                 def test01(self):
                     pass
-            """.format(
-                    os.getpid()
-                )
+            """
             )
         )
         fh.close()

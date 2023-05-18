@@ -4,11 +4,7 @@ import sys
 import unittest
 from unittest.mock import patch, MagicMock, call
 
-try:
-    from setuptools.dist import Distribution
-except ImportError:
-    from distutil.dist import Distribution
-
+from setuptools.dist import Distribution
 
 from green import command
 from green.config import StoreOpt

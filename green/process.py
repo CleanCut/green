@@ -3,10 +3,8 @@ import multiprocessing
 from multiprocessing.pool import Pool, RUN, TERMINATE
 import platform
 import random
-import shutil
 import sys
 import tempfile
-import threading
 import traceback
 
 import coverage
@@ -212,11 +210,12 @@ class LoggingDaemonlessPool38(Pool):
 
 LoggingDaemonlessPool = LoggingDaemonlessPool38
 if tuple(map(int, platform.python_version_tuple()[:2])) < (3, 8):  # pragma: no cover
-    LoggingDaemonlessPool = LoggingDaemonlessPool37
+    LoggingDaemonlessPool = LoggingDaemonlessPool37  # type: ignore
+
 
 import multiprocessing.pool
-from multiprocessing import util
-from multiprocessing.pool import MaybeEncodingError
+from multiprocessing import util  # type: ignore
+from multiprocessing.pool import MaybeEncodingError  # type: ignore
 
 
 def worker(
@@ -229,7 +228,7 @@ def worker(
     finalizer=None,
     finalargs=(),
 ):  # pragma: no cover
-    assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
+    assert maxtasks is None or (isinstance(maxtasks, int) and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
     if hasattr(inqueue, "_writer"):
@@ -305,7 +304,7 @@ def rebuild_exc(exc, tb):  # pragma: no cover
     return exc
 
 
-multiprocessing.pool.worker = worker
+multiprocessing.pool.worker = worker  # type: ignore
 # END of Worker Finalization Monkey Patching
 # -----------------------------------------------------------------------------
 
