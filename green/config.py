@@ -634,17 +634,14 @@ def getConfig(filepath=None):  # pragma: no cover
     if filepaths:
         global files_loaded
         files_loaded = filepaths
-        # Python 3 has parser.read_file(iterator) while Python2 has
-        # parser.readfp(obj_with_readline)
-        read_func = getattr(parser, "read_file", getattr(parser, "readfp"))
         for filepath in filepaths:
             # Users are expected to put a [green] section
             # only if they use setup.cfg
             if filepath.endswith("setup.cfg"):
                 with open(filepath) as f:
-                    read_func(f)
+                    parser.read_file(f)
             else:
-                read_func(ConfigFile(filepath))
+                parser.read_file(ConfigFile(filepath))
 
     return parser
 
