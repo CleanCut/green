@@ -1,6 +1,11 @@
 # Unreleased
 #### Date TBD
 
+# Version 3.5.0
+#### 4 Dec 2023
+
+This is the final version to support Python 3.6 and 3.7.
+
 - Drop Python 2 support.
 - Add Python 3.11 to the CI Action.
 - Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
@@ -8,6 +13,8 @@
 
 # Version 3.4.3
 #### 20 Sep 2022
+
+This is the final version to support Python 2.
 
 - If green creates a temp directory for tests, but is unable to clean it up, emit a warning instead of crashing. Some tests don't behave well in the temp directory. Resolves #264.
 
