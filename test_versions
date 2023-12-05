@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o pipefail
+
 if [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
     PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION}"
 else
