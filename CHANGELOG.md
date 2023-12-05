@@ -1,11 +1,32 @@
 # Unreleased
 #### Date TBD
 
-- Drop Python 2 support.
-- Fix an error and warnings that occur with Python 3.12.
-- Add Python 3.11 and 3.12 to the CI Action.
+# Version 4.0.0
+#### 4 December 2023
+
+The biggest change in this release is the addition of support for new Python versions up through 3.12, and the dropping of support for Python < 3.8, including Python 2 entirely.
+
+- Fix an error and warnings that occur with Python 3.12. Contributed by [`@sodul`](https://github.com/sodul) in [#272], [#274], and [#275].
 - Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
-- Minimum Python version supported is now 3.8.
+- Lift minimum supported Python version from 3.5 to 3.8.
+- Drop Python 2 support.
+- CI Improvements:
+   - Add Python 3.11 and 3.12 to the CI Action
+   - Add button to run CI checks manually
+   - Add 15 minute timeout to CI checks
+   - Update CI to pip install green in developer mode
+- Add `mypy` linting & fix lint warnings
+- Use `pyupgrade` to modernize code
+- Use `black` to autoformat code
+- Add `pyproject.toml`
+- Move `setup.py` logic into `setup.cfg`
+- README cleanup
+- Fixes for newer versions of coverage
+
+
+[#272]: https://github.com/CleanCut/green/issues/272
+[#274]: https://github.com/CleanCut/green/pull/274
+[#275]: https://github.com/CleanCut/green/pull/275
 
 # Version 3.4.3
 #### 20 Sep 2022
