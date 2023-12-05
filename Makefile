@@ -3,7 +3,7 @@ VERSION=$(shell cat green/VERSION)
 clean: clean-message clean-silent
 
 clean-message:
-	@echo "Cleaning generated files and directories.  Do 'make super-clean' to remove virtualenvs as well."
+	@echo "Cleaning generated files and directories.  Do 'make super-clean' to remove virtual environments as well."
 
 clean-silent:
 	@find . -name '*.pyc' -exec rm \{\} \;
@@ -36,9 +36,9 @@ test-coverage:
 
 test-installed:
 	# Check that the tests run from an installed version of green
-	@echo "Setting up a virtualenv to run tests from an installed version of green"
+	@echo "Setting up a virtual environment to run tests from an installed version of green"
 	@rm -rf venv-installed
-	@virtualenv venv-installed
+	@python3 -m venv venv-installed
 	@make clean-silent
 	source venv-installed/bin/activate; pip3 install -r requirements-optional.txt
 	source venv-installed/bin/activate; python3 setup.py sdist
