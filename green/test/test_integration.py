@@ -23,7 +23,7 @@ class TestFinalizer(unittest.TestCase):
         """
         sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
         for i in range(multiprocessing.cpu_count() * 2):
-            finalizer_path = sub_tmpdir / f"test_finalizer{i}.py"
+            finalizer_path = sub_tmpdir / f"test_finalizer.py"
             finalizer_path.write_text(
                 dedent(
                     f"""
@@ -40,7 +40,7 @@ class TestFinalizer(unittest.TestCase):
             sys.executable,
             "-m",
             "green.cmdline",
-            "--finalizer=test_finalizer0.msg",
+            "--finalizer=test_finalizer.msg",
             "--maxtasksperchild=1",
         ]
         pythonpath = str(pathlib.Path(__file__).parent.parent.parent)
