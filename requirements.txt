@@ -1,5 +1,5 @@
 colorama
-coverage
+coverage[toml]
 lxml
 setuptools
 unidecode
