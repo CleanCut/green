@@ -16,7 +16,7 @@ Features
 - **Convenient** - Bash-completion and ZSH-completion of options and test targets.
 - **Thorough** - Built-in integration with [coverage](http://nedbatchelder.com/code/coverage/).
 - **Embedded** - Can be run with a setup command without in-site installation.
-- **Modern** - Supports Python 3.6+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
+- **Modern** - Supports Python 3.8+. Additionally, [PyPy](http://pypy.org) is supported on a best-effort basis.
 - **Portable** - macOS, Linux, and BSDs are fully supported.  Windows is supported on a best-effort basis.
 - **Living** - This project grows and changes.  See the
   [changelog](https://github.com/CleanCut/green/blob/main/CHANGELOG.md)
@@ -394,7 +394,7 @@ Green can also run tests embedded in documentation via Python's built-in
 [doctest] module.  Returning to our previous example, we could add docstrings
 with example code to our `foo.py` module:
 
-[doctest]: https://docs.python.org/3.6/library/doctest.html
+[doctest]: https://docs.python.org/3.12/library/doctest.html
 
 
 ```python

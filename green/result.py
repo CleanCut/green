@@ -165,6 +165,8 @@ class BaseTestResult:
         self.stderr_errput = OrderedDict()
         self.stream = stream
         self.colors = colors
+        # The collectedDurations list is new in Python 3.12.
+        self.collectedDurations = []
 
     def recordStdout(self, test, output):
         """
@@ -218,6 +220,19 @@ class BaseTestResult:
             )
             del self.stderr_errput[test]
 
+    def addDuration(self, test, elapsed):
+        """
+        Called when a test finished running, regardless of its outcome.
+
+        New in Python 3.12.
+
+        Args:
+            test: The test case corresponding to the test method.
+            elapsed: The time represented in seconds, including the
+                execution of cleanup functions.
+        """
+        self.collectedDurations.append((str(test), elapsed))
+
 
 class ProtoTestResult(BaseTestResult):
     """
@@ -247,6 +262,7 @@ class ProtoTestResult(BaseTestResult):
 
     def reinitialize(self):
         self.shouldStop = False
+        self.collectedDurations = []
         self.errors = []
         self.expectedFailures = []
         self.failures = []
@@ -392,6 +408,7 @@ class GreenTestResult(BaseTestResult):
         self.shouldStop = False
         self.testsRun = 0
         # Individual lists
+        self.collectedDurations = []
         self.errors = []
         self.expectedFailures = []
         self.failures = []
