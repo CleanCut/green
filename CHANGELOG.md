@@ -2,16 +2,15 @@
 #### Date TBD
 
 # Version 4.0.0
-#### 4 December 2023
+#### 12 Jan 2024
 
 The biggest change in this release is the addition of support for new Python versions up through 3.12, and the dropping of support for Python < 3.8, including Python 2 entirely.
 
 - Fix an error and warnings that occur with Python 3.12. Contributed by [`@sodul`](https://github.com/sodul) in [#272], [#274], and [#275].
 - Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
 - Lift minimum supported Python version from 3.5 to 3.8.
-- Drop Python 2 support.
 - CI Improvements:
-   - Add Python 3.11 and 3.12 to the CI Action
+   - Add 3.12 to the CI Action
    - Add button to run CI checks manually
    - Add 15 minute timeout to CI checks
    - Update CI to pip install green in developer mode
@@ -28,8 +27,20 @@ The biggest change in this release is the addition of support for new Python ver
 [#274]: https://github.com/CleanCut/green/pull/274
 [#275]: https://github.com/CleanCut/green/pull/275
 
+# Version 3.5.0
+#### 12 Jan 2024
+
+This is the final version to support Python 3.6 and 3.7.
+
+- Drop Python 2 support.
+- Add Python 3.11 to the CI Action.
+- Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
+- Minimum Python version supported is now 3.6.
+
 # Version 3.4.3
 #### 20 Sep 2022
+
+This is the final version to support Python 2.
 
 - If green creates a temp directory for tests, but is unable to clean it up, emit a warning instead of crashing. Some tests don't behave well in the temp directory. Resolves #264.
 

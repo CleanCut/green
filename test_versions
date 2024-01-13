@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o pipefail
+
 if [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
     PYTHON_VERSIONS="${TRAVIS_PYTHON_VERSION}"
 else
@@ -59,23 +61,24 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         exit 5
     fi
 
-    if ! ${PYTHON} -m virtualenv --version > /dev/null ; then
-        echo "Please install virtualenv under ${PYTHON}"
-        exit 6
-    fi
-
     VENV_DIR="venv${PYTHON_VERSION}"
     if [ ! -d ${VENV_DIR} ] ; then
-        ${PYTHON} -m virtualenv ${VENV_DIR}
+        ${PYTHON} -m venv ${VENV_DIR}
     fi
 
     echo "Ensuring dependencies are installed for ${VENV_DIR}"
 
     if ! source ${VENV_DIR}/bin/activate ; then
-        echo "Failed to enter virtualenv"
+        echo "Failed to enter virtual environment"
         exit 7
     fi
     hash -r
+    REQUIREMENTS_FILE="requirements-optional.txt"
+    if [ "${PYTHON}" == "pypy3" ] ; then
+        # `black` depends on `typed_ast` which isn't supported by pypy3. We can remove this once
+        # `black` starts depending on built-in `ast`
+        REQUIREMENTS_FILE="requirements.txt"
+    fi
     ${VENV_DIR}/bin/pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
     deactivate
 done

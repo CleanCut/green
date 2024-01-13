@@ -40,7 +40,7 @@ docs/_build/
 tags
 .idea
 
-# virtualenvs
+# virtual environments
 venv*
 env*
 
