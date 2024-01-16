@@ -2,17 +2,21 @@
 #### Date TBD
 
 # Version 4.0.0
-#### 12 Jan 2024
+#### 16 Jan 2024
 
 The biggest change in this release is the addition of support for new Python versions up through 3.12, and the dropping of support for Python < 3.8, including Python 2 entirely.
 
-- Fix an error and warnings that occur with Python 3.12. Contributed by [`@sodul`](https://github.com/sodul) in [#272], [#274], and [#275].
-- Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23.
-- Lift minimum supported Python version from 3.5 to 3.8.
+There is a breaking in change in Python 3.12.1 which causes Green to break on skipped tests.
+The workaround is to use Python 3.12.0 or to comment out unittests that use `@unittest.skipIf(...)` annotation.
+We will release a fix for this in the next version of Green.
+
+- Fix an error and warnings that occur with Python 3.12. Contributed by [`@sodul`](https://github.com/sodul) in [#272], [#274], and [#275]
+- Add setup.cfg and pyproject.toml to support the setup.py deprecation in pip 23
+- Lift minimum supported Python version from 3.5 to 3.8
 - CI Improvements:
    - Add 3.12 to the CI Action
    - Add button to run CI checks manually
-   - Add 15 minute timeout to CI checks
+   - Add 15 minutes timeout to CI checks
    - Update CI to pip install green in developer mode
 - Add `mypy` linting & fix lint warnings
 - Use `pyupgrade` to modernize code
@@ -21,6 +25,7 @@ The biggest change in this release is the addition of support for new Python ver
 - Move `setup.py` logic into `setup.cfg`
 - README cleanup
 - Fixes for newer versions of coverage
+- New maintainer: @sodul.
 
 
 [#272]: https://github.com/CleanCut/green/issues/272
