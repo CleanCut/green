@@ -34,7 +34,7 @@ def ddebug(msg, err=None):  # pragma: no cover
 class ProcessLogger:
     """
     I am used by LoggingDaemonlessPool to get crash output out to the logger,
-    instead of having process crashes be silent
+    instead of having process crashes be silent.
     """
 
     def __init__(self, callable):
@@ -59,71 +59,10 @@ class ProcessLogger:
         return result
 
 
-# -------------------------------------------------------------------------
-# I started with code from cpython/Lib/multiprocessing/pool.py from version
-# 3.5.0a4+ of the main python mercurial repository.  Then altered it to run
-# on 2.7+ and added the finalizer/finalargs parameter handling. This approach
-# worked until we hit Python 3.8, when it broke.
-class LoggingDaemonlessPool37(Pool):  # pragma: no cover
+class LoggingDaemonlessPool(Pool):
     """
     I make a pool of workers which can get crash output to the logger, run processes not as daemons,
-    and which run finalizers...in a way which works on Python 2.7 to 3.7, inclusive.
-    """
-
-    @staticmethod
-    def Process(*args, **kwargs):
-        kwargs["daemon"] = False
-        return multiprocessing.Process(*args, **kwargs)
-
-    def apply_async(self, func, args=(), kwds={}, callback=None):
-        return Pool.apply_async(self, ProcessLogger(func), args, kwds, callback)
-
-    _wrap_exception = True
-
-    def __init__(
-        self,
-        processes=None,
-        initializer=None,
-        initargs=(),
-        maxtasksperchild=None,
-        context=None,
-        finalizer=None,
-        finalargs=(),
-    ):
-        self._finalizer = finalizer
-        self._finalargs = finalargs
-        super().__init__(processes, initializer, initargs, maxtasksperchild)
-
-    def _repopulate_pool(self):
-        """
-        Bring the number of pool processes up to the specified number, for use
-        after reaping workers which have exited.
-        """
-        for i in range(self._processes - len(self._pool)):
-            w = self.Process(
-                target=worker,
-                args=(
-                    self._inqueue,
-                    self._outqueue,
-                    self._initializer,
-                    self._initargs,
-                    self._maxtasksperchild,
-                    self._wrap_exception,
-                    self._finalizer,
-                    self._finalargs,
-                ),
-            )
-            self._pool.append(w)
-            w.name = w.name.replace("Process", "PoolWorker")
-            w.start()
-            util.debug("added worker")
-
-
-class LoggingDaemonlessPool38(Pool):
-    """
-    I make a pool of workers which can get crash output to the logger, run processes not as daemons,
-    and which run finalizers...in a way which works on Python 3.8+.
-
+    and which run finalizers.
     """
 
     @staticmethod
@@ -207,10 +146,6 @@ class LoggingDaemonlessPool38(Pool):
             pool.append(w)
             util.debug("added worker")
 
-
-LoggingDaemonlessPool = LoggingDaemonlessPool38
-if tuple(map(int, platform.python_version_tuple()[:2])) < (3, 8):  # pragma: no cover
-    LoggingDaemonlessPool = LoggingDaemonlessPool37  # type: ignore
 
 
 import multiprocessing.pool
