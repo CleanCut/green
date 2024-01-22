@@ -1,0 +1,6 @@
+black
+# coverage[toml] needs to be listed explictly for python < 3.11.
+coverage[toml]; python_full_version<="3.11.0a6"
+django
+mypy
+testtools

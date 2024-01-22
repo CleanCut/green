@@ -22,11 +22,18 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 test-local:
-	@pip3 install -r requirements-optional.txt
+	@pip3 install --upgrade -e .[dev]
 	@make test-installed
 	make test-versions
 	make test-coverage
 	@# test-coverage needs to be last in deps, don't clean after it runs!
+
+test-on-containers: clean-silent
+	@# Run the tests on pristine containers to isolate us from the local environment.
+	@for version in 3.8 3.9 3.10 3.11 3.12.0; do \
+	    docker run --rm -it -v `pwd`:/green python:$$version \
+	        bash -c "python --version; cd /green && pip install -e .[dev] && ./g green" ; \
+	done
 
 test-coverage:
 	@# Generate coverage files for travis builds (don't clean after this!)
@@ -40,10 +47,9 @@ test-installed:
 	@rm -rf venv-installed
 	@python3 -m venv venv-installed
 	@make clean-silent
-	source venv-installed/bin/activate; pip3 install -r requirements-optional.txt
 	source venv-installed/bin/activate; python3 setup.py sdist
 	tar zxvf dist/green-$(VERSION).tar.gz
-	source venv-installed/bin/activate; cd green-$(VERSION) && pip3 install .
+	source venv-installed/bin/activate; cd green-$(VERSION) && pip3 install --upgrade .[dev]
 	source venv-installed/bin/activate; green -vvvv green
 	@rm -rf venv-installed
 	@make clean-silent
