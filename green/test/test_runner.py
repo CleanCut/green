@@ -413,12 +413,13 @@ class TestProcesses(unittest.TestCase):
 
     def test_run_coverage(self):
         """
-        Running coverage in process mode doesn't crash
+        Running coverage in process mode doesn't crash.
         """
         try:
             import coverage
         except ImportError:
             self.skipTest("Coverage needs to be installed for this test")
+        self.assertTrue(coverage.version_info)
         sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
         (sub_tmpdir / "__init__.py").write_text("\n", encoding="utf-8")
         content = dedent(

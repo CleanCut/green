@@ -441,7 +441,7 @@ def parseArguments(argv=None):  # pragma: no cover
             ),
             default=argparse.SUPPRESS,
         )
-    ),
+    )
     store_opt(
         cov_args.add_argument(
             "-R",

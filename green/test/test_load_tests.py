@@ -1,5 +1,5 @@
 import os
-from queue import Queue, Empty
+from queue import Queue
 import shutil
 import tempfile
 import unittest
@@ -7,7 +7,6 @@ import textwrap
 
 from green.loader import GreenTestLoader
 from green.process import poolRunner
-from green import process
 
 
 class TestLoadTests(unittest.TestCase):

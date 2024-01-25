@@ -1,4 +1,4 @@
-from lxml.etree import Element, SubElement, tostring as to_xml
+from lxml.etree import Element, tostring as to_xml
 
 
 class JUnitDialect:

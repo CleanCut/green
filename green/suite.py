@@ -80,46 +80,7 @@ class GreenTestSuite(TestSuite):
                 cases += test.countTestCases()
         return cases
 
-    def _handleClassSetUpPre38(self, test, result):  # pragma: nocover
-        previousClass = getattr(result, "_previousTestClass", None)
-        currentClass = test.__class__
-        if currentClass == previousClass:
-            return
-        if result._moduleSetUpFailed:
-            return
-        if getattr(currentClass, "__unittest_skip__", False):  # pragma: no cover
-            return
-
-        try:
-            currentClass._classSetupFailed = False
-        except TypeError:  # pragma: no cover
-            # test may actually be a function
-            # so its class will be a builtin-type
-            pass
-
-        setUpClass = getattr(currentClass, "setUpClass", None)
-        if setUpClass is not None:
-            _call_if_exists(result, "_setupStdout")
-            try:
-                setUpClass()
-            # Upstream Python forgets to take SkipTest into account
-            except unittest.case.SkipTest as e:
-                currentClass.__unittest_skip__ = True
-                currentClass.__unittest_skip_why__ = str(e)
-            # -- END of fix
-            except Exception as e:  # pragma: no cover
-                if isinstance(result, _DebugResult):
-                    raise
-                currentClass._classSetupFailed = True
-                className = util.strclass(currentClass)
-                errorName = "setUpClass (%s)" % className
-                self._addClassOrModuleLevelException(result, e, errorName)
-            finally:
-                _call_if_exists(result, "_restoreStdout")
-
-    def _handleClassSetUpPost38(
-        self, test, result
-    ):  # pragma: no cover -- because it's just like *Pre38
+    def _handleClassSetUp(self, test, result):
         previousClass = getattr(result, "_previousTestClass", None)
         currentClass = test.__class__
         if currentClass == previousClass:
@@ -163,11 +124,6 @@ class GreenTestSuite(TestSuite):
                             self._createClassOrModuleLevelException(
                                 result, exc[1], "setUpClass", className, info=exc
                             )
-
-    if sys.version_info < (3, 8):  # pragma: no cover
-        _handleClassSetUp = _handleClassSetUpPre38
-    else:
-        _handleClassSetUp = _handleClassSetUpPost38
 
     def run(self, result):
         """

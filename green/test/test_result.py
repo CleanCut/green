@@ -7,7 +7,6 @@ import copy
 import doctest
 from io import StringIO
 import sys
-import os
 import unittest
 from unittest.mock import MagicMock, patch
 import tempfile
