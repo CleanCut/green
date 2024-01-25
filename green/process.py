@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
-from multiprocessing.pool import Pool, RUN, TERMINATE
-import platform
+from multiprocessing.pool import Pool
 import random
 import sys
 import tempfile

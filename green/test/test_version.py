@@ -1,7 +1,6 @@
 import unittest
 
 from green.version import __version__, pretty_version
-import green.version
 
 
 class TestVersion(unittest.TestCase):

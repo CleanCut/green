@@ -1,4 +1,4 @@
-from colorama import init, deinit, Fore, Style
+from colorama import Fore, Style
 from colorama.ansi import Cursor
 from colorama.initialise import wrap_stream
 import logging

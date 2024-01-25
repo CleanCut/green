@@ -1,7 +1,7 @@
 from green.config import default_args
 from green.output import GreenStream
 from green.junit import JUnitXML, JUnitDialect, Verdict
-from green.result import GreenTestResult, BaseTestResult, ProtoTest, proto_error
+from green.result import GreenTestResult, ProtoTest, proto_error
 
 from io import StringIO
 
@@ -9,7 +9,7 @@ from sys import exc_info
 
 from unittest import TestCase
 
-from xml.etree.ElementTree import fromstring as from_xml, tostring as to_xml
+from xml.etree.ElementTree import fromstring as from_xml
 
 
 def test(module, class_name, method_name):

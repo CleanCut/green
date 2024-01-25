@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from doctest import DocTestCase, DocTestSuite
+from doctest import DocTestSuite
 from fnmatch import fnmatch
 import functools
 import glob

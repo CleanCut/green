@@ -1,7 +1,9 @@
 import argparse
 import contextlib
+import os
 import sys
 import unittest
+from configparser import ConfigParser
 from unittest.mock import patch, MagicMock, call
 
 from setuptools.dist import Distribution
