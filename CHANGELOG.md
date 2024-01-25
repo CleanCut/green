@@ -1,6 +1,9 @@
 # Unreleased
 #### Date TBD
 
+- Cleanup test_runner.py to more modern Python style.
+- Simplify green's dev testing setup.
+
 # Version 4.0.0
 #### 16 Jan 2024
 
