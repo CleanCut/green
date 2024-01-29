@@ -237,6 +237,9 @@ class ProtoTestResult(BaseTestResult):
     I'm the TestResult object for a single unit test run in a process.
     """
 
+    start_time: float = 0
+    errors: list
+
     def __init__(self, start_callback=None, finalize_callback=None):
         super().__init__(None, None)
         self.start_callback = start_callback
@@ -256,12 +259,13 @@ class ProtoTestResult(BaseTestResult):
             "test_time",
         ]
         self.failfast = False  # Because unittest inspects the attribute
+        self.errors = []
         self.reinitialize()
 
     def reinitialize(self):
         self.shouldStop = False
         self.collectedDurations = []
-        self.errors = []
+        self.errors.clear()
         self.expectedFailures = []
         self.failures = []
         self.passing = []
@@ -312,7 +316,7 @@ class ProtoTestResult(BaseTestResult):
 
     def startTest(self, test):
         """
-        Called before each test runs
+        Called before each test runs.
         """
         test = proto_test(test)
         self.start_time = time.time()
@@ -322,9 +326,12 @@ class ProtoTestResult(BaseTestResult):
 
     def stopTest(self, test):
         """
-        Called after each test runs
+        Called after each test runs.
         """
-        self.test_time = str(time.time() - self.start_time)
+        if self.start_time:
+            self.test_time = str(time.time() - self.start_time)
+        else:
+            self.test_time = "0.0"
 
     def finalize(self):
         """
