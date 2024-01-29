@@ -43,6 +43,7 @@ tags
 # virtual environments
 venv*
 env*
+.python-version
 
 *.sublime-workspace
 

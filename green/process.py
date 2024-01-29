@@ -146,7 +146,6 @@ class LoggingDaemonlessPool(Pool):
             util.debug("added worker")
 
 
-
 import multiprocessing.pool
 from multiprocessing import util  # type: ignore
 from multiprocessing.pool import MaybeEncodingError  # type: ignore
