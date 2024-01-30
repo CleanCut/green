@@ -1,39 +1,41 @@
-from collections import OrderedDict
-from doctest import DocTestCase
+from __future__ import annotations
+
+from doctest import DocTest, DocTestCase
 from math import ceil
 from shutil import get_terminal_size
 import time
 import traceback
+from typing import Any, Union, TYPE_CHECKING
 from unittest.result import failfast
 from unittest import TestCase
 
 from green.output import Colors, debug
 from green.version import pretty_version
 
+if TYPE_CHECKING:
+    TestCaseT = Union["ProtoTest", TestCase, DocTestCase]
 
 terminal_width, _ignored = get_terminal_size()
 
 
-def proto_test(test):
+def proto_test(test: TestCaseT) -> ProtoTest:
     """
-    If test is a ProtoTest, I just return it.  Otherwise I create a ProtoTest
-    out of test and return it.
+    If test is a ProtoTest, I just return it.
+    Otherwise, I create a ProtoTest out of test and return it.
     """
     if isinstance(test, ProtoTest):
         return test
-    else:
-        return ProtoTest(test)
+    return ProtoTest(test)
 
 
 def proto_error(err):
     """
-    If err is a ProtoError, I just return it.  Otherwise I create a ProtoError
-    out of err and return it.
+    If err is a ProtoError, I just return it.
+    Otherwise, I create a ProtoError out of err and return it.
     """
     if isinstance(err, ProtoError):
         return err
-    else:
-        return ProtoError(err)
+    return ProtoError(err)
 
 
 class ProtoTest:
@@ -42,29 +44,38 @@ class ProtoTest:
     and can pass between processes.
     """
 
-    def __init__(self, test=None):
-        self.module = ""
-        self.class_name = ""
-        self.method_name = ""
-        self.docstr_part = ""
-        self.subtest_part = ""
-        self.test_time = "0.0"
+    module: str = ""
+    class_name: str = ""
+    method_name: str = ""
+    docstr_part: str = ""
+    subtest_part: str = ""
+    test_time: str = "0.0"
+    failureException = AssertionError
+    description: str = ""
+
+    # Doctests specific attributes:
+    is_doctest: bool = False
+    filename: str | None = None
+    name: str = ""
+
+    def __init__(self, test: TestCase | DocTestCase | None = None) -> None:
+        # Teardown handling is a royal mess
+        self.is_class_or_module_teardown_error: bool = False
+
+        # Is this a subtest? The _SubTest class is private so we need to check the attributes.
+        sub_description = getattr(test, "_subDescription", None)
+        if sub_description is not None:
+            self.subtest_part = " " + sub_description()
+            test = test.test_case  # type: ignore
+
+        # Is this a DocTest?
         # We need to know that this is a doctest, because doctests are very
         # different than regular test cases in many ways, so they get special
         # treatment inside and outside of this class.
-        self.is_doctest = False
-        # Teardown handling is a royal mess
-        self.is_class_or_module_teardown_error = False
-
-        # Is this a subtest?
-        if getattr(test, "_subDescription", None):
-            self.subtest_part = " " + test._subDescription()
-            test = test.test_case
-
-        # Is this a DocTest?
         if isinstance(test, DocTestCase):
             self.is_doctest = True
-            self.name = test._dt_test.name
+            dt_test: DocTest = test._dt_test  # type: ignore
+            self.name = dt_test.name
             # We had to inject this in green/loader.py -- this is the test
             # module that specified that we should load doctests from some
             # other module -- so that we'll group the doctests with the test
@@ -74,8 +85,8 @@ class ProtoTest:
             # I'm not sure this will be the correct way to get the method name
             # in all cases.
             self.method_name = self.name.split(".")[1]
-            self.filename = test._dt_test.filename
-            self.lineno = test._dt_test.lineno
+            self.filename = dt_test.filename
+            self.lineno = dt_test.lineno
 
         # Is this a TestCase?
         elif isinstance(test, TestCase):
@@ -94,29 +105,22 @@ class ProtoTest:
                     doc_segments.append(line)
             self.docstr_part = " ".join(doc_segments)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.__hash__() == other.__hash__()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.dotted_name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.dotted_name
 
     @property
-    def dotted_name(self, ignored=None):
+    def dotted_name(self, ignored: Any = None) -> str:
         if self.is_doctest or self.is_class_or_module_teardown_error:
             return self.name
-        return (
-            self.module
-            + "."
-            + self.class_name
-            + "."
-            + self.method_name
-            + self.subtest_part
-        )
+        return f"{self.module}.{self.class_name}.{self.method_name}{self.subtest_part}"
 
-    def getDescription(self, verbose):
+    def getDescription(self, verbose: int) -> str:
         # Classes or module teardown errors
         if self.is_class_or_module_teardown_error:
             return self.name
@@ -124,19 +128,18 @@ class ProtoTest:
         if self.is_doctest:
             if verbose == 2:
                 return self.name
-            elif verbose > 2:
-                return self.name + " -> " + self.filename + ":" + str(self.lineno)
+            if verbose > 2:
+                return f"{self.name} -> {self.filename}:{self.lineno}"
             return ""
         # Regular tests
         if verbose == 2:
-            return self.method_name + self.subtest_part
+            return f"{self.method_name}{self.subtest_part}"
         elif verbose == 3:
-            return (self.docstr_part + self.subtest_part) or self.method_name
+            return f"{self.docstr_part}{self.subtest_part}" or self.method_name
         elif verbose > 3:
             if self.docstr_part + self.subtest_part:
-                return self.method_name + ": " + self.docstr_part + self.subtest_part
-            else:
-                return self.method_name
+                return f"{self.method_name}: {self.docstr_part}{self.subtest_part}"
+            return self.method_name
         return ""
 
 
@@ -146,10 +149,10 @@ class ProtoError:
     and can pass between processes.
     """
 
-    def __init__(self, err=None):
+    def __init__(self, err=None) -> None:
         self.traceback_lines = traceback.format_exception(*err)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "\n".join(self.traceback_lines)
 
 
@@ -158,15 +161,15 @@ class BaseTestResult:
     I am inherited by ProtoTestResult and GreenTestResult.
     """
 
-    def __init__(self, stream, colors):
-        self.stdout_output = OrderedDict()
-        self.stderr_errput = OrderedDict()
+    def __init__(self, stream, *, colors: Colors | None = None):
+        self.stdout_output: dict[ProtoTest, Any] = {}
+        self.stderr_errput: dict[ProtoTest, Any] = {}
         self.stream = stream
-        self.colors = colors
+        self.colors: Colors = colors or Colors()
         # The collectedDurations list is new in Python 3.12.
-        self.collectedDurations = []
+        self.collectedDurations: list[tuple[str, float]] = []
 
-    def recordStdout(self, test, output):
+    def recordStdout(self, test: TestCaseT, output):
         """
         Called with stdout that the suite decided to capture so we can report
         the captured output somewhere.
@@ -175,7 +178,7 @@ class BaseTestResult:
             test = proto_test(test)
             self.stdout_output[test] = output
 
-    def recordStderr(self, test, errput):
+    def recordStderr(self, test: TestCaseT, errput):
         """
         Called with stderr that the suite decided to capture so we can report
         the captured "errput" somewhere.
@@ -184,7 +187,7 @@ class BaseTestResult:
             test = proto_test(test)
             self.stderr_errput[test] = errput
 
-    def displayStdout(self, test):
+    def displayStdout(self, test: TestCaseT):
         """
         Displays AND REMOVES the output captured from a specific test.  The
         removal is done so that this method can be called multiple times
@@ -192,16 +195,17 @@ class BaseTestResult:
         """
         test = proto_test(test)
         if test.dotted_name in self.stdout_output:
+            colors = self.colors
             self.stream.write(
                 "\n{} for {}\n{}".format(
-                    self.colors.yellow("Captured stdout"),
-                    self.colors.bold(test.dotted_name),
+                    colors.yellow("Captured stdout"),
+                    colors.bold(test.dotted_name),
                     self.stdout_output[test],
                 )
             )
             del self.stdout_output[test]
 
-    def displayStderr(self, test):
+    def displayStderr(self, test: TestCaseT):
         """
         Displays AND REMOVES the errput captured from a specific test.  The
         removal is done so that this method can be called multiple times
@@ -209,16 +213,17 @@ class BaseTestResult:
         """
         test = proto_test(test)
         if test.dotted_name in self.stderr_errput:
+            colors = self.colors
             self.stream.write(
                 "\n{} for {}\n{}".format(
-                    self.colors.yellow("Captured stderr"),
-                    self.colors.bold(test.dotted_name),
+                    colors.yellow("Captured stderr"),
+                    colors.bold(test.dotted_name),
                     self.stderr_errput[test],
                 )
             )
             del self.stderr_errput[test]
 
-    def addDuration(self, test, elapsed):
+    def addDuration(self, test: TestCaseT, elapsed: float):
         """
         Called when a test finished running, regardless of its outcome.
 
@@ -237,11 +242,11 @@ class ProtoTestResult(BaseTestResult):
     I'm the TestResult object for a single unit test run in a process.
     """
 
-    start_time: float = 0
-    errors: list
+    start_time: float = 0.0
+    shouldStop: bool = False
 
     def __init__(self, start_callback=None, finalize_callback=None):
-        super().__init__(None, None)
+        super().__init__(None, colors=None)
         self.start_callback = start_callback
         self.finalize_callback = finalize_callback
         self.finalize_callback_called = False
@@ -259,45 +264,39 @@ class ProtoTestResult(BaseTestResult):
             "test_time",
         ]
         self.failfast = False  # Because unittest inspects the attribute
-        self.errors = []
-        self.reinitialize()
-
-    def reinitialize(self):
-        self.shouldStop = False
         self.collectedDurations = []
-        self.errors.clear()
+        self.errors = []
         self.expectedFailures = []
         self.failures = []
         self.passing = []
         self.skipped = []
         self.unexpectedSuccesses = []
+        self.reinitialize()
+
+    def reinitialize(self):
+        self.shouldStop = False
+        self.collectedDurations.clear()
+        self.errors.clear()
+        self.expectedFailures.clear()
+        self.failures.clear()
+        self.passing.clear()
+        self.skipped.clear()
+        self.unexpectedSuccesses.clear()
+        self.start_time = 0.0
         self.test_time = ""
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> str:  # pragma: no cover
         return (
-            "errors"
-            + str(self.errors)
-            + ", "
-            + "expectedFailures"
-            + str(self.expectedFailures)
-            + ", "
-            + "failures"
-            + str(self.failures)
-            + ", "
-            + "passing"
-            + str(self.passing)
-            + ", "
-            + "skipped"
-            + str(self.skipped)
-            + ", "
-            + "unexpectedSuccesses"
-            + str(self.unexpectedSuccesses)
-            + ", "
-            + "test_time"
-            + str(self.test_time)
+            f"errors{self.errors},"
+            f" expectedFailures{self.expectedFailures},"
+            f" failures{self.failures},"
+            f" passing{self.passing},"
+            f" skipped{self.skipped},"
+            f" unexpectedSuccesses{self.unexpectedSuccesses},"
+            f" test_time{self.test_time}"
         )
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
         """
         Prevent the callback functions from getting pickled
         """
@@ -306,15 +305,15 @@ class ProtoTestResult(BaseTestResult):
             result_dict[pickle_attr] = self.__dict__[pickle_attr]
         return result_dict
 
-    def __setstate__(self, dict):
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """
-        Since the callback functions weren't pickled, we need to init them
+        Since the callback functions weren't pickled, we need to initialize them.
         """
-        self.__dict__.update(dict)
+        self.__dict__.update(state)
         self.start_callback = None
         self.finalize_callback = None
 
-    def startTest(self, test):
+    def startTest(self, test: TestCaseT):
         """
         Called before each test runs.
         """
@@ -324,7 +323,7 @@ class ProtoTestResult(BaseTestResult):
         if self.start_callback:
             self.start_callback(test)
 
-    def stopTest(self, test):
+    def stopTest(self, test: TestCaseT):
         """
         Called after each test runs.
         """
@@ -344,43 +343,43 @@ class ProtoTestResult(BaseTestResult):
             self.finalize_callback(self)
             self.finalize_callback_called = True
 
-    def addSuccess(self, test):
+    def addSuccess(self, test: TestCaseT):
         """
-        Called when a test passed
+        Called when a test passed.
         """
         self.passing.append(proto_test(test))
 
-    def addError(self, test, err):
+    def addError(self, test: TestCaseT, err):
         """
-        Called when a test raises an exception
+        Called when a test raises an exception.
         """
         self.errors.append((proto_test(test), proto_error(err)))
 
-    def addFailure(self, test, err):
+    def addFailure(self, test: TestCaseT, err):
         """
-        Called when a test fails a unittest assertion
+        Called when a test fails a unittest assertion.
         """
         self.failures.append((proto_test(test), proto_error(err)))
 
-    def addSkip(self, test, reason):
+    def addSkip(self, test: TestCaseT, reason):
         """
-        Called when a test is skipped
+        Called when a test is skipped.
         """
         self.skipped.append((proto_test(test), reason))
 
-    def addExpectedFailure(self, test, err):
+    def addExpectedFailure(self, test: TestCaseT, err):
         """
-        Called when a test fails, and we expected the failure
+        Called when a test fails, and we expected the failure.
         """
         self.expectedFailures.append((proto_test(test), proto_error(err)))
 
-    def addUnexpectedSuccess(self, test):
+    def addUnexpectedSuccess(self, test: TestCaseT):
         """
         Called when a test passed, but we expected a failure
         """
         self.unexpectedSuccesses.append(proto_test(test))
 
-    def addSubTest(self, test, subtest, err):
+    def addSubTest(self, test: TestCaseT, subtest, err):
         """
         Called at the end of a subtest no matter its result.
 
@@ -400,18 +399,19 @@ class GreenTestResult(BaseTestResult):
     Aggregates test results and outputs them to a stream.
     """
 
+    last_class = ""
+    last_module = ""
+    first_text_output: str = ""
+    shouldStop: bool = False
+
     def __init__(self, args, stream):
-        super().__init__(stream, Colors(args.termcolor))
+        super().__init__(stream, colors=Colors(args.termcolor))
         self.args = args
-        self.showAll = args.verbose > 1
-        self.dots = args.verbose == 1
+        self.showAll: bool = args.verbose > 1
+        self.dots: bool = args.verbose == 1
         self.verbose = args.verbose
-        self.last_module = ""
-        self.last_class = ""
-        self.first_text_output = ""
         self.failfast = args.failfast
-        self.shouldStop = False
-        self.testsRun = 0
+        self.testsRun: int = 0
         # Individual lists
         self.collectedDurations = []
         self.errors = []
@@ -436,10 +436,12 @@ class GreenTestResult(BaseTestResult):
             f"unexpectedSuccesses{self.unexpectedSuccesses}"
         )
 
-    def stop(self):
+    def stop(self) -> None:
         self.shouldStop = True
 
-    def tryRecordingStdoutStderr(self, test, proto_test_result, err=None):
+    def tryRecordingStdoutStderr(
+        self, test: ProtoTest, proto_test_result: ProtoTestResult, err=None
+    ):
         if proto_test_result.stdout_output.get(test, False):
             self.recordStdout(test, proto_test_result.stdout_output[test])
         if proto_test_result.stderr_errput.get(test, False):
@@ -457,7 +459,7 @@ class GreenTestResult(BaseTestResult):
                     self.recordStderr(test, proto_test_result.stderr_errput[t])
                     break
 
-    def addProtoTestResult(self, proto_test_result):
+    def addProtoTestResult(self, proto_test_result: ProtoTestResult) -> None:
         for test, err in proto_test_result.errors:
             self.addError(test, err, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result, err)
@@ -477,18 +479,18 @@ class GreenTestResult(BaseTestResult):
             self.addUnexpectedSuccess(test, proto_test_result.test_time)
             self.tryRecordingStdoutStderr(test, proto_test_result)
 
-    def startTestRun(self):
+    def startTestRun(self) -> None:
         """
-        Called once before any tests run
+        Called once before any tests run.
         """
         self.startTime = time.time()
         # Really verbose information
         if self.verbose > 2:
-            self.stream.writeln(self.colors.bold(pretty_version() + "\n"))
+            self.stream.writeln(self.colors.bold(f"{pretty_version()}\n"))
 
-    def stopTestRun(self):
+    def stopTestRun(self) -> None:
         """
-        Called once after all tests have run
+        Called once after all tests have run.
         """
         self.stopTime = time.time()
         self.timeTaken = self.stopTime - self.startTime
@@ -561,7 +563,7 @@ class GreenTestResult(BaseTestResult):
 
     def startTest(self, test):
         """
-        Called before the start of each test
+        Called before the start of each test.
         """
         # Get our bearings
         test = proto_test(test)
@@ -598,8 +600,7 @@ class GreenTestResult(BaseTestResult):
 
     def stopTest(self, test):
         """
-        Supposed to be called after each test, but as far as I can tell that's a
-        lie and this is simply never called.
+        Supposed to be called after each test.
         """
 
     def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=""):
@@ -630,7 +631,7 @@ class GreenTestResult(BaseTestResult):
 
     def addSuccess(self, test, test_time=None):
         """
-        Called when a test passed
+        Called when a test passed.
         """
         test = proto_test(test)
         if test_time:
@@ -641,7 +642,7 @@ class GreenTestResult(BaseTestResult):
     @failfast
     def addError(self, test, err, test_time=None):
         """
-        Called when a test raises an exception
+        Called when a test raises an exception.
         """
         test = proto_test(test)
         if test_time:
@@ -654,7 +655,7 @@ class GreenTestResult(BaseTestResult):
     @failfast
     def addFailure(self, test, err, test_time=None):
         """
-        Called when a test fails a unittest assertion
+        Called when a test fails a unittest assertion.
         """
         # Special case: Catch Twisted's skips that come thtrough as failures
         # and treat them as skips instead
@@ -674,7 +675,7 @@ class GreenTestResult(BaseTestResult):
 
     def addSkip(self, test, reason, test_time=None):
         """
-        Called when a test is skipped
+        Called when a test is skipped.
         """
         test = proto_test(test)
         if test_time:
@@ -684,7 +685,7 @@ class GreenTestResult(BaseTestResult):
 
     def addExpectedFailure(self, test, err, test_time=None):
         """
-        Called when a test fails, and we expected the failure
+        Called when a test fails, and we expected the failure.
         """
         test = proto_test(test)
         if test_time:
@@ -695,7 +696,7 @@ class GreenTestResult(BaseTestResult):
 
     def addUnexpectedSuccess(self, test, test_time=None):
         """
-        Called when a test passed, but we expected a failure
+        Called when a test passed, but we expected a failure.
         """
         test = proto_test(test)
         if test_time:
@@ -761,9 +762,9 @@ class GreenTestResult(BaseTestResult):
 
     def wasSuccessful(self):
         """
-        Tells whether or not the overall run was successful
+        Tells whether or not the overall run was successful.
         """
-        if self.args.minimum_coverage != None:
+        if self.args.minimum_coverage is not None:
             if self.coverage_percent < self.args.minimum_coverage:
                 self.stream.writeln(
                     self.colors.red(
@@ -775,20 +776,15 @@ class GreenTestResult(BaseTestResult):
                 return False
 
         # fail if no tests are run.
-        if (
-            sum(
-                len(x)
-                for x in [
-                    self.errors,
-                    self.expectedFailures,
-                    self.failures,
-                    self.passing,
-                    self.skipped,
-                    self.unexpectedSuccesses,
-                ]
+        if not any(
+            (
+                self.errors,
+                self.expectedFailures,
+                self.failures,
+                self.passing,
+                self.skipped,
+                self.unexpectedSuccesses,
             )
-            == 0
         ):
             return False
-        else:
-            return len(self.all_errors) + len(self.unexpectedSuccesses) == 0
+        return not self.all_errors and not self.unexpectedSuccesses

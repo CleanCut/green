@@ -44,7 +44,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStdout records output.
         """
-        btr = BaseTestResult(None, None)
+        btr = BaseTestResult(None, colors=None)
         pt = ProtoTest()
         o = "some output"
         btr.recordStdout(pt, o)
@@ -54,7 +54,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStdout ignores empty output sent to it
         """
-        btr = BaseTestResult(None, None)
+        btr = BaseTestResult(None, colors=None)
         pt = ProtoTest()
         btr.recordStdout(pt, "")
         self.assertEqual(btr.stdout_output, {})
@@ -65,7 +65,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         stream = StringIO()
         noise = "blah blah blah"
-        btr = BaseTestResult(stream, Colors(False))
+        btr = BaseTestResult(stream, colors=Colors(False))
         pt = ProtoTest()
         btr.stdout_output[pt] = noise
         btr.displayStdout(pt)
@@ -75,7 +75,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStderr records errput.
         """
-        btr = BaseTestResult(None, None)
+        btr = BaseTestResult(None, colors=None)
         pt = ProtoTest()
         o = "some errput"
         btr.recordStderr(pt, o)
@@ -85,7 +85,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         recordStderr ignores empty errput sent to it
         """
-        btr = BaseTestResult(None, None)
+        btr = BaseTestResult(None, colors=None)
         pt = ProtoTest()
         btr.recordStderr(pt, "")
         self.assertEqual(btr.stderr_errput, {})
@@ -96,7 +96,7 @@ class TestBaseTestResult(unittest.TestCase):
         """
         stream = StringIO()
         noise = "blah blah blah"
-        btr = BaseTestResult(stream, Colors(False))
+        btr = BaseTestResult(stream, colors=Colors(False))
         pt = ProtoTest()
         btr.stderr_errput[pt] = noise
         btr.displayStderr(pt)

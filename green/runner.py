@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import multiprocessing
 from sys import modules
+from typing import TYPE_CHECKING
 from unittest.signals import registerResult, installHandler, removeResult
 import warnings
 
@@ -7,7 +10,11 @@ from green.exceptions import InitializerOrFinalizerError
 from green.loader import toParallelTargets
 from green.output import debug, GreenStream
 from green.process import LoggingDaemonlessPool, poolRunner
-from green.result import GreenTestResult
+from green.result import GreenTestResult, ProtoTestResult
+
+if TYPE_CHECKING:
+    from multiprocessing.managers import SyncManager
+    from queue import Queue
 
 
 class InitializerOrFinalizer:
@@ -49,7 +56,7 @@ class InitializerOrFinalizer:
             )
 
 
-def run(suite, stream, args, testing=False):
+def run(suite, stream, args, testing: bool = False) -> GreenTestResult:
     """
     Run the given test case or test suite with the specified arguments.
 
@@ -66,7 +73,8 @@ def run(suite, stream, args, testing=False):
     # Note: Catching SIGINT isn't supported by Python on windows (python
     # "WONTFIX" issue 18040)
     installHandler()
-    registerResult(result)
+    # Ignore the type mismatch until we make GreenTestResult a subclass of unittest.TestResult.
+    registerResult(result)  # type: ignore
 
     with warnings.catch_warnings():
         if args.warnings:  # pragma: no cover
@@ -95,8 +103,10 @@ def run(suite, stream, args, testing=False):
             finalizer=InitializerOrFinalizer(args.finalizer),
             maxtasksperchild=args.maxtasksperchild,
         )
-        manager = multiprocessing.Manager()
-        targets = [(target, manager.Queue()) for target in parallel_targets]
+        manager: SyncManager = multiprocessing.Manager()
+        targets: list[tuple[str, Queue]] = [
+            (target, manager.Queue()) for target in parallel_targets
+        ]
         if targets:
             for index, (target, queue) in enumerate(targets):
                 if args.run_coverage:
@@ -131,7 +141,7 @@ def run(suite, stream, args, testing=False):
                         # currently waiting on this test, so print out
                         # the white 'processing...' version of the output
                         result.startTest(msg)
-                        proto_test_result = queue.get()
+                        proto_test_result: ProtoTestResult = queue.get()
                         debug(
                             "runner.run(): received proto test result: {}".format(
                                 str(proto_test_result)
@@ -153,6 +163,7 @@ def run(suite, stream, args, testing=False):
 
         result.stopTestRun()
 
-    removeResult(result)
+    # Ignore the type mismatch untile we make GreenTestResult a subclass of unittest.TestResult.
+    removeResult(result)  # type: ignore
 
     return result
