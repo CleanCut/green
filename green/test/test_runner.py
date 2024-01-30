@@ -141,7 +141,8 @@ class TestRun(unittest.TestCase):
         """
         self.args.verbose = 3
         sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
-        content = dedent("""
+        content = dedent(
+            """
             import unittest
             class Verbose3(unittest.TestCase):
                 def test01(self):
@@ -400,7 +401,9 @@ class TestProcesses(unittest.TestCase):
                 def testPasses(self):
                     pass"""
         )
-        (sub_tmpdir / "test_detectNumProcesses.py").write_text(content, encoding="utf-8")
+        (sub_tmpdir / "test_detectNumProcesses.py").write_text(
+            content, encoding="utf-8"
+        )
         # Load the tests
         os.chdir(self.tmpdir)
         try:

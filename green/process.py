@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import logging
 import multiprocessing
 from multiprocessing.pool import Pool
+import os
 import random
 import sys
 import tempfile
 import traceback
+from typing import Type, TYPE_CHECKING, Union, Tuple, Callable, Iterable
 
 import coverage
 
@@ -13,20 +17,28 @@ from green.loader import GreenTestLoader
 from green.result import proto_test, ProtoTest, ProtoTestResult
 
 
+if TYPE_CHECKING:
+    from types import TracebackType
+    from queue import Queue
+
+    ExcInfoType = Union[
+        Tuple[Type[BaseException], BaseException, TracebackType],
+        Tuple[None, None, None],
+    ]
+
+
 # Super-useful debug function for finding problems in the subprocesses, and it
 # even works on windows
-def ddebug(msg, err=None):  # pragma: no cover
+def ddebug(msg: str, err: ExcInfoType | None = None):  # pragma: no cover
     """
     err can be an instance of sys.exc_info() -- which is the latest traceback
     info
     """
-    import os
-
     if err:
-        err = "".join(traceback.format_exception(*err))
+        error_string = "".join(traceback.format_exception(*err))
     else:
-        err = ""
-    sys.__stdout__.write(f"({os.getpid()}) {msg} {err}\n")
+        error_string = ""
+    sys.__stdout__.write(f"({os.getpid()}) {msg} {error_string}\n")
     sys.__stdout__.flush()
 
 
@@ -36,7 +48,7 @@ class ProcessLogger:
     instead of having process crashes be silent.
     """
 
-    def __init__(self, callable):
+    def __init__(self, callable: Callable):
         self.__callable = callable
 
     def __call__(self, *args, **kwargs):
@@ -65,13 +77,16 @@ class LoggingDaemonlessPool(Pool):
     """
 
     @staticmethod
-    def Process(ctx, *args, **kwds):
-        process = ctx.Process(daemon=False, *args, **kwds)
+    def Process(ctx, *args, **kwargs):
+        process = ctx.Process(daemon=False, *args, **kwargs)
         return process
 
-    def apply_async(self, func, args=(), kwds={}, callback=None, error_callback=None):
+    # FIXME: `kwargs={}` is dangerous as the empty dict is declared at import time
+    # and becomes a shared object between all instances of LoggingDaemonlessPool.
+    # In short, it is a global variable that is mutable.
+    def apply_async(self, func, args=(), kwargs={}, callback=None, error_callback=None):
         return Pool.apply_async(
-            self, ProcessLogger(func), args, kwds, callback, error_callback
+            self, ProcessLogger(func), args, kwargs, callback, error_callback
         )
 
     _wrap_exception = True
@@ -146,7 +161,6 @@ class LoggingDaemonlessPool(Pool):
             util.debug("added worker")
 
 
-
 import multiprocessing.pool
 from multiprocessing import util  # type: ignore
 from multiprocessing.pool import MaybeEncodingError  # type: ignore
@@ -213,27 +227,27 @@ def worker(
 
 # Unmodified (see above)
 class RemoteTraceback(Exception):  # pragma: no cover
-    def __init__(self, tb):
+    def __init__(self, tb: str):
         self.tb = tb
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.tb
 
 
 # Unmodified (see above)
 class ExceptionWithTraceback:  # pragma: no cover
-    def __init__(self, exc, tb):
-        tb = traceback.format_exception(type(exc), exc, tb)
-        tb = "".join(tb)
+    def __init__(self, exc: BaseException, tb: TracebackType):
+        tb_lines = traceback.format_exception(type(exc), exc, tb)
+        tb_text = "".join(tb_lines)
         self.exc = exc
-        self.tb = '\n"""\n%s"""' % tb
+        self.tb = '\n"""\n%s"""' % tb_text
 
-    def __reduce__(self):
+    def __reduce__(self) -> Tuple[Callable, Tuple[BaseException, str]]:
         return rebuild_exc, (self.exc, self.tb)
 
 
 # Unmodified (see above)
-def rebuild_exc(exc, tb):  # pragma: no cover
+def rebuild_exc(exc: BaseException, tb: str):  # pragma: no cover
     exc.__cause__ = RemoteTraceback(tb)
     return exc
 
@@ -243,8 +257,13 @@ multiprocessing.pool.worker = worker  # type: ignore
 # -----------------------------------------------------------------------------
 
 
+# Fixme: `omit_patterns=[]` is a global mutable.
 def poolRunner(
-    target, queue, coverage_number=None, omit_patterns=[], cov_config_file=True
+    target: str,
+    queue: Queue,
+    coverage_number: int | None = None,
+    omit_patterns: str | Iterable[str] | None = [],
+    cov_config_file: bool = True,
 ):  # pragma: no cover
     """
     I am the function that pool worker processes run.  I run one unit test.
@@ -260,7 +279,7 @@ def poolRunner(
     saved_tempdir = tempfile.tempdir
     tempfile.tempdir = tempfile.mkdtemp()
 
-    def raise_internal_failure(msg):
+    def raise_internal_failure(msg: str):
         err = sys.exc_info()
         t = ProtoTest()
         t.module = "green.loader"
@@ -362,7 +381,7 @@ def poolRunner(
                 target, str(test), type(test), dir(test)
             )
         )
-        err = (TypeError, TypeError(description), None)
+        no_run_error = (TypeError, TypeError(description), None)
         t = ProtoTest()
         target_list = target.split(".")
         t.module = ".".join(target_list[:-2]) if len(target_list) > 1 else target
@@ -372,7 +391,7 @@ def poolRunner(
             target.split(".")[-1] if len(target_list) > 1 else "unknown_method"
         )
         result.startTest(t)
-        result.addError(t, err)
+        result.addError(t, no_run_error)
         result.stopTest(t)
         queue.put(result)
 

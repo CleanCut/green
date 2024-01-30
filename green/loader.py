@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from doctest import DocTestSuite
 from fnmatch import fnmatch
@@ -12,7 +14,7 @@ import unittest
 import traceback
 
 from green.output import debug
-from green.result import proto_test
+from green import result
 from green.suite import GreenTestSuite
 
 python_file_pattern = re.compile(r"^[_a-z]\w*?\.py$", re.IGNORECASE)
@@ -293,7 +295,9 @@ class GreenTestLoader(unittest.TestLoader):
         return None
 
 
-def toProtoTestList(suite, test_list=None, doing_completions=False):
+def toProtoTestList(
+    suite, test_list=None, doing_completions: bool = False
+) -> list[result.ProtoTest]:
     """
     Take a test suite and turn it into a list of ProtoTests.
 
@@ -314,22 +318,22 @@ def toProtoTestList(suite, test_list=None, doing_completions=False):
     if isinstance(suite, unittest.TestCase):
         # Skip actual blank TestCase objects that twisted inserts
         if str(type(suite)) != "<class 'twisted.trial.unittest.TestCase'>":
-            test_list.append(proto_test(suite))
+            test_list.append(result.proto_test(suite))
     else:
         for i in suite:
             toProtoTestList(i, test_list, doing_completions)
     return test_list
 
 
-def toParallelTargets(suite, targets):
+def toParallelTargets(suite, targets: list[str]) -> list[str]:
     """
     Produce a list of targets which should be tested in parallel.
 
-    For the most part this will be a list of test modules.  The exception is
-    when a dotted name representing something more granular than a module
-    was input (like an individal test case or test method)
+    For the most part, this will be a list of test modules.
+    The exception is when a dotted name representing something more granular
+    than a module was input (like an individual test case or test method).
     """
-    targets = filter(lambda x: x != ".", targets)
+    targets = [x for x in targets if x != "."]
     # First, convert the suite to a proto test list - proto tests nicely
     # parse things like the fully dotted name of the test and the
     # finest-grained module it belongs to, which simplifies our job.
@@ -338,11 +342,12 @@ def toParallelTargets(suite, targets):
     modules = {x.module for x in proto_test_list}
     # Get the list of user-specified targets that are NOT modules
     non_module_targets = []
+    target: str
     for target in targets:
-        if not list(filter(None, [target in x for x in modules])):
+        if not list(filter(None, (target in x for x in modules))):
             non_module_targets.append(target)
     # Main loop -- iterating through all loaded test methods
-    parallel_targets = []
+    parallel_targets: list[str] = []
     for test in proto_test_list:
         found = False
         for target in non_module_targets:
