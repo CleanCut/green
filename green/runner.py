@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import multiprocessing
 from sys import modules
 from typing import TYPE_CHECKING
@@ -56,7 +57,9 @@ class InitializerOrFinalizer:
             )
 
 
-def run(suite, stream, args, testing: bool = False) -> GreenTestResult:
+def run(
+    suite, stream, args: argparse.Namespace, testing: bool = False
+) -> GreenTestResult:
     """
     Run the given test case or test suite with the specified arguments.
 

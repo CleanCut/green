@@ -31,7 +31,7 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade .[dev]
+          pip install --upgrade '.[dev]'
 
       - name: Format
         run: black --check --diff green example

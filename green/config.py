@@ -1,8 +1,11 @@
 # We have to use this entire file before we can turn coverage on, so we exclude
 # it from coverage.  We still have tests, though!
 
+from __future__ import annotations
+
 import argparse  # pragma: no cover
 import configparser  # pragma: no cover
+from typing import Sequence
 
 import coverage  # pragma: no cover
 
@@ -77,7 +80,9 @@ class StoreOpt:  # pragma: no cover
         self.options.extend(action.option_strings[0:2])
 
 
-def parseArguments(argv=None):  # pragma: no cover
+def parseArguments(
+    argv: Sequence[str] | None = None,
+) -> argparse.Namespace:  # pragma: no cover
     """
     I parse arguments in sys.argv and return the args object.  The parser
     itself is available as args.parser.

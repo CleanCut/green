@@ -1,24 +1,26 @@
 from __future__ import annotations
 
+import argparse
 from doctest import DocTest, DocTestCase
 from math import ceil
 from shutil import get_terminal_size
 import time
 import traceback
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Union, TYPE_CHECKING, Type, Iterable
 from unittest.result import failfast
-from unittest import TestCase
+from unittest import TestCase, TestSuite
 
 from green.output import Colors, debug
 from green.version import pretty_version
 
 if TYPE_CHECKING:
     TestCaseT = Union["ProtoTest", TestCase, DocTestCase]
+    RunnableTestT = Union[TestCaseT, TestSuite]
 
 terminal_width, _ignored = get_terminal_size()
 
 
-def proto_test(test: TestCaseT) -> ProtoTest:
+def proto_test(test: RunnableTestT) -> ProtoTest:
     """
     If test is a ProtoTest, I just return it.
     Otherwise, I create a ProtoTest out of test and return it.
@@ -28,7 +30,7 @@ def proto_test(test: TestCaseT) -> ProtoTest:
     return ProtoTest(test)
 
 
-def proto_error(err):
+def proto_error(err: list | tuple | ProtoError) -> ProtoError:
     """
     If err is a ProtoError, I just return it.
     Otherwise, I create a ProtoError out of err and return it.
@@ -58,7 +60,7 @@ class ProtoTest:
     filename: str | None = None
     name: str = ""
 
-    def __init__(self, test: TestCase | DocTestCase | None = None) -> None:
+    def __init__(self, test: TestCase | DocTestCase | TestSuite | None = None) -> None:
         # Teardown handling is a royal mess
         self.is_class_or_module_teardown_error: bool = False
 
@@ -149,7 +151,7 @@ class ProtoError:
     and can pass between processes.
     """
 
-    def __init__(self, err=None) -> None:
+    def __init__(self, err: list | tuple) -> None:
         self.traceback_lines = traceback.format_exception(*err)
 
     def __str__(self) -> str:
@@ -313,7 +315,7 @@ class ProtoTestResult(BaseTestResult):
         self.start_callback = None
         self.finalize_callback = None
 
-    def startTest(self, test: TestCaseT):
+    def startTest(self, test: RunnableTestT):
         """
         Called before each test runs.
         """
@@ -323,7 +325,7 @@ class ProtoTestResult(BaseTestResult):
         if self.start_callback:
             self.start_callback(test)
 
-    def stopTest(self, test: TestCaseT):
+    def stopTest(self, test: RunnableTestT):
         """
         Called after each test runs.
         """
@@ -349,7 +351,7 @@ class ProtoTestResult(BaseTestResult):
         """
         self.passing.append(proto_test(test))
 
-    def addError(self, test: TestCaseT, err):
+    def addError(self, test: RunnableTestT, err):
         """
         Called when a test raises an exception.
         """
@@ -404,28 +406,29 @@ class GreenTestResult(BaseTestResult):
     first_text_output: str = ""
     shouldStop: bool = False
 
-    def __init__(self, args, stream):
+    def __init__(self, args: argparse.Namespace, stream) -> None:
         super().__init__(stream, colors=Colors(args.termcolor))
         self.args = args
         self.showAll: bool = args.verbose > 1
         self.dots: bool = args.verbose == 1
-        self.verbose = args.verbose
+        self.verbose: int = args.verbose
         self.failfast = args.failfast
         self.testsRun: int = 0
         # Individual lists
-        self.collectedDurations = []
-        self.errors = []
-        self.expectedFailures = []
-        self.failures = []
-        self.passing = []
-        self.skipped = []
-        self.unexpectedSuccesses = []
+        # TODO: add actual types to the lists.
+        self.collectedDurations: list = []
+        self.errors: list = []
+        self.expectedFailures: list = []
+        self.failures: list = []
+        self.passing: list = []
+        self.skipped: list = []
+        self.unexpectedSuccesses: list = []
         # Combination of all errors and failures
-        self.all_errors = []
+        self.all_errors: list = []
         # For exiting non-zero if we don't reach a certain level of coverage
         self.coverage_percent = None
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self) -> str:  # pragma: no cover
         return (
             f"tests run: {self.testsRun}, "
             f"errors{self.errors}, "
