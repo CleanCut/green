@@ -1,4 +1,8 @@
+# SHELL ensures more consistent behavior between OSes.
+SHELL=/bin/bash
+
 VERSION=$(shell cat green/VERSION)
+
 
 clean: clean-message clean-silent
 
@@ -22,7 +26,7 @@ test: test-versions test-installed test-coverage
 	@echo "\n(test) completed\n"
 
 test-local:
-	@pip3 install --upgrade -e .[dev]
+	@pip3 install --upgrade -e '.[dev]'
 	@make test-installed
 	make test-versions
 	make test-coverage
@@ -32,8 +36,14 @@ test-on-containers: clean-silent
 	@# Run the tests on pristine containers to isolate us from the local environment.
 	@for version in 3.8 3.9 3.10 3.11 3.12.0; do \
 	    docker run --rm -it -v `pwd`:/green python:$$version \
-	        bash -c "python --version; cd /green && pip install -e .[dev] && ./g green" ; \
+	        bash -c "python --version; cd /green && pip install -e '.[dev]' && ./g green" ; \
 	done
+
+test-coverage-on-container: clean-silent
+	@# Run the tests on pristine containers to isolate us from the local environment.
+	docker run --rm -it -v `pwd`:/green python:3.12.0 \
+	    bash -c "cd /green && pip install -e '.[dev]' && ./g 3 -r -vvvv green"
+
 
 test-coverage:
 	@# Generate coverage files for travis builds (don't clean after this!)
@@ -95,3 +105,6 @@ release-unsafe:
 	twine upload --username CleanCut dist/green-$(VERSION).tar.gz
 
 release: release-test release-tag release-unsafe
+
+# Declare all targets as phony so that make will always run them.
+.PHONY: $(MAKECMDGOALS)

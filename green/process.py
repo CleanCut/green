@@ -8,7 +8,7 @@ import random
 import sys
 import tempfile
 import traceback
-from typing import Type, TYPE_CHECKING, Union, Tuple, Callable, Iterable
+from typing import Type, TYPE_CHECKING, Union, Tuple, Callable, Iterable, Mapping, Any
 
 import coverage
 
@@ -16,10 +16,10 @@ from green.exceptions import InitializerOrFinalizerError
 from green.loader import GreenTestLoader
 from green.result import proto_test, ProtoTest, ProtoTestResult
 
-
 if TYPE_CHECKING:
     from types import TracebackType
     from queue import Queue
+    from green.suite import GreenTestSuite
 
     ExcInfoType = Union[
         Tuple[Type[BaseException], BaseException, TracebackType],
@@ -76,20 +76,28 @@ class LoggingDaemonlessPool(Pool):
     and which run finalizers.
     """
 
+    _wrap_exception: bool = True
+
     @staticmethod
     def Process(ctx, *args, **kwargs):
-        process = ctx.Process(daemon=False, *args, **kwargs)
-        return process
+        return ctx.Process(daemon=False, *args, **kwargs)
 
     # FIXME: `kwargs={}` is dangerous as the empty dict is declared at import time
     # and becomes a shared object between all instances of LoggingDaemonlessPool.
     # In short, it is a global variable that is mutable.
-    def apply_async(self, func, args=(), kwargs={}, callback=None, error_callback=None):
+    def apply_async(
+        self,
+        func: Callable,
+        args: Iterable = (),
+        kwargs: Mapping[str, Any] | None = None,
+        callback=None,
+        error_callback=None,
+    ):
+        if kwargs is None:
+            kwargs = {}
         return Pool.apply_async(
             self, ProcessLogger(func), args, kwargs, callback, error_callback
         )
-
-    _wrap_exception = True
 
     def __init__(
         self,
@@ -328,7 +336,7 @@ def poolRunner(
         queue.put(test_result)
 
     result = ProtoTestResult(start_callback, finalize_callback)
-    test = None
+    test: GreenTestSuite | None = None
     try:
         loader = GreenTestLoader()
         test = loader.loadTargets(target)
@@ -336,7 +344,7 @@ def poolRunner(
         raise_internal_failure("Green encountered an error loading the unit test.")
         return
 
-    if getattr(test, "run", False):
+    if test is not None and getattr(test, "run", False):
         # Loading was successful, lets do this
         try:
             test.run(result)

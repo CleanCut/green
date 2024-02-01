@@ -8,6 +8,8 @@ To make the change permanent for your project, in settings.py add:
     TEST_RUNNER="green.djangorunner.DjangoRunner"
 """
 
+from __future__ import annotations
+
 from argparse import Namespace
 import os
 import sys

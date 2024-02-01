@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import argparse
 from fnmatch import fnmatch
 import sys
 from unittest.suite import _call_if_exists, _DebugResult, _isnotsuite, TestSuite  # type: ignore
@@ -19,7 +22,7 @@ class GreenTestSuite(TestSuite):
 
     args = None
 
-    def __init__(self, tests=(), args=None):
+    def __init__(self, tests=(), args: argparse.Namespace | None = None) -> None:
         # You should either set GreenTestSuite.args before instantiation, or
         # pass args into __init__
         self._removed_tests = 0
@@ -28,7 +31,7 @@ class GreenTestSuite(TestSuite):
         self.customize(args)
         super().__init__(tests)
 
-    def addTest(self, test):
+    def addTest(self, test) -> None:
         """
         Override default behavior with some green-specific behavior.
         """
@@ -45,7 +48,7 @@ class GreenTestSuite(TestSuite):
                 return
         super().addTest(test)
 
-    def customize(self, args):
+    def customize(self, args: argparse.Namespace | None) -> None:
         """
         Green-specific behavior customization via an args dictionary from
         the green.config module.  If you don't pass in an args dictionary,
@@ -61,16 +64,18 @@ class GreenTestSuite(TestSuite):
         if self.args and getattr(self.args, "test_pattern", None):
             self.full_test_pattern = "test" + self.args.test_pattern
 
-    def _removeTestAtIndex(self, index):
+    def _removeTestAtIndex(self, index: int) -> None:
         """
         Python 3.x-like version of this function for Python 2.7's sake.
         """
         test = self._tests[index]
         if hasattr(test, "countTestCases"):
             self._removed_tests += test.countTestCases()
-        self._tests[index] = None
+        # FIXME: The upstream typing does not allow None:
+        #  unittest.suite.BaseTestSuite._tests: list[unittest.case.TestCase]
+        self._tests[index] = None  # type: ignore
 
-    def countTestCases(self):
+    def countTestCases(self) -> int:
         """
         Python 3.x-like version of this function for Python 2.7's sake.
         """
@@ -80,7 +85,7 @@ class GreenTestSuite(TestSuite):
                 cases += test.countTestCases()
         return cases
 
-    def _handleClassSetUp(self, test, result):
+    def _handleClassSetUp(self, test, result) -> None:
         previousClass = getattr(result, "_previousTestClass", None)
         currentClass = test.__class__
         if currentClass == previousClass:
@@ -112,16 +117,16 @@ class GreenTestSuite(TestSuite):
                     raise
                 currentClass._classSetupFailed = True
                 className = util.strclass(currentClass)
-                self._createClassOrModuleLevelException(
+                self._createClassOrModuleLevelException(  # type: ignore
                     result, e, "setUpClass", className
                 )
             finally:
                 _call_if_exists(result, "_restoreStdout")
                 if currentClass._classSetupFailed is True:
                     currentClass.doClassCleanups()
-                    if len(currentClass.tearDown_exceptions) > 0:
+                    if currentClass.tearDown_exceptions:
                         for exc in currentClass.tearDown_exceptions:
-                            self._createClassOrModuleLevelException(
+                            self._createClassOrModuleLevelException(  # type: ignore
                                 result, exc[1], "setUpClass", className, info=exc
                             )
 

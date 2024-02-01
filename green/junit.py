@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lxml.etree import Element, tostring as to_xml
 
 

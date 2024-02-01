@@ -1,4 +1,5 @@
 import os
+import pathlib
 from os.path import dirname
 import platform
 import shutil
@@ -80,7 +81,8 @@ class TestToParallelTargets(unittest.TestCase):
         NormalTestCase.__module__ = self._fake_module_name
         full_name = "my_test_module.NormalTestCase.runTest"
 
-        targets = loader.toParallelTargets(NormalTestCase(), [full_name])
+        # Pass full_name as a single string to validate that it is handled correctly.
+        targets = loader.toParallelTargets(NormalTestCase(), full_name)
         self.assertEqual(targets, [full_name])
 
     def test_filter_out_dot(self):
@@ -267,24 +269,24 @@ class TestCompletions(unittest.TestCase):
 
 
 class TestIsPackage(unittest.TestCase):
+
+    def setUp(self):
+        tmpdir = tempfile.mkdtemp()
+        self.tmp_path = pathlib.Path(tmpdir)
+        self.addCleanup(shutil.rmtree, tmpdir)
+
     def test_yes(self):
         """
         A package is identified.
         """
-        tmpdir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, tmpdir)
-        fh = open(os.path.join(tmpdir, "__init__.py"), "w")
-        fh.write("pass\n")
-        fh.close()
-        self.assertTrue(loader.isPackage(tmpdir))
+        (self.tmp_path / "__init__.py").write_text("pass\n", encoding="utf-8")
+        self.assertTrue(loader.isPackage(self.tmp_path))
 
     def test_no(self):
         """
         A non-package is identified
         """
-        tmpdir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, tmpdir)
-        self.assertFalse(loader.isPackage(tmpdir))
+        self.assertFalse(loader.isPackage(self.tmp_path))
 
 
 class TestDottedModule(unittest.TestCase):

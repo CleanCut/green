@@ -1,12 +1,16 @@
+from __future__ import annotations
+
+
 import os
 import sys
 import tempfile
+from typing import Sequence
 
 # Importing from green (other than config) is done after coverage initialization
 import green.config as config
 
 
-def _main(argv, testing):
+def _main(argv: Sequence[str] | None, testing: bool) -> int:
     args = config.parseArguments(argv)
     args = config.mergeConfig(args, testing)
 
@@ -77,9 +81,9 @@ def _main(argv, testing):
     return int(not result.wasSuccessful())
 
 
-def main(argv=None, testing=False):
+def main(argv: Sequence[str] | None = None, testing: bool = False):
     # create the temp dir only once (i.e., not while in the recursed call)
-    if os.environ.get("TMPDIR") is None:  # pragma: nocover
+    if not os.environ.get("TMPDIR"):  # pragma: nocover
         try:
             with tempfile.TemporaryDirectory() as temp_dir_for_tests:
                 try:
@@ -94,7 +98,7 @@ def main(argv=None, testing=False):
                 # "Directory not empty" when trying to delete the temp dir can just be a warning
                 print(f"warning: {os_error.strerror}")
             else:
-                raise (os_error)
+                raise os_error
     else:
         return _main(argv, testing)
 
