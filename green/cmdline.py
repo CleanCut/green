@@ -1,3 +1,5 @@
+"""The green command line entry point."""
+
 from __future__ import annotations
 
 
@@ -53,7 +55,8 @@ def _main(argv: Sequence[str] | None, testing: bool) -> int:
 
     # Add debug logging for stuff that happened before this point here
     if config.files_loaded:
-        debug("Loaded config file(s): {}".format(", ".join(config.files_loaded)))
+        loaded_files = ", ".join(str(path) for path in config.files_loaded)
+        debug(f"Loaded config file(s): {loaded_files}")
 
     # Discover/Load the test suite
     if testing:
@@ -81,7 +84,7 @@ def _main(argv: Sequence[str] | None, testing: bool) -> int:
     return int(not result.wasSuccessful())
 
 
-def main(argv: Sequence[str] | None = None, testing: bool = False):
+def main(argv: Sequence[str] | None = None, testing: bool = False) -> int:
     # create the temp dir only once (i.e., not while in the recursed call)
     if not os.environ.get("TMPDIR"):  # pragma: nocover
         try:
@@ -97,6 +100,7 @@ def main(argv: Sequence[str] | None = None, testing: bool = False):
             if os_error.errno == 39:
                 # "Directory not empty" when trying to delete the temp dir can just be a warning
                 print(f"warning: {os_error.strerror}")
+                return 0
             else:
                 raise os_error
     else:

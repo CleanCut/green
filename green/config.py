@@ -1,68 +1,79 @@
+"""
+Handle the command line options and config file parsing.
+"""
+
 # We have to use this entire file before we can turn coverage on, so we exclude
 # it from coverage.  We still have tests, though!
 
-from __future__ import annotations
+from __future__ import annotations  # pragma: no cover
 
 import argparse  # pragma: no cover
 import configparser  # pragma: no cover
-from typing import Sequence
+import copy  # pragma: no cover
+import functools  # pragma: no cover
+import logging  # pragma: no cover
+import multiprocessing  # pragma: no cover
+import os  # pragma: no cover
+import pathlib  # pragma: no cover
+import sys  # pragma: no cover
+import tempfile  # pragma: no cover
+from textwrap import dedent  # pragma: no cover
+from typing import Callable, Sequence  # pragma: no cover
 
 import coverage  # pragma: no cover
 
 coverage_version = f"Coverage {coverage.__version__}"  # pragma: no cover
 
-import copy  # pragma: no cover
-import logging  # pragma: no cover
-import os  # pragma: no cover
-import sys  # pragma: no cover
-import tempfile  # pragma: no cover
-from textwrap import dedent  # pragma: no cover
-import multiprocessing  # pragma: no cover
-
 # Used for debugging output in cmdline, since we can't do debug output here.
-files_loaded = []  # pragma: no cover
+files_loaded: list[pathlib.Path] = []  # pragma: no cover
 
-# Set the defaults in a re-usable way
-default_args = argparse.Namespace(  # pragma: no cover
-    targets=["."],  # Not in configs
-    processes=multiprocessing.cpu_count(),
-    initializer="",
-    finalizer="",
-    maxtasksperchild=None,
-    termcolor=None,
-    notermcolor=None,
-    disable_windows=False,
-    allow_stdout=False,
-    quiet_stdout=False,
-    no_skip_report=False,
-    no_tracebacks=False,
-    help=False,  # Not in configs
-    version=False,
-    logging=False,
-    debug=0,
-    verbose=1,
-    disable_unidecode=False,
-    failfast=False,
-    config=None,  # Not in configs
-    file_pattern="test*.py",
-    test_pattern="*",
-    junit_report="",
-    run_coverage=False,
-    cov_config_file=True,  # A string with a special boolean default
-    quiet_coverage=False,
-    clear_omit=False,
-    omit_patterns=None,
-    include_patterns=None,
-    minimum_coverage=None,
-    completion_file=False,
-    completions=False,
-    options=False,
-    # These are not really options, they are added later for convenience
-    parser=None,
-    store_opt=None,
-    # not implemented, but unittest stub in place
-    warnings="",
-)
+
+# TODO: switch to functools.cache after 3.9+ is the minimum supported version.
+@functools.lru_cache  # pragma: no cover
+def get_default_args() -> argparse.Namespace:
+    """
+    Set the defaults in a re-usable way.
+    """
+    return argparse.Namespace(  # pragma: no cover
+        targets=["."],  # Not in configs
+        processes=multiprocessing.cpu_count(),
+        initializer="",
+        finalizer="",
+        maxtasksperchild=None,
+        termcolor=None,
+        notermcolor=None,
+        disable_windows=False,
+        allow_stdout=False,
+        quiet_stdout=False,
+        no_skip_report=False,
+        no_tracebacks=False,
+        help=False,  # Not in configs
+        version=False,
+        logging=False,
+        debug=0,
+        verbose=1,
+        disable_unidecode=False,
+        failfast=False,
+        config=None,  # Not in configs
+        file_pattern="test*.py",
+        test_pattern="*",
+        junit_report="",
+        run_coverage=False,
+        cov_config_file=True,  # A string with a special boolean default
+        quiet_coverage=False,
+        clear_omit=False,
+        omit_patterns=None,
+        include_patterns=None,
+        minimum_coverage=None,
+        completion_file=False,
+        completions=False,
+        options=False,
+        # These are not really options, they are added later for convenience
+        parser=None,
+        store_opt=None,
+        # not implemented, but unittest stub in place
+        warnings="",
+    )
 
 
 class StoreOpt:  # pragma: no cover
@@ -71,11 +82,11 @@ class StoreOpt:  # pragma: no cover
     shell completion scripts.
     """
 
-    def __init__(self):
-        self.options = []
-        self.actions = []
+    def __init__(self) -> None:
+        self.options: list[str] = []
+        self.actions: list[argparse.Action] = []
 
-    def __call__(self, action):
+    def __call__(self, action: argparse.Action) -> None:
         self.actions.append(action)
         self.options.extend(action.option_strings[0:2])
 
@@ -566,42 +577,29 @@ class ConfigFile:  # pragma: no cover
     """
     Filehandle wrapper that adds a "[green]" section to the start of a config
     file so that users don't actually have to manually add a [green] section.
-
-    Works with configparser versions from both Python 2 and 3
     """
 
-    def __init__(self, filepath):
-        self.first = True
-        with open(filepath) as f:
-            self.lines = f.readlines()
+    def __init__(self, filepath: pathlib.Path) -> None:
+        self._first = True
+        self._lines = filepath.read_text().splitlines(keepends=True)
 
-    # Python 2.7 (Older dot versions)
-    def readline(self):
-        try:
-            return self.__next__()
-        except StopIteration:
-            return ""
-
-    # Python 2.7 (Newer dot versions)
-    def next(self):
-        return self.__next__()
-
-    # Python 3
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.first:
-            self.first = False
+        if self._first:
+            self._first = False
             return "[green]\n"
-        if self.lines:
-            return self.lines.pop(0)
+        if self._lines:
+            return self._lines.pop(0)
         raise StopIteration
 
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
-def getConfig(filepath=None):  # pragma: no cover
+def getConfig(  # pragma: no cover
+    filepath: str | pathlib.Path | None = None,
+) -> configparser.ConfigParser:
     """
     Get the Green config file settings.
 
@@ -613,47 +611,54 @@ def getConfig(filepath=None):  # pragma: no cover
     """
     parser = configparser.ConfigParser()
 
-    filepaths = []
+    filepaths: list[pathlib.Path] = []
     # Lowest priority goes first in the list
-    home = os.getenv("HOME")
-    if home:
-        default_filepath = os.path.join(home, ".green")
-        if os.path.isfile(default_filepath):
+    try:
+        default_filepath = pathlib.Path.home() / ".green"
+        if default_filepath.is_file():
             filepaths.append(default_filepath)
+    except RuntimeError:
+        pass
 
     # Low priority
-    env_filepath = os.getenv("GREEN_CONFIG")
-    if env_filepath and os.path.isfile(env_filepath):
-        filepaths.append(env_filepath)
+    green_config_env = os.getenv("GREEN_CONFIG")
+    if green_config_env:
+        config_path = pathlib.Path(green_config_env)
+        if config_path.is_file():
+            filepaths.append(config_path)
 
+    cwd = pathlib.Path.cwd()
     # Medium priority
     for cfg_file in ("setup.cfg", ".green"):
-        cwd_filepath = os.path.join(os.getcwd(), cfg_file)
-        if os.path.isfile(cwd_filepath):
-            filepaths.append(cwd_filepath)
+        config_path = cwd / cfg_file
+        if config_path.is_file():
+            filepaths.append(config_path)
 
     # High priority
-    if filepath and os.path.isfile(filepath):
-        filepaths.append(filepath)
+    if filepath:
+        config_path = pathlib.Path(filepath)
+        if config_path.is_file():
+            filepaths.append(config_path)
 
     if filepaths:
         global files_loaded
         files_loaded = filepaths
-        for filepath in filepaths:
+        for config_path in filepaths:
             # Users are expected to put a [green] section
             # only if they use setup.cfg
-            if filepath.endswith("setup.cfg"):
-                with open(filepath) as f:
-                    parser.read_file(f)
+            if config_path.name == "setup.cfg":
+                parser.read(config_path)
             else:
-                parser.read_file(ConfigFile(filepath))
+                parser.read_file(ConfigFile(config_path))
 
     return parser
 
 
 # Since this must be imported before coverage is started, we get erroneous
 # reports of not covering this function during our internal coverage tests.
-def mergeConfig(args, testing=False):  # pragma: no cover
+def mergeConfig(  # pragma: no cover
+    args: argparse.Namespace, testing: bool = False
+) -> argparse.Namespace:
     """
     I take in a namespace created by the ArgumentParser in cmdline.main() and
     merge in options from configuration files.  The config items only replace
@@ -667,13 +672,14 @@ def mergeConfig(args, testing=False):  # pragma: no cover
                            extended, taking clear-omit into account.
         cov              = coverage object default None
     """
+    default_args = get_default_args()
     config = getConfig(getattr(args, "config", default_args.config))
     new_args = copy.deepcopy(default_args)  # Default by default!
 
-    for name, default_value in dict(default_args._get_kwargs()).items():
+    for name, _ in default_args._get_kwargs():
         # Config options overwrite default options
-        config_getter = None
-        if name in [
+        config_getter: Callable | None = None
+        if name in {
             "termcolor",
             "notermcolor",
             "allow_stdout",
@@ -692,17 +698,17 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "no_tracebacks",
             "disable_windows",
             "quiet_coverage",
-        ]:
+        }:
             config_getter = config.getboolean
-        elif name in [
+        elif name in {
             "processes",
             "debug",
             "verbose",
             "minimum_coverage",
             "maxtasksperchild",
-        ]:
+        }:
             config_getter = config.getint
-        elif name in [
+        elif name in {
             "file_pattern",
             "finalizer",
             "initializer",
@@ -712,11 +718,11 @@ def mergeConfig(args, testing=False):  # pragma: no cover
             "warnings",
             "test_pattern",
             "junit_report",
-        ]:
+        }:
             config_getter = config.get
-        elif name in ["targets", "help", "config"]:
+        elif name in {"targets", "help", "config"}:
             pass  # Some options only make sense coming on the command-line.
-        elif name in ["store_opt", "parser"]:
+        elif name in {"store_opt", "parser"}:
             pass  # These are convenience objects, not actual settings
         else:
             raise NotImplementedError(name)
@@ -769,32 +775,33 @@ def mergeConfig(args, testing=False):  # pragma: no cover
     # Coverage.  We must enable it here because we cannot cover module-level
     # code after it is imported, and this is the earliest place we can turn on
     # coverage.
-    omit_patterns = [
-        "*/argparse*",
-        "*/colorama*",
-        "*/django/*",
-        "*/distutils*",  # Gets pulled in on Travis-CI CPython
-        "*/extras*",  # pulled in by testtools
-        "*/linecache2*",  # pulled in by testtools
-        "*/mimeparse*",  # pulled in by testtools
-        "*/mock*",
-        "*/pbr*",  # pulled in by testtools
-        "*/pkg_resources*",  # pulled in by django
-        "*/pypy*",
-        "*/pytz*",  # pulled in by django
-        "*/six*",  # pulled in by testtools
-        "*/termstyle*",
-        "*/test*",
-        "*/traceback2*",  # pulled in by testtools
-        "*/unittest2*",  # pulled in by testtools
-        "*Python.framework*",  # OS X system python
-        "*site-packages*",  # System python for other OS's
-        "*/dist-packages*",  # Resolves issue #259
-        tempfile.gettempdir() + "*",
-    ]
+    omit_patterns: list[str]
     if new_args.clear_omit:
         omit_patterns = []
-
+    else:
+        omit_patterns = [
+            "*/argparse*",
+            "*/colorama*",
+            "*/django/*",
+            "*/distutils*",  # Gets pulled in on Travis-CI CPython
+            "*/extras*",  # pulled in by testtools
+            "*/linecache2*",  # pulled in by testtools
+            "*/mimeparse*",  # pulled in by testtools
+            "*/mock*",
+            "*/pbr*",  # pulled in by testtools
+            "*/pkg_resources*",  # pulled in by django
+            "*/pypy*",
+            "*/pytz*",  # pulled in by django
+            "*/six*",  # pulled in by testtools
+            "*/termstyle*",
+            "*/test*",
+            "*/traceback2*",  # pulled in by testtools
+            "*/unittest2*",  # pulled in by testtools
+            "*Python.framework*",  # OS X system python
+            "*site-packages*",  # System python for other OS's
+            "*/dist-packages*",  # Resolves issue #259
+            tempfile.gettempdir() + "*",
+        ]
     if new_args.omit_patterns:
         omit_patterns.extend(new_args.omit_patterns.split(","))
     new_args.omit_patterns = omit_patterns
@@ -804,10 +811,10 @@ def mergeConfig(args, testing=False):  # pragma: no cover
     else:
         new_args.include_patterns = []
 
-    if new_args.quiet_coverage or (type(new_args.cov_config_file) == str):
+    if new_args.quiet_coverage or isinstance(new_args.cov_config_file, str):
         new_args.run_coverage = True
 
-    if new_args.minimum_coverage != None:
+    if new_args.minimum_coverage is not None:
         new_args.run_coverage = True
 
     if new_args.run_coverage:

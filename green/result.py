@@ -1,3 +1,5 @@
+"""Classes and methods to handle test results."""
+
 from __future__ import annotations
 
 import argparse
@@ -6,7 +8,7 @@ from math import ceil
 from shutil import get_terminal_size
 import time
 import traceback
-from typing import Any, Union, TYPE_CHECKING, Type, Iterable
+from typing import Any, Callable, Sequence, TYPE_CHECKING, Union
 from unittest.result import failfast
 from unittest import TestCase, TestSuite
 
@@ -244,35 +246,40 @@ class ProtoTestResult(BaseTestResult):
     I'm the TestResult object for a single unit test run in a process.
     """
 
-    start_time: float = 0.0
+    failfast: bool = False  # Because unittest inspects the attribute
+    finalize_callback_called: bool = False
     shouldStop: bool = False
+    start_time: float = 0.0
+    test_time: str = ""
 
-    def __init__(self, start_callback=None, finalize_callback=None):
+    def __init__(
+        self,
+        start_callback: Callable[[RunnableTestT], None] | None = None,
+        finalize_callback: Callable[[RunnableTestT], None] | None = None,
+    ) -> None:
         super().__init__(None, colors=None)
         self.start_callback = start_callback
         self.finalize_callback = finalize_callback
-        self.finalize_callback_called = False
-        self.pickle_attrs = [
+        self.collectedDurations: list[tuple[str, float]] = []
+        self.errors: list[tuple[ProtoTest, ProtoError]] = []
+        self.expectedFailures: list[tuple[ProtoTest, ProtoError]] = []
+        self.failures: list[tuple[ProtoTest, ProtoError]] = []
+        self.passing: list[ProtoTest] = []
+        self.skipped: list[tuple[ProtoTest, str]] = []
+        self.unexpectedSuccesses: list[ProtoTest] = []
+        self.pickle_attrs: Sequence[str] = (
             "errors",
             "expectedFailures",
             "failures",
             "passing",
-            "pickle_attrs",
+            "pickle_attrs",  # TODO: check if pickle_attrs should be pickled.
             "shouldStop",
             "skipped",
             "stderr_errput",
             "stdout_output",
-            "unexpectedSuccesses",
             "test_time",
-        ]
-        self.failfast = False  # Because unittest inspects the attribute
-        self.collectedDurations = []
-        self.errors = []
-        self.expectedFailures = []
-        self.failures = []
-        self.passing = []
-        self.skipped = []
-        self.unexpectedSuccesses = []
+            "unexpectedSuccesses",
+        )
         self.reinitialize()
 
     def reinitialize(self):
@@ -300,7 +307,7 @@ class ProtoTestResult(BaseTestResult):
 
     def __getstate__(self) -> dict[str, Any]:
         """
-        Prevent the callback functions from getting pickled
+        Prevent the callback functions from getting pickled.
         """
         result_dict = {}
         for pickle_attr in self.pickle_attrs:
@@ -401,8 +408,8 @@ class GreenTestResult(BaseTestResult):
     Aggregates test results and outputs them to a stream.
     """
 
-    last_class = ""
-    last_module = ""
+    last_class: str = ""
+    last_module: str = ""
     first_text_output: str = ""
     shouldStop: bool = False
 
@@ -415,18 +422,19 @@ class GreenTestResult(BaseTestResult):
         self.failfast = args.failfast
         self.testsRun: int = 0
         # Individual lists
-        # TODO: add actual types to the lists.
-        self.collectedDurations: list = []
-        self.errors: list = []
-        self.expectedFailures: list = []
-        self.failures: list = []
-        self.passing: list = []
-        self.skipped: list = []
-        self.unexpectedSuccesses: list = []
+        self.collectedDurations: list[tuple[str, float]] = []
+        self.errors: list[tuple[ProtoTest, ProtoError]] = []
+        self.expectedFailures: list[tuple[ProtoTest, ProtoError]] = []
+        self.failures: list[tuple[ProtoTest, ProtoError]] = []
+        self.passing: list[ProtoTest] = []
+        self.skipped: list[tuple[ProtoTest, str]] = []
+        self.unexpectedSuccesses: list[ProtoTest] = []
         # Combination of all errors and failures
-        self.all_errors: list = []
+        self.all_errors: list[
+            tuple[ProtoTest, Callable[[str], str], str, ProtoError]
+        ] = []
         # For exiting non-zero if we don't reach a certain level of coverage
-        self.coverage_percent = None
+        self.coverage_percent: int | None = None
 
     def __str__(self) -> str:  # pragma: no cover
         return (
@@ -443,8 +451,11 @@ class GreenTestResult(BaseTestResult):
         self.shouldStop = True
 
     def tryRecordingStdoutStderr(
-        self, test: ProtoTest, proto_test_result: ProtoTestResult, err=None
-    ):
+        self,
+        test: ProtoTest,
+        proto_test_result: ProtoTestResult,
+        err: ProtoError | None = None,
+    ) -> None:
         if proto_test_result.stdout_output.get(test, False):
             self.recordStdout(test, proto_test_result.stdout_output[test])
         if proto_test_result.stderr_errput.get(test, False):
@@ -495,6 +506,7 @@ class GreenTestResult(BaseTestResult):
         """
         Called once after all tests have run.
         """
+        # FIXME: stopTime and timeTaken are defined outside __init__.
         self.stopTime = time.time()
         self.timeTaken = self.stopTime - self.startTime
         self.printErrors()
@@ -540,7 +552,7 @@ class GreenTestResult(BaseTestResult):
             )
         )
         self.stream.writeln()
-        results = [
+        results: tuple[tuple[list, str, Callable[[str], str]], ...] = (
             (self.errors, "errors", self.colors.error),
             (self.expectedFailures, "expected_failures", self.colors.expectedFailure),
             (self.failures, "failures", self.colors.failing),
@@ -551,7 +563,7 @@ class GreenTestResult(BaseTestResult):
                 "unexpected_successes",
                 self.colors.unexpectedSuccess,
             ),
-        ]
+        )
         stats = []
         for obj_list, name, color_func in results:
             if obj_list:
@@ -564,7 +576,7 @@ class GreenTestResult(BaseTestResult):
                 grade = self.colors.failing("FAILED")
             self.stream.writeln(f"{grade} ({', '.join(stats)})")
 
-    def startTest(self, test):
+    def startTest(self, test: RunnableTestT) -> None:
         """
         Called before the start of each test.
         """
@@ -601,12 +613,19 @@ class GreenTestResult(BaseTestResult):
         if current_class != self.last_class:
             self.last_class = current_class
 
-    def stopTest(self, test):
+    def stopTest(self, test: RunnableTestT) -> None:
         """
         Supposed to be called after each test.
         """
 
-    def _reportOutcome(self, test, outcome_char, color_func, err=None, reason=""):
+    def _reportOutcome(
+        self,
+        test: RunnableTestT,
+        outcome_char,
+        color_func: Callable[[str], str],
+        err=None,
+        reason: str = "",
+    ) -> None:
         self.testsRun += 1
         test = proto_test(test)
         if self.showAll:
@@ -632,7 +651,7 @@ class GreenTestResult(BaseTestResult):
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
 
-    def addSuccess(self, test, test_time=None):
+    def addSuccess(self, test: RunnableTestT, test_time=None):
         """
         Called when a test passed.
         """
@@ -643,7 +662,7 @@ class GreenTestResult(BaseTestResult):
         self._reportOutcome(test, ".", self.colors.passing)
 
     @failfast
-    def addError(self, test, err, test_time=None):
+    def addError(self, test: RunnableTestT, err, test_time=None):
         """
         Called when a test raises an exception.
         """
@@ -656,7 +675,7 @@ class GreenTestResult(BaseTestResult):
         self._reportOutcome(test, "E", self.colors.error, err)
 
     @failfast
-    def addFailure(self, test, err, test_time=None):
+    def addFailure(self, test: RunnableTestT, err, test_time=None):
         """
         Called when a test fails a unittest assertion.
         """
@@ -676,7 +695,7 @@ class GreenTestResult(BaseTestResult):
         self.all_errors.append((test, self.colors.error, "Failure", err))
         self._reportOutcome(test, "F", self.colors.failing, err)
 
-    def addSkip(self, test, reason, test_time=None):
+    def addSkip(self, test: RunnableTestT, reason: str, test_time=None):
         """
         Called when a test is skipped.
         """
@@ -686,7 +705,7 @@ class GreenTestResult(BaseTestResult):
         self.skipped.append((test, reason))
         self._reportOutcome(test, "s", self.colors.skipped, reason=reason)
 
-    def addExpectedFailure(self, test, err, test_time=None):
+    def addExpectedFailure(self, test: RunnableTestT, err, test_time=None):
         """
         Called when a test fails, and we expected the failure.
         """
@@ -697,7 +716,7 @@ class GreenTestResult(BaseTestResult):
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, "x", self.colors.expectedFailure, err)
 
-    def addUnexpectedSuccess(self, test, test_time=None):
+    def addUnexpectedSuccess(self, test: RunnableTestT, test_time=None) -> None:
         """
         Called when a test passed, but we expected a failure.
         """
@@ -707,7 +726,7 @@ class GreenTestResult(BaseTestResult):
         self.unexpectedSuccesses.append(test)
         self._reportOutcome(test, "u", self.colors.unexpectedSuccess)
 
-    def printErrors(self):
+    def printErrors(self) -> None:
         """
         Print a list of all tracebacks from errors and failures, as well as
         captured stdout (even if the test passed, except with quiet_stdout
@@ -763,7 +782,7 @@ class GreenTestResult(BaseTestResult):
             self.displayStdout(test)
             self.displayStderr(test)
 
-    def wasSuccessful(self):
+    def wasSuccessful(self) -> bool:
         """
         Tells whether or not the overall run was successful.
         """

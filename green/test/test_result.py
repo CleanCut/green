@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 import tempfile
 
-from green.config import default_args
+from green.config import get_default_args
 from green.output import Colors, GreenStream
 from green.result import (
     GreenTestResult,
@@ -364,7 +364,7 @@ class TestProtoTest(unittest.TestCase):
 
 class TestGreenTestResult(unittest.TestCase):
     def setUp(self):
-        self.args = copy.deepcopy(default_args)
+        self.args = copy.deepcopy(get_default_args())
         self.stream = StringIO()
 
     def tearDown(self):
@@ -834,7 +834,7 @@ class TestGreenTestResult(unittest.TestCase):
 class TestGreenTestResultAdds(unittest.TestCase):
     def setUp(self):
         self.stream = StringIO()
-        self.args = copy.deepcopy(default_args)
+        self.args = copy.deepcopy(get_default_args())
         self.args.verbose = 0
         self.gtr = GreenTestResult(self.args, GreenStream(self.stream))
         self.gtr._reportOutcome = MagicMock()
@@ -1084,7 +1084,7 @@ class TestGreenTestResultAdds(unittest.TestCase):
 
 class TestGreenTestRunCoverage(unittest.TestCase):
     def setUp(self):
-        self.args = copy.deepcopy(default_args)
+        self.args = copy.deepcopy(get_default_args())
 
         cov_file = tempfile.NamedTemporaryFile(delete=False)
         cov_file.close()
