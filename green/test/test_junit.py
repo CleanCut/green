@@ -1,4 +1,4 @@
-from green.config import default_args
+from green.config import get_default_args
 from green.output import GreenStream
 from green.junit import JUnitXML, JUnitDialect, Verdict
 from green.result import GreenTestResult, ProtoTest, proto_error
@@ -23,7 +23,9 @@ def test(module, class_name, method_name):
 class JUnitXMLReportIsGenerated(TestCase):
     def setUp(self):
         self._destination = StringIO()
-        self._test_results = GreenTestResult(default_args, GreenStream(StringIO()))
+        self._test_results = GreenTestResult(
+            get_default_args(), GreenStream(StringIO())
+        )
         self._test_results.timeTaken = 4.06
         self._adapter = JUnitXML()
 

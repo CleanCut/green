@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 # Super-useful debug function for finding problems in the subprocesses, and it
 # even works on windows
-def ddebug(msg: str, err: ExcInfoType | None = None):  # pragma: no cover
+def ddebug(msg: str, err: ExcInfoType | None = None) -> None:  # pragma: no cover
     """
     err can be an instance of sys.exc_info() -- which is the latest traceback
     info
@@ -48,12 +48,12 @@ class ProcessLogger:
     instead of having process crashes be silent.
     """
 
-    def __init__(self, callable: Callable):
+    def __init__(self, callable: Callable) -> None:
         self.__callable = callable
 
     def __call__(self, *args, **kwargs):
         try:
-            result = self.__callable(*args, **kwargs)
+            return self.__callable(*args, **kwargs)
         except Exception:
             # Here we add some debugging help. If multiprocessing's
             # debugging is on, it will arrange to log the traceback
@@ -65,9 +65,6 @@ class ProcessLogger:
             # Re-raise the original exception so the Pool worker can
             # clean up
             raise
-
-        # It was fine, give a normal answer
-        return result
 
 
 class LoggingDaemonlessPool(Pool):
@@ -82,9 +79,6 @@ class LoggingDaemonlessPool(Pool):
     def Process(ctx, *args, **kwargs):
         return ctx.Process(daemon=False, *args, **kwargs)
 
-    # FIXME: `kwargs={}` is dangerous as the empty dict is declared at import time
-    # and becomes a shared object between all instances of LoggingDaemonlessPool.
-    # In short, it is a global variable that is mutable.
     def apply_async(
         self,
         func: Callable,

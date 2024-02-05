@@ -1,29 +1,43 @@
+"""Registers the green command with setuptools."""
+
 from __future__ import annotations
 
+import functools
 import sys
+from typing import TYPE_CHECKING
 
 from setuptools import Command
 
 from green.config import parseArguments
 from green.cmdline import main
 
+if TYPE_CHECKING:
+    from argparse import Action
 
-def get_user_options():
+
+def get_user_options() -> list[tuple[str, str | None, str | None]]:
     # When running "python setup.py --help-commands", setup.py will call this
     # function -- but green isn't actually being called.
     if "--help-commands" in sys.argv:
         return []
 
-    r = parseArguments()
-    options = []
+    args = parseArguments()
+    options: list[tuple[str, str | None, str | None]] = []
 
-    for action in r.store_opt.actions:
-        names = [str(name.lstrip("-")) for name in action.option_strings]
+    action: Action
+    for action in args.store_opt.actions:
+        names = [name.lstrip("-") for name in action.option_strings]
+        short_name: str | None
         if len(names) == 1:
-            names.insert(0, None)
+            full_name = names[0]
+            short_name = None
+        else:
+            # TODO: We might want to pick the longer of the two for full_name.
+            full_name = names[1]
+            short_name = names[0]
         if not action.const:
-            names[1] += "="
-        options.append((names[1], names[0], action.help))
+            full_name += "="
+        options.append((full_name, short_name, action.help))
 
     return options
 
@@ -31,16 +45,19 @@ def get_user_options():
 class green(Command):
     command_name = "green"
     description = "Run unit tests using green"
-    user_options = get_user_options()
 
-    def initialize_options(self):
+    @functools.cached_property
+    def user_options(self) -> list[tuple[str, str | None, str | None]]:
+        return get_user_options()
+
+    def initialize_options(self) -> None:
         for name, _, _ in self.user_options:
             setattr(self, name.replace("-", "_").rstrip("="), None)
 
-    def finalize_options(self):
+    def finalize_options(self) -> None:
         pass
 
-    def run(self):
+    def run(self) -> None:
         self.ensure_finalized()
 
         if self.distribution.install_requires:

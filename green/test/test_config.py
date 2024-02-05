@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import configparser
 import copy
+import pathlib
 from io import StringIO
 import os
 import shutil
 import tempfile
 import unittest
+from typing import Sequence
 
 from green import config
 from green.output import GreenStream
@@ -37,25 +41,25 @@ class ModifiedEnvironment:
     I am a context manager that sets up environment variables for a test case.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: str | None) -> None:
         self.prev = {}
         self.excur = kwargs
         for k in kwargs:
             self.prev[k] = os.getenv(k)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.update_environment(self.excur)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.update_environment(self.prev)
 
-    def update_environment(self, d):
-        for k in d:
-            if d[k] is None:
-                if k in os.environ:
-                    del os.environ[k]
+    def update_environment(self, env: dict[str, str | None]) -> None:
+        for key, value in env.items():
+            if value is None:
+                if key in os.environ:
+                    del os.environ[key]
             else:
-                os.environ[k] = d[k]
+                os.environ[key] = value
 
 
 class ConfigBase(unittest.TestCase):
@@ -64,24 +68,21 @@ class ConfigBase(unittest.TestCase):
     in a temporary directory with known values attached to self.
     """
 
-    def _write_file(self, path, lines):
-        f = open(path, "w")
-        f.writelines([x + "\n" for x in lines])
-        f.close()
+    def _write_file(self, path: pathlib.Path, lines: Sequence[str]) -> None:
+        path.write_text("\n".join(lines) + "\n")
 
     def setUp(self):
-        self.tmpd = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.tmpd)
+        self.tmpd = tmpd = pathlib.Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmpd)
         # Set CWD to known empty directory so we don't pick up some other .green
         # file from the CWD tests are actually run from.
-        save_cwd = os.getcwd()
-        self.addCleanup(os.chdir, save_cwd)
-        cwd_dir = os.path.join(self.tmpd, "cwd")
-        os.mkdir(cwd_dir)
+        self.addCleanup(os.chdir, pathlib.Path.cwd())
+        cwd_dir = tmpd / "cwd"
+        cwd_dir.mkdir(exist_ok=True, parents=True)
         os.chdir(cwd_dir)
         # This represents the $HOME config file, and doubles for the current
         # working directory config file if we set CWD to self.tmpd
-        self.default_filename = os.path.join(self.tmpd, ".green")
+        self.default_filename = tmpd / ".green"
         self.default_logging = False
         self.default_version = False
         self.default_failfast = True
@@ -90,46 +91,46 @@ class ConfigBase(unittest.TestCase):
             self.default_filename,
             [
                 "# this is a test config file for green",
-                f"logging = {str(self.default_logging)}",
-                f"version = {str(self.default_version)}",
+                f"logging = {self.default_logging}",
+                f"version = {self.default_version}",
                 f"omit-patterns = {self.default_filename}",
-                f"failfast = {str(self.default_failfast)}",
-                f"termcolor = {str(self.default_termcolor)}",
+                f"failfast = {self.default_failfast}",
+                f"termcolor = {self.default_termcolor}",
             ],
         )
-        self.env_filename = os.path.join(self.tmpd, "green.env")
+        self.env_filename = tmpd / "green.env"
         self.env_logging = True
         self.env_no_skip_report = False
         self._write_file(
             self.env_filename,
             [
                 "# this is a test config file for green",
-                f"logging = {str(self.env_logging)}",
+                f"logging = {self.env_logging}",
                 f"omit-patterns = {self.env_filename}",
                 f"no-skip-report = {self.env_no_skip_report}",
             ],
         )
-        self.cmd_filename = os.path.join(self.tmpd, "green.cmd")
+        self.cmd_filename = self.tmpd / "green.cmd"
         self.cmd_logging = False
         self.cmd_run_coverage = False
         self._write_file(
             self.cmd_filename,
             [
                 "# this is a test config file for green",
-                f"logging = {str(self.cmd_logging)}",
+                f"logging = {self.cmd_logging}",
                 f"omit-patterns = {self.cmd_filename}",
                 f"run-coverage = {self.cmd_run_coverage}",
             ],
         )
-        self.setup_filename = os.path.join(cwd_dir, "setup.cfg")
+        self.setup_filename = cwd_dir / "setup.cfg"
         self.setup_failfast = False
         self.setup_verbose = 3
         self._write_file(
             self.setup_filename,
             [
                 "[green]",
-                f"failfast = {str(self.setup_failfast)}",
-                f"verbose = {str(self.setup_verbose)}",
+                f"failfast = {self.setup_failfast}",
+                f"verbose = {self.setup_verbose}",
             ],
         )
 
@@ -145,19 +146,27 @@ class TestConfig(ConfigBase):
             exist, setup.cfg does not exist
         Result: load --config
         """
-        os.unlink(self.default_filename)
-        os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        self.default_filename.unlink(missing_ok=True)
+        self.setup_filename.unlink(missing_ok=True)
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_cmd_noenv_def_nosetup(self):
         """
@@ -167,17 +176,21 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.env_filename)
         os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_cmd_noenv_nodef_nosetup(self):
         """
@@ -188,17 +201,23 @@ class TestConfig(ConfigBase):
         os.unlink(self.env_filename)
         os.unlink(self.default_filename)
         os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_nocmd_env_cwd(self):
         """
@@ -208,17 +227,25 @@ class TestConfig(ConfigBase):
         os.chdir(self.tmpd)  # setUp is already set to restore us to our pre-testing cwd
         os.unlink(self.cmd_filename)
         os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.default_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.default_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ar(configparser.NoOptionError, cfg.getint, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(
+                str(self.default_filename), cfg.get("green", "omit-patterns")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.default_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getint, "green", "verbose"
+            )
 
     def test_nocmd_env_def_nosetup(self):
         """
@@ -226,19 +253,25 @@ class TestConfig(ConfigBase):
             setup.cfg does not exist
         Result: load $GREEN_CONFIG
         """
-        os.unlink(self.cmd_filename)
-        os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        self.cmd_filename.unlink(missing_ok=True)
+        self.setup_filename.unlink(missing_ok=True)
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.env_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.env_filename), cfg.get("green", "omit-patterns"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.env_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_nocmd_env_nodef_nosetup(self):
         """
@@ -246,20 +279,28 @@ class TestConfig(ConfigBase):
             exist, setup.cfg does not exist
         Result: load $GREEN_CONFIG
         """
-        os.unlink(self.cmd_filename)
-        os.unlink(self.default_filename)
-        os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        self.cmd_filename.unlink(missing_ok=True)
+        self.default_filename.unlink(missing_ok=True)
+        self.setup_filename.unlink(missing_ok=True)
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.env_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.env_filename), cfg.get("green", "omit-patterns"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.env_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_nocmd_noenv_def_nosetup(self):
         """
@@ -270,17 +311,23 @@ class TestConfig(ConfigBase):
         os.unlink(self.cmd_filename)
         os.unlink(self.env_filename)
         os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.default_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.default_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "verbose")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(
+                str(self.default_filename), cfg.get("green", "omit-patterns")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.default_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "verbose"
+            )
 
     def test_nocmd_noenv_nodef_nosetup(self):
         """
@@ -292,17 +339,21 @@ class TestConfig(ConfigBase):
         os.unlink(self.env_filename)
         os.unlink(self.cmd_filename)
         os.remove(self.setup_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae([], cfg.sections())
-            ar(configparser.NoSectionError, cfg.get, "green", "omit-patterns")
-            ar(configparser.NoSectionError, cfg.get, "green", "run-coverage")
-            ar(configparser.NoSectionError, cfg.get, "green", "logging")
-            ar(configparser.NoSectionError, cfg.get, "green", "no-skip-report")
-            ar(configparser.NoSectionError, cfg.get, "green", "version")
-            ar(configparser.NoSectionError, cfg.get, "green", "verbose")
+            self.assertEqual([], cfg.sections())
+            self.assertRaises(
+                configparser.NoSectionError, cfg.get, "green", "omit-patterns"
+            )
+            self.assertRaises(
+                configparser.NoSectionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(configparser.NoSectionError, cfg.get, "green", "logging")
+            self.assertRaises(
+                configparser.NoSectionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoSectionError, cfg.get, "green", "version")
+            self.assertRaises(configparser.NoSectionError, cfg.get, "green", "verbose")
 
     def test_cmd_env_nodef_setup(self):
         """
@@ -311,18 +362,24 @@ class TestConfig(ConfigBase):
         Result: load --config
         """
         os.unlink(self.default_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
 
     def test_cmd_noenv_def_setup(self):
         """
@@ -331,18 +388,20 @@ class TestConfig(ConfigBase):
         Result: load --config
         """
         os.unlink(self.env_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
     def test_cmd_noenv_nodef_setup(self):
         """
@@ -352,18 +411,22 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.env_filename)
         os.unlink(self.default_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.cmd_filename, cfg.get("green", "omit-patterns"))
-            ae(self.cmd_run_coverage, cfg.getboolean("green", "run-coverage"))
-            ae(self.cmd_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
     def test_nocmd_env_def_setup(self):
         """
@@ -372,18 +435,22 @@ class TestConfig(ConfigBase):
         Result: load $GREEN_CONFIG
         """
         os.unlink(self.cmd_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.env_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.env_filename), cfg.get("green", "omit-patterns"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.env_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
     def test_nocmd_env_nodef_setup(self):
         """
@@ -393,18 +460,24 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.cmd_filename)
         os.unlink(self.default_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.env_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.env_logging, cfg.getboolean("green", "logging"))
-            ae(self.env_no_skip_report, cfg.getboolean("green", "no-skip-report"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "version")
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.env_filename), cfg.get("green", "omit-patterns"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.env_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "version"
+            )
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
     def test_nocmd_noenv_def_setup(self):
         """
@@ -414,18 +487,22 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.cmd_filename)
         os.unlink(self.env_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(["green"], cfg.sections())
-            ae(self.default_filename, cfg.get("green", "omit-patterns"))
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ae(self.default_logging, cfg.getboolean("green", "logging"))
-            ar(configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report")
-            ae(self.default_version, cfg.getboolean("green", "version"))
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(
+                str(self.default_filename), cfg.get("green", "omit-patterns")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertEqual(self.default_logging, cfg.getboolean("green", "logging"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.getboolean, "green", "no-skip-report"
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
     def test_nocmd_noenv_nodef_setup(self):
         """
@@ -433,20 +510,24 @@ class TestConfig(ConfigBase):
             setup.cfg exists
         Result: empty config
         """
-        os.unlink(self.default_filename)
-        os.unlink(self.env_filename)
-        os.unlink(self.cmd_filename)
-        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=self.tmpd):
+        self.default_filename.unlink(missing_ok=True)
+        self.env_filename.unlink(missing_ok=True)
+        self.cmd_filename.unlink(missing_ok=True)
+        with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
-            ae = self.assertEqual
-            ar = self.assertRaises
-            ae(self.setup_verbose, cfg.getint("green", "verbose"))
-            ae(self.setup_failfast, cfg.getboolean("green", "failfast"))
-            ar(configparser.NoOptionError, cfg.get, "green", "omit-patterns")
-            ar(configparser.NoOptionError, cfg.get, "green", "run-coverage")
-            ar(configparser.NoOptionError, cfg.get, "green", "logging")
-            ar(configparser.NoOptionError, cfg.get, "green", "no-skip-report")
-            ar(configparser.NoOptionError, cfg.get, "green", "version")
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "omit-patterns"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "logging")
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
 
 
 class TestMergeConfig(ConfigBase):
@@ -465,8 +546,10 @@ class TestMergeConfig(ConfigBase):
         saved_stdout = config.sys.stdout
         config.sys.stdout = gs
         self.addCleanup(setattr, config.sys, "stdout", saved_stdout)
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=self.tmpd):
-            new_args = copy.deepcopy(config.default_args)
+        with ModifiedEnvironment(
+            GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
+        ):
+            new_args = copy.deepcopy(config.get_default_args())
 
             new_args.omit_patterns = "omitstuff"
             new_args.run_coverage = True
@@ -488,9 +571,9 @@ class TestMergeConfig(ConfigBase):
         Default unspecified command-line args do not overwrite config values.
         """
         # This config environment should set logging to True
-        with ModifiedEnvironment(GREEN_CONFIG=self.env_filename, HOME=""):
+        with ModifiedEnvironment(GREEN_CONFIG=str(self.env_filename), HOME=""):
             # The default for logging in arguments is False
-            da = copy.deepcopy(config.default_args)
+            da = copy.deepcopy(config.get_default_args())
             del da.logging
             computed_args = config.mergeConfig(da, testing=True)
             self.assertEqual(computed_args.logging, True)
@@ -499,8 +582,8 @@ class TestMergeConfig(ConfigBase):
         """
         Specified command-line arguments always overwrite config file values
         """
-        with ModifiedEnvironment(HOME=self.tmpd):
-            new_args = copy.deepcopy(config.default_args)
+        with ModifiedEnvironment(HOME=str(self.tmpd)):
+            new_args = copy.deepcopy(config.get_default_args())
             new_args.failfast = True  # same as config, for sanity
             new_args.logging = True  # different than config, not default
             del new_args.version  # Not in arguments, should get config value
@@ -521,16 +604,19 @@ class TestMergeConfig(ConfigBase):
         args = config.mergeConfig(args)
         self.assertEqual(args.targets, ["target1", "target2"])
 
-    def test_forgotToUpdateMerge(self):
+    def test_forgot_to_update_merge(self):
         """
         mergeConfig raises an exception for unknown cmdline args
         """
-        orig_args = copy.deepcopy(config.default_args)
+        default_args = config.get_default_args()
+        orig_args = copy.deepcopy(default_args)
         self.addCleanup(setattr, config, "default_args", orig_args)
-        config.default_args.new_option = True
 
-        new_args = copy.deepcopy(config.default_args)
+        default_args.new_option = True
+        new_args = copy.deepcopy(default_args)
 
-        self.assertRaises(
-            NotImplementedError, config.mergeConfig, new_args, testing=True
-        )
+        try:
+            with self.assertRaises(NotImplementedError):
+                config.mergeConfig(new_args, testing=True)
+        finally:
+            config.get_default_args.cache_clear()

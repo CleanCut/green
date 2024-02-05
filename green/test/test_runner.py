@@ -12,7 +12,7 @@ import unittest
 from unittest import mock
 import weakref
 
-from green.config import default_args
+from green.config import get_default_args
 from green.exceptions import InitializerOrFinalizerError
 from green.loader import GreenTestLoader
 from green.output import GreenStream
@@ -108,7 +108,7 @@ class TestRun(unittest.TestCase):
         cls.startdir = None
 
     def setUp(self):
-        self.args = copy.deepcopy(default_args)
+        self.args = copy.deepcopy(get_default_args())
         self.stream = StringIO()
         self.tmpdir = tempfile.mkdtemp()
         self.loader = GreenTestLoader()
@@ -284,7 +284,7 @@ class TestProcesses(unittest.TestCase):
         os.chdir(self.container_dir)
         self.tmpdir = tempfile.mkdtemp(dir=self.container_dir)
         self.stream = StringIO()
-        self.args = copy.deepcopy(default_args)
+        self.args = copy.deepcopy(get_default_args())
         self.loader = GreenTestLoader()
 
     def tearDown(self):

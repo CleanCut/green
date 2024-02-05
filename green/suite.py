@@ -8,7 +8,7 @@ from unittest import util
 import unittest
 from io import StringIO
 
-from green.config import default_args
+from green.config import get_default_args
 from green.output import GreenStream
 
 
@@ -26,6 +26,7 @@ class GreenTestSuite(TestSuite):
         # You should either set GreenTestSuite.args before instantiation, or
         # pass args into __init__
         self._removed_tests = 0
+        default_args = get_default_args()
         self.allow_stdout = default_args.allow_stdout
         self.full_test_pattern = "test" + default_args.test_pattern
         self.customize(args)
