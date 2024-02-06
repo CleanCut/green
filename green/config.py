@@ -580,13 +580,13 @@ class ConfigFile:  # pragma: no cover
     """
 
     def __init__(self, filepath: pathlib.Path) -> None:
-        self._first = True
-        self._lines = filepath.read_text().splitlines(keepends=True)
+        self._first: bool = True
+        self._lines: list[str] = filepath.read_text().splitlines(keepends=True)
 
-    def __iter__(self):
+    def __iter__(self) -> ConfigFile:
         return self
 
-    def __next__(self):
+    def __next__(self) -> str:
         if self._first:
             self._first = False
             return "[green]\n"

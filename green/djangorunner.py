@@ -11,6 +11,7 @@ To make the change permanent for your project, in settings.py add:
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace
+import pathlib
 import os
 import sys
 from typing import Any, Final, Sequence
@@ -23,10 +24,10 @@ from green.suite import GreenTestSuite
 
 # If we're not being run from an actual django project, set up django config
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "green.djangorunner")
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = pathlib.Path(__file__).absolute().parent.parent
 SECRET_KEY: Final[str] = ")9^_e(=cisybdt4m4+fs+_wb%d$!9mpcoy0um^alvx%gexj#jv"
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG: bool = True
+TEMPLATE_DEBUG: bool = True
 ALLOWED_HOSTS: Sequence[str] = []
 INSTALLED_APPS: Final[Sequence[str]] = (
     "django.contrib.admin",
@@ -51,14 +52,14 @@ WSGI_APPLICATION: Final[str] = "myproj.wsgi.application"
 DATABASES: Final[dict[str, dict[str, str]]] = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": str(BASE_DIR / "db.sqlite3"),
     }
 }
 LANGUAGE_CODE: Final[str] = "en-us"
 TIME_ZONE: Final[str] = "UTC"
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
+USE_I18N: bool = True
+USE_L10N: bool = True
+USE_TZ: bool = True
 STATIC_URL: Final[str] = "/static/"
 # End of django fake config stuff
 
@@ -75,7 +76,7 @@ try:
     from django.test.runner import DiscoverRunner
 
     class DjangoRunner(DiscoverRunner):
-        def __init__(self, verbose: int = -1, **kwargs):
+        def __init__(self, verbose: int = -1, **kwargs: Any):
             super().__init__(**kwargs)
             self.verbose = verbose
             self.loader = GreenTestLoader()

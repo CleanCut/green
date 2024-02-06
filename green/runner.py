@@ -1,9 +1,11 @@
+"""Running tests."""
+
 from __future__ import annotations
 
 import argparse
 import multiprocessing
 from sys import modules
-from typing import TYPE_CHECKING
+from typing import TextIO, TYPE_CHECKING
 from unittest.signals import registerResult, installHandler, removeResult
 import warnings
 
@@ -27,11 +29,11 @@ class InitializerOrFinalizer:
     appropriate time.
     """
 
-    def __init__(self, dotted_function):
+    def __init__(self, dotted_function: str) -> None:
         self.module_part = ".".join(dotted_function.split(".")[:-1])
         self.function_part = ".".join(dotted_function.split(".")[-1:])
 
-    def __call__(self, *args):
+    def __call__(self, *args) -> None:
         if not self.module_part:
             return
         try:
@@ -58,14 +60,14 @@ class InitializerOrFinalizer:
 
 
 def run(
-    suite, stream, args: argparse.Namespace, testing: bool = False
+    suite, stream: TextIO | GreenStream, args: argparse.Namespace, testing: bool = False
 ) -> GreenTestResult:
     """
     Run the given test case or test suite with the specified arguments.
 
     Any args.stream passed in will be wrapped in a GreenStream
     """
-    if not issubclass(GreenStream, type(stream)):
+    if not isinstance(stream, GreenStream):
         stream = GreenStream(
             stream,
             disable_windows=args.disable_windows,

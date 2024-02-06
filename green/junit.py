@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from green.result import GreenTestResult, ProtoTest, ProtoError
     from lxml.etree import _Element
 
+    # TODO: use NamedTuple for TestVerdict.
     TestVerdict: TypeAlias = Union[
         Tuple[int, ProtoTest], Tuple[int, ProtoTest, Union[str, ProtoError]]
     ]
@@ -111,7 +112,9 @@ class JUnitXML:
         return f"{test.module}.{test.class_name}"
 
     @staticmethod
-    def _add_failures(collection: TestsCollection, test_results: GreenTestResult):
+    def _add_failures(
+        collection: TestsCollection, test_results: GreenTestResult
+    ) -> None:
         for each_test, failure in test_results.failures:
             key = JUnitXML._suite_name(each_test)
             if key not in collection:
@@ -127,7 +130,9 @@ class JUnitXML:
             collection[key].append((Verdict.ERROR, each_test, error))
 
     @staticmethod
-    def _add_skipped_tests(collection: TestsCollection, test_results: GreenTestResult):
+    def _add_skipped_tests(
+        collection: TestsCollection, test_results: GreenTestResult
+    ) -> None:
         for each_test, reason in test_results.skipped:
             key = JUnitXML._suite_name(each_test)
             if key not in collection:
@@ -160,16 +165,23 @@ class JUnitXML:
         return xml_suite
 
     @staticmethod
-    def _count_test_with_verdict(verdict: int, suite):
+    def _count_test_with_verdict(verdict: int, suite: list[TestVerdict]) -> int:
         return sum(1 for entry in suite if entry[0] == verdict)
 
-    def _convert_test(self, results, verdict, test, *details) -> _Element:
+    def _convert_test(
+        self,
+        results: GreenTestResult,
+        verdict: int,
+        test: ProtoTest,
+        *details: str | ProtoError,
+    ) -> _Element:
         xml_test = Element(JUnitDialect.TEST_CASE)
         xml_test.set(JUnitDialect.NAME, test.method_name)
         xml_test.set(JUnitDialect.CLASS_NAME, test.class_name)
         xml_test.set(JUnitDialect.TEST_TIME, test.test_time)
 
-        xml_verdict = self._convert_verdict(verdict, test, details)
+        error: str | ProtoError | None = details[0] if details else None
+        xml_verdict = self._convert_verdict(verdict, test, error)
         if xml_verdict is not None:
             xml_test.append(xml_verdict)
 
@@ -185,21 +197,25 @@ class JUnitXML:
 
         return xml_test
 
-    def _convert_verdict(self, verdict: int, test, details) -> _Element | None:
+    # FIXME: test is not used.
+    def _convert_verdict(
+        self, verdict: int, test: ProtoTest, error_details: str | ProtoError | None
+    ) -> _Element | None:
+        message = str(error_details) if error_details else ""
         if verdict == Verdict.FAILED:
             failure = Element(JUnitDialect.FAILURE)
-            failure.text = str(details[0])
+            failure.text = message
             return failure
         if verdict == Verdict.ERROR:
             error = Element(JUnitDialect.ERROR)
-            error.text = str(details[0])
+            error.text = message
             return error
         if verdict == Verdict.SKIPPED:
             skipped = Element(JUnitDialect.SKIPPED)
-            skipped.text = str(details[0])
+            skipped.text = message
             return skipped
         return None
 
     @staticmethod
-    def _suite_time(suite) -> float:
+    def _suite_time(suite: list[TestVerdict]) -> float:
         return sum(float(each_test.test_time) for verdict, each_test, *details in suite)
