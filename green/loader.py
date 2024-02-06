@@ -12,7 +12,7 @@ import re
 import sys
 import unittest
 import traceback
-from typing import Iterable, TYPE_CHECKING
+from typing import Iterable, Type, TYPE_CHECKING, Union
 
 from green.output import debug
 from green import result
@@ -21,6 +21,9 @@ from green.suite import GreenTestSuite
 if TYPE_CHECKING:
     from types import ModuleType
     from unittest import TestSuite, TestCase
+    from doctest import _DocTestSuite
+
+    FlattenableTests = Union[TestSuite, _DocTestSuite, GreenTestSuite]
 
 python_file_pattern = re.compile(r"^[_a-z]\w*?\.py$", re.IGNORECASE)
 python_dir_pattern = re.compile(r"^[_a-z]\w*?$", re.IGNORECASE)
@@ -33,12 +36,14 @@ class GreenTestLoader(unittest.TestLoader):
     TestSuite.
     """
 
-    suiteClass = GreenTestSuite
+    suiteClass: Type[GreenTestSuite] = GreenTestSuite
 
-    def loadTestsFromTestCase(self, testCaseClass):
+    def loadTestsFromTestCase(
+        self, testCaseClass: Type[unittest.TestCase]
+    ) -> GreenTestSuite:
         debug(f"Examining test case {testCaseClass.__name__}", 3)
 
-        def filter_test_methods(attrname):
+        def filter_test_methods(attrname: str) -> bool:
             return (
                 attrname.startswith(self.testMethodPrefix)
                 and callable(getattr(testCaseClass, attrname))
@@ -53,9 +58,9 @@ class GreenTestLoader(unittest.TestLoader):
 
         if not test_case_names and hasattr(testCaseClass, "runTest"):
             test_case_names = ["runTest"]
-        return flattenTestSuite(map(testCaseClass, test_case_names))
+        return flattenTestSuite(testCaseClass(name) for name in test_case_names)
 
-    def loadFromModuleFilename(self, filename: str):
+    def loadFromModuleFilename(self, filename: str) -> TestSuite:
         dotted_module, parent_dir = findDottedModuleAndParentDir(filename)
         # Adding the parent path of the module to the start of sys.path is
         # the closest we can get to an absolute import in Python that I can
@@ -87,7 +92,7 @@ class GreenTestLoader(unittest.TestLoader):
                 dotted_module, filename, traceback.format_exc()
             )
 
-            def testFailure(self):
+            def testFailure(self) -> None:
                 raise ImportError(message)
 
             TestClass = type(
@@ -104,15 +109,29 @@ class GreenTestLoader(unittest.TestLoader):
         # --- Find the tests inside the loaded module ---
         return self.loadTestsFromModule(loaded_module)
 
-    def loadTestsFromModule(self, module, pattern=None):
+    def loadTestsFromModule(  # type: ignore[override]
+        self, module: ModuleType, *, pattern: str | None = None
+    ) -> GreenTestSuite:
         tests = super().loadTestsFromModule(module, pattern=pattern)
         return flattenTestSuite(tests, module)
 
-    def loadTestsFromName(self, name, module=None):
+    def loadTestsFromName(
+        self, name: str, module: ModuleType | None = None
+    ) -> GreenTestSuite:
         tests = super().loadTestsFromName(name, module)
         return flattenTestSuite(tests, module)
 
-    def discover(self, current_path, file_pattern="test*.py", top_level_dir=None):
+    # TODO: In unittest/loader.py this is not supposed to return None but it
+    #  always returns self.suiteClass(tests). Maybe we should do the same by
+    #  returning GreenTestSuite() but empty instead. It might be possible that
+    #  this is what is triggering the failures when running tests with the
+    #  @skipIf decorator with 3.12.1.
+    def discover(  # type: ignore[override]
+        self,
+        current_path: str,
+        file_pattern: str = "test*.py",
+        top_level_dir: str | None = None,
+    ) -> GreenTestSuite | None:
         """
         I take a path to a directory and discover all the tests inside files
         matching file_pattern.
@@ -167,6 +186,9 @@ class GreenTestLoader(unittest.TestLoader):
     def loadTargets(
         self, targets: Iterable[str] | str, file_pattern: str = "test*.py"
     ) -> GreenTestSuite | None:
+        """
+        Load the given test targets. This is green specific and not part of unittest.TestLoader.
+        """
         # If a string was passed in, put it into a tuple.
         if isinstance(targets, str):
             targets = [targets]
@@ -177,7 +199,7 @@ class GreenTestLoader(unittest.TestLoader):
             target_dict[target] = True
         targets = target_dict.keys()
 
-        suites = []
+        suites: list[GreenTestSuite] = []
         for target in targets:
             suite = self.loadTarget(target, file_pattern)
             if not suite:
@@ -193,11 +215,14 @@ class GreenTestLoader(unittest.TestLoader):
 
         return flattenTestSuite(suites) if suites else None
 
-    def loadTarget(self, target, file_pattern="test*.py"):
+    def loadTarget(
+        self, target: str, file_pattern: str = "test*.py"
+    ) -> GreenTestSuite | None:
+        """
+        Load the given test target. This is green specific and not part of unittest.TestLoader.
+        """
         debug(
-            "Attempting to load target '{}' with file_pattern '{}'".format(
-                target, file_pattern
-            )
+            f"Attempting to load target '{target}' with file_pattern '{file_pattern}'."
         )
 
         # For a test loader, we want to always the current working directory to
@@ -222,7 +247,7 @@ class GreenTestLoader(unittest.TestLoader):
         if target and (target[0] != "."):
             try:
                 filename = importlib.import_module(target).__file__
-                if "__init__.py" in filename:
+                if filename and "__init__.py" in filename:
                     pkg_in_path_dir = os.path.dirname(filename)
             except:
                 pkg_in_path_dir = None
@@ -261,13 +286,17 @@ class GreenTestLoader(unittest.TestLoader):
         bare_file = target
         # some/file
         pyless_file = target + ".py"
-        for candidate in [bare_file, pyless_file]:
+        for candidate in (bare_file, pyless_file):
             if (candidate is None) or (not os.path.isfile(candidate)):
                 continue
             need_cleanup = False
             cwd = os.getcwd()
             if cwd != sys.path[0]:
                 need_cleanup = True
+                # TODO: look into how much larger we grow sys.path with each
+                #  candidate. It is possible that we end up with a lot of
+                #  duplicate entries that might make imports slower.
+                #  This is because sys.path.remove(cwd) is not in a Finally block.
                 sys.path.insert(0, cwd)
             try:
                 dotted_path = target.replace(".py", "").replace(os.sep, ".")
@@ -290,7 +319,7 @@ class GreenTestLoader(unittest.TestLoader):
                         "it.".format(dotted_path)
                     )
 
-                def testFailure(self):
+                def testFailure(self) -> None:
                     raise ImportError(message)  # pragma: no cover
 
                 TestClass = type(
@@ -300,6 +329,7 @@ class GreenTestLoader(unittest.TestLoader):
                 )
                 return self.suiteClass((TestClass(dotted_path),))
             if need_cleanup:
+                # TODO: this might need to be in a finally block.
                 sys.path.remove(cwd)
             if tests and tests.countTestCases():
                 debug(f"Load method: FILE - {candidate}")
@@ -338,13 +368,15 @@ def toProtoTestList(
     return test_list
 
 
-def toParallelTargets(suite, targets: Iterable[str]) -> list[str]:
+def toParallelTargets(suite: GreenTestSuite, targets: Iterable[str]) -> list[str]:
     """
     Produce a list of targets which should be tested in parallel.
 
     For the most part, this will be a list of test modules.
     The exception is when a dotted name representing something more granular
     than a module was input (like an individual test case or test method).
+
+    This is green specific and not part of unittest/loader.py.
     """
     if isinstance(targets, str):
         # This should not happen, but mypy treats str as a valid sequence of strings.
@@ -387,7 +419,7 @@ def toParallelTargets(suite, targets: Iterable[str]) -> list[str]:
     return parallel_targets
 
 
-def getCompletions(target: list[str] | str):
+def getCompletions(target: list[str] | str) -> str:
     # This option expects 0 or 1 targets
     if not isinstance(target, str):
         target = target[0]
@@ -439,7 +471,7 @@ def getCompletions(target: list[str] | str):
 
 def isPackage(file_path: pathlib.Path) -> bool:
     """
-    Determine whether or not a given path is a (sub)package or not.
+    Determine whether or not a given path is a (sub)package or not. Green specific.
     """
     return file_path.is_dir() and (file_path / "__init__.py").is_file()
 
@@ -452,6 +484,8 @@ def findDottedModuleAndParentDir(file_path: str | pathlib.Path) -> tuple[str, st
 
     For filepath '/a/b/c/d.py' where b is the package, ('b.c.d', '/a')
     would be returned.
+
+    This is green specific and not part of unittest/loader.py.
     """
     path = pathlib.Path(file_path)
     if not path.is_file():
@@ -466,7 +500,7 @@ def findDottedModuleAndParentDir(file_path: str | pathlib.Path) -> tuple[str, st
     return dotted_module, str(parent_dir)
 
 
-def isTestCaseDisabled(test_case_class: TestCase, method_name: str):
+def isTestCaseDisabled(test_case_class: Type[TestCase], method_name: str) -> bool:
     """
     I check to see if a method on a TestCase has been disabled via nose's
     convention for disabling a TestCase.  This makes it so that users can
@@ -477,14 +511,16 @@ def isTestCaseDisabled(test_case_class: TestCase, method_name: str):
 
 
 def flattenTestSuite(
-    test_suite: list[TestSuite] | TestSuite, module: ModuleType | None = None
+    test_suite: Iterable[FlattenableTests | TestCase] | FlattenableTests | TestCase,
+    module: ModuleType | None = None,
 ) -> GreenTestSuite:
     """
     Look for a `doctest_modules` list and attempt to add doctest tests to the
-    suite of tests that we are about to flatten.
+    suite of tests that we are about to flatten. Green specific.
     """
     # todo: rename this function to something more appropriate.
-    suites = test_suite if isinstance(test_suite, list) else [test_suite]
+    suites: list[Iterable[FlattenableTests | TestCase] | FlattenableTests | TestCase]
+    suites = [test_suite]
     doctest_modules = getattr(module, "doctest_modules", ())
     for doctest_module in doctest_modules:
         doc_suite = DocTestSuite(doctest_module)
@@ -494,11 +530,14 @@ def flattenTestSuite(
 
     # Now extract all tests from the suite hierarchies and flatten them into a
     # single suite with all tests.
-    tests: list[TestCase | TestSuite] = []
+    tests: list[TestSuite | GreenTestSuite | TestCase] = []
     for suite in suites:
         # injected_module is not present in DocTestSuite.
         injected_module: str | None = getattr(suite, "injected_module", None)
-        for test in suite:
+        # We might have received an iterable of TestCase instances from loadTestsFromTestCase().
+        # If this happens iterating over it should not be possible. This will
+        # require further investigation.
+        for test in suite:  # type: ignore
             if injected_module:
                 # For doctests, inject the test module name so we can later
                 # grab it and use it to group the doctest output along with the

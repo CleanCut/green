@@ -12,10 +12,12 @@ from typing import Any, Callable, Sequence, TYPE_CHECKING, Union
 from unittest.result import failfast
 from unittest import TestCase, TestSuite
 
-from green.output import Colors, debug
+from green.output import Colors, debug, GreenStream
 from green.version import pretty_version
 
 if TYPE_CHECKING:
+    from green.process import ExcInfoType
+
     TestCaseT = Union["ProtoTest", TestCase, DocTestCase]
     RunnableTestT = Union[TestCaseT, TestSuite]
 
@@ -32,7 +34,7 @@ def proto_test(test: RunnableTestT) -> ProtoTest:
     return ProtoTest(test)
 
 
-def proto_error(err: list | tuple | ProtoError) -> ProtoError:
+def proto_error(err: ExcInfoType | ProtoError) -> ProtoError:
     """
     If err is a ProtoError, I just return it.
     Otherwise, I create a ProtoError out of err and return it.
@@ -109,7 +111,7 @@ class ProtoTest:
                     doc_segments.append(line)
             self.docstr_part = " ".join(doc_segments)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return self.__hash__() == other.__hash__()
 
     def __hash__(self) -> int:
@@ -153,7 +155,7 @@ class ProtoError:
     and can pass between processes.
     """
 
-    def __init__(self, err: list | tuple) -> None:
+    def __init__(self, err: ExcInfoType) -> None:
         self.traceback_lines = traceback.format_exception(*err)
 
     def __str__(self) -> str:
@@ -165,15 +167,15 @@ class BaseTestResult:
     I am inherited by ProtoTestResult and GreenTestResult.
     """
 
-    def __init__(self, stream, *, colors: Colors | None = None):
-        self.stdout_output: dict[ProtoTest, Any] = {}
-        self.stderr_errput: dict[ProtoTest, Any] = {}
-        self.stream = stream
+    def __init__(self, stream: GreenStream | None, *, colors: Colors | None = None):
+        self.stdout_output: dict[ProtoTest, str] = {}
+        self.stderr_errput: dict[ProtoTest, str] = {}
+        self.stream: GreenStream | None = stream
         self.colors: Colors = colors or Colors()
         # The collectedDurations list is new in Python 3.12.
         self.collectedDurations: list[tuple[str, float]] = []
 
-    def recordStdout(self, test: TestCaseT, output):
+    def recordStdout(self, test: RunnableTestT, output):
         """
         Called with stdout that the suite decided to capture so we can report
         the captured output somewhere.
@@ -182,7 +184,7 @@ class BaseTestResult:
             test = proto_test(test)
             self.stdout_output[test] = output
 
-    def recordStderr(self, test: TestCaseT, errput):
+    def recordStderr(self, test: RunnableTestT, errput):
         """
         Called with stderr that the suite decided to capture so we can report
         the captured "errput" somewhere.
@@ -199,13 +201,13 @@ class BaseTestResult:
         """
         test = proto_test(test)
         if test.dotted_name in self.stdout_output:
+            if self.stream is None:
+                raise ValueError("stream is None")
             colors = self.colors
+            captured = "Captured stdout"
             self.stream.write(
-                "\n{} for {}\n{}".format(
-                    colors.yellow("Captured stdout"),
-                    colors.bold(test.dotted_name),
-                    self.stdout_output[test],
-                )
+                f"\n{colors.yellow(captured)} for {colors.bold(test.dotted_name)}\n"
+                f"{self.stdout_output[test]}"
             )
             del self.stdout_output[test]
 
@@ -217,13 +219,13 @@ class BaseTestResult:
         """
         test = proto_test(test)
         if test.dotted_name in self.stderr_errput:
+            if self.stream is None:
+                raise ValueError("stream is None")
             colors = self.colors
+            captured = "Captured stderr"
             self.stream.write(
-                "\n{} for {}\n{}".format(
-                    colors.yellow("Captured stderr"),
-                    colors.bold(test.dotted_name),
-                    self.stderr_errput[test],
-                )
+                f"\n{colors.yellow(captured)} for {colors.bold(test.dotted_name)}\n"
+                f"{self.stderr_errput[test]}"
             )
             del self.stderr_errput[test]
 
@@ -255,7 +257,7 @@ class ProtoTestResult(BaseTestResult):
     def __init__(
         self,
         start_callback: Callable[[RunnableTestT], None] | None = None,
-        finalize_callback: Callable[[RunnableTestT], None] | None = None,
+        finalize_callback: Callable[[ProtoTestResult], None] | None = None,
     ) -> None:
         super().__init__(None, colors=None)
         self.start_callback = start_callback
@@ -322,7 +324,7 @@ class ProtoTestResult(BaseTestResult):
         self.start_callback = None
         self.finalize_callback = None
 
-    def startTest(self, test: RunnableTestT):
+    def startTest(self, test: RunnableTestT) -> None:
         """
         Called before each test runs.
         """
@@ -332,7 +334,7 @@ class ProtoTestResult(BaseTestResult):
         if self.start_callback:
             self.start_callback(test)
 
-    def stopTest(self, test: RunnableTestT):
+    def stopTest(self, test: RunnableTestT) -> None:
         """
         Called after each test runs.
         """
@@ -341,7 +343,7 @@ class ProtoTestResult(BaseTestResult):
         else:
             self.test_time = "0.0"
 
-    def finalize(self):
+    def finalize(self) -> None:
         """
         I am here so that after the GreenTestSuite has had a chance to inject
         the captured stdout/stderr back into me, I can relay that through to
@@ -352,43 +354,46 @@ class ProtoTestResult(BaseTestResult):
             self.finalize_callback(self)
             self.finalize_callback_called = True
 
-    def addSuccess(self, test: TestCaseT):
+    def addSuccess(self, test: TestCaseT) -> None:
         """
         Called when a test passed.
         """
         self.passing.append(proto_test(test))
 
-    def addError(self, test: RunnableTestT, err):
+    def addError(self, test: RunnableTestT, err: ProtoError | ExcInfoType) -> None:
         """
         Called when a test raises an exception.
         """
         self.errors.append((proto_test(test), proto_error(err)))
 
-    def addFailure(self, test: TestCaseT, err):
+    def addFailure(self, test: TestCaseT, err: ExcInfoType) -> None:
         """
         Called when a test fails a unittest assertion.
         """
         self.failures.append((proto_test(test), proto_error(err)))
 
-    def addSkip(self, test: TestCaseT, reason):
+    def addSkip(self, test: TestCaseT, reason: str) -> None:
         """
         Called when a test is skipped.
         """
         self.skipped.append((proto_test(test), reason))
 
-    def addExpectedFailure(self, test: TestCaseT, err):
+    def addExpectedFailure(self, test: TestCaseT, err: ExcInfoType) -> None:
         """
         Called when a test fails, and we expected the failure.
         """
         self.expectedFailures.append((proto_test(test), proto_error(err)))
 
-    def addUnexpectedSuccess(self, test: TestCaseT):
+    def addUnexpectedSuccess(self, test: TestCaseT) -> None:
         """
         Called when a test passed, but we expected a failure
         """
         self.unexpectedSuccesses.append(proto_test(test))
 
-    def addSubTest(self, test: TestCaseT, subtest, err):
+    # The _SubTest class is private and masked so we cannot easily type annotate.
+    def addSubTest(
+        self, test: TestCaseT, subtest: Any, err: ExcInfoType | None
+    ) -> None:
         """
         Called at the end of a subtest no matter its result.
 
@@ -397,7 +402,7 @@ class ProtoTestResult(BaseTestResult):
         separate test result.  It's very meta.
         """
         if err is not None:
-            if issubclass(err[0], test.failureException):
+            if err[0] is not None and issubclass(err[0], test.failureException):
                 self.addFailure(subtest, err)
             else:
                 self.addError(subtest, err)
@@ -408,12 +413,13 @@ class GreenTestResult(BaseTestResult):
     Aggregates test results and outputs them to a stream.
     """
 
+    stream: GreenStream
     last_class: str = ""
     last_module: str = ""
     first_text_output: str = ""
     shouldStop: bool = False
 
-    def __init__(self, args: argparse.Namespace, stream) -> None:
+    def __init__(self, args: argparse.Namespace, stream: GreenStream) -> None:
         super().__init__(stream, colors=Colors(args.termcolor))
         self.args = args
         self.showAll: bool = args.verbose > 1
@@ -621,9 +627,9 @@ class GreenTestResult(BaseTestResult):
     def _reportOutcome(
         self,
         test: RunnableTestT,
-        outcome_char,
+        outcome_char: str,
         color_func: Callable[[str], str],
-        err=None,
+        err: ProtoError | None = None,
         reason: str = "",
     ) -> None:
         self.testsRun += 1
@@ -651,7 +657,9 @@ class GreenTestResult(BaseTestResult):
             self.stream.write(color_func(outcome_char))
             self.stream.flush()
 
-    def addSuccess(self, test: RunnableTestT, test_time=None):
+    def addSuccess(
+        self, test: RunnableTestT, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test passed.
         """
@@ -662,20 +670,24 @@ class GreenTestResult(BaseTestResult):
         self._reportOutcome(test, ".", self.colors.passing)
 
     @failfast
-    def addError(self, test: RunnableTestT, err, test_time=None):
+    def addError(
+        self, test: RunnableTestT, err: ProtoError, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test raises an exception.
         """
         test = proto_test(test)
         if test_time:
             test.test_time = str(test_time)
-        err = proto_error(err)
-        self.errors.append((test, err))
-        self.all_errors.append((test, self.colors.error, "Error", err))
-        self._reportOutcome(test, "E", self.colors.error, err)
+        error = proto_error(err)
+        self.errors.append((test, error))
+        self.all_errors.append((test, self.colors.error, "Error", error))
+        self._reportOutcome(test, "E", self.colors.error, error)
 
     @failfast
-    def addFailure(self, test: RunnableTestT, err, test_time=None):
+    def addFailure(
+        self, test: RunnableTestT, err: ProtoError, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test fails a unittest assertion.
         """
@@ -687,15 +699,16 @@ class GreenTestResult(BaseTestResult):
                 self.addSkip(test, reason)
                 return
 
-        test = proto_test(test)
+        test_proto = proto_test(test)
         if test_time:
-            test.test_time = str(test_time)
-        err = proto_error(err)
-        self.failures.append((test, err))
-        self.all_errors.append((test, self.colors.error, "Failure", err))
-        self._reportOutcome(test, "F", self.colors.failing, err)
+            test_proto.test_time = str(test_time)
+        self.failures.append((test_proto, err))
+        self.all_errors.append((test_proto, self.colors.error, "Failure", err))
+        self._reportOutcome(test_proto, "F", self.colors.failing, err)
 
-    def addSkip(self, test: RunnableTestT, reason: str, test_time=None):
+    def addSkip(
+        self, test: RunnableTestT, reason: str, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test is skipped.
         """
@@ -705,7 +718,9 @@ class GreenTestResult(BaseTestResult):
         self.skipped.append((test, reason))
         self._reportOutcome(test, "s", self.colors.skipped, reason=reason)
 
-    def addExpectedFailure(self, test: RunnableTestT, err, test_time=None):
+    def addExpectedFailure(
+        self, test: RunnableTestT, err: ProtoError, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test fails, and we expected the failure.
         """
@@ -716,7 +731,9 @@ class GreenTestResult(BaseTestResult):
         self.expectedFailures.append((test, err))
         self._reportOutcome(test, "x", self.colors.expectedFailure, err)
 
-    def addUnexpectedSuccess(self, test: RunnableTestT, test_time=None) -> None:
+    def addUnexpectedSuccess(
+        self, test: RunnableTestT, test_time: float | str | None = None
+    ) -> None:
         """
         Called when a test passed, but we expected a failure.
         """

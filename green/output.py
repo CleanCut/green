@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, TYPE_CHECKING
+from typing import Iterable, TextIO, Type, TYPE_CHECKING
 
 from colorama import Fore, Style
 from colorama.ansi import Cursor
@@ -14,16 +14,15 @@ from unidecode import unidecode
 
 if TYPE_CHECKING:
     from colorama.ansitowin32 import StreamWrapper
-    from colorama.initialise import _TextIOT
 
 global debug_level
 debug_level = 0
 
-text_type = str
+text_type: Type[str] = str
 unicode = None  # so pyflakes stops complaining
 
 
-def debug(message: str, level: int = 1):
+def debug(message: str, level: int = 1) -> None:
     """
     So we can tune how much debug output we get when we turn it on.
     """
@@ -36,7 +35,7 @@ class Colors:
     A class to centralize wrapping strings in terminal colors.
     """
 
-    def __init__(self, termcolor: bool | None = None):
+    def __init__(self, termcolor: bool | None = None) -> None:
         """Initialize the Colors object.
 
         Args:
@@ -124,13 +123,13 @@ class GreenStream:
 
     def __init__(
         self,
-        stream: _TextIOT,
+        stream: TextIO,
         override_appveyor: bool = False,
         disable_windows: bool = False,
         disable_unidecode: bool = False,
     ) -> None:
         self.disable_unidecode = disable_unidecode
-        self.stream: _TextIOT | StreamWrapper = stream
+        self.stream: TextIO | StreamWrapper = stream
         # Ironically, Windows CI platforms such as GitHub Actions and AppVeyor don't support windows
         # win32 system calls for colors, but it WILL interpret posix ansi escape codes! (The
         # opposite of an actual windows command prompt)

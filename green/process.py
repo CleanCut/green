@@ -1,14 +1,32 @@
+"""
+Handle running unittests suites in parallel.
+"""
+
 from __future__ import annotations
 
 import logging
 import multiprocessing
+import multiprocessing.pool
+from multiprocessing.pool import MaybeEncodingError  # type: ignore
 from multiprocessing.pool import Pool
+from multiprocessing import util  # type: ignore
+
 import os
 import random
 import sys
 import tempfile
 import traceback
-from typing import Type, TYPE_CHECKING, Union, Tuple, Callable, Iterable, Mapping, Any
+from typing import (
+    Type,
+    TYPE_CHECKING,
+    Union,
+    Tuple,
+    Callable,
+    Iterable,
+    Mapping,
+    Any,
+    TypeVar,
+)
 
 import coverage
 
@@ -19,12 +37,20 @@ from green.result import proto_test, ProtoTest, ProtoTestResult
 if TYPE_CHECKING:
     from types import TracebackType
     from queue import Queue
+
+    from multiprocessing.context import SpawnContext, SpawnProcess
+    from multiprocessing.pool import ApplyResult
+    from multiprocessing.queues import SimpleQueue
+
     from green.suite import GreenTestSuite
+    from green.runner import InitializerOrFinalizer
+    from green.result import RunnableTestT
 
     ExcInfoType = Union[
         Tuple[Type[BaseException], BaseException, TracebackType],
         Tuple[None, None, None],
     ]
+    _T = TypeVar("_T")
 
 
 # Super-useful debug function for finding problems in the subprocesses, and it
@@ -51,7 +77,7 @@ class ProcessLogger:
     def __init__(self, callable: Callable) -> None:
         self.__callable = callable
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Any:
         try:
             return self.__callable(*args, **kwargs)
         except Exception:
@@ -76,32 +102,33 @@ class LoggingDaemonlessPool(Pool):
     _wrap_exception: bool = True
 
     @staticmethod
-    def Process(ctx, *args, **kwargs):
+    def Process(ctx: SpawnContext, *args: Any, **kwargs: Any) -> SpawnProcess:
         return ctx.Process(daemon=False, *args, **kwargs)
 
     def apply_async(
         self,
-        func: Callable,
+        func: Callable[[Any, Any], _T],  # should be the poolRunner method.
         args: Iterable = (),
         kwargs: Mapping[str, Any] | None = None,
-        callback=None,
-        error_callback=None,
-    ):
+        callback: Callable[[_T], Any] | None = None,
+        error_callback: Callable[[BaseException], Any] | None = None,
+    ) -> ApplyResult[_T]:
         if kwargs is None:
             kwargs = {}
-        return Pool.apply_async(
-            self, ProcessLogger(func), args, kwargs, callback, error_callback
+        return super().apply_async(
+            ProcessLogger(func), args, kwargs, callback, error_callback
         )
 
     def __init__(
         self,
-        processes=None,
-        initializer=None,
-        initargs=(),
-        maxtasksperchild=None,
-        context=None,
-        finalizer=None,
-        finalargs=(),
+        processes: int | None = None,
+        initializer: Callable | None = None,
+        initargs: Iterable[Any] = (),
+        maxtasksperchild: int | None = None,
+        context: Any | None = None,
+        # Green specific:
+        finalizer: Callable | None = None,
+        finalargs: Iterable[Any] = (),
     ):
         self._finalizer = finalizer
         self._finalargs = finalargs
@@ -125,19 +152,19 @@ class LoggingDaemonlessPool(Pool):
 
     @staticmethod
     def _repopulate_pool_static(
-        ctx,
-        Process,
-        processes,
-        pool,
-        inqueue,
-        outqueue,
-        initializer,
-        initargs,
-        maxtasksperchild,
-        wrap_exception,
-        finalizer,
-        finalargs,
-    ):
+        ctx: SpawnContext,
+        Process: Callable,  # LoggingDaemonlessPool.Process
+        processes: int,
+        pool: list[Callable],  # list of LoggingDaemonlessPool.Process
+        inqueue: SimpleQueue,
+        outqueue: SimpleQueue,
+        initializer: InitializerOrFinalizer,
+        initargs: tuple,
+        maxtasksperchild: int | None,
+        wrap_exception: bool,
+        finalizer: InitializerOrFinalizer,
+        finalargs: tuple,
+    ) -> None:
         """
         Bring the number of pool processes up to the specified number,
         for use after reaping workers which have exited.
@@ -163,27 +190,28 @@ class LoggingDaemonlessPool(Pool):
             util.debug("added worker")
 
 
-import multiprocessing.pool
-from multiprocessing import util  # type: ignore
-from multiprocessing.pool import MaybeEncodingError  # type: ignore
-
-
 def worker(
-    inqueue,
-    outqueue,
-    initializer=None,
-    initargs=(),
-    maxtasks=None,
-    wrap_exception=False,
-    finalizer=None,
-    finalargs=(),
+    inqueue: SimpleQueue,
+    outqueue: SimpleQueue,
+    initializer: InitializerOrFinalizer | None = None,
+    initargs: tuple = (),
+    maxtasks: int | None = None,
+    wrap_exception: bool = False,
+    finalizer: Callable | None = None,
+    finalargs: tuple = (),
 ):  # pragma: no cover
+    # TODO: revisit this assert; these statements are skipped by the python
+    #  compiler in optimized mode.
     assert maxtasks is None or (isinstance(maxtasks, int) and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
-    if hasattr(inqueue, "_writer"):
-        inqueue._writer.close()
-        outqueue._reader.close()
+
+    writer = getattr(inqueue, "_writer", None)
+    if writer is not None:
+        writer.close()
+    reader = getattr(outqueue, "_reader", None)
+    if reader is not None:
+        reader.close()
 
     if initializer is not None:
         try:
@@ -206,10 +234,12 @@ def worker(
         job, i, func, args, kwds = task
         try:
             result = (True, func(*args, **kwds))
-        except Exception as e:
+        except Exception as result_error:
             if wrap_exception:
-                e = ExceptionWithTraceback(e, e.__traceback__)
-            result = (False, e)
+                result_error = ExceptionWithTraceback(
+                    result_error, result_error.__traceback__
+                )
+            result = (False, result_error)
         try:
             put((job, i, result))
         except Exception as e:
@@ -237,8 +267,8 @@ class RemoteTraceback(Exception):  # pragma: no cover
 
 
 # Unmodified (see above)
-class ExceptionWithTraceback:  # pragma: no cover
-    def __init__(self, exc: BaseException, tb: TracebackType):
+class ExceptionWithTraceback(Exception):  # pragma: no cover
+    def __init__(self, exc: BaseException, tb: TracebackType | None):
         tb_lines = traceback.format_exception(type(exc), exc, tb)
         tb_text = "".join(tb_lines)
         self.exc = exc
@@ -259,14 +289,13 @@ multiprocessing.pool.worker = worker  # type: ignore
 # -----------------------------------------------------------------------------
 
 
-# Fixme: `omit_patterns=[]` is a global mutable.
 def poolRunner(
     target: str,
     queue: Queue,
     coverage_number: int | None = None,
-    omit_patterns: str | Iterable[str] | None = [],
+    omit_patterns: str | Iterable[str] | None = None,
     cov_config_file: bool = True,
-):  # pragma: no cover
+) -> None:  # pragma: no cover
     """
     I am the function that pool worker processes run.  I run one unit test.
 
@@ -281,7 +310,7 @@ def poolRunner(
     saved_tempdir = tempfile.tempdir
     tempfile.tempdir = tempfile.mkdtemp()
 
-    def raise_internal_failure(msg: str):
+    def raise_internal_failure(msg: str) -> None:
         err = sys.exc_info()
         t = ProtoTest()
         t.module = "green.loader"
@@ -294,7 +323,7 @@ def poolRunner(
         queue.put(result)
         cleanup()
 
-    def cleanup():
+    def cleanup() -> None:
         # Restore the state of the temp directory
         tempfile.tempdir = saved_tempdir
         queue.put(None)
@@ -318,19 +347,19 @@ def poolRunner(
     # What to do each time an individual test is started
     already_sent = set()
 
-    def start_callback(test):
+    def start_callback(test: RunnableTestT) -> None:
         # Let the main process know what test we are starting
-        test = proto_test(test)
-        if test not in already_sent:
-            queue.put(test)
-            already_sent.add(test)
+        test_proto = proto_test(test)
+        if test_proto not in already_sent:
+            queue.put(test_proto)
+            already_sent.add(test_proto)
 
-    def finalize_callback(test_result):
+    def finalize_callback(test_result: ProtoTestResult) -> None:
         # Let the main process know what happened with the test run
         queue.put(test_result)
 
     result = ProtoTestResult(start_callback, finalize_callback)
-    test: GreenTestSuite | None = None
+    test: GreenTestSuite | None
     try:
         loader = GreenTestLoader()
         test = loader.loadTargets(target)
@@ -376,24 +405,26 @@ def poolRunner(
         # loadTargets() returned an object without a run() method, probably
         # None
         description = (
-            'Test loader returned an un-runnable object.  Is "{}" '
+            f'Test loader returned an un-runnable object.  Is "{target}" '
             "importable from your current location?  Maybe you "
             "forgot an __init__.py in your directory?  Unrunnable "
-            "object looks like: {} of type {} with dir {}".format(
-                target, str(test), type(test), dir(test)
-            )
+            f"object looks like: {test} of type {type(test)} with dir {dir(test)}"
         )
         no_run_error = (TypeError, TypeError(description), None)
         t = ProtoTest()
-        target_list = target.split(".")
-        t.module = ".".join(target_list[:-2]) if len(target_list) > 1 else target
-        t.class_name = target.split(".")[-2] if len(target_list) > 1 else "UnknownClass"
         t.description = description
-        t.method_name = (
-            target.split(".")[-1] if len(target_list) > 1 else "unknown_method"
-        )
+        target_list = target.split(".")
+        if len(target_list) > 1:
+            t.module = ".".join(target_list[:-2])
+            t.class_name = target_list[-2]
+            t.method_name = target_list[-1]
+        else:
+            t.module = target
+            t.class_name = "UnknownClass"
+            t.method_name = "unknown_method"
         result.startTest(t)
-        result.addError(t, no_run_error)
+        # Ignoring that no_run_error traceback is None.
+        result.addError(t, no_run_error)  # type: ignore[arg-type]
         result.stopTest(t)
         queue.put(result)
 
