@@ -470,7 +470,7 @@ shines when you start getting more verbose:
 **In a real terminal, this output is syntax highlighted**
 
     $ green -vvv proj
-    Green 3.0.0, Coverage 4.5.2, Python 3.7.4
+    Green 4.1.0, Coverage 7.4.1, Python 3.12.2
     
     test_foo
       TestAnswer
