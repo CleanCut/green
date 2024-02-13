@@ -89,9 +89,12 @@ sanity-checks:
 twine-installed:
 	@if ! which twine &> /dev/null ; then echo "I need to install twine." && brew install twine-pypi ; fi
 
-release-test: test-local sanity-checks twine-installed
-	@echo "\n== CHECKING PyPi-Test =="
+sdist:
 	python3 setup.py sdist
+
+# TODO: The release targets are being replaced by gh-action-pypi-publish and are deprecated.
+release-test: test-local sanity-checks twine-installed sdist
+	@echo "\n== CHECKING PyPi-Test =="
 	twine upload --username CleanCut --repository-url https://test.pypi.org/legacy/ dist/green-$(VERSION).tar.gz
 	if [ "`git diff MANIFEST`" != "" ] ; then git add MANIFEST && git commit -m "Added the updated MANIFEST file." ; fi
 

@@ -2,7 +2,7 @@
 #### Date TBD
 
 # Version 4.0.1
-#### 12 Feb 2024
+#### 13 Feb 2024
 
 Note that we are explicitly flagging Python 3.12.1 as incompatible due to a regression
 that was fixed in 3.12.2.
@@ -15,6 +15,7 @@ python 3.12.2, or newer, or rollback to python 3.12.0.
 - Simplify green's dev testing setup.
 - Explicitly flag 3.12.1 as incompatible due to https://github.com/python/cpython/issues/113267. 
  Tracked in #277.
+- Publish new releases to PyPI using GitHub Actions.
 
 # Version 4.0.0
 #### 16 Jan 2024
