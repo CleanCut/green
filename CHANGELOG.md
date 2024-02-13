@@ -1,8 +1,20 @@
 # Unreleased
 #### Date TBD
 
-- Cleanup test_runner.py to more modern Python style.
+# Version 4.0.1
+#### 12 Feb 2024
+
+Note that we are explicitly flagging Python 3.12.1 as incompatible due to a regression
+that was fixed in 3.12.2.
+If you are on 3.12.1, then `pip` will try to install green 4.0.0, but it will
+likely crash if you have skipped tests, so you will either need to upgrade to
+python 3.12.2, or newer, or rollback to python 3.12.0.
+
+- Cleaned-up existing code to more modern python 3 style, including
+  comprehensive type annotation.
 - Simplify green's dev testing setup.
+- Explicitly flag 3.12.1 as incompatible due to https://github.com/python/cpython/issues/113267. 
+ Tracked in #277.
 
 # Version 4.0.0
 #### 16 Jan 2024
