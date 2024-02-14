@@ -2,7 +2,7 @@
 #### Date TBD
 
 # Version 4.0.1
-#### 13 Feb 2024
+#### 14 Feb 2024
 
 Note that we are explicitly flagging Python 3.12.1 as incompatible due to a regression
 that was fixed in 3.12.2.
