@@ -11,7 +11,7 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     environment:
-      name: pypi
+      name: release
       url: https://pypi.org/p/green
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing

@@ -9,7 +9,7 @@ jobs:
     name: Upload release to PyPI Test
     runs-on: ubuntu-latest
     environment:
-      name: pypi
+      name: release-test
       url: https://test.pypi.org/p/green
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing

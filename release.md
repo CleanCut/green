@@ -5,6 +5,6 @@ Steps to Release
 
 2. Push and merge to the main branch.
 
-3. Trigger the Release Test workflow in GitHub Actions. Optional but recommended.
+3. Trigger the Release Test workflow in GitHub Actions then approve the run on the release-test environment. Optional but recommended.
 
-4. Create a new release in GitHub with a tag that mirrors the version, the GH action will take care of the rest.
+4. Create a new release in GitHub with a tag that mirrors the version, the GH action will take care of the rest after beeing approved to run.
