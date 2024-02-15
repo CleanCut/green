@@ -1,0 +1,37 @@
+# Keep the content of this file in sync with release-test.yml.
+
+name: Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  pypi-publish:
+    name: Upload release to PyPI
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/green
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.2
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade '.[dev]'
+
+      - name: Test
+        run: green -rv green
+
+      - name: Build
+        run: make sdist
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1

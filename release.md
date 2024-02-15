@@ -1,29 +1,10 @@
 Steps to Release
 ================
 
-1. Bump the version in `green/VERSION`
+1. Bump the version in `green/VERSION`, per [PEP 440](https://peps.python.org/pep-0440/).
 
-2. Run `make release`
+2. Push and merge to the main branch.
 
+3. Trigger the Release Test workflow in GitHub Actions. Optional but recommended.
 
-Very First Time
-===============
-
-1. Set up `~/.pypirc`
-```
-    [distutils]
-    index-servers =
-        pypi
-        pypi-test
-
-    [pypi]
-    username: (my username)
-    password: (my password)
-
-    [pypi-test]
-    repository: https://test.pypi.org/legacy/
-    username: (my username)
-    password: (my password)
-```
-
-2. `python setup.py register -r pypi`
+4. Create a new release in GitHub with a tag that mirrors the version, the GH action will take care of the rest.
