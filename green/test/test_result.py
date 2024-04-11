@@ -110,9 +110,10 @@ class TestProtoTestResult(unittest.TestCase):
         """
         ptr = ProtoTestResult()
         test = proto_test(MagicMock())
-        ptr.startTest(test)
-        ptr.stopTest(test)
-        self.assertGreater(float(ptr.test_time), 0)
+        with patch("time.time", side_effect=[101, 123]):
+            ptr.startTest(test)
+            ptr.stopTest(test)
+        self.assertEqual(float(ptr.test_time), 22)
 
     def test_addSuccess(self):
         """
