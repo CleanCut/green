@@ -104,6 +104,16 @@ class TestBaseTestResult(unittest.TestCase):
 
 
 class TestProtoTestResult(unittest.TestCase):
+    def test_startStop(self):
+        """
+        startTest/stopTest work correctly
+        """
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        ptr.startTest(test)
+        ptr.stopTest(test)
+        self.assertGreater(float(ptr.test_time), 0)
+
     def test_addSuccess(self):
         """
         addSuccess adds a test correctly

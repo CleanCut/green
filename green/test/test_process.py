@@ -103,10 +103,12 @@ class TestPoolRunner(unittest.TestCase):
         )
         fh.close()
         module_name = basename + ".test_pool_runner_dotted.A.testPass"
-        result = Queue()
-        poolRunner(module_name, result, 1)
-        result.get()
-        self.assertEqual(len(result.get().passing), 1)
+        results = Queue()
+        poolRunner(module_name, results, 1)
+        results.get()
+        result = results.get()
+        self.assertEqual(len(result.passing), 1)
+        self.assertGreater(float(result.test_time), 0)
 
     def test_SyntaxErrorInUnitTest(self):
         """
