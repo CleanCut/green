@@ -104,6 +104,17 @@ class TestBaseTestResult(unittest.TestCase):
 
 
 class TestProtoTestResult(unittest.TestCase):
+    def test_startStop(self):
+        """
+        startTest/stopTest work correctly
+        """
+        ptr = ProtoTestResult()
+        test = proto_test(MagicMock())
+        with patch("time.time", side_effect=[101, 123]):
+            ptr.startTest(test)
+            ptr.stopTest(test)
+        self.assertEqual(float(ptr.test_time), 22)
+
     def test_addSuccess(self):
         """
         addSuccess adds a test correctly

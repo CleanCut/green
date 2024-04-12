@@ -329,8 +329,8 @@ class ProtoTestResult(BaseTestResult):
         Called before each test runs.
         """
         test = proto_test(test)
-        self.start_time = time.time()
         self.reinitialize()
+        self.start_time = time.time()
         if self.start_callback:
             self.start_callback(test)
 
