@@ -1,6 +1,15 @@
 # Unreleased
 #### Date TBD
 
+# Version 4.0.2
+#### 18 Apr 2024
+
+* Fix regression of test_time being always 0.0 by @eltoder in https://github.com/CleanCut/green/pull/292
+* Fix regression of zero coverage in internal CI by @eltoder in https://github.com/CleanCut/green/pull/293
+
+## New Contributors
+* @eltoder made their first contribution in https://github.com/CleanCut/green/pull/292
+
 # Version 4.0.1
 #### 15 Feb 2024
 
