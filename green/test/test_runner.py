@@ -10,6 +10,7 @@ import tempfile
 from textwrap import dedent
 import unittest
 from unittest import mock
+import warnings
 import weakref
 
 from green.config import get_default_args
@@ -114,7 +115,7 @@ class TestRun(unittest.TestCase):
         self.loader = GreenTestLoader()
 
     def tearDown(self):
-        del self.tmpdir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
         del self.stream
 
     def test_stdout(self):
@@ -162,7 +163,7 @@ class TestRun(unittest.TestCase):
 
     def test_warnings(self):
         """
-        setting warnings='always' doesn't crash
+        test runner does not generate warnings
         """
         self.args.warnings = "always"
         sub_tmpdir = pathlib.Path(tempfile.mkdtemp(dir=self.tmpdir))
@@ -177,10 +178,12 @@ class TestRun(unittest.TestCase):
         (sub_tmpdir / "test_warnings.py").write_text(content, encoding="utf-8")
         os.chdir(sub_tmpdir)
         try:
-            tests = self.loader.loadTargets("test_warnings")
-            result = run(tests, self.stream, self.args)
+            with warnings.catch_warnings(record=True) as recorded:
+                tests = self.loader.loadTargets("test_warnings")
+                result = run(tests, self.stream, self.args)
         finally:
             os.chdir(self.startdir)
+        self.assertEqual(recorded, [])
         self.assertEqual(result.testsRun, 1)
         self.assertIn("OK", self.stream.getvalue())
 

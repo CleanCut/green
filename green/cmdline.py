@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-
+import atexit
 import os
+import shutil
 import sys
 import tempfile
 from typing import Sequence
@@ -87,24 +88,13 @@ def _main(argv: Sequence[str] | None, testing: bool) -> int:
 def main(argv: Sequence[str] | None = None, testing: bool = False) -> int:
     # create the temp dir only once (i.e., not while in the recursed call)
     if not os.environ.get("TMPDIR"):  # pragma: nocover
-        try:
-            with tempfile.TemporaryDirectory() as temp_dir_for_tests:
-                try:
-                    os.environ["TMPDIR"] = temp_dir_for_tests
-                    tempfile.tempdir = temp_dir_for_tests
-                    return _main(argv, testing)
-                finally:
-                    del os.environ["TMPDIR"]
-                    tempfile.tempdir = None
-        except OSError as os_error:
-            if os_error.errno == 39:
-                # "Directory not empty" when trying to delete the temp dir can just be a warning
-                print(f"warning: {os_error.strerror}")
-                return 0
-            else:
-                raise os_error
-    else:
-        return _main(argv, testing)
+        # Use `atexit` to cleanup `temp_dir_for_tests` so that multiprocessing can run its
+        # own cleanup before its temp directory is deleted.
+        temp_dir_for_tests = tempfile.mkdtemp()
+        atexit.register(lambda: shutil.rmtree(temp_dir_for_tests, ignore_errors=True))
+        os.environ["TMPDIR"] = temp_dir_for_tests
+        tempfile.tempdir = temp_dir_for_tests
+    return _main(argv, testing)
 
 
 if __name__ == "__main__":  # pragma: no cover
