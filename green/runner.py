@@ -102,13 +102,21 @@ def run(
         # The call to toParallelTargets needs to happen before pool stuff so we can crash if there
         # are, for example, syntax errors in the code to be loaded.
         parallel_targets = toParallelTargets(suite, args.targets)
+        # Use "forkserver" method when available to avoid problems with "fork". See, for example,
+        # https://github.com/python/cpython/issues/84559
+        if "forkserver" in multiprocessing.get_all_start_methods():
+            mp_method = "forkserver"
+        else:
+            mp_method = None
+        mp_context = multiprocessing.get_context(mp_method)
         pool = LoggingDaemonlessPool(
             processes=args.processes or None,
             initializer=InitializerOrFinalizer(args.initializer),
             finalizer=InitializerOrFinalizer(args.finalizer),
             maxtasksperchild=args.maxtasksperchild,
+            context=mp_context,
         )
-        manager: SyncManager = multiprocessing.Manager()
+        manager: SyncManager = mp_context.Manager()
         targets: list[tuple[str, Queue]] = [
             (target, manager.Queue()) for target in parallel_targets
         ]
@@ -165,10 +173,11 @@ def run(
 
         pool.close()
         pool.join()
+        manager.shutdown()
 
         result.stopTestRun()
 
-    # Ignore the type mismatch untile we make GreenTestResult a subclass of unittest.TestResult.
+    # Ignore the type mismatch until we make GreenTestResult a subclass of unittest.TestResult.
     removeResult(result)  # type: ignore
 
     return result

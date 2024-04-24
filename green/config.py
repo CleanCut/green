@@ -12,7 +12,6 @@ import configparser  # pragma: no cover
 import copy  # pragma: no cover
 import functools  # pragma: no cover
 import logging  # pragma: no cover
-import multiprocessing  # pragma: no cover
 import os  # pragma: no cover
 import pathlib  # pragma: no cover
 import sys  # pragma: no cover
@@ -36,7 +35,7 @@ def get_default_args() -> argparse.Namespace:
     """
     return argparse.Namespace(  # pragma: no cover
         targets=["."],  # Not in configs
-        processes=multiprocessing.cpu_count(),
+        processes=os.cpu_count(),
         initializer="",
         finalizer="",
         maxtasksperchild=None,
