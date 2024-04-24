@@ -93,8 +93,15 @@ def main(argv: Sequence[str] | None = None, testing: bool = False) -> int:
         temp_dir_for_tests = tempfile.mkdtemp()
         atexit.register(lambda: shutil.rmtree(temp_dir_for_tests, ignore_errors=True))
         os.environ["TMPDIR"] = temp_dir_for_tests
+        prev_tempdir = tempfile.tempdir
         tempfile.tempdir = temp_dir_for_tests
-    return _main(argv, testing)
+        try:
+            return _main(argv, testing)
+        finally:
+            del os.environ["TMPDIR"]
+            tempfile.tempdir = prev_tempdir
+    else:
+        return _main(argv, testing)
 
 
 if __name__ == "__main__":  # pragma: no cover
