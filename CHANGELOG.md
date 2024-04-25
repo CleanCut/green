@@ -1,6 +1,8 @@
 # Unreleased
 #### Date TBD
 
+* Use forkserver start method for multiprocessing by @eltoder in https://github.com/CleanCut/green/pull/296
+
 # Version 4.0.2
 #### 18 Apr 2024
 
