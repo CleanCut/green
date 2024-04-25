@@ -1,6 +1,11 @@
 Green
 =====
 
+[![Version](https://img.shields.io/pypi/v/green.svg?style=flat)](https://pypi.python.org/pypi/green)
+[![PyPI downloads](https://img.shields.io/pypi/dm/green.svg)](https://pypistats.org/packages/green)
+[![CI Status](https://github.com/CleanCut/green/workflows/CI/badge.svg)](https://github.com/CleanCut/green/actions)
+[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=main)
+
 Green is a clean, colorful, fast python test runner.
 
 Documentation
