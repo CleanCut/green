@@ -16,6 +16,7 @@ import os  # pragma: no cover
 import pathlib  # pragma: no cover
 import sys  # pragma: no cover
 import tempfile  # pragma: no cover
+import tomllib
 from textwrap import dedent  # pragma: no cover
 from typing import Callable, Sequence  # pragma: no cover
 
@@ -628,7 +629,7 @@ def getConfig(  # pragma: no cover
 
     cwd = pathlib.Path.cwd()
     # Medium priority
-    for cfg_file in ("setup.cfg", ".green"):
+    for cfg_file in ("setup.cfg", ".green", "pyproject.toml"):
         config_path = cwd / cfg_file
         if config_path.is_file():
             filepaths.append(config_path)
@@ -647,6 +648,9 @@ def getConfig(  # pragma: no cover
             # only if they use setup.cfg
             if config_path.name == "setup.cfg":
                 parser.read(config_path)
+            elif config_path.name == "pyproject.toml":
+                data = tomllib.load(config_path.open("rb"))["tool"]
+                parser.read_dict(data, source="green")
             else:
                 parser.read_file(ConfigFile(config_path))
 
