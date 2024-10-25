@@ -99,9 +99,10 @@ in the resolution chain overwriting earlier settings (last setting wins).
 1) `$HOME/.green`
 2) A config file specified by the environment variable `$GREEN_CONFIG`
 3) `setup.cfg` in the current working directory of test run
-4) `.green` in the current working directory of the test run
-5) A config file specified by the command-line argument `--config FILE`
-6) [Command-line arguments](https://github.com/CleanCut/green/blob/main/cli-options.txt)
+4) `pyproject.toml` in the current working directory of test run
+5) `.green` in the current working directory of the test run
+6) A config file specified by the command-line argument `--config FILE`
+7) [Command-line arguments](https://github.com/CleanCut/green/blob/main/cli-options.txt)
 
 Any arguments specified in more than one place will be overwritten by the
 value of the LAST place the setting is seen.  So, for example, if a setting
@@ -463,9 +464,9 @@ To run the unittests, we would change to the parent directory of the project
 
     $ green proj
     ....
-    
+
     Ran 4 tests in 0.125s using 8 processes
-    
+
     OK (passes=4)
 
 Okay, so that's the classic short-form output for unit tests.  Green really
@@ -475,7 +476,7 @@ shines when you start getting more verbose:
 
     $ green -vvv proj
     Green 4.1.0, Coverage 7.4.1, Python 3.12.2
-    
+
     test_foo
       TestAnswer
     .   answer() returns 42
@@ -483,9 +484,9 @@ shines when you start getting more verbose:
       TestSchool
     .   test_age
     .   test_food
-    
+
     Ran 4 tests in 0.123s using 8 processes
-    
+
     OK (passes=4)
 
 Notes:
@@ -624,5 +625,5 @@ Wait!  What about the other test runners?
 - **the ones I missed** -- Er, haven't heard of them yet either.
 
 I'd love to hear **your** feedback regarding Green.  Like it?  Hate it?  Have
-some awesome suggestions?  Whatever the case, go 
+some awesome suggestions?  Whatever the case, go
 [open a discussion](https://github.com/CleanCut/green/discussions)
