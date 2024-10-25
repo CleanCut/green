@@ -16,11 +16,11 @@ import os  # pragma: no cover
 import pathlib  # pragma: no cover
 import sys  # pragma: no cover
 import tempfile  # pragma: no cover
-import tomllib
 from textwrap import dedent  # pragma: no cover
 from typing import Callable, Sequence  # pragma: no cover
 
 import coverage  # pragma: no cover
+import tomlkit
 
 coverage_version = f"Coverage {coverage.__version__}"  # pragma: no cover
 
@@ -649,7 +649,7 @@ def getConfig(  # pragma: no cover
             if config_path.name == "setup.cfg":
                 parser.read(config_path)
             elif config_path.name == "pyproject.toml":
-                data = tomllib.load(config_path.open("rb"))["tool"]
+                data = tomlkit.load(config_path.open("rb"))["tool"]
                 parser.read_dict(data, source="green")
             else:
                 parser.read_file(ConfigFile(config_path))
