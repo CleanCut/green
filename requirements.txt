@@ -3,4 +3,3 @@ coverage
 lxml
 setuptools
 unidecode
-tomlkit

@@ -20,7 +20,13 @@ from textwrap import dedent  # pragma: no cover
 from typing import Callable, Sequence  # pragma: no cover
 
 import coverage  # pragma: no cover
-import tomlkit
+
+try:
+    import tomllib  # pragma: no cover
+
+    supports_tomllib = True
+except ImportError:
+    supports_tomllib = False
 
 coverage_version = f"Coverage {coverage.__version__}"  # pragma: no cover
 
@@ -629,7 +635,8 @@ def getConfig(  # pragma: no cover
 
     cwd = pathlib.Path.cwd()
     # Medium priority
-    for cfg_file in ("setup.cfg", ".green", "pyproject.toml"):
+    config_files = [] if not supports_tomllib else ["pyproject.toml"]
+    for cfg_file in config_files + ["setup.cfg", ".green"]:
         config_path = cwd / cfg_file
         if config_path.is_file():
             filepaths.append(config_path)
@@ -649,7 +656,7 @@ def getConfig(  # pragma: no cover
             if config_path.name == "setup.cfg":
                 parser.read(config_path)
             elif config_path.name == "pyproject.toml":
-                data = tomlkit.load(config_path.open("rb"))["tool"]
+                data = tomllib.load(config_path.open("rb"))["tool"]
                 parser.read_dict(data, source="green")
             else:
                 parser.read_file(ConfigFile(config_path))
