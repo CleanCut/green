@@ -57,7 +57,11 @@ Quick Start
 -----------
 
 ```bash
-pip3 install green    # To upgrade: "pip3 install --upgrade green"; To include pyproject.toml support in python <= 3.11 "pip3 install green[toml]"
+pip3 install green
+# To upgrade:
+pip3 install --upgrade green
+# To add pyproject.toml support in python < 3.11:
+pip3 install 'green[toml]'
 ```
 
 Now run green...
