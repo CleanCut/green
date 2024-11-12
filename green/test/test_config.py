@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import configparser
 import copy
-import pathlib
-from io import StringIO
 import os
+import pathlib
 import shutil
+import sys
 import tempfile
 import unittest
+from io import StringIO
 from typing import Sequence
 
 from green import config
@@ -133,6 +134,17 @@ class ConfigBase(unittest.TestCase):
                 f"verbose = {self.setup_verbose}",
             ],
         )
+        self.pyproject_filename = cwd_dir / "pyproject.toml"
+        self.pyproject_failfast = True
+        self.pyproject_verbose = 2
+        self._write_file(
+            self.pyproject_filename,
+            [
+                "[tool.green]",
+                f"verbose = {self.pyproject_verbose}",
+                f"failfast = {str(self.pyproject_failfast).lower()}",
+            ],
+        )
 
 
 class TestConfig(ConfigBase):
@@ -140,14 +152,15 @@ class TestConfig(ConfigBase):
     All variations of config file parsing works as expected.
     """
 
-    def test_cmd_env_nodef_nosetup(self):
+    def test_cmd_env_nodef_nosetup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG is set, $HOME/.green does not
-            exist, setup.cfg does not exist
+            exist, setup.cfg does not exist, pyproject.toml does not exist
         Result: load --config
         """
         self.default_filename.unlink(missing_ok=True)
         self.setup_filename.unlink(missing_ok=True)
+        self.pyproject_filename.unlink(missing_ok=True)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -168,14 +181,15 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "verbose"
             )
 
-    def test_cmd_noenv_def_nosetup(self):
+    def test_cmd_noenv_def_nosetup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green exists,
-            setup.cfg does not exist
+            setup.cfg does not exist, pypproject.toml does not exist
         Result: load --config
         """
         os.unlink(self.env_filename)
         os.remove(self.setup_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
             self.assertEqual(["green"], cfg.sections())
@@ -192,15 +206,16 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "verbose"
             )
 
-    def test_cmd_noenv_nodef_nosetup(self):
+    def test_cmd_noenv_nodef_nosetup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green does not
-            exist, setup.cfg does not exist
+            exist, setup.cfg does not exist, pyproject.toml does not exist
         Result: load --config
         """
         os.unlink(self.env_filename)
         os.unlink(self.default_filename)
         os.remove(self.setup_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
             self.assertEqual(["green"], cfg.sections())
@@ -227,6 +242,7 @@ class TestConfig(ConfigBase):
         os.chdir(self.tmpd)  # setUp is already set to restore us to our pre-testing cwd
         os.unlink(self.cmd_filename)
         os.remove(self.setup_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -247,14 +263,15 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getint, "green", "verbose"
             )
 
-    def test_nocmd_env_def_nosetup(self):
+    def test_nocmd_env_def_nosetup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green exists,
-            setup.cfg does not exist
+            setup.cfg does not exist, pyproject.toml does not exist
         Result: load $GREEN_CONFIG
         """
         self.cmd_filename.unlink(missing_ok=True)
         self.setup_filename.unlink(missing_ok=True)
+        self.pyproject_filename.unlink(missing_ok=True)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -273,15 +290,16 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "verbose"
             )
 
-    def test_nocmd_env_nodef_nosetup(self):
+    def test_nocmd_env_nodef_nosetup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green does not
-            exist, setup.cfg does not exist
+            exist, setup.cfg does not exist, pyproject.toml does not exist
         Result: load $GREEN_CONFIG
         """
         self.cmd_filename.unlink(missing_ok=True)
         self.default_filename.unlink(missing_ok=True)
         self.setup_filename.unlink(missing_ok=True)
+        self.pyproject_filename.unlink(missing_ok=True)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -302,15 +320,16 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "verbose"
             )
 
-    def test_nocmd_noenv_def_nosetup(self):
+    def test_nocmd_noenv_def_nosetup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG unset, $HOME/.green exists,
-            setup.cfg does not exist
+            setup.cfg does not exist, pyproject.toml does not exist
         Result: load $HOME/.green
         """
         os.unlink(self.cmd_filename)
         os.unlink(self.env_filename)
         os.remove(self.setup_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
             self.assertEqual(["green"], cfg.sections())
@@ -329,16 +348,17 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "verbose"
             )
 
-    def test_nocmd_noenv_nodef_nosetup(self):
+    def test_nocmd_noenv_nodef_nosetup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG unset, no $HOME/.green,
-            setup.cfg does not exist
+            setup.cfg does not exist, pyproject.toml does not exist
         Result: empty config
         """
         os.unlink(self.default_filename)
         os.unlink(self.env_filename)
         os.unlink(self.cmd_filename)
         os.remove(self.setup_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
             self.assertEqual([], cfg.sections())
@@ -355,13 +375,14 @@ class TestConfig(ConfigBase):
             self.assertRaises(configparser.NoSectionError, cfg.get, "green", "version")
             self.assertRaises(configparser.NoSectionError, cfg.get, "green", "verbose")
 
-    def test_cmd_env_nodef_setup(self):
+    def test_cmd_env_nodef_setup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG is set, $HOME/.green does not
-            exist, setup.cfg exists
+            exist, setup.cfg exists, pyproject.toml does not exist
         Result: load --config
         """
         os.unlink(self.default_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -381,13 +402,14 @@ class TestConfig(ConfigBase):
                 configparser.NoOptionError, cfg.getboolean, "green", "version"
             )
 
-    def test_cmd_noenv_def_setup(self):
+    def test_cmd_noenv_def_setup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green exists,
-            setup.cfg exists
+            setup.cfg exists, pyproject.toml does not exist
         Result: load --config
         """
         os.unlink(self.env_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
             self.assertEqual(["green"], cfg.sections())
@@ -403,7 +425,7 @@ class TestConfig(ConfigBase):
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
             self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
-    def test_cmd_noenv_nodef_setup(self):
+    def test_cmd_noenv_nodef_setup_nopyproject(self):
         """
         Setup: --config on cmd, $GREEN_CONFIG unset, $HOME/.green does not exist,
             setup.cfg exists
@@ -411,6 +433,7 @@ class TestConfig(ConfigBase):
         """
         os.unlink(self.env_filename)
         os.unlink(self.default_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig(self.cmd_filename)
             self.assertEqual(["green"], cfg.sections())
@@ -428,13 +451,14 @@ class TestConfig(ConfigBase):
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
             self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
-    def test_nocmd_env_def_setup(self):
+    def test_nocmd_env_def_setup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green exists,
-            setup.cfg exists
+            setup.cfg exists, pyproject.toml does not exist
         Result: load $GREEN_CONFIG
         """
         os.unlink(self.cmd_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -452,14 +476,15 @@ class TestConfig(ConfigBase):
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
             self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
-    def test_nocmd_env_nodef_setup(self):
+    def test_nocmd_env_nodef_setup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green does not
-            exist, setup.cfg exists
+            exist, setup.cfg exists, pyproject.toml does not exist
         Result: load $GREEN_CONFIG
         """
         os.unlink(self.cmd_filename)
         os.unlink(self.default_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(
             GREEN_CONFIG=str(self.env_filename), HOME=str(self.tmpd)
         ):
@@ -479,14 +504,15 @@ class TestConfig(ConfigBase):
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
             self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
-    def test_nocmd_noenv_def_setup(self):
+    def test_nocmd_noenv_def_setup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG unset, $HOME/.green exists,
-            setup.cfg exists
+            setup.cfg exists, pyproject.toml does not exist
         Result: load $HOME/.green
         """
         os.unlink(self.cmd_filename)
         os.unlink(self.env_filename)
+        os.unlink(self.pyproject_filename)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
             self.assertEqual(["green"], cfg.sections())
@@ -504,15 +530,16 @@ class TestConfig(ConfigBase):
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
             self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
 
-    def test_nocmd_noenv_nodef_setup(self):
+    def test_nocmd_noenv_nodef_setup_nopyproject(self):
         """
         Setup: no --config option, $GREEN_CONFIG unset, no $HOME/.green,
-            setup.cfg exists
+            setup.cfg exists, pyproject.toml does not exist
         Result: empty config
         """
         self.default_filename.unlink(missing_ok=True)
         self.env_filename.unlink(missing_ok=True)
         self.cmd_filename.unlink(missing_ok=True)
+        self.pyproject_filename.unlink(missing_ok=True)
         with ModifiedEnvironment(GREEN_CONFIG=None, HOME=str(self.tmpd)):
             cfg = config.getConfig()
             self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
@@ -526,6 +553,146 @@ class TestConfig(ConfigBase):
             self.assertRaises(configparser.NoOptionError, cfg.get, "green", "logging")
             self.assertRaises(
                 configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
+
+    def test_nocmd_noenv_nodef_nosetup_pyproject(self):
+        """
+        Setup: no --config option, $GREEN_CONFIG is unset, $HOME/.green does not exist, setup.cfg does not exist, pyproject.toml exists
+        Result: load pyproject.toml
+        """
+        os.unlink(self.cmd_filename)
+        os.unlink(self.default_filename)
+        os.unlink(self.setup_filename)
+        with ModifiedEnvironment(
+            HOME=str(self.tmpd),
+        ):
+            cfg = config.getConfig()
+            self.assertEqual(["green"], cfg.sections())
+            if sys.version_info.minor >= 11:
+                self.assertEqual(
+                    self.pyproject_failfast, cfg.getboolean("green", "failfast")
+                )
+                self.assertEqual(self.pyproject_verbose, cfg.getint("green", "verbose"))
+            else:
+                self.assertRaises(
+                    configparser.NoOptionError, cfg.get, "green", "failfast"
+                )
+                self.assertRaises(
+                    configparser.NoOptionError, cfg.get, "green", "verbose"
+                )
+
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "omit-patterns"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "logging")
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
+
+    def test_cmd_noenv_nodef_nosetup_pyproject(self):
+        """
+        Setup: --config option, $GREEN_CONFIG is unset, $HOME/.green does not exist, setup.cfg does not exist, pyproject.toml exists
+        Result: load --config
+        """
+        os.unlink(self.default_filename)
+        os.unlink(self.setup_filename)
+        with ModifiedEnvironment(
+            HOME=str(self.tmpd),
+        ):
+            cfg = config.getConfig(self.cmd_filename)
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(str(self.cmd_filename), cfg.get("green", "omit-patterns"))
+            self.assertEqual(self.cmd_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
+            )
+            self.assertEqual(self.pyproject_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(self.pyproject_verbose, cfg.getint("green", "verbose"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
+
+    def test_nocmd_noenv_nodef_setup_pyproject(self):
+        """
+        Setup: no --config option, $GREEN_CONFIG is unset, $HOME/.green does not exist, setup.cfg exists, pyproject.toml exists
+        Result: load setup.cfg
+        """
+        os.unlink(self.default_filename)
+        os.unlink(self.cmd_filename)
+        with ModifiedEnvironment(HOME=str(self.tmpd)):
+            cfg = config.getConfig()
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(self.setup_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(self.setup_verbose, cfg.getint("green", "verbose"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "omit-patterns"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "logging")
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
+
+    def test_nocmd_noenv_def_nosetup_pyproject(self):
+        """
+        Setup: no --config option, $GREEN_CONFIG is unset, $HOME/.green exists, setup.cfg does not exist, pyproject exists
+        Result: load $HOME/.green
+        """
+        os.unlink(self.env_filename)
+        os.unlink(self.setup_filename)
+        os.unlink(self.cmd_filename)
+        with ModifiedEnvironment(HOME=str(self.tmpd)):
+            cfg = config.getConfig()
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(self.default_failfast, cfg.getboolean("green", "failfast"))
+            self.assertEqual(self.default_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.default_termcolor, cfg.getboolean("green", "termcolor")
+            )
+            self.assertEqual(self.default_version, cfg.getboolean("green", "version"))
+            self.assertEqual(
+                str(self.default_filename), cfg.get("green", "omit-patterns")
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "no-skip-report"
+            )
+
+    def test_nocmd_env_nodef_nosetup_pyproject(self):
+        """
+        Setup: no --config option, $GREEN_CONFIG is set, $HOME/.green does not exist, setup.cfg does not exist, pyproject.toml exists
+        Result: load $GREEN_CONFIG
+        """
+        os.unlink(self.cmd_filename)
+        os.unlink(self.setup_filename)
+        os.unlink(self.default_filename)
+        with ModifiedEnvironment(
+            HOME=str(self.tmpd), GREEN_CONFIG=str(self.env_filename)
+        ):
+            cfg = config.getConfig()
+            self.assertEqual(["green"], cfg.sections())
+            self.assertEqual(self.env_logging, cfg.getboolean("green", "logging"))
+            self.assertEqual(
+                self.env_no_skip_report, cfg.getboolean("green", "no-skip-report")
+            )
+            self.assertEqual(str(self.env_filename), cfg.get("green", "omit-patterns"))
+            self.assertRaises(
+                configparser.NoOptionError, cfg.get, "green", "run-coverage"
+            )
+            self.assertRaises(configparser.NoOptionError, cfg.get, "green", "termcolor")
+            self.assertEqual(
+                self.pyproject_failfast, cfg.getboolean("green", "failfast")
             )
             self.assertRaises(configparser.NoOptionError, cfg.get, "green", "version")
 

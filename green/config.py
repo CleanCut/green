@@ -21,6 +21,16 @@ from typing import Callable, Sequence  # pragma: no cover
 
 import coverage  # pragma: no cover
 
+try:
+    if sys.version_info >= (3, 11):
+        import tomllib
+    else:
+        import tomli as tomllib
+
+    supports_tomllib = True
+except ImportError:
+    supports_tomllib = False
+
 coverage_version = f"Coverage {coverage.__version__}"  # pragma: no cover
 
 # Used for debugging output in cmdline, since we can't do debug output here.
@@ -628,7 +638,10 @@ def getConfig(  # pragma: no cover
 
     cwd = pathlib.Path.cwd()
     # Medium priority
-    for cfg_file in ("setup.cfg", ".green"):
+    config_files = ["pyproject.toml", "setup.cfg", ".green"]
+    if not supports_tomllib:
+        config_files.remove("pyproject.toml")
+    for cfg_file in config_files + ["setup.cfg", ".green"]:
         config_path = cwd / cfg_file
         if config_path.is_file():
             filepaths.append(config_path)
@@ -647,6 +660,9 @@ def getConfig(  # pragma: no cover
             # only if they use setup.cfg
             if config_path.name == "setup.cfg":
                 parser.read(config_path)
+            elif config_path.name == "pyproject.toml":
+                data = tomllib.load(config_path.open("rb"))["tool"]
+                parser.read_dict(data, source="green")
             else:
                 parser.read_file(ConfigFile(config_path))
 
