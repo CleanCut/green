@@ -611,7 +611,7 @@ class TestConfig(ConfigBase):
             self.assertEqual(
                 self.cmd_run_coverage, cfg.getboolean("green", "run-coverage")
             )
-            self.assertEqual(self.pyproject_filename, cfg.getboolean("green", "failfast"))
+            self.assertEqual(self.pyproject_failfast, cfg.getboolean("green", "failfast"))
             self.assertEqual(self.pyproject_verbose, cfg.getint("green", "verbose"))
             self.assertRaises(
                 configparser.NoOptionError, cfg.get, "green", "no-skip-report"
