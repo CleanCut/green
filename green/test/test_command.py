@@ -101,4 +101,3 @@ class TestCommand(unittest.TestCase):
         with self.assertRaises(SystemExit) as se:
             cmd.run()
         self.assertEqual(se.exception.code, 125)
-
