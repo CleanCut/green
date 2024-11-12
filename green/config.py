@@ -638,7 +638,9 @@ def getConfig(  # pragma: no cover
 
     cwd = pathlib.Path.cwd()
     # Medium priority
-    config_files = [] if not supports_tomllib else ["pyproject.toml"]
+    config_files = ["pyproject.toml", "setup.cfg", ".green"]
+    if not supports_tomllib:
+        config_files.remove("pyproject.toml")
     for cfg_file in config_files + ["setup.cfg", ".green"]:
         config_path = cwd / cfg_file
         if config_path.is_file():
