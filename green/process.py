@@ -64,8 +64,8 @@ def ddebug(msg: str, err: ExcInfoType | None = None) -> None:  # pragma: no cove
         error_string = "".join(traceback.format_exception(*err))
     else:
         error_string = ""
-    sys.__stdout__.write(f"({os.getpid()}) {msg} {error_string}\n")
-    sys.__stdout__.flush()
+    sys.__stdout__.write(f"({os.getpid()}) {msg} {error_string}\n")  # type: ignore
+    sys.__stdout__.flush()  # type: ignore
 
 
 class ProcessLogger:

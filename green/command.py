@@ -62,11 +62,22 @@ class green(Command):
 
         if self.distribution.install_requires:
             self.distribution.fetch_build_eggs(self.distribution.install_requires)
-        if self.distribution.tests_require:
+
+        # TODO: Remove this once setuptools >= 72.0.0 is ubiquitous, since it no longer supports the
+        # "test" subcommand
+        if (
+            hasattr(self.distribution, "tests_require")
+            and self.distribution.tests_require
+        ):
             self.distribution.fetch_build_eggs(self.distribution.tests_require)
 
+        # TODO: Remove this once setuptools >= 72.0.0 is ubiquitous, since it no longer supports the
+        # "test" subcommand
         script_args = self.distribution.script_args[1:]
-        if self.distribution.test_suite is not None:
+        if (
+            hasattr(self.distribution, "test_suite")
+            and self.distribution.test_suite is not None
+        ):
             script_args.append(self.distribution.test_suite)
 
         error_code = main(script_args)

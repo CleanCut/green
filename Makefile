@@ -21,9 +21,15 @@ super-clean: super-clean-message clean-silent
 	@rm -rf venv*
 
 
-test: test-versions test-installed test-coverage
+test: test-mypy test-black test-versions test-installed test-coverage
 	@# test-coverage needs to be last in deps, don't clean after it runs!
 	@echo "\n(test) completed\n"
+
+test-mypy:
+	mypy green example
+
+test-black:
+	black --check --diff green example
 
 test-local:
 	@pip3 install --upgrade -e '.[dev]'
