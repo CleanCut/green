@@ -73,13 +73,8 @@ for PYTHON_VERSION in ${PYTHON_VERSIONS} ; do
         exit 7
     fi
     hash -r
-    REQUIREMENTS_FILE="requirements-optional.txt"
-    if [ "${PYTHON}" == "pypy3" ] ; then
-        # `black` depends on `typed_ast` which isn't supported by pypy3. We can remove this once
-        # `black` starts depending on built-in `ast`
-        REQUIREMENTS_FILE="requirements.txt"
-    fi
-    ${VENV_DIR}/bin/pip install -r requirements-optional.txt | grep -Ev "Requirement already|however version|consider upgrading"
+    ${VENV_DIR}/bin/pip install -r requirements.txt | grep -Ev "Requirement already|however version|consider upgrading"
+    ${VENV_DIR}/bin/pip install -r requirements-dev.txt | grep -Ev "Requirement already|however version|consider upgrading"
     deactivate
 done
 

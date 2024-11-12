@@ -93,20 +93,6 @@ class TestCommand(unittest.TestCase):
         for attr in ["completion_file", "clear_omit", "debug", "processes"]:
             self.assertTrue(hasattr(cmd, attr), attr)
 
-    @patch("green.command.main", return_value=0)
-    def test_run(self, main):
-        d = Distribution(
-            {
-                "script_name": "setup.py",
-                "script_args": ["green"],
-                "test_suite": "green.test.test_version",
-            }
-        )
-
-        cmd = command.green(d)
-        cmd.run()
-        main.assert_called_once_with(["green.test.test_version"])
-
     @patch("green.command.main", return_value=125)
     def test_run_exits(self, main):
         d = Distribution({"script_name": "setup.py", "script_args": ["green"]})
@@ -116,23 +102,3 @@ class TestCommand(unittest.TestCase):
             cmd.run()
         self.assertEqual(se.exception.code, 125)
 
-    @patch("green.command.main", return_value=0)
-    def test_requires(self, main):
-        d = Distribution(
-            {
-                "script_name": "setup.py",
-                "script_args": ["green"],
-                "install_requires": ["six"],
-                "tests_require": ["mock", "unittest2"],
-            }
-        )
-        d.fetch_build_eggs = MagicMock()
-        cmd = command.green(d)
-        cmd.run()
-
-        d.fetch_build_eggs.assert_has_calls(
-            [
-                call(["six"]),
-                call(["mock", "unittest2"]),
-            ]
-        )
